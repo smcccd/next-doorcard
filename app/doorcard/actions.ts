@@ -7,385 +7,275 @@ import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 import { timeBlockSchema } from "@/lib/validations/doorcard-edit";
 
-// Server Action to validate and save campus/term selection
+/* -------------------------------------------------------------------------- */
+/* Schemas / helpers                                                          */
+/* -------------------------------------------------------------------------- */
+
+const CAMPUS_VALUES = ["SKYLINE", "CSM", "CANADA"] as const;
+
+const campusTermSchema = z.object({
+  term: z.string().min(1, "Term is required"),
+  year: z.string().min(1, "Year is required"),
+  college: z
+    .string()
+    .min(1, "Campus is required")
+    .refine((val) => CAMPUS_VALUES.includes(val as any), {
+      message: "Campus is required",
+    }),
+});
+
+const personalInfoSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  doorcardName: z.string().min(1, "Doorcard name is required"),
+  officeNumber: z.string().min(1, "Office number is required"),
+});
+
+type ActionResult = { success: boolean; message?: string };
+
+async function requireAuth() {
+  const authResult = await requireAuthUserAPI();
+  if ("error" in authResult) throw new Error(authResult.error);
+  return authResult.user;
+}
+
+function campusLabel(code: string) {
+  switch (code) {
+    case "SKYLINE":
+      return "Skyline College";
+    case "CSM":
+      return "College of San Mateo";
+    case "CANADA":
+      return "Cañada College";
+    default:
+      return code;
+  }
+}
+
+function handleActionError(err: unknown): ActionResult {
+  if (err instanceof z.ZodError) {
+    return {
+      success: false,
+      message: `Validation failed: ${err.errors
+        .map((e) => e.message)
+        .join(", ")}`,
+    };
+  }
+  return {
+    success: false,
+    message:
+      err instanceof Error ? err.message : "An unexpected error occurred",
+  };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Actions                                                                    */
+/* -------------------------------------------------------------------------- */
+
 export async function validateCampusTerm(
   doorcardId: string,
-  prevState: any,
+  _prevState: any,
   formData: FormData
-): Promise<{ success: boolean; message?: string }> {
-  const authResult = await requireAuthUserAPI();
-  if ("error" in authResult) {
-    return { success: false, message: authResult.error };
-  }
-  const { user } = authResult;
-
-  // Extract and validate campus/term data
-  const rawData = {
-    term: formData.get("term")?.toString() || "",
-    year: formData.get("year")?.toString() || "",
-    college: formData.get("college")?.toString() || "",
-  };
-
-  // Validate with Zod (subset of basicInfoSchema)
-  const campusTermSchema = z.object({
-    term: z.string().min(1, "Term is required"),
-    year: z.string().min(1, "Year is required"),
-    college: z
-      .string()
-      .min(1, "Campus is required")
-      .refine((val) => ["SKYLINE", "CSM", "CANADA"].includes(val), {
-        message: "Campus is required",
-      }),
-  });
-
+): Promise<ActionResult> {
   try {
-    const validatedData = campusTermSchema.parse(rawData);
+    const user = await requireAuth();
 
-    // Check for duplicate doorcards
-    const existingDoorcard = await prisma.doorcard.findFirst({
-      where: {
-        userId: user.id,
-        college: validatedData.college as any,
-        term: validatedData.term,
-        year: validatedData.year,
-        isActive: true,
-        // Exclude the current doorcard we're editing
-        NOT: { id: doorcardId },
-      },
-    });
-
-    if (existingDoorcard) {
-      const campusName =
-        validatedData.college === "SKYLINE"
-          ? "Skyline College"
-          : validatedData.college === "CSM"
-          ? "College of San Mateo"
-          : validatedData.college === "CANADA"
-          ? "Cañada College"
-          : validatedData.college;
-
-      return {
-        success: false,
-        message: `You already have a doorcard for ${campusName} - ${validatedData.term} ${validatedData.year}. Please edit your existing doorcard "${existingDoorcard.doorcardName}" instead.`,
-      };
-    }
-
-    // Update the doorcard with campus/term info
-    await prisma.doorcard.update({
-      where: {
-        id: doorcardId,
-        userId: user.id,
-      },
-      data: {
-        term: validatedData.term,
-        year: validatedData.year,
-        college: validatedData.college as any,
-      },
-    });
-
-    // Revalidate the current page
-    revalidatePath(`/doorcard/${doorcardId}/edit`);
-
-    // Redirect to basic info step - don't catch this error
-    redirect(`/doorcard/${doorcardId}/edit?step=1`);
-  } catch (error) {
-    // Only catch validation errors, not redirect errors
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        message: `Validation failed: ${error.errors
-          .map((e) => e.message)
-          .join(", ")}`,
-      };
-    }
-
-    // Re-throw redirect errors and other system errors
-    throw error;
-  }
-}
-
-// Server Action to update basic info
-export async function updateBasicInfo(
-  doorcardId: string,
-  prevState: any,
-  formData: FormData
-): Promise<{ success: boolean; message?: string }> {
-  const authResult = await requireAuthUserAPI();
-  if ("error" in authResult) {
-    return { success: false, message: authResult.error };
-  }
-  const { user } = authResult;
-
-  // Extract and validate form data (no campus/term/year - those are handled in step 0)
-  const rawData = {
-    name: formData.get("name")?.toString() || "",
-    doorcardName: formData.get("doorcardName")?.toString() || "",
-    officeNumber: formData.get("officeNumber")?.toString() || "",
-  };
-
-  // Validate with simplified schema (no campus/term/year)
-  const personalInfoSchema = z.object({
-    name: z.string().min(1, "Name is required"),
-    doorcardName: z.string().min(1, "Doorcard name is required"),
-    officeNumber: z.string().min(1, "Office number is required"),
-  });
-
-  try {
-    const validatedData = personalInfoSchema.parse(rawData);
-
-    // Update the doorcard in the database
-    await prisma.doorcard.update({
-      where: {
-        id: doorcardId,
-        userId: user.id, // Security: ensure user owns this doorcard
-      },
-      data: {
-        name: validatedData.name,
-        doorcardName: validatedData.doorcardName,
-        officeNumber: validatedData.officeNumber,
-      },
-    });
-
-    // Revalidate the current page
-    revalidatePath(`/doorcard/${doorcardId}/edit`);
-
-    // Redirect to next step - don't catch this error
-    redirect(`/doorcard/${doorcardId}/edit?step=2`);
-  } catch (error) {
-    // Only catch validation errors, not redirect errors
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        message: `Validation failed: ${error.errors
-          .map((e) => e.message)
-          .join(", ")}`,
-      };
-    }
-
-    // Re-throw redirect errors and other system errors
-    throw error;
-  }
-}
-
-// Server Action to update time blocks
-export async function updateTimeBlocks(
-  doorcardId: string,
-  prevState: any,
-  formData: FormData
-): Promise<{ success: boolean; message?: string }> {
-  const authResult = await requireAuthUserAPI();
-  if ("error" in authResult) {
-    return { success: false, message: authResult.error };
-  }
-  const { user } = authResult;
-
-  // Parse time blocks from form data
-  const timeBlocksJson = formData.get("timeBlocks")?.toString();
-  if (!timeBlocksJson) {
-    return { success: false, message: "No time blocks provided" };
-  }
-
-  try {
-    const timeBlocks = JSON.parse(timeBlocksJson);
-
-    // Validate each time block
-    const validatedTimeBlocks = z.array(timeBlockSchema).parse(timeBlocks);
-
-    if (validatedTimeBlocks.length === 0) {
-      return { success: false, message: "At least one time block is required" };
-    }
-
-    // First, delete existing appointments for this doorcard
-    await prisma.appointment.deleteMany({
-      where: { doorcardId },
-    });
-
-    // Create new appointments from time blocks
-    await prisma.appointment.createMany({
-      data: validatedTimeBlocks.map((block) => ({
-        doorcardId,
-        name: block.activity,
-        startTime: block.startTime,
-        endTime: block.endTime,
-        dayOfWeek: block.day,
-        category: block.category || "OFFICE_HOURS",
-        location: block.location,
-      })),
-    });
-
-    // Revalidate the current page
-    revalidatePath(`/doorcard/${doorcardId}/edit`);
-
-    // Redirect to preview step - don't catch this error
-    redirect(`/doorcard/${doorcardId}/edit?step=3`);
-  } catch (error) {
-    // Only catch validation errors, not redirect errors
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        message: `Validation failed: ${error.errors
-          .map((e) => e.message)
-          .join(", ")}`,
-      };
-    }
-
-    // Re-throw redirect errors and other system errors
-    throw error;
-  }
-}
-
-// Server Action to create a new doorcard draft
-export async function createDoorcardDraft() {
-  try {
-    const authResult = await requireAuthUserAPI();
-    if ("error" in authResult) {
-      throw new Error(authResult.error);
-    }
-    const { user } = authResult;
-
-    // Create a new doorcard with minimal default data and DRAFT status
-    const newDraft = await prisma.doorcard.create({
-      data: {
-        name: "",
-        doorcardName: "",
-        officeNumber: "",
-        term: "", // Empty - user must select
-        year: "", // Empty - user must select
-        college: null, // Null - user must select
-        isActive: false, // Draft doorcards are not active
-        isPublic: false, // Draft doorcards are not public
-        userId: user.id,
-      },
-    });
-
-    // Return the URL instead of redirecting
-    return `/doorcard/${newDraft.id}/edit?step=0`;
-  } catch (error) {
-    console.error("Error creating doorcard draft:", error);
-    throw error;
-  }
-}
-
-// Server Action to publish a doorcard (convert from draft to published)
-export async function publishDoorcard(doorcardId: string) {
-  try {
-    const authResult = await requireAuthUserAPI();
-    if ("error" in authResult) {
-      throw new Error(authResult.error);
-    }
-    const { user } = authResult;
-
-    // Update the doorcard to be active and public
-    await prisma.doorcard.update({
-      where: {
-        id: doorcardId,
-        userId: user.id,
-      },
-      data: {
-        isActive: true,
-        isPublic: true,
-      },
-    });
-
-    // Revalidate relevant pages
-    revalidatePath(`/doorcard/${doorcardId}/edit`);
-    revalidatePath("/dashboard");
-
-    // Redirect to dashboard
-    redirect("/dashboard");
-  } catch (error) {
-    console.error("Error publishing doorcard:", error);
-    throw error;
-  }
-}
-
-// Server Action to create a doorcard after validating campus/term (no draft until valid)
-export async function createDoorcardWithCampusTerm(
-  prevState: any,
-  formData: FormData
-): Promise<{ success: boolean; message?: string }> {
-  try {
-    const authResult = await requireAuthUserAPI();
-    if ("error" in authResult) {
-      return { success: false, message: authResult.error };
-    }
-    const { user } = authResult;
-
-    const rawData = {
+    const data = campusTermSchema.parse({
       term: formData.get("term")?.toString() || "",
       year: formData.get("year")?.toString() || "",
       college: formData.get("college")?.toString() || "",
-    };
-
-    const campusTermSchema = z.object({
-      term: z.string().min(1, "Term is required"),
-      year: z.string().min(1, "Year is required"),
-      college: z
-        .string()
-        .min(1, "Campus is required")
-        .refine((val) => ["SKYLINE", "CSM", "CANADA"].includes(val), {
-          message: "Campus is required",
-        }),
     });
 
-    const validatedData = campusTermSchema.parse(rawData);
-
-    // Check for duplicate
-    const existingDoorcard = await prisma.doorcard.findFirst({
+    const existing = await prisma.doorcard.findFirst({
       where: {
         userId: user.id,
-        college: validatedData.college as any,
-        term: validatedData.term,
-        year: validatedData.year,
+        college: data.college as any,
+        term: data.term,
+        year: data.year,
         isActive: true,
+        NOT: { id: doorcardId },
       },
     });
-    if (existingDoorcard) {
-      const campusName =
-        validatedData.college === "SKYLINE"
-          ? "Skyline College"
-          : validatedData.college === "CSM"
-          ? "College of San Mateo"
-          : validatedData.college === "CANADA"
-          ? "Cañada College"
-          : validatedData.college;
-
+    if (existing) {
       return {
         success: false,
-        message: `You already have a doorcard for ${campusName} - ${validatedData.term} ${validatedData.year}. Please edit your existing doorcard "${existingDoorcard.doorcardName}" instead.`,
+        message: `You already have a doorcard for ${campusLabel(
+          data.college
+        )} - ${data.term} ${data.year}. Please edit your existing doorcard "${
+          existing.doorcardName
+        }" instead.`,
       };
     }
 
-    // Create the draft
-    const newDraft = await prisma.doorcard.create({
+    await prisma.doorcard.update({
+      where: { id: doorcardId, userId: user.id },
+      data: { term: data.term, year: data.year, college: data.college as any },
+    });
+  } catch (err) {
+    return handleActionError(err);
+  }
+
+  revalidatePath(`/doorcard/${doorcardId}/edit`);
+  redirect(`/doorcard/${doorcardId}/edit?step=1`);
+}
+
+export async function updateBasicInfo(
+  doorcardId: string,
+  _prevState: any,
+  formData: FormData
+): Promise<ActionResult> {
+  try {
+    const user = await requireAuth();
+
+    const data = personalInfoSchema.parse({
+      name: formData.get("name")?.toString() || "",
+      doorcardName: formData.get("doorcardName")?.toString() || "",
+      officeNumber: formData.get("officeNumber")?.toString() || "",
+    });
+
+    await prisma.doorcard.update({
+      where: { id: doorcardId, userId: user.id },
+      data: {
+        name: data.name,
+        doorcardName: data.doorcardName,
+        officeNumber: data.officeNumber,
+      },
+    });
+  } catch (err) {
+    return handleActionError(err);
+  }
+
+  revalidatePath(`/doorcard/${doorcardId}/edit`);
+  redirect(`/doorcard/${doorcardId}/edit?step=2`);
+}
+
+export async function updateTimeBlocks(
+  doorcardId: string,
+  _prevState: any,
+  formData: FormData
+): Promise<ActionResult> {
+  try {
+    await requireAuth();
+
+    const json = formData.get("timeBlocks")?.toString();
+    if (!json) return { success: false, message: "No time blocks provided" };
+
+    const blocks = z.array(timeBlockSchema).parse(JSON.parse(json));
+    if (blocks.length === 0) {
+      return { success: false, message: "At least one time block is required" };
+    }
+
+    await prisma.appointment.deleteMany({ where: { doorcardId } });
+    await prisma.appointment.createMany({
+      data: blocks.map((b) => ({
+        doorcardId,
+        name: b.activity,
+        startTime: b.startTime,
+        endTime: b.endTime,
+        dayOfWeek: b.day,
+        category: b.category || "OFFICE_HOURS",
+        location: b.location,
+      })),
+    });
+  } catch (err) {
+    return handleActionError(err);
+  }
+
+  revalidatePath(`/doorcard/${doorcardId}/edit`);
+  redirect(`/doorcard/${doorcardId}/edit?step=3`);
+}
+
+/**
+ * Optional legacy draft creation (kept if needed).
+ */
+export async function createDoorcardDraft(): Promise<string> {
+  const user = await requireAuth();
+  const newDraft = await prisma.doorcard.create({
+    data: {
+      name: "",
+      doorcardName: "",
+      officeNumber: "",
+      term: "",
+      year: "",
+      college: null,
+      isActive: false,
+      isPublic: false,
+      userId: user.id,
+    },
+  });
+  return `/doorcard/${newDraft.id}/edit?step=0`;
+}
+
+export async function publishDoorcard(doorcardId: string) {
+  try {
+    const user = await requireAuth();
+    await prisma.doorcard.update({
+      where: { id: doorcardId, userId: user.id },
+      data: { isActive: true, isPublic: true },
+    });
+  } catch (err) {
+    // Allow redirect errors to bubble if any occur later
+    console.error("Error publishing doorcard:", err);
+    throw err;
+  }
+
+  revalidatePath(`/doorcard/${doorcardId}/edit`);
+  revalidatePath("/dashboard");
+  redirect("/dashboard");
+}
+
+/**
+ * Creates a doorcard only AFTER campus/term validation.
+ */
+export async function createDoorcardWithCampusTerm(
+  _prevState: any,
+  formData: FormData
+): Promise<ActionResult> {
+  try {
+    const user = await requireAuth();
+
+    const data = campusTermSchema.parse({
+      term: formData.get("term")?.toString() || "",
+      year: formData.get("year")?.toString() || "",
+      college: formData.get("college")?.toString() || "",
+    });
+
+    const existing = await prisma.doorcard.findFirst({
+      where: {
+        userId: user.id,
+        college: data.college as any,
+        term: data.term,
+        year: data.year,
+        isActive: true,
+      },
+    });
+    if (existing) {
+      return {
+        success: false,
+        message: `You already have a doorcard for ${campusLabel(
+          data.college
+        )} - ${data.term} ${data.year}. Please edit your existing doorcard "${
+          existing.doorcardName
+        }" instead.`,
+      };
+    }
+
+    const newDoorcard = await prisma.doorcard.create({
       data: {
         name: "",
         doorcardName: "",
         officeNumber: "",
-        term: validatedData.term,
-        year: validatedData.year,
-        college: validatedData.college as any,
+        term: data.term,
+        year: data.year,
+        college: data.college as any,
         isActive: false,
         isPublic: false,
         userId: user.id,
       },
     });
 
-    // Redirect to edit page for next step
-    redirect(`/doorcard/${newDraft.id}/edit?step=1`);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return {
-        success: false,
-        message: `Validation failed: ${error.errors
-          .map((e) => e.message)
-          .join(", ")}`,
-      };
-    }
-    return {
-      success: false,
-      message:
-        error instanceof Error ? error.message : "An unexpected error occurred",
-    };
+    revalidatePath(`/doorcard/${newDoorcard.id}/edit`);
+    redirect(`/doorcard/${newDoorcard.id}/edit?step=1`);
+  } catch (err) {
+    return handleActionError(err);
   }
 }

@@ -34,7 +34,7 @@ type ActionState = { success: boolean; message?: string };
 interface Props {
   doorcard: {
     id: string;
-    college?: College | "";
+    college?: string;
     term?: string;
     year?: string;
   };
@@ -71,7 +71,7 @@ function Alert({ children }: { children: React.ReactNode }) {
 /* -------------------------------------------------------------------------- */
 
 export default function CampusTermForm({ doorcard }: Props) {
-  const [college, setCollege] = useState<College | "">(doorcard.college ?? "");
+  const [college, setCollege] = useState<string>(doorcard.college ?? "");
   const [term, setTerm] = useState(doorcard.term ?? "");
   const [year, setYear] = useState(doorcard.year ?? "");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -158,7 +158,7 @@ export default function CampusTermForm({ doorcard }: Props) {
             <Select
               value={college}
               onValueChange={(v) => {
-                setCollege(v as College);
+                setCollege(v);
                 if (clientTried)
                   setFieldErrors((prev) => ({
                     ...prev,
@@ -262,7 +262,7 @@ export default function CampusTermForm({ doorcard }: Props) {
           </h3>
           <p className="mt-2 text-sm text-gray-500">
             To avoid confusion, you can only have one active doorcard per campus
-            per term. If one exists already you’ll be guided to edit it.
+            per term. If one exists already you&apos;ll be guided to edit it.
           </p>
         </div>
       </div>
