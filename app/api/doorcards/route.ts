@@ -1,31 +1,24 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 import { doorcardSchema } from "@/lib/validations/doorcard";
 import { z } from "zod";
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await requireAuthUserAPI();
+    if ("error" in authResult) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.status }
+      );
     }
+    const { user } = authResult;
 
     const json = await req.json();
 
     try {
       const validatedData = doorcardSchema.parse(json);
-
-      // Find user by email since session might not have id
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-      });
-
-      if (!user) {
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
-      }
 
       // Check for existing doorcard with same college/term/year combination
       const existingDoorcard = await prisma.doorcard.findFirst({
@@ -113,20 +106,14 @@ export async function POST(req: Request) {
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await requireAuthUserAPI();
+    if ("error" in authResult) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.status }
+      );
     }
-
-    // Find user by email since session might not have id
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    const { user } = authResult;
 
     const doorcards = await prisma.doorcard.findMany({
       where: {

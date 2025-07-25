@@ -1,71 +1,66 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuthUserAPI } from "@/lib/require-auth-user";
 
-// GET /api/doorcards/view/[username]/[termSlug] - Get specific term doorcard for username (authenticated)
+// GET /api/doorcards/view/[username]/[termSlug]
 export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ username: string; termSlug: string }> }
+  _req: Request,
+  { params }: { params: { username: string; termSlug: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Require authentication (admin/internal view)
+    const auth = await requireAuthUserAPI();
+    if ("error" in auth) {
+      return NextResponse.json(
+        { error: auth.error },
+        { status: auth.status || 401 }
+      );
     }
 
-    const { username, termSlug } = await params;
+    const { username, termSlug } = params;
 
-    // Find the user by username or email
+    // Find the target user (allow username, email, or partial name)
     const user = await prisma.user.findFirst({
       where: {
         OR: [
-          { username: username },
+          { username },
           { email: username },
-          { name: { contains: username, mode: 'insensitive' } }
-        ]
-      }
+          { name: { contains: username, mode: "insensitive" } },
+        ],
+      },
+      select: { id: true },
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Parse term slug (e.g., "fall-2024" -> term: "Fall", year: "2024")
-    const termMatch = termSlug.match(/^(\w+)-(\d{4})$/);
-    if (!termMatch) {
-      return NextResponse.json({ error: "Invalid term format" }, { status: 400 });
+    // Expect slug like "fall-2024"
+    const match = termSlug.match(/^([a-z]+)-(\d{4})$/i);
+    if (!match) {
+      return NextResponse.json(
+        { error: "Invalid term format" },
+        { status: 400 }
+      );
     }
 
-    const [, termSeason, year] = termMatch;
-    const term = termSeason.charAt(0).toUpperCase() + termSeason.slice(1).toLowerCase();
+    const [, rawSeason, year] = match;
+    const term =
+      rawSeason.charAt(0).toUpperCase() + rawSeason.slice(1).toLowerCase(); // e.g. Fall
 
-    // Get the doorcard for this user and specific term (no public restriction for admin view)
     const doorcard = await prisma.doorcard.findFirst({
-      where: {
-        userId: user.id,
-        term: term,
-        year: year,
-      },
+      where: { userId: user.id, term, year },
       include: {
-        user: {
-          select: {
-            name: true,
-            college: true,
-          },
-        },
-        appointments: {
-          orderBy: [
-            { dayOfWeek: 'asc' },
-            { startTime: 'asc' }
-          ]
-        },
+        user: { select: { name: true, college: true } },
+        appointments: { orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }] },
       },
     });
 
     if (!doorcard) {
-      return NextResponse.json({ error: "Doorcard not found for this term" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Doorcard not found for this term" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(doorcard);
@@ -76,4 +71,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

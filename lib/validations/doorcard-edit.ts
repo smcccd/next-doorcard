@@ -1,46 +1,50 @@
 import { z } from "zod";
+import { College, DayOfWeek, AppointmentCategory } from "@prisma/client";
 
-// Schemas for the edit flow (migrated from actions.ts)
+/**
+ * Schema for the "basic info" step.
+ */
 export const basicInfoSchema = z.object({
   name: z.string().min(1, "Name is required"),
   doorcardName: z.string().min(1, "Doorcard name is required"),
   officeNumber: z.string().min(1, "Office number is required"),
   term: z.string().min(1, "Term is required"),
   year: z.string().min(1, "Year is required"),
-  college: z.enum(["SKYLINE", "CSM", "CANADA"], {
-    required_error: "Campus is required",
-  }),
+  college: z.nativeEnum(College, { required_error: "Campus is required" }),
 });
 
-export const timeBlockSchema = z.object({
-  id: z.string(),
-  day: z.enum([
-    "MONDAY",
-    "TUESDAY", 
-    "WEDNESDAY",
-    "THURSDAY",
-    "FRIDAY",
-    "SATURDAY",
-    "SUNDAY",
-  ], {
-    required_error: "Day is required",
-  }),
-  startTime: z
-    .string()
-    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format"),
-  endTime: z
-    .string()
-    .regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Invalid time format"),
-  activity: z.string().min(1, "Activity is required"),
-  location: z.string().nullable().optional(),
-  category: z
-    .enum([
-      "OFFICE_HOURS",
-      "IN_CLASS",
-      "LECTURE",
-      "LAB",
-      "HOURS_BY_ARRANGEMENT",
-      "REFERENCE",
-    ])
-    .optional(),
-}); 
+/**
+ * A single time block row. Times use 24h HH:mm format.
+ */
+export const timeBlockSchema = z
+  .object({
+    id: z.string(),
+    day: z.nativeEnum(DayOfWeek, { required_error: "Day is required" }),
+    startTime: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Invalid time format (HH:mm)"),
+    endTime: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Invalid time format (HH:mm)"),
+    activity: z.string().min(1, "Activity is required"),
+    location: z.string().nullable().optional(),
+    category: z.nativeEnum(AppointmentCategory).optional(),
+  })
+  .refine((val) => val.endTime > val.startTime, {
+    message: "End time must be after start time",
+    path: ["endTime"],
+  });
+
+/**
+ * Full doorcard editor schema (basic info + time blocks).
+ */
+export const doorcardEditorSchema = basicInfoSchema.extend({
+  timeBlocks: z
+    .array(timeBlockSchema)
+    .min(1, "At least one time block is required"),
+});
+
+/* ----- Inferred Types ----- */
+export type BasicInfoForm = z.infer<typeof basicInfoSchema>;
+export type TimeBlockForm = z.infer<typeof timeBlockSchema>;
+export type DoorcardForm = z.infer<typeof doorcardEditorSchema>;

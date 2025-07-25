@@ -1,58 +1,56 @@
-"use client";
-
-import { useSession, signOut } from "next-auth/react";
+// components/Navbar.tsx (SERVER COMPONENT)
 import Image from "next/image";
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { SignOutButton } from "./SignOutButton";
 
-const Navbar = () => {
-  const { data: session, status } = useSession();
-  console.log(session);
-
-  const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/" });
-  };
+export default async function Navbar() {
+  const session = await getServerSession(authOptions);
+  const userDisplay =
+    session?.user?.name || session?.user?.email || "Faculty Member";
 
   return (
-    <div className="bg-gray-800 text-white text-2xl py-5 px-10">
-      <div className="flex justify-between items-center">
+    <nav
+      className="bg-gray-800 text-white px-6 py-4 shadow-sm"
+      aria-label="Primary"
+    >
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <Image
-            src="/smccd-logo-white.svg"
-            alt="SMCCD Logo"
-            width={250}
-            height={150}
-            className="pr-4 border-r-2 border-white"
-            priority
-          />
-          <div className="text-3xl font-bold">Faculty Doorcard</div>
+          <Link href="/" className="flex items-center gap-4" prefetch={false}>
+            <Image
+              src="/smccd-logo-white.svg"
+              alt="San Mateo County Community College District"
+              width={180}
+              height={60}
+              priority
+              className="h-auto w-[180px]"
+            />
+            <span className="text-xl font-semibold tracking-tight">
+              Faculty Doorcard
+            </span>
+          </Link>
         </div>
+
         <div className="flex items-center gap-4">
-          {status === "loading" ? (
-            <div className="text-sm">Loading...</div>
-          ) : session ? (
-            <div className="flex items-center gap-4">
-              <span className="text-sm">
-                Welcome, {session.user?.name || session.user?.email}
+          {session ? (
+            <>
+              <span className="text-sm text-gray-200">
+                Welcome, <span className="font-medium">{userDisplay}</span>
               </span>
-              <button
-                onClick={handleSignOut}
-                className="text-sm bg-red-600 hover:bg-red-700 px-3 py-1 rounded transition-colors"
-              >
-                Logout
-              </button>
-            </div>
+              <SignOutButton />
+            </>
           ) : (
             <Link
               href="/login"
-              className="text-sm bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded transition-colors"
+              className="rounded bg-blue-600 px-3 py-1 text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              prefetch={false}
             >
               Login
             </Link>
           )}
         </div>
       </div>
-    </div>
+    </nav>
   );
-};
-
-export default Navbar;
+}

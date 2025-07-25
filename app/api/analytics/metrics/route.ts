@@ -1,19 +1,23 @@
+import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
 import { prisma } from "@/lib/prisma";
-import { authOptions } from "@/lib/auth";
 
-export async function GET() {
+export async function GET(req: Request) {
+  const auth = await requireAuthUserAPI();
+  if ("error" in auth) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
+
   try {
-    const session = await getServerSession(authOptions);
+    const session = auth.user;
 
-    if (!session?.user?.email) {
+    if (!session?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Find user by email
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: session.email },
     });
 
     if (!user) {

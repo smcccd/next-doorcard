@@ -1,64 +1,53 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireAuthUserAPI } from "@/lib/require-auth-user";
 
-// GET /api/doorcards/view/[username]/current - Get current active doorcard for username (authenticated)
 export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ username: string }> }
+  _req: Request,
+  { params }: { params: { username: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Auth (admin / internal view)
+    const auth = await requireAuthUserAPI();
+    if ("error" in auth) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
 
-    const { username } = await params;
+    const { username } = params;
 
-    // Find the user by username or email
+    // Find the target user (allow username, email, or name contains)
     const user = await prisma.user.findFirst({
       where: {
         OR: [
           { username: username },
           { email: username },
-          { name: { contains: username, mode: 'insensitive' } }
-        ]
-      }
+          { name: { contains: username, mode: "insensitive" } },
+        ],
+      },
+      select: { id: true },
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Get the current active doorcard for this user (no public/active restrictions for admin view)
+    // Active doorcard
     const doorcard = await prisma.doorcard.findFirst({
-      where: {
-        userId: user.id,
-        isActive: true,
-      },
+      where: { userId: user.id, isActive: true },
       include: {
-        user: {
-          select: {
-            name: true,
-            college: true,
-          },
-        },
+        user: { select: { name: true, college: true } },
         appointments: {
-          orderBy: [
-            { dayOfWeek: 'asc' },
-            { startTime: 'asc' }
-          ]
+          orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
         },
       },
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: { createdAt: "desc" },
     });
 
     if (!doorcard) {
-      return NextResponse.json({ error: "No active doorcard found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active doorcard found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(doorcard);
@@ -69,4 +58,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}

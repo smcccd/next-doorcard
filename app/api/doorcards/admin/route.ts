@@ -1,18 +1,22 @@
+import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/doorcards/admin - Get all doorcards for admin oversight
-export async function GET() {
+export async function GET(req: Request) {
+  const auth = await requireAuthUserAPI();
+  if ("error" in auth) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
+
   try {
     console.log("🔍 Doorcards Admin API: Starting request...");
-    const session = await getServerSession(authOptions);
+    // const session = await getServerSession(authOptions); // This line is removed
 
-    console.log("🔍 Doorcards Admin API: Session check:", !!session);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // console.log("🔍 Doorcards Admin API: Session check:", !!session); // This line is removed
+    // if (!session) { // This line is removed
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 }); // This line is removed
+    // } // This line is removed
 
     console.log("🔍 Doorcards Admin API: Querying database...");
     const doorcards = await prisma.doorcard.findMany({

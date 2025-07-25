@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { TermManager } from "@/lib/term-management";
 
 // POST /api/terms/archive - Archive a specific term
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await requireAuthUserAPI();
 
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if ("error" in session) {
+      return NextResponse.json(
+        { error: session.error },
+        { status: session.status }
+      );
     }
 
     const body = await request.json();
@@ -43,10 +45,13 @@ export async function POST(request: NextRequest) {
 // GET /api/terms/archive/auto - Auto-archive expired terms
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await requireAuthUserAPI();
 
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if ("error" in session) {
+      return NextResponse.json(
+        { error: session.error },
+        { status: session.status }
+      );
     }
 
     const archivedCount = await TermManager.autoArchiveExpiredTerms();

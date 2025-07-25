@@ -3,13 +3,9 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
-import {
-  basicInfoSchema,
-  timeBlockSchema,
-} from "@/lib/validations/doorcard-edit";
+import { timeBlockSchema } from "@/lib/validations/doorcard-edit";
 
 // Server Action to validate and save campus/term selection
 export async function validateCampusTerm(
@@ -17,19 +13,11 @@ export async function validateCampusTerm(
   prevState: any,
   formData: FormData
 ): Promise<{ success: boolean; message?: string }> {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) {
-    return { success: false, message: "Unauthorized" };
+  const authResult = await requireAuthUserAPI();
+  if ("error" in authResult) {
+    return { success: false, message: authResult.error };
   }
-
-  // Find user by email since session might not have id
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
-
-  if (!user) {
-    return { success: false, message: "User not found" };
-  }
+  const { user } = authResult;
 
   // Extract and validate campus/term data
   const rawData = {
@@ -122,19 +110,11 @@ export async function updateBasicInfo(
   prevState: any,
   formData: FormData
 ): Promise<{ success: boolean; message?: string }> {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) {
-    return { success: false, message: "Unauthorized" };
+  const authResult = await requireAuthUserAPI();
+  if ("error" in authResult) {
+    return { success: false, message: authResult.error };
   }
-
-  // Find user by email since session might not have id
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
-
-  if (!user) {
-    return { success: false, message: "User not found" };
-  }
+  const { user } = authResult;
 
   // Extract and validate form data (no campus/term/year - those are handled in step 0)
   const rawData = {
@@ -193,19 +173,11 @@ export async function updateTimeBlocks(
   prevState: any,
   formData: FormData
 ): Promise<{ success: boolean; message?: string }> {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email) {
-    return { success: false, message: "Unauthorized" };
+  const authResult = await requireAuthUserAPI();
+  if ("error" in authResult) {
+    return { success: false, message: authResult.error };
   }
-
-  // Find user by email since session might not have id
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
-
-  if (!user) {
-    return { success: false, message: "User not found" };
-  }
+  const { user } = authResult;
 
   // Parse time blocks from form data
   const timeBlocksJson = formData.get("timeBlocks")?.toString();
@@ -265,19 +237,11 @@ export async function updateTimeBlocks(
 // Server Action to create a new doorcard draft
 export async function createDoorcardDraft() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      throw new Error("Unauthorized");
+    const authResult = await requireAuthUserAPI();
+    if ("error" in authResult) {
+      throw new Error(authResult.error);
     }
-
-    // Find user by email since session might not have id
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
-      throw new Error("User not found");
-    }
+    const { user } = authResult;
 
     // Create a new doorcard with minimal default data and DRAFT status
     const newDraft = await prisma.doorcard.create({
@@ -305,19 +269,11 @@ export async function createDoorcardDraft() {
 // Server Action to publish a doorcard (convert from draft to published)
 export async function publishDoorcard(doorcardId: string) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      throw new Error("Unauthorized");
+    const authResult = await requireAuthUserAPI();
+    if ("error" in authResult) {
+      throw new Error(authResult.error);
     }
-
-    // Find user by email since session might not have id
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user) {
-      throw new Error("User not found");
-    }
+    const { user } = authResult;
 
     // Update the doorcard to be active and public
     await prisma.doorcard.update({
@@ -349,18 +305,11 @@ export async function createDoorcardWithCampusTerm(
   formData: FormData
 ): Promise<{ success: boolean; message?: string }> {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return { success: false, message: "Unauthorized" };
+    const authResult = await requireAuthUserAPI();
+    if ("error" in authResult) {
+      return { success: false, message: authResult.error };
     }
-
-    // Find user by email since session might not have id
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-    if (!user) {
-      return { success: false, message: "User not found" };
-    }
+    const { user } = authResult;
 
     const rawData = {
       term: formData.get("term")?.toString() || "",

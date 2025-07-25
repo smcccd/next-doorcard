@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { TermManager, TermData } from "@/lib/term-management";
 
 // GET /api/terms - Get all terms
 export async function GET() {
   try {
     console.log("🔍 Terms API: Starting request...");
-    const session = await getServerSession(authOptions);
+    const authResult = await requireAuthUserAPI();
 
-    console.log("🔍 Terms API: Session check:", !!session);
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    console.log("🔍 Terms API: Auth check:", !("error" in authResult));
+    if ("error" in authResult) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.status }
+      );
     }
 
     console.log("🔍 Terms API: Calling TermManager.getAllTerms()...");
@@ -35,10 +37,9 @@ export async function GET() {
 // POST /api/terms - Create a new term
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const authResult = await requireAuthUserAPI();
+    if ('error' in authResult) {
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
     }
 
     const body: TermData = await request.json();

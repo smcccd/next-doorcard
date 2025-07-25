@@ -1,681 +1,480 @@
 "use client";
 
-import { useState } from "react";
-import { useActionState } from "react";
+import { useState, useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
+  SelectTrigger,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  Clock,
-  X,
-  Plus,
   CalendarDays,
+  Clock,
+  Plus,
+  X,
   Building2,
-  Loader2,
   AlertCircle,
 } from "lucide-react";
 import { updateTimeBlocks } from "@/app/doorcard/actions";
+import type { AppointmentCategory, DayOfWeek } from "@prisma/client";
+
+/* -------------------------------------------------------------------------- */
+/* Types / Constants                                                          */
+/* -------------------------------------------------------------------------- */
 
 interface TimeBlock {
   id: string;
-  day: string;
+  day: DayOfWeek;
   startTime: string;
   endTime: string;
   activity: string;
   location?: string;
-  category?: string;
+  category: AppointmentCategory;
 }
 
-interface TimeBlockFormProps {
-  doorcard: {
-    id: string;
-    timeBlocks: TimeBlock[];
-  };
+interface Props {
+  doorcard: { id: string; timeBlocks: TimeBlock[] };
+  draftId?: string;
 }
 
-interface TimeBlockErrors {
-  startTime?: string;
-  endTime?: string;
-  activity?: string;
-  location?: string;
-  days?: string;
-  general?: string;
-}
-
-const days = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"];
-
-const dayLabels = {
+const DAYS: DayOfWeek[] = [
+  "MONDAY",
+  "TUESDAY",
+  "WEDNESDAY",
+  "THURSDAY",
+  "FRIDAY",
+];
+const DAY_LABEL: Record<DayOfWeek, string> = {
   MONDAY: "Monday",
   TUESDAY: "Tuesday",
   WEDNESDAY: "Wednesday",
   THURSDAY: "Thursday",
   FRIDAY: "Friday",
+  SATURDAY: "Saturday",
+  SUNDAY: "Sunday",
 };
 
-const categories = [
+const CATEGORY_OPTIONS: { value: AppointmentCategory; label: string }[] = [
   { value: "OFFICE_HOURS", label: "Office Hours" },
+  { value: "IN_CLASS", label: "In Class" },
   { value: "LECTURE", label: "Lecture" },
   { value: "LAB", label: "Lab" },
-  { value: "MEETING", label: "Meeting" },
-  { value: "OTHER", label: "Other" },
+  { value: "HOURS_BY_ARRANGEMENT", label: "Hours by Arrangement" },
+  { value: "REFERENCE", label: "Reference" },
 ];
 
-function SubmitButton({ hasTimeBlocks }: { hasTimeBlocks: boolean }) {
-  const { pending } = useFormStatus();
+type BlockDraft = {
+  startTime: string;
+  endTime: string;
+  activity: string;
+  location: string;
+  category: AppointmentCategory;
+};
+type Errors = {
+  startTime?: string;
+  endTime?: string;
+  activity?: string;
+  location?: string;
+  days?: string;
+  conflict?: string;
+};
 
+/* -------------------------------------------------------------------------- */
+/* Submit Button                                                              */
+/* -------------------------------------------------------------------------- */
+function SubmitButton({ disabled }: { disabled: boolean }) {
+  const { pending } = useFormStatus();
   return (
-    <Button
-      type="submit"
-      disabled={pending || !hasTimeBlocks}
-      className="w-full"
-    >
-      {pending ? (
-        <>
-          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          Saving...
-        </>
-      ) : (
-        "Continue to Preview"
-      )}
+    <Button type="submit" disabled={pending || disabled} className="w-full">
+      {pending ? "Saving…" : "Continue to Preview"}
     </Button>
   );
 }
 
-export default function TimeBlockForm({ doorcard }: TimeBlockFormProps) {
-  const [timeBlocks, setTimeBlocks] = useState<TimeBlock[]>(
-    doorcard.timeBlocks || []
-  );
-  const [isAdding, setIsAdding] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
-  const [addMode, setAddMode] = useState<"single" | "repeating" | null>(null);
-  const [editingBlock, setEditingBlock] = useState<TimeBlock | null>(null);
-  const [newBlock, setNewBlock] = useState({
+/* -------------------------------------------------------------------------- */
+/* Component                                                                  */
+/* -------------------------------------------------------------------------- */
+export default function TimeBlockForm({ doorcard, draftId }: Props) {
+  console.log("draftId", draftId);
+  const [blocks, setBlocks] = useState<TimeBlock[]>(doorcard.timeBlocks || []);
+  const [adding, setAdding] = useState(false);
+  const [mode, setMode] = useState<"single" | "repeat">("single");
+  const [selectedDays, setSelectedDays] = useState<DayOfWeek[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  const [draft, setDraft] = useState<BlockDraft>({
     startTime: "",
     endTime: "",
     activity: "",
     location: "",
     category: "OFFICE_HOURS",
   });
+  const [errors, setErrors] = useState<Errors>({});
 
-  // Validation state for time block creation/editing
-  const [timeBlockErrors, setTimeBlockErrors] = useState<TimeBlockErrors>({});
-  const [hasAttemptedAdd, setHasAttemptedAdd] = useState(false);
-
-  // Server action state
-  const [state, formAction] = useActionState(
+  const [serverState, serverAction] = useActionState(
     updateTimeBlocks.bind(null, doorcard.id),
-    {
-      success: true,
-    }
+    { success: true } as { success: boolean; message?: string }
   );
 
-  // Validation functions for time blocks
-  const validateTimeField = (
-    field: keyof TimeBlockErrors,
-    value: string | string[]
-  ): string | undefined => {
-    switch (field) {
-      case "startTime":
-        if (!value || (typeof value === "string" && !value.trim()))
-          return "Start time is required";
-        return undefined;
-      case "endTime":
-        if (!value || (typeof value === "string" && !value.trim()))
-          return "End time is required";
-        if (
-          typeof value === "string" &&
-          newBlock.startTime &&
-          value <= newBlock.startTime
-        ) {
-          return "End time must be after start time";
-        }
-        return undefined;
-      case "activity":
-        if (!value || (typeof value === "string" && !value.trim()))
-          return "Activity is required";
-        if (typeof value === "string" && value.trim().length < 2)
-          return "Activity must be at least 2 characters";
-        if (typeof value === "string" && value.trim().length > 100)
-          return "Activity must be less than 100 characters";
-        return undefined;
-      case "location":
-        if (typeof value === "string" && value.length > 100)
-          return "Location must be less than 100 characters";
-        return undefined;
-      case "days":
-        if (!Array.isArray(value) || value.length === 0)
-          return "At least one day must be selected";
-        return undefined;
-      default:
-        return undefined;
+  /* ---------------------------------------------------------------------- */
+  /* Validation                                                             */
+  /* ---------------------------------------------------------------------- */
+  const validate = (): Errors => {
+    const e: Errors = {};
+    if (!draft.startTime) e.startTime = "Start required";
+    if (!draft.endTime) e.endTime = "End required";
+    if (draft.startTime && draft.endTime && draft.endTime <= draft.startTime)
+      e.endTime = "End must be after start";
+    if (draft.activity.trim().length < 1 && draft.category !== "OFFICE_HOURS")
+      e.activity = "Activity required";
+    if (draft.location.length > 100) e.location = "Location too long";
+    if (selectedDays.length === 0) e.days = "Pick at least one day";
+
+    // conflict detection
+    if (!e.startTime && !e.endTime && !e.days) {
+      const test = (d: DayOfWeek) =>
+        blocks.some((b) => {
+          if (editingId && b.id === editingId) return false;
+          if (b.day !== d) return false;
+          const overlap =
+            (draft.startTime >= b.startTime && draft.startTime < b.endTime) ||
+            (draft.endTime > b.startTime && draft.endTime <= b.endTime) ||
+            (draft.startTime <= b.startTime && draft.endTime >= b.endTime);
+          return overlap;
+        });
+      const conflictDay = selectedDays.find(test);
+      if (conflictDay)
+        e.conflict = `Time overlaps with existing block on ${DAY_LABEL[conflictDay]}`;
     }
+    return e;
   };
 
-  const validateTimeBlock = (): TimeBlockErrors => {
-    const errors: TimeBlockErrors = {};
-
-    errors.startTime = validateTimeField("startTime", newBlock.startTime);
-    errors.endTime = validateTimeField("endTime", newBlock.endTime);
-    errors.activity = validateTimeField("activity", newBlock.activity);
-    errors.location = validateTimeField("location", newBlock.location);
-    errors.days = validateTimeField("days", selectedDays);
-
-    // Check for time conflicts
-    if (newBlock.startTime && newBlock.endTime && selectedDays.length > 0) {
-      const conflictingBlocks = timeBlocks.filter((block) => {
-        if (editingBlock && block.id === editingBlock.id) return false;
-
-        return (
-          selectedDays.includes(block.day) &&
-          ((newBlock.startTime >= block.startTime &&
-            newBlock.startTime < block.endTime) ||
-            (newBlock.endTime > block.startTime &&
-              newBlock.endTime <= block.endTime) ||
-            (newBlock.startTime <= block.startTime &&
-              newBlock.endTime >= block.endTime))
-        );
-      });
-
-      if (conflictingBlocks.length > 0) {
-        errors.general = `Time conflict detected with existing ${
-          conflictingBlocks[0].activity
-        } on ${dayLabels[conflictingBlocks[0].day as keyof typeof dayLabels]}`;
-      }
-    }
-
-    return errors;
-  };
-
-  const resetForm = () => {
-    setIsAdding(false);
+  const reset = () => {
+    setAdding(false);
+    setEditingId(null);
     setSelectedDays([]);
-    setAddMode(null);
-    setEditingBlock(null);
-    setTimeBlockErrors({});
-    setHasAttemptedAdd(false);
-    setNewBlock({
+    setDraft({
       startTime: "",
       endTime: "",
       activity: "",
       location: "",
       category: "OFFICE_HOURS",
     });
+    setErrors({});
   };
 
-  const handleTimeBlockFieldChange = (
-    field: keyof typeof newBlock,
-    value: string
-  ) => {
-    setNewBlock((prev) => ({ ...prev, [field]: value }));
+  /* ---------------------------------------------------------------------- */
+  /* CRUD                                                                   */
+  /* ---------------------------------------------------------------------- */
+  const handleAddOrUpdate = () => {
+    const e = validate();
+    setErrors(e);
+    if (Object.values(e).some(Boolean)) return;
 
-    // Clear field error if now valid, or show error if attempted add
-    if (hasAttemptedAdd || timeBlockErrors[field as keyof TimeBlockErrors]) {
-      const error = validateTimeField(field as keyof TimeBlockErrors, value);
-      setTimeBlockErrors((prev) => ({
-        ...prev,
-        [field]: error,
-      }));
-    }
-  };
-
-  const addTimeBlock = () => {
-    setHasAttemptedAdd(true);
-
-    // Validate the time block
-    const errors = validateTimeBlock();
-    const hasErrors = Object.values(errors).some((error) => error);
-
-    if (hasErrors) {
-      setTimeBlockErrors(errors);
-      return;
-    }
-
-    // Clear errors
-    setTimeBlockErrors({});
-
-    if (editingBlock) {
-      // Update existing block
-      setTimeBlocks(
-        timeBlocks.map((block) =>
-          block.id === editingBlock.id
+    if (editingId) {
+      setBlocks((prev) =>
+        prev.map((b) =>
+          b.id === editingId
             ? {
-                ...block,
-                startTime: newBlock.startTime,
-                endTime: newBlock.endTime,
-                activity: newBlock.activity.trim(),
-                location: newBlock.location.trim() || undefined,
-                category: newBlock.category,
+                ...b,
+                startTime: draft.startTime,
+                endTime: draft.endTime,
+                activity:
+                  draft.category === "OFFICE_HOURS"
+                    ? "Office Hours"
+                    : draft.activity.trim(),
+                location: draft.location.trim() || undefined,
+                category: draft.category,
+                day: selectedDays[0],
               }
-            : block
+            : b
         )
       );
     } else {
-      // Add new blocks
-      const newBlocks = selectedDays.map((day) => ({
+      const newOnes = selectedDays.map<TimeBlock>((d) => ({
         id: crypto.randomUUID(),
-        day,
-        startTime: newBlock.startTime,
-        endTime: newBlock.endTime,
-        activity: newBlock.activity.trim(),
-        location: newBlock.location.trim() || undefined,
-        category: newBlock.category,
+        day: d,
+        startTime: draft.startTime,
+        endTime: draft.endTime,
+        activity:
+          draft.category === "OFFICE_HOURS"
+            ? "Office Hours"
+            : draft.activity.trim(),
+        location: draft.location.trim() || undefined,
+        category: draft.category,
       }));
-      setTimeBlocks([...timeBlocks, ...newBlocks]);
+      setBlocks((prev) => [...prev, ...newOnes]);
     }
-
-    resetForm();
+    reset();
   };
 
-  const removeTimeBlock = (id: string) => {
-    setTimeBlocks(timeBlocks.filter((block) => block.id !== id));
-  };
-
-  const editTimeBlock = (block: TimeBlock) => {
-    setEditingBlock(block);
-    setNewBlock({
-      startTime: block.startTime,
-      endTime: block.endTime,
-      activity: block.activity,
-      location: block.location || "",
-      category: block.category || "OFFICE_HOURS",
+  const handleEdit = (b: TimeBlock) => {
+    setAdding(true);
+    setMode("single");
+    setEditingId(b.id);
+    setSelectedDays([b.day]);
+    setDraft({
+      startTime: b.startTime,
+      endTime: b.endTime,
+      activity: b.category === "OFFICE_HOURS" ? "" : b.activity,
+      location: b.location || "",
+      category: b.category,
     });
-    setSelectedDays([block.day]);
-    setAddMode("single");
-    setIsAdding(true);
-    setTimeBlockErrors({});
-    setHasAttemptedAdd(false);
   };
 
-  const handleSubmit = async (formData: FormData) => {
-    try {
-      if (timeBlocks.length === 0) {
-        setError("Please add at least one time block before continuing");
-        return;
-      }
-      setError(null);
-      formData.set("timeBlocks", JSON.stringify(timeBlocks));
-      await updateTimeBlocks(doorcard.id, null, formData);
-    } catch (err) {
-      // Only catch non-redirect errors
-      if (err instanceof Error && !err.message.includes("NEXT_REDIRECT")) {
-        setError(err.message);
-      } else {
-        throw err; // Re-throw redirect errors
-      }
+  const handleRemove = (id: string) =>
+    setBlocks((prev) => prev.filter((b) => b.id !== id));
+
+  /* ---------------------------------------------------------------------- */
+  /* Final submit                                                           */
+  /* ---------------------------------------------------------------------- */
+  const onSubmit = (fd: FormData) => {
+    if (blocks.length === 0) {
+      setErrors({ days: "Add at least one block first" });
+      return;
     }
+    fd.set("timeBlocks", JSON.stringify(blocks));
+    serverAction(fd);
   };
 
-  // Check if there are any time block validation errors
-  const hasTimeBlockErrors = Object.values(timeBlockErrors).some(
-    (error) => error
-  );
-
+  /* ---------------------------------------------------------------------- */
+  /* Render                                                                 */
+  /* ---------------------------------------------------------------------- */
   return (
     <div className="space-y-8">
-      {/* Current Schedule */}
-      <div className="space-y-4">
-        <div className="flex items-start gap-3 pb-2">
-          <CalendarDays className="h-5 w-5 text-blue-500 mt-1 flex-shrink-0" />
-          <div>
-            <h3 className="font-medium text-gray-900">Current Schedule</h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Your weekly schedule will be displayed on your doorcard.
-            </p>
-          </div>
+      <div className="flex items-start gap-3">
+        <CalendarDays className="h-5 w-5 text-blue-500 mt-1 shrink-0" />
+        <div>
+          <h3 className="font-medium text-gray-900">Weekly Schedule</h3>
+          <p className="text-sm text-gray-500">
+            Add office hours, classes, and other availability.
+          </p>
         </div>
-
-        {timeBlocks.length === 0 ? (
-          <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-200">
-            <CalendarDays className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              No time blocks
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Add your schedule to get started
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {days.map((day) => {
-              const dayBlocks = timeBlocks
-                .filter((block) => block.day === day)
-                .sort((a, b) => a.startTime.localeCompare(b.startTime));
-
-              if (dayBlocks.length === 0) return null;
-
-              return (
-                <Card key={day} className="overflow-hidden">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-medium text-gray-900">
-                        {dayLabels[day as keyof typeof dayLabels]}
-                      </h4>
-                    </div>
-                    <div className="space-y-2">
-                      {dayBlocks.map((block) => (
-                        <div
-                          key={block.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                        >
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
-                              <Clock className="h-4 w-4" />
-                              {block.startTime} - {block.endTime}
-                            </div>
-                            <p className="text-sm text-gray-600 mt-1">
-                              {block.activity}
-                            </p>
-                            {block.location && (
-                              <div className="flex items-center gap-1 text-sm text-gray-500 mt-1">
-                                <Building2 className="h-3 w-3" />
-                                {block.location}
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex gap-2">
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="outline"
-                              onClick={() => editTimeBlock(block)}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="outline"
-                              onClick={() => removeTimeBlock(block.id)}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    {timeBlockErrors.days && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {timeBlockErrors.days}
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        )}
       </div>
 
-      {/* Add Time Block Buttons */}
-      {!isAdding && (
-        <div className="flex gap-3 justify-center">
+      {/* Existing blocks */}
+      {blocks.length === 0 ? (
+        <div className="rounded border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-sm text-gray-500">
+          No time blocks yet.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {DAYS.map((d) => {
+            const dayBlocks = blocks
+              .filter((b) => b.day === d)
+              .sort((a, b) => a.startTime.localeCompare(b.startTime));
+            if (!dayBlocks.length) return null;
+            return (
+              <Card key={d}>
+                <CardContent className="space-y-2 p-4">
+                  <h4 className="font-medium">{DAY_LABEL[d]}</h4>
+                  {dayBlocks.map((b) => (
+                    <div
+                      key={b.id}
+                      className="flex items-center justify-between rounded bg-gray-50 px-3 py-2 text-sm"
+                    >
+                      <div>
+                        <div className="font-medium">
+                          <Clock className="mr-1 inline h-4 w-4" />
+                          {b.startTime}–{b.endTime}
+                        </div>
+                        <div className="text-gray-600">
+                          {b.activity}
+                          {b.location && (
+                            <span className="text-gray-400">
+                              {" "}
+                              – {b.location}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          type="button"
+                          onClick={() => handleEdit(b)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          type="button"
+                          onClick={() => handleRemove(b.id)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Add buttons */}
+      {!adding && (
+        <div className="flex justify-center gap-3">
           <Button
-            onClick={() => {
-              setIsAdding(true);
-              setAddMode("single");
-              setSelectedDays([days[0]]);
-            }}
             variant="outline"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Single Time Block
-          </Button>
-          <Button
+            type="button"
             onClick={() => {
-              setIsAdding(true);
-              setAddMode("repeating");
+              setAdding(true);
+              setMode("single");
+              setSelectedDays([DAYS[0]]);
             }}
           >
-            <CalendarDays className="h-4 w-4 mr-2" />
-            Repeating Time Block
+            <Plus className="mr-2 h-4 w-4" />
+            Single Block
+          </Button>
+          <Button
+            type="button"
+            onClick={() => {
+              setAdding(true);
+              setMode("repeat");
+              setSelectedDays([]);
+            }}
+          >
+            <CalendarDays className="mr-2 h-4 w-4" />
+            Repeating Block
           </Button>
         </div>
       )}
 
-      {/* Error Display */}
-      {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <AlertCircle
-                className="h-5 w-5 text-red-400"
-                aria-hidden="true"
-              />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Error</h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{error}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Server Error Display */}
-      {state && !state.success && state.message && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <AlertCircle
-                className="h-5 w-5 text-red-400"
-                aria-hidden="true"
-              />
-            </div>
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
-                Cannot Save Schedule
-              </h3>
-              <div className="mt-2 text-sm text-red-700">
-                <p>{state.message}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Add New Time Block Form */}
-      {isAdding && (
+      {/* Add/Edit form */}
+      {adding && (
         <Card>
-          <CardContent className="p-4 space-y-4">
+          <CardContent className="space-y-4 p-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">
-                {editingBlock
+              <h4 className="font-semibold">
+                {editingId
                   ? "Edit Time Block"
-                  : `Add ${
-                      addMode === "single" ? "Single" : "Repeating"
-                    } Time Block`}
-              </h3>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={resetForm}
-              >
+                  : mode === "single"
+                  ? "Add Single Block"
+                  : "Add Repeating Block"}
+              </h4>
+              <Button size="sm" variant="ghost" type="button" onClick={reset}>
                 <X className="h-4 w-4" />
               </Button>
             </div>
 
-            {/* Validation Error Summary */}
-            {hasAttemptedAdd &&
-              (hasTimeBlockErrors || timeBlockErrors.general) && (
-                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <AlertCircle
-                        className="h-5 w-5 text-red-400"
-                        aria-hidden="true"
-                      />
-                    </div>
-                    <div className="ml-3">
-                      <h3 className="text-sm font-medium text-red-800">
-                        Please correct the following errors:
-                      </h3>
-                      <div className="mt-2 text-sm text-red-700">
-                        <ul className="list-disc list-inside space-y-1">
-                          {timeBlockErrors.startTime && (
-                            <li>{timeBlockErrors.startTime}</li>
-                          )}
-                          {timeBlockErrors.endTime && (
-                            <li>{timeBlockErrors.endTime}</li>
-                          )}
-                          {timeBlockErrors.activity && (
-                            <li>{timeBlockErrors.activity}</li>
-                          )}
-                          {timeBlockErrors.location && (
-                            <li>{timeBlockErrors.location}</li>
-                          )}
-                          {timeBlockErrors.days && (
-                            <li>{timeBlockErrors.days}</li>
-                          )}
-                          {timeBlockErrors.general && (
-                            <li>{timeBlockErrors.general}</li>
-                          )}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-            {/* Days Selection - Replaced checkboxes with better UI */}
+            {/* Days */}
             <div>
-              <Label className="text-sm font-medium text-gray-900 mb-2 block">
-                {addMode === "single" ? "Select Day" : "Select Days"}{" "}
+              <Label className="mb-1 block">
+                {mode === "single" ? "Day" : "Days"}{" "}
                 <span className="text-red-500">*</span>
               </Label>
-              {addMode === "single" ? (
+              {mode === "single" ? (
                 <Select
                   value={selectedDays[0] || ""}
-                  onValueChange={(day) => {
-                    setSelectedDays([day]);
-                    setError(null);
-                  }}
+                  onValueChange={(v) => setSelectedDays([v as DayOfWeek])}
                 >
                   <SelectTrigger
-                    className={`w-full ${
-                      timeBlockErrors.days ? "border-red-500" : ""
-                    }`}
+                    className={errors.days ? "border-red-500" : undefined}
                   >
-                    <SelectValue placeholder="Select a day" />
+                    <SelectValue placeholder="Select day" />
                   </SelectTrigger>
                   <SelectContent>
-                    {days.map((day) => (
-                      <SelectItem key={day} value={day}>
-                        {dayLabels[day as keyof typeof dayLabels]}
+                    {DAYS.map((d) => (
+                      <SelectItem key={d} value={d}>
+                        {DAY_LABEL[d]}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               ) : (
                 <div className="flex flex-wrap gap-2">
-                  {days.map((day) => (
-                    <Button
-                      key={day}
-                      type="button"
-                      size="sm"
-                      variant={
-                        selectedDays.includes(day) ? "default" : "outline"
-                      }
-                      onClick={() => {
-                        setSelectedDays(
-                          selectedDays.includes(day)
-                            ? selectedDays.filter((d) => d !== day)
-                            : [...selectedDays, day]
-                        );
-                        setError(null);
-                      }}
-                      className={`flex-1 min-w-[100px] ${
-                        selectedDays.includes(day)
-                          ? "bg-blue-600 text-white"
-                          : ""
-                      }`}
-                    >
-                      {dayLabels[day as keyof typeof dayLabels]}
-                    </Button>
-                  ))}
+                  {DAYS.map((d) => {
+                    const active = selectedDays.includes(d);
+                    return (
+                      <Button
+                        key={d}
+                        type="button"
+                        size="sm"
+                        variant={active ? "default" : "outline"}
+                        onClick={() =>
+                          setSelectedDays((prev) =>
+                            active ? prev.filter((x) => x !== d) : [...prev, d]
+                          )
+                        }
+                      >
+                        {DAY_LABEL[d]}
+                      </Button>
+                    );
+                  })}
                 </div>
               )}
-              {timeBlockErrors.days && (
-                <p className="text-xs text-red-500 mt-1">
-                  {timeBlockErrors.days}
-                </p>
+              {errors.days && (
+                <p className="mt-1 text-xs text-red-600">{errors.days}</p>
               )}
             </div>
 
-            {/* Time and Category Selection - Improved Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Times + category */}
+            <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-4">
                 <div className="flex gap-2">
                   <div className="flex-1">
-                    <Label htmlFor="startTime">Start</Label>
+                    <Label>Start</Label>
                     <Input
                       type="time"
-                      value={newBlock.startTime}
+                      value={draft.startTime}
                       onChange={(e) =>
-                        handleTimeBlockFieldChange("startTime", e.target.value)
+                        setDraft((d) => ({ ...d, startTime: e.target.value }))
                       }
-                      className={
-                        timeBlockErrors.startTime ? "border-red-500" : ""
-                      }
+                      className={errors.startTime ? "border-red-500" : ""}
                     />
-                    {timeBlockErrors.startTime && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {timeBlockErrors.startTime}
+                    {errors.startTime && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {errors.startTime}
                       </p>
                     )}
                   </div>
                   <div className="flex-1">
-                    <Label htmlFor="endTime">End</Label>
+                    <Label>End</Label>
                     <Input
                       type="time"
-                      value={newBlock.endTime}
+                      value={draft.endTime}
                       onChange={(e) =>
-                        handleTimeBlockFieldChange("endTime", e.target.value)
+                        setDraft((d) => ({ ...d, endTime: e.target.value }))
                       }
-                      className={
-                        timeBlockErrors.endTime ? "border-red-500" : ""
-                      }
+                      className={errors.endTime ? "border-red-500" : ""}
                     />
-                    {timeBlockErrors.endTime && (
-                      <p className="text-xs text-red-500 mt-1">
-                        {timeBlockErrors.endTime}
+                    {errors.endTime && (
+                      <p className="mt-1 text-xs text-red-600">
+                        {errors.endTime}
                       </p>
                     )}
                   </div>
                 </div>
+
                 <div>
-                  <Label htmlFor="category">Type</Label>
+                  <Label>Type</Label>
                   <Select
-                    value={newBlock.category}
-                    onValueChange={(value) => {
-                      setNewBlock({
-                        ...newBlock,
-                        category: value,
-                        activity:
-                          value === "OFFICE_HOURS" ? "Office Hours" : "",
-                      });
-                      setError(null);
-                    }}
+                    value={draft.category}
+                    onValueChange={(v) =>
+                      setDraft((d) => ({
+                        ...d,
+                        category: v as AppointmentCategory,
+                        activity: v === "OFFICE_HOURS" ? "" : d.activity,
+                      }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat.value} value={cat.value}>
-                          {cat.label}
+                      {CATEGORY_OPTIONS.map((c) => (
+                        <SelectItem key={c.value} value={c.value}>
+                          {c.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -685,72 +484,70 @@ export default function TimeBlockForm({ doorcard }: TimeBlockFormProps) {
 
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="activity">
-                    {newBlock.category === "OFFICE_HOURS" ? (
-                      <>
-                        Title <span className="text-gray-500">(Optional)</span>
-                      </>
-                    ) : (
-                      "Activity/Course"
-                    )}
+                  <Label>
+                    {draft.category === "OFFICE_HOURS"
+                      ? "Title (optional)"
+                      : "Activity / Course"}
                   </Label>
                   <Input
-                    value={newBlock.activity}
-                    onChange={(e) =>
-                      handleTimeBlockFieldChange("activity", e.target.value)
-                    }
+                    value={draft.activity}
                     placeholder={
-                      newBlock.category === "OFFICE_HOURS"
+                      draft.category === "OFFICE_HOURS"
                         ? "Office Hours"
-                        : "e.g., MATH 101"
+                        : "e.g. MATH 101"
                     }
-                    className={timeBlockErrors.activity ? "border-red-500" : ""}
+                    onChange={(e) =>
+                      setDraft((d) => ({ ...d, activity: e.target.value }))
+                    }
+                    className={errors.activity ? "border-red-500" : ""}
                   />
-                  {timeBlockErrors.activity && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {timeBlockErrors.activity}
+                  {errors.activity && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {errors.activity}
                     </p>
                   )}
                 </div>
                 <div>
-                  <Label htmlFor="location">
-                    Location <span className="text-gray-500">(Optional)</span>
+                  <Label>
+                    Location <span className="text-gray-400">(optional)</span>
                   </Label>
                   <Input
-                    value={newBlock.location}
+                    value={draft.location}
                     onChange={(e) =>
-                      handleTimeBlockFieldChange("location", e.target.value)
+                      setDraft((d) => ({ ...d, location: e.target.value }))
                     }
-                    placeholder="e.g., Building 10, Room 203"
-                    className={timeBlockErrors.location ? "border-red-500" : ""}
+                    placeholder="Building / Room"
+                    className={errors.location ? "border-red-500" : ""}
                   />
-                  {timeBlockErrors.location && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {timeBlockErrors.location}
+                  {errors.location && (
+                    <p className="mt-1 text-xs text-red-600">
+                      {errors.location}
                     </p>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-2 pt-4">
+            {errors.conflict && (
+              <p className="text-sm text-red-600">{errors.conflict}</p>
+            )}
+
+            <div className="flex gap-2 pt-2">
               <Button
                 type="button"
-                onClick={addTimeBlock}
-                className="bg-blue-600 hover:bg-blue-700 flex-1"
+                className="flex-1"
+                onClick={handleAddOrUpdate}
               >
-                <Plus className="h-4 w-4 mr-2" />
-                {editingBlock
-                  ? "Update Time Block"
-                  : `Add ${
-                      addMode === "single" ? "Time Block" : "Time Blocks"
-                    }`}
+                {editingId
+                  ? "Update Block"
+                  : mode === "single"
+                  ? "Add Block"
+                  : "Add Blocks"}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                onClick={resetForm}
+                onClick={reset}
                 className="flex-1"
               >
                 Cancel
@@ -760,10 +557,17 @@ export default function TimeBlockForm({ doorcard }: TimeBlockFormProps) {
         </Card>
       )}
 
-      {/* Submit Form */}
-      {timeBlocks.length > 0 && (
-        <form action={handleSubmit}>
-          <SubmitButton hasTimeBlocks={timeBlocks.length > 0} />
+      {/* Server error */}
+      {!serverState.success && serverState.message && (
+        <div className="flex gap-2 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+          <AlertCircle className="h-4 w-4" /> {serverState.message}
+        </div>
+      )}
+
+      {/* Final submit */}
+      {blocks.length > 0 && (
+        <form action={onSubmit}>
+          <SubmitButton disabled={blocks.length === 0} />
         </form>
       )}
     </div>

@@ -1,20 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { requireAuthUserAPI } from "@/lib/require-auth-user";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/doorcards/[id]/timeblocks - Get appointments (timeblocks) for a doorcard
 export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  req: Request,
+  { params }: { params: { id: string } }
 ) {
-  try {
-    const session = await getServerSession(authOptions);
-    const { id } = await params;
+  const auth = await requireAuthUserAPI();
+  if ("error" in auth) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
 
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  try {
+    const { id } = params;
 
     const appointments = await prisma.appointment.findMany({
       where: { doorcardId: id },

@@ -1,357 +1,269 @@
 "use client";
 
-import { useActionState, useState, useEffect } from "react";
+import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+
+import { validateCampusTerm } from "@/app/doorcard/actions";
+import { COLLEGE_META, type College } from "@/types/doorcard";
+
 import {
   Select,
+  SelectTrigger,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { validateCampusTerm } from "@/app/doorcard/actions";
-import { COLLEGES } from "@/types/doorcard";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
-interface CampusTermFormProps {
+/* -------------------------------------------------------------------------- */
+/* Constants                                                                  */
+/* -------------------------------------------------------------------------- */
+
+const TERM_OPTIONS = ["Fall", "Spring", "Summer", "Winter"] as const;
+const COLLEGE_OPTIONS = Object.keys(COLLEGE_META) as College[];
+const CURRENT_YEAR = new Date().getFullYear();
+const YEAR_OPTIONS = Array.from({ length: 5 }, (_, i) =>
+  (CURRENT_YEAR + i).toString()
+);
+
+type FieldErrors = { college?: string; term?: string; year?: string };
+type ActionState = { success: boolean; message?: string };
+
+interface Props {
   doorcard: {
     id: string;
-    term: string;
-    year: string;
-    college: string;
+    college?: College | "";
+    term?: string;
+    year?: string;
   };
 }
 
-interface FieldErrors {
-  college?: string;
-  term?: string;
-  year?: string;
-}
+/* -------------------------------------------------------------------------- */
+/* Small Components                                                           */
+/* -------------------------------------------------------------------------- */
 
 function SubmitButton() {
   const { pending } = useFormStatus();
-
   return (
     <Button type="submit" disabled={pending} className="w-full">
-      {pending ? "Validating..." : "Continue to Basic Info"}
+      {pending ? "Validating…" : "Continue to Basic Info"}
     </Button>
   );
 }
 
-export default function CampusTermForm({ doorcard }: CampusTermFormProps) {
-  // Form state
-  const [college, setCollege] = useState(
-    doorcard.college && doorcard.college !== "null" ? doorcard.college : ""
-  );
-  const [term, setTerm] = useState(doorcard.term || "");
-  const [year, setYear] = useState(doorcard.year || "");
+function ErrorText({ children }: { children: React.ReactNode }) {
+  return <p className="mt-1 text-xs text-red-600">{children}</p>;
+}
 
-  // Validation state
+function Alert({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex gap-2 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+      <AlertCircle className="h-4 w-4 shrink-0" />
+      <div>{children}</div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Main Form                                                                  */
+/* -------------------------------------------------------------------------- */
+
+export default function CampusTermForm({ doorcard }: Props) {
+  const [college, setCollege] = useState<College | "">(doorcard.college ?? "");
+  const [term, setTerm] = useState(doorcard.term ?? "");
+  const [year, setYear] = useState(doorcard.year ?? "");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+  const [clientTried, setClientTried] = useState(false);
 
-  // Server action state
-  const [state, formAction] = useActionState(
+  const [state, serverAction] = useActionState<ActionState, FormData>(
     validateCampusTerm.bind(null, doorcard.id),
-    {
-      success: true,
-    }
+    { success: true }
   );
 
-  // Client-side validation function
+  /* ------------------------------ Validation ------------------------------ */
+
   const validateField = (
-    fieldName: keyof FieldErrors,
+    name: keyof FieldErrors,
     value: string
   ): string | undefined => {
-    switch (fieldName) {
+    if (!value) return "Required";
+    switch (name) {
       case "college":
-        if (!value) return "Campus is required";
-        if (!["SKYLINE", "CSM", "CANADA"].includes(value))
-          return "Please select a valid campus";
-        return undefined;
+        return COLLEGE_OPTIONS.includes(value as College)
+          ? undefined
+          : "Invalid campus";
       case "term":
-        if (!value) return "Term is required";
-        if (!["Fall", "Spring", "Summer", "Winter"].includes(value))
-          return "Please select a valid term";
-        return undefined;
+        return TERM_OPTIONS.includes(value as any) ? undefined : "Invalid term";
       case "year":
-        if (!value) return "Year is required";
-        const currentYear = new Date().getFullYear();
-        const yearNum = parseInt(value);
-        if (
-          isNaN(yearNum) ||
-          yearNum < currentYear ||
-          yearNum > currentYear + 5
-        ) {
-          return "Please select a valid year";
-        }
-        return undefined;
+        return YEAR_OPTIONS.includes(value) ? undefined : "Invalid year";
       default:
         return undefined;
     }
   };
 
-  // Validate all fields
-  const validateAllFields = (): FieldErrors => {
-    return {
-      college: validateField("college", college),
-      term: validateField("term", term),
-      year: validateField("year", year),
-    };
-  };
+  const validateAll = (): FieldErrors => ({
+    college: validateField("college", college),
+    term: validateField("term", term),
+    year: validateField("year", year),
+  });
 
-  // Real-time validation on field change
-  const handleFieldChange = (fieldName: keyof FieldErrors, value: string) => {
-    // Update field value
-    switch (fieldName) {
-      case "college":
-        setCollege(value);
-        break;
-      case "term":
-        setTerm(value);
-        break;
-      case "year":
-        setYear(value);
-        break;
-    }
-
-    // Clear field error if now valid, or show error if attempted submit
-    if (hasAttemptedSubmit || fieldErrors[fieldName]) {
-      const error = validateField(fieldName, value);
-      setFieldErrors((prev) => ({
-        ...prev,
-        [fieldName]: error,
-      }));
-    }
-  };
-
-  // Form submission with comprehensive validation
   const handleSubmit = (formData: FormData) => {
-    setHasAttemptedSubmit(true);
+    setClientTried(true);
+    const errs = validateAll();
+    setFieldErrors(errs);
+    if (Object.values(errs).some(Boolean)) return;
 
-    // Run client-side validation
-    const errors = validateAllFields();
-    const hasErrors = Object.values(errors).some((error) => error);
-
-    if (hasErrors) {
-      setFieldErrors(errors);
-      return;
-    }
-
-    // Clear field errors
-    setFieldErrors({});
-
-    // Set the values in FormData to ensure they're sent
+    // ensure values are sent to the server action
     formData.set("college", college);
     formData.set("term", term);
     formData.set("year", year);
-
-    // Call the server action
-    formAction(formData);
+    serverAction(formData);
   };
 
-  // Check if form is valid
-  const isFormValid =
-    college &&
-    term &&
-    year &&
-    Object.values(fieldErrors).every((error) => !error);
-  const hasAnyFieldErrors = Object.values(fieldErrors).some((error) => error);
+  const anyClientErrors = Object.values(fieldErrors).some(Boolean);
+  const errorClass =
+    "mt-1.5 border-red-300 focus:ring-red-500 focus:border-red-500";
+
+  /* ------------------------------- Rendering ------------------------------ */
 
   return (
     <div className="space-y-8">
-      {/* Main Form */}
-      <form action={handleSubmit} className="space-y-8">
-        {/* Step Description */}
-        <div className="flex items-start gap-3 pb-2">
-          <CheckCircle2 className="h-5 w-5 text-blue-500 mt-1 flex-shrink-0" />
-          <div>
-            <h3 className="font-medium text-gray-900">
-              Select Your Campus and Term
-            </h3>
-            <p className="text-sm text-gray-500 mt-1">
-              Choose where and when this doorcard will be active. You can create
-              one doorcard per campus per term.
-            </p>
-          </div>
+      <div className="flex items-start gap-3">
+        <CheckCircle2 className="h-5 w-5 text-blue-500 mt-1 shrink-0" />
+        <div>
+          <h3 className="font-medium text-gray-900">
+            Select Campus &amp; Term
+          </h3>
+          <p className="text-sm text-gray-500">
+            One doorcard per campus per term. Choose where this one applies.
+          </p>
         </div>
+      </div>
 
-        {/* Overall Error Display (Server errors or form-level validation) */}
-        {state && !state.success && state.message && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <AlertCircle
-                  className="h-5 w-5 text-red-400"
-                  aria-hidden="true"
-                />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">
-                  Cannot Create Doorcard
-                </h3>
-                <div className="mt-2 text-sm text-red-700">
-                  <p>{state.message}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+      {!state.success && state.message && <Alert>{state.message}</Alert>}
 
-        {/* Client-side validation summary */}
-        {hasAttemptedSubmit && hasAnyFieldErrors && (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <AlertCircle
-                  className="h-5 w-5 text-red-400"
-                  aria-hidden="true"
-                />
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">
-                  Please correct the following errors:
-                </h3>
-                <div className="mt-2 text-sm text-red-700">
-                  <ul className="list-disc list-inside space-y-1">
-                    {fieldErrors.college && <li>{fieldErrors.college}</li>}
-                    {fieldErrors.term && <li>{fieldErrors.term}</li>}
-                    {fieldErrors.year && <li>{fieldErrors.year}</li>}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+      {clientTried && anyClientErrors && (
+        <Alert>Please fill in all required fields correctly.</Alert>
+      )}
 
-        {/* Form Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <form action={handleSubmit} className="space-y-8" noValidate>
+        <div className="grid gap-6 md:grid-cols-3">
+          {/* Campus */}
           <div>
-            <Label
-              htmlFor="college"
-              className="text-sm font-medium text-gray-900"
-            >
+            <Label className="text-sm font-medium">
               Campus <span className="text-red-500">*</span>
             </Label>
             <Select
-              name="college"
               value={college}
-              onValueChange={(value) => handleFieldChange("college", value)}
-              required
+              onValueChange={(v) => {
+                setCollege(v as College);
+                if (clientTried)
+                  setFieldErrors((prev) => ({
+                    ...prev,
+                    college: validateField("college", v),
+                  }));
+              }}
             >
               <SelectTrigger
-                className={`mt-1.5 ${
-                  fieldErrors.college
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                    : ""
-                }`}
+                aria-invalid={!!fieldErrors.college}
+                className={fieldErrors.college ? errorClass : "mt-1.5"}
               >
-                <SelectValue placeholder="Select a campus" />
+                <SelectValue placeholder="Select campus" />
               </SelectTrigger>
               <SelectContent>
-                {COLLEGES.map((collegeOption) => (
-                  <SelectItem
-                    key={collegeOption.value}
-                    value={collegeOption.value}
-                  >
-                    {collegeOption.label}
+                {COLLEGE_OPTIONS.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {COLLEGE_META[c].label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {fieldErrors.college && (
-              <p className="mt-1 text-sm text-red-600">{fieldErrors.college}</p>
+              <ErrorText>{fieldErrors.college}</ErrorText>
             )}
           </div>
 
+          {/* Term */}
           <div>
-            <Label htmlFor="term" className="text-sm font-medium text-gray-900">
+            <Label className="text-sm font-medium">
               Term <span className="text-red-500">*</span>
             </Label>
             <Select
-              name="term"
               value={term}
-              onValueChange={(value) => handleFieldChange("term", value)}
-              required
+              onValueChange={(v) => {
+                setTerm(v);
+                if (clientTried)
+                  setFieldErrors((prev) => ({
+                    ...prev,
+                    term: validateField("term", v),
+                  }));
+              }}
             >
               <SelectTrigger
-                className={`mt-1.5 ${
-                  fieldErrors.term
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                    : ""
-                }`}
+                aria-invalid={!!fieldErrors.term}
+                className={fieldErrors.term ? errorClass : "mt-1.5"}
               >
-                <SelectValue placeholder="Select a term" />
+                <SelectValue placeholder="Select term" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Fall">Fall</SelectItem>
-                <SelectItem value="Spring">Spring</SelectItem>
-                <SelectItem value="Summer">Summer</SelectItem>
-                <SelectItem value="Winter">Winter</SelectItem>
+                {TERM_OPTIONS.map((t) => (
+                  <SelectItem key={t} value={t}>
+                    {t}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            {fieldErrors.term && (
-              <p className="mt-1 text-sm text-red-600">{fieldErrors.term}</p>
-            )}
+            {fieldErrors.term && <ErrorText>{fieldErrors.term}</ErrorText>}
           </div>
 
+          {/* Year */}
           <div>
-            <Label htmlFor="year" className="text-sm font-medium text-gray-900">
+            <Label className="text-sm font-medium">
               Year <span className="text-red-500">*</span>
             </Label>
             <Select
-              name="year"
               value={year}
-              onValueChange={(value) => handleFieldChange("year", value)}
-              required
+              onValueChange={(v) => {
+                setYear(v);
+                if (clientTried)
+                  setFieldErrors((prev) => ({
+                    ...prev,
+                    year: validateField("year", v),
+                  }));
+              }}
             >
               <SelectTrigger
-                className={`mt-1.5 ${
-                  fieldErrors.year
-                    ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                    : ""
-                }`}
+                aria-invalid={!!fieldErrors.year}
+                className={fieldErrors.year ? errorClass : "mt-1.5"}
               >
-                <SelectValue placeholder="Select a year" />
+                <SelectValue placeholder="Select year" />
               </SelectTrigger>
               <SelectContent>
-                {Array.from({ length: 5 }, (_, i) => {
-                  const yearValue = new Date().getFullYear() + i;
-                  return (
-                    <SelectItem key={yearValue} value={yearValue.toString()}>
-                      {yearValue}
-                    </SelectItem>
-                  );
-                })}
+                {YEAR_OPTIONS.map((y) => (
+                  <SelectItem key={y} value={y}>
+                    {y}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
-            {fieldErrors.year && (
-              <p className="mt-1 text-sm text-red-600">{fieldErrors.year}</p>
-            )}
+            {fieldErrors.year && <ErrorText>{fieldErrors.year}</ErrorText>}
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="pt-6">
-          <SubmitButton />
-        </div>
+        <SubmitButton />
       </form>
 
-      {/* Help Text */}
       <div className="rounded-lg bg-gray-50 border border-gray-200">
         <div className="px-4 py-5 sm:p-6">
           <h3 className="text-sm font-medium text-gray-900">
-            About Campus & Term Selection
+            About Campus &amp; Term Selection
           </h3>
-          <div className="mt-2 max-w-xl text-sm text-gray-500">
-            <p>
-              To prevent confusion for students, you can only have one active
-              doorcard per campus per term. If you need to make changes to an
-              existing doorcard, you'll be directed to edit that one instead.
-            </p>
-          </div>
+          <p className="mt-2 text-sm text-gray-500">
+            To avoid confusion, you can only have one active doorcard per campus
+            per term. If one exists already you’ll be guided to edit it.
+          </p>
         </div>
       </div>
     </div>

@@ -157,7 +157,7 @@ export default function ResumeDoorcard({
             disabled={isDeleting}
             aria-describedby={`resume-desc-${draft.id}`}
           >
-            <Link href={`/create-doorcard`}>
+            <Link href={`/doorcard/${draft.id}/edit?step=0`}>
               <Play className="h-4 w-4 mr-2" />
               Resume Work
             </Link>
