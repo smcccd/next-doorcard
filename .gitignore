@@ -11,6 +11,7 @@
 # next.js
 /.next/
 /out/
+/.swc
 
 # production
 /build
@@ -46,3 +47,5 @@ prisma/dev.db-journal
 
 # Development process tracking
 .dev-pids
+
+.swc
