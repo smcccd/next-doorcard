@@ -111,6 +111,17 @@
   }
 }
 
+/* Utility classes for explicit font usage */
+@layer utilities {
+  .font-heading {
+    font-family: var(--font-source-sans), system-ui, sans-serif;
+  }
+  
+  .font-body {
+    font-family: var(--font-inter), system-ui, sans-serif;
+  }
+}
+
 /* Print Styles for Doorcard */
 @media print {
   @page {
