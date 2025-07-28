@@ -70,7 +70,9 @@ async function processUserBatch(users: UserData[]): Promise<WorkerResult> {
     });
 
     const idMappings = createdUsers.reduce((acc, user) => {
-      acc[user.username] = user.id;
+      if (user.username) {
+        acc[user.username] = user.id;
+      }
       return acc;
     }, {} as Record<string, string>);
 
