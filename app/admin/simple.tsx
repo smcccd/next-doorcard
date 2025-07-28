@@ -2,11 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import type { Doorcard, User } from "@prisma/client";
+
+type DoorcardWithUser = Doorcard & {
+  user?: Pick<User, 'email' | 'name'>;
+};
 
 export default function SimpleAdminPage() {
   const { data: session, status } = useSession();
   const [terms, setTerms] = useState([]);
-  const [doorcards, setDoorcards] = useState([]);
+  const [doorcards, setDoorcards] = useState<DoorcardWithUser[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -80,13 +85,13 @@ export default function SimpleAdminPage() {
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="font-medium">Active Doorcards</h3>
             <p className="text-2xl font-bold">
-              {doorcards.filter((d: any) => d.isActive).length}
+              {doorcards.filter((d) => d.isActive).length}
             </p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="font-medium">Faculty Members</h3>
             <p className="text-2xl font-bold">
-              {new Set(doorcards.map((d: any) => d.user?.email)).size}
+              {new Set(doorcards.map((d) => d.user?.email)).size}
             </p>
           </div>
         </div>
@@ -94,7 +99,7 @@ export default function SimpleAdminPage() {
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-lg font-semibold mb-4">Recent Doorcards</h2>
           <div className="space-y-2">
-            {doorcards.slice(0, 10).map((doorcard: any) => (
+            {doorcards.slice(0, 10).map((doorcard) => (
               <div key={doorcard.id} className="flex justify-between items-center p-2 border-b">
                 <div>
                   <span className="font-medium">{doorcard.doorcardName}</span>

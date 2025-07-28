@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
     ]);
 
     // Process campus breakdown
-    const campusBreakdown: any = {};
+    const campusBreakdown: Record<string, { users: number; doorcards: number; appointments: number }> = {};
     
     for (const stat of campusStats) {
       const campus = stat.college;

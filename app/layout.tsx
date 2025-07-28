@@ -9,6 +9,7 @@ import { ProfileSetupProvider } from "@/components/ProfileSetupProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { DarkModeProvider } from "@/components/DarkModeProvider";
 import ClarityInit from "@/components/ClarityInit";
+import { TourProvider } from "@/components/tour/TourProvider";
 import { ReactNode, Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -66,7 +67,8 @@ export default async function RootLayout({
 
         <DarkModeProvider>
           <AuthProvider session={session}>
-            <ProfileSetupProvider>
+            <TourProvider>
+              <ProfileSetupProvider>
             {/* Wrap Navbar in Suspense if it does async work */}
             <Suspense fallback={<div className="h-16" />}>
               <Navbar />
@@ -97,7 +99,8 @@ export default async function RootLayout({
                 aria-atomic="true"
                 className="sr-only"
               />
-            </ProfileSetupProvider>
+              </ProfileSetupProvider>
+            </TourProvider>
           </AuthProvider>
         </DarkModeProvider>
       </body>

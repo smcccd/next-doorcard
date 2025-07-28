@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
 
-export async function GET(req: Request) {
+export async function GET() {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
@@ -85,24 +85,6 @@ export async function GET(req: Request) {
       take: 20,
     });
 
-    // Get daily activity for the last 30 days
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-    const dailyActivity = await prisma.doorcardAnalytics.groupBy({
-      by: ['eventType'],
-      where: {
-        createdAt: {
-          gte: thirtyDaysAgo,
-        },
-      },
-      _count: {
-        eventType: true,
-      },
-      orderBy: {
-        eventType: 'asc',
-      },
-    });
 
     // Calculate engagement score for platform
     const totalViews = totalMetrics._sum.totalViews || 0;

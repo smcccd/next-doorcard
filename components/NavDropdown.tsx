@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
 import { DarkModeToggle } from "./DarkModeToggle";
+import { TourControl } from "./tour/TourControl";
 
 interface NavDropdownProps {
   userDisplay: string;
@@ -106,6 +107,11 @@ export function NavDropdown({
             Help
           </Link>
         </DropdownMenuItem>
+
+        {/* Tour Control in Header */}
+        <div className="px-2 py-1">
+          <TourControl showInHeader={true} />
+        </div>
 
         <DropdownMenuSeparator />
 

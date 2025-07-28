@@ -55,13 +55,11 @@ interface DoorcardOversightProps {
 
 const ITEMS_PER_PAGE = 12;
 const COLLEGES = ["SKYLINE", "CSM", "CANADA"];
-const STATUSES = ["active", "inactive", "public", "private"];
 
 export default function DoorcardOversight({
   doorcards,
   onEditDoorcard,
   onExportDoorcards,
-  onBulkAction,
 }: DoorcardOversightProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");

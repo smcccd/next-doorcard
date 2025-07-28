@@ -31,7 +31,7 @@ export const ClarityUtils = {
   setTag: (key: string, value: string) => {
     if (typeof window !== "undefined") {
       try {
-        Clarity.set(key, value);
+        Clarity.setTag(key, value);
         console.log(`🏷️ Clarity tag set: ${key} = ${value}`);
       } catch (error) {
         console.error("Failed to set Clarity tag:", error);

@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     const active = searchParams.get('active');
 
     // Build where clause
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     
     if (search) {
       where.OR = [
