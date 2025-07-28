@@ -14,7 +14,6 @@ import {
 import { type College } from "@/types/doorcard";
 import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
 import type { Doorcard, Appointment, User } from "@prisma/client";
-import CollegeLogo from "@/components/CollegeLogo";
 
 interface Props {
   doorcards: (Doorcard & {
@@ -151,13 +150,6 @@ function DoorcardCard({
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-2">
-            {doorcard.college && (
-              <CollegeLogo 
-                college={doorcard.college} 
-                height={20}
-                className="flex-shrink-0"
-              />
-            )}
             <Badge
               variant={badgeProps.variant}
               className={`flex items-center gap-1 ${badgeProps.className} text-xs`}
@@ -321,13 +313,6 @@ function DoorcardRow({
       <CardContent className="p-4 flex items-center justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            {doorcard.college && (
-              <CollegeLogo 
-                college={doorcard.college} 
-                height={18}
-                className="flex-shrink-0"
-              />
-            )}
             <p className="font-medium">
               {doorcard.doorcardName ||
                 `${doorcard.name || "Faculty Member"}'s ${doorcard.term} ${
