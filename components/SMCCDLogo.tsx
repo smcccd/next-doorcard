@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface SMCCDLogoProps {
   /** Width of the logo (height will scale proportionally) */
@@ -14,31 +14,32 @@ interface SMCCDLogoProps {
   /** Whether to make the logo clickable */
   onClick?: () => void;
   /** Accessibility label */
-  'aria-label'?: string;
+  "aria-label"?: string;
 }
 
 export default function SMCCDLogo({
   width,
   height = 57,
-  className = '',
-  color = '#FFFFFF',
+  className = "",
+  color = "#FFFFFF",
   animate = false,
   onClick,
-  'aria-label': ariaLabel = 'San Mateo County Community College District Logo',
+  "aria-label": ariaLabel = "San Mateo County Community College District Logo",
   ...props
 }: SMCCDLogoProps) {
   // Calculate proportional width if not provided
   const aspectRatio = 274.702 / 57.03;
-  const finalWidth = width || (height * aspectRatio);
+  const finalWidth = width || height * aspectRatio;
   const finalHeight = height || (width ? width / aspectRatio : 57);
 
   const svgClasses = [
     className,
-    animate && 'transition-all duration-300 hover:scale-105 hover:brightness-110',
-    onClick && 'cursor-pointer',
+    animate &&
+      "transition-all duration-300 hover:scale-105 hover:brightness-110",
+    onClick && "cursor-pointer",
   ]
     .filter(Boolean)
-    .join(' ');
+    .join(" ");
 
   return (
     <svg
@@ -50,7 +51,7 @@ export default function SMCCDLogo({
       className={svgClasses}
       onClick={onClick}
       aria-label={ariaLabel}
-      role={onClick ? 'button' : 'img'}
+      role={onClick ? "button" : "img"}
       {...props}
     >
       <g fill={color}>
@@ -73,12 +74,7 @@ export default function SMCCDLogo({
         strokeWidth=".825"
         d="M75.587 11.975c-1.228 1.863-5.389 7.523-5.388 16.54.001 15.521 12.579 28.103 28.102 28.103 15.52 0 28.102-12.582 28.102-28.103 0-15.52-12.582-28.102-28.102-28.102a27.965 27.965 0 0 0-17.284 5.953M51.086 45.255c3.204-4.466 5.533-10.038 5.533-16.74 0-15.52-12.583-28.102-28.104-28.102C12.995.413.413 12.995.413 28.515c0 15.521 12.582 28.103 28.102 28.103 6.569 0 12.605-2.26 17.389-6.033"
       />
-      <g
-        fill="none"
-        stroke={color}
-        strokeMiterlimit="3.864"
-        strokeWidth=".825"
-      >
+      <g fill="none" stroke={color} strokeMiterlimit="3.864" strokeWidth=".825">
         <path d="M80.833 50.589a27.993 27.993 0 0 1-17.398 6.029c-15.522 0-28.1-12.582-28.1-28.103 0-6.806 2.911-13.259 5.387-16.54M86.152 45.063c3.146-4.779 5.384-9.944 5.384-16.548 0-15.52-12.582-28.102-28.102-28.102a27.964 27.964 0 0 0-17.291 5.96" />
       </g>
     </svg>

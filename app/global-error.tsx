@@ -3,7 +3,19 @@
 import * as Sentry from "@sentry/nextjs";
 import NextError from "next/error";
 import { useEffect } from "react";
+import { Inter, Source_Sans_3 } from "next/font/google";
 
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-source-sans",
+});
 export default function GlobalError({
   error,
 }: {
@@ -14,7 +26,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html>
+    <html lang="en" className={`${inter.variable} ${sourceSans.variable}`}>
       <body>
         {/* `NextError` is the default Next.js error page component. Its type
         definition requires a `statusCode` prop. However, since the App Router

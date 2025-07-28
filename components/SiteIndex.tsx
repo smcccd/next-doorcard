@@ -36,7 +36,7 @@ export default function SiteIndex() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="w-full bg-gradient-to-r from-blue-800 to-blue-900 dark:from-blue-900 dark:to-blue-950 shadow-sm">
+    <div className="mb-8 w-full bg-gradient-to-r from-blue-800 to-blue-900 dark:from-blue-900 dark:to-blue-950 shadow-sm">
       {/* Desktop View */}
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-6">

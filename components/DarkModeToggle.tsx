@@ -11,10 +11,10 @@ export function DarkModeToggle() {
       variant="ghost"
       size="sm"
       onClick={toggleDarkMode}
-      className="relative text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 hover:scale-110 active:scale-95 group"
+      className="w-full justify-start text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 group"
       title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
     >
-      <div className="relative w-5 h-5">
+      <div className="relative w-5 h-5 mr-2">
         {/* Animated SVG */}
         <svg
           width="20"
@@ -74,6 +74,9 @@ export function DarkModeToggle() {
           />
         </svg>
       </div>
+      <span className="text-sm font-medium">
+        {isDarkMode ? "Light Mode" : "Dark Mode"}
+      </span>
     </Button>
   );
 }

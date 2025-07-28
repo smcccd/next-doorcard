@@ -16,8 +16,32 @@ export default function ClarityInit() {
           process.env.NEXT_PUBLIC_CLARITY_ID,
         );
 
-        // Optional: Add a custom event to verify it's working
-        Clarity.event("clarity_initialized");
+        // Add custom events for better tracking
+        Clarity.event("app_initialized");
+
+        // Add custom tags for environment and app info
+        Clarity.setTag("environment", process.env.NODE_ENV || "development");
+        Clarity.setTag("app_name", "Faculty Doorcard");
+        Clarity.setTag("version", "1.0.0");
+
+        // Track page load
+        Clarity.event("page_loaded");
+
+        // Optional: Track user interactions
+        const trackUserInteraction = () => {
+          Clarity.event("user_interaction");
+        };
+
+        // Add event listeners for key interactions
+        document.addEventListener("click", trackUserInteraction);
+        document.addEventListener("scroll", () => {
+          Clarity.event("page_scroll");
+        });
+
+        // Cleanup event listeners
+        return () => {
+          document.removeEventListener("click", trackUserInteraction);
+        };
       } catch (error) {
         console.error("❌ Failed to initialize Microsoft Clarity:", error);
       }

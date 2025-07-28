@@ -40,22 +40,17 @@ export default async function Navbar() {
       aria-label="Primary"
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-        <div className="flex flex-shrink-0 items-center justify-center gap-4">
-          <Link href="/" className="group block" prefetch={false}>
-            <div className="flex flex-col items-center transition-all duration-700 group-hover:scale-110 group-hover:-translate-y-1">
-              <div className="transition-all duration-700 group-hover:drop-shadow-2xl group-hover:rotate-2 group-hover:scale-110">
-                <SMCCDLogo
-                  height={45}
-                  className="w-[160px] sm:w-[180px] transition-all duration-700 group-hover:brightness-125 group-hover:scale-110 animate-pulse hover:animate-spin"
-                />
-              </div>
-              <div className="text-base font-semibold sm:text-lg font-heading transition-all duration-700 group-hover:text-blue-300 tracking-widest -ml-8 sm:-ml-10 group-hover:tracking-wider group-hover:scale-110 animate-bounce hover:animate-ping">
-                Faculty Doorcard
-              </div>
-              <div className="w-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-700 group-hover:w-full group-hover:h-1 rounded-full opacity-0 group-hover:opacity-100"></div>
-            </div>
-          </Link>
-        </div>
+        <Link
+          href="/"
+          className="flex flex-row sm:flex-col items-center gap-2 sm:gap-0.5"
+          prefetch={false}
+        >
+          <SMCCDLogo height={40} className="w-[140px] sm:w-[160px]" />
+          <div className="hidden sm:block w-1/3 h-px bg-white/30 my-0.5"></div>
+          <span className="text-sm sm:text-base font-heading font-semibold tracking-wide text-center">
+            Faculty Doorcard
+          </span>
+        </Link>
 
         <div className="hidden lg:flex flex-1 items-center justify-center gap-x-6">
           {navLinks.map((link) => (
