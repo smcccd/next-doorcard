@@ -11,9 +11,10 @@ import {
   Archive,
   AlertTriangle,
 } from "lucide-react";
-import { COLLEGE_META, type College } from "@/types/doorcard";
+import { type College } from "@/types/doorcard";
 import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
 import type { Doorcard, Appointment, User } from "@prisma/client";
+import CollegeLogo from "@/components/CollegeLogo";
 
 interface Props {
   doorcards: (Doorcard & {
@@ -65,10 +66,6 @@ function publicSlug(user?: { username?: string | null; name?: string | null }) {
   return "user";
 }
 
-function campusLabel(college?: string | null) {
-  if (!college) return null;
-  return COLLEGE_META[college as College]?.label || college;
-}
 
 /* -------------------------------------------------------------------------- */
 /* Card (grid variant)                                                        */
@@ -133,19 +130,44 @@ function DoorcardCard({
 
   const badgeProps = getBadgeProps(displayStatus.status);
 
+  // Campus-specific card styling
+  const getCampusCardStyle = (college?: College) => {
+    if (!college) return "hover:shadow-sm";
+    
+    switch (college) {
+      case "SKYLINE":
+        return "hover:shadow-sm border-l-4 border-l-blue-500 hover:border-l-blue-600 bg-gradient-to-r from-blue-50/30 to-transparent dark:from-blue-950/30";
+      case "CSM":
+        return "hover:shadow-sm border-l-4 border-l-red-500 hover:border-l-red-600 bg-gradient-to-r from-red-50/30 to-transparent dark:from-red-950/30";
+      case "CANADA":
+        return "hover:shadow-sm border-l-4 border-l-green-500 hover:border-l-green-600 bg-gradient-to-r from-green-50/30 to-transparent dark:from-green-950/30";
+      default:
+        return "hover:shadow-sm";
+    }
+  };
+
   return (
-    <Card className="hover:shadow-sm">
+    <Card className={getCampusCardStyle(doorcard.college)}>
       <CardHeader className="pb-2">
-        <div className="flex justify-between">
-          <Badge
-            variant={badgeProps.variant}
-            className={`flex items-center gap-1 ${badgeProps.className}`}
-            data-testid="status-badge"
-            title={displayStatus.description}
-          >
-            {badgeProps.icon}
-            {displayStatus.label}
-          </Badge>
+        <div className="flex justify-between items-start">
+          <div className="flex items-center gap-2">
+            {doorcard.college && (
+              <CollegeLogo 
+                college={doorcard.college} 
+                height={20}
+                className="flex-shrink-0"
+              />
+            )}
+            <Badge
+              variant={badgeProps.variant}
+              className={`flex items-center gap-1 ${badgeProps.className} text-xs`}
+              data-testid="status-badge"
+              title={displayStatus.description}
+            >
+              {badgeProps.icon}
+              {displayStatus.label}
+            </Badge>
+          </div>
         </div>
         <CardTitle as="h3" className="text-base">
           {doorcard.doorcardName ||
@@ -159,12 +181,6 @@ function DoorcardCard({
         </p>
       </CardHeader>
       <CardContent className="text-xs space-y-2">
-        {doorcard.college && (
-          <div>
-            <span className="text-gray-600">Campus:</span>{" "}
-            {campusLabel(doorcard.college)}
-          </div>
-        )}
         <div>
           <span className="text-gray-600">Term:</span> {doorcard.term}{" "}
           {doorcard.year}
@@ -284,11 +300,34 @@ function DoorcardRow({
 
   const badgeProps = getBadgeProps(displayStatus.status);
 
+  // Campus-specific card styling for list view
+  const getCampusRowStyle = (college?: College) => {
+    if (!college) return "";
+    
+    switch (college) {
+      case "SKYLINE":
+        return "border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-50/20 to-transparent dark:from-blue-950/20";
+      case "CSM":
+        return "border-l-4 border-l-red-500 bg-gradient-to-r from-red-50/20 to-transparent dark:from-red-950/20";
+      case "CANADA":
+        return "border-l-4 border-l-green-500 bg-gradient-to-r from-green-50/20 to-transparent dark:from-green-950/20";
+      default:
+        return "";
+    }
+  };
+
   return (
-    <Card>
+    <Card className={getCampusRowStyle(doorcard.college)}>
       <CardContent className="p-4 flex items-center justify-between">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
+            {doorcard.college && (
+              <CollegeLogo 
+                college={doorcard.college} 
+                height={18}
+                className="flex-shrink-0"
+              />
+            )}
             <p className="font-medium">
               {doorcard.doorcardName ||
                 `${doorcard.name || "Faculty Member"}'s ${doorcard.term} ${
@@ -297,7 +336,7 @@ function DoorcardRow({
             </p>
             <Badge
               variant={badgeProps.variant}
-              className={`flex items-center gap-1 ${badgeProps.className}`}
+              className={`flex items-center gap-1 ${badgeProps.className} text-xs`}
               data-testid="status-badge"
               title={displayStatus.description}
             >

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Driver.js Test</title>
+    <script src="https://unpkg.com/driver.js@1.3.6/dist/driver.js.iife.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/driver.js@1.3.6/dist/driver.css">
+</head>
+<body>
+    <div style="padding: 50px;">
+        <h1>Driver.js Test</h1>
+        <button id="start-tour">Start Tour</button>
+        <div id="step1" style="margin: 20px; padding: 20px; border: 1px solid #ccc;">
+            Step 1 Element
+        </div>
+        <div id="step2" style="margin: 20px; padding: 20px; border: 1px solid #ccc;">
+            Step 2 Element
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('start-tour').addEventListener('click', function() {
+            const driverObj = driver({
+                showProgress: true,
+                steps: [
+                    { element: '#step1', popover: { title: 'Step 1', description: 'This is the first step' } },
+                    { element: '#step2', popover: { title: 'Step 2', description: 'This is the second step' } }
+                ]
+            });
+            driverObj.drive();
+        });
+    </script>
+</body>
+</html>

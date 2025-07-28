@@ -38,7 +38,7 @@ export const DASHBOARD_TOUR_STEPS: TourStep[] = [
       requiredInputType: "click",
       inputSelector: '[data-tour="create-doorcard-btn"]',
       onUserInputComplete: () => {
-        console.log("User clicked create doorcard button!");
+        // User completed create doorcard action
       },
     },
   },
@@ -222,6 +222,8 @@ export const useTourSteps = () => {
         const element = document.querySelector(selector);
         if (element) {
           element.setAttribute("data-tour", tourId);
+        } else {
+          console.warn(`Tour preparation: Element not found for selector: ${selector}`);
         }
       });
     }, 100);
@@ -249,6 +251,8 @@ export const useTourSteps = () => {
         const element = document.querySelector(selector);
         if (element) {
           element.setAttribute("data-tour", tourId);
+        } else {
+          console.warn(`Tour preparation: Element not found for selector: ${selector}`);
         }
       });
     }, 100);
@@ -279,6 +283,8 @@ export const useTourSteps = () => {
         const element = document.querySelector(selector);
         if (element) {
           element.setAttribute("data-tour", tourId);
+        } else {
+          console.warn(`Tour preparation: Element not found for selector: ${selector}`);
         }
       });
     }, 100);

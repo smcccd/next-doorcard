@@ -81,7 +81,7 @@ export const TourControl: React.FC<TourControlProps> = ({
     },
   ];
 
-  const handleStartTour = (tourId: string) => {
+  const handleStartTour = async (tourId: string) => {
     const tour = tourOptions.find((t) => t.id === tourId);
     if (!tour) return;
 
@@ -89,11 +89,9 @@ export const TourControl: React.FC<TourControlProps> = ({
     tour.prepare();
 
     // Start the tour
-    startTour(tour.steps, {
+    await startTour(tour.steps, {
       showProgress: true,
       allowClose: true,
-      overlayOpacity: 0.7,
-      smoothScroll: true,
     });
   };
 

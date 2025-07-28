@@ -83,7 +83,7 @@ export default function TourDemoPage() {
           "Choose your college from this dropdown. The tour waits for your selection.",
         waitForUserInput: true,
         requiredInputType: "select",
-        inputSelector: '[data-tour="college-select"] select',
+        inputSelector: '[data-tour="college-select"]',
       },
     },
     {
@@ -154,7 +154,10 @@ export default function TourDemoPage() {
   };
 
   const startDemoTour = () => {
-    startTour(demoTourSteps);
+    // Small delay to ensure all elements are properly mounted
+    setTimeout(async () => {
+      await startTour(demoTourSteps);
+    }, 100);
   };
 
   return (
@@ -251,9 +254,14 @@ export default function TourDemoPage() {
                 <div className="space-y-2">
                   <Label htmlFor="college-select">College *</Label>
                   <Select
-                    onValueChange={(value) =>
-                      handleInputChange("college", value)
-                    }
+                    onValueChange={(value) => {
+                      handleInputChange("college", value);
+                      // Trigger tour input completion for select
+                      const selectElement = document.querySelector('[data-tour="college-select"]');
+                      if (selectElement) {
+                        selectElement.dispatchEvent(new Event('change', { bubbles: true }));
+                      }
+                    }}
                   >
                     <SelectTrigger id="college-select">
                       <SelectValue placeholder="Select your college" />

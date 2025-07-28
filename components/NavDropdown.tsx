@@ -43,9 +43,7 @@ export function NavDropdown({
           className="text-white hover:text-white focus:text-white hover:bg-gray-900 focus:bg-gray-900 gap-2 bg-transparent border-gray-600 hover:border-gray-400 focus:border-gray-400"
         >
           {/* Show different content on mobile vs desktop */}
-          <span className="hidden xl:block text-sm">
-            Welcome, <span className="font-medium">{userDisplay}</span>
-          </span>
+          <span className="hidden xl:block text-sm font-medium">Menu</span>
           <span className="hidden sm:block xl:hidden text-sm font-medium">
             Menu
           </span>

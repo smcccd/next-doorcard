@@ -1,19 +1,18 @@
-// components/Navbar.tsx (SERVER COMPONENT)
-import Image from "next/image";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { NavDropdown } from "./NavDropdown";
 import { prisma } from "@/lib/prisma";
+import SMCCDLogo from "./SMCCDLogo";
 
 const navLinks = [
-  { href: "//smccd.edu/", text: "Home" },
-  { href: "//smccd.edu/aboutus/", text: "About Us" },
-  { href: "//smccd.edu/boardoftrustees/", text: "Board of Trustees" },
-  { href: "//smccd.edu/departments/", text: "Departments" },
+  { href: "https://smccd.edu/", text: "Home" },
+  { href: "https://smccd.edu/aboutus/", text: "About Us" },
+  { href: "https://smccd.edu/boardoftrustees/", text: "Board of Trustees" },
+  { href: "https://smccd.edu/departments/", text: "Departments" },
   { href: "https://jobs.smccd.edu/", text: "Employment" },
   { href: "http://foundation.smccd.edu", text: "Foundation" },
-  { href: "//smccd.edu/aboutus/contactus.php", text: "Contact Us" },
+  { href: "https://smccd.edu/aboutus/contactus.php", text: "Contact Us" },
 ];
 
 export default async function Navbar() {
@@ -41,32 +40,30 @@ export default async function Navbar() {
       aria-label="Primary"
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
-        <div className="flex flex-shrink-0 items-center gap-4">
-          <Link href="/" className="block" prefetch={false}>
-            <div className="text-center">
-              <Image
-                src="/smccd-logo-white.svg"
-                alt="San Mateo County Community College District"
-                width={140}
-                height={47}
-                priority
-                className="h-auto w-[120px] sm:w-[140px] "
-              />
-              <div className="text-lg font-semibold tracking-wide sm:text-xl mt-1">
+        <div className="flex flex-shrink-0 items-center justify-center gap-4">
+          <Link href="/" className="group block" prefetch={false}>
+            <div className="flex flex-col items-center transition-all duration-300 group-hover:scale-105">
+              <div className="transition-all duration-300 group-hover:drop-shadow-lg">
+                <SMCCDLogo
+                  height={45}
+                  className="w-[160px] sm:w-[180px] transition-all duration-300 group-hover:brightness-110"
+                />
+              </div>
+              <div className="text-base font-semibold sm:text-lg font-heading transition-all duration-300 group-hover:text-blue-200 tracking-widest">
                 Faculty Doorcard
               </div>
             </div>
           </Link>
         </div>
 
-        <div className="hidden lg:flex flex-1 items-center justify-center gap-x-4">
+        <div className="hidden lg:flex flex-1 items-center justify-center gap-x-6">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white transition-colors text-sm font-medium whitespace-nowrap"
+              className="text-gray-300 hover:text-white transition-colors text-md font-medium whitespace-nowrap"
             >
               {link.text}
             </a>
@@ -82,7 +79,7 @@ export default async function Navbar() {
               className="rounded bg-blue-500 px-3 py-1 text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
               prefetch={false}
             >
-              Faculty Login
+              Login
             </Link>
           )}
         </div>
