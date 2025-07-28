@@ -54,7 +54,7 @@ export default {
         },
       },
       fontFamily: {
-        'sans': ['var(--font-source-sans)', 'system-ui', 'sans-serif'],
+        'sans': ['var(--font-inter)', 'system-ui', 'sans-serif'],
         'heading': ['var(--font-source-sans)', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
