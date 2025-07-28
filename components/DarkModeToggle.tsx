@@ -11,7 +11,7 @@ export function DarkModeToggle() {
       variant="ghost"
       size="sm"
       onClick={toggleDarkMode}
-      className="w-full justify-start text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 group"
+      className="w-full justify-start text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 group cursor-pointer"
       title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
     >
       <div className="relative w-5 h-5 mr-2">

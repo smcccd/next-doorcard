@@ -286,22 +286,49 @@ describe("Auth Configuration", () => {
   });
 
   describe("Environment Variables", () => {
-    it("should require OneLogin client ID", () => {
+    let originalClientId: string | undefined;
+    let originalClientSecret: string | undefined;
+
+    beforeEach(() => {
+      // Store original values
+      originalClientId = process.env.ONELOGIN_CLIENT_ID;
+      originalClientSecret = process.env.ONELOGIN_CLIENT_SECRET;
+    });
+
+    afterEach(() => {
+      // Restore original values
+      if (originalClientId) {
+        process.env.ONELOGIN_CLIENT_ID = originalClientId;
+      } else {
+        delete process.env.ONELOGIN_CLIENT_ID;
+      }
+      if (originalClientSecret) {
+        process.env.ONELOGIN_CLIENT_SECRET = originalClientSecret;
+      } else {
+        delete process.env.ONELOGIN_CLIENT_SECRET;
+      }
+    });
+
+    it("should require OneLogin client ID", async () => {
       delete process.env.ONELOGIN_CLIENT_ID;
 
-      // The provider is configured with process.env.ONELOGIN_CLIENT_ID!
-      // If missing, it would be undefined (not throw)
+      // Re-import to get fresh configuration
+      jest.resetModules();
+      const { authOptions } = await import("../auth");
+
       const oneLoginProvider = authOptions.providers.find(
         (p: any) => p.id === "onelogin",
       );
       expect(oneLoginProvider?.clientId).toBeUndefined();
     });
 
-    it("should require OneLogin client secret", () => {
+    it("should require OneLogin client secret", async () => {
       delete process.env.ONELOGIN_CLIENT_SECRET;
 
-      // The provider is configured with process.env.ONELOGIN_CLIENT_SECRET!
-      // If missing, it would be undefined (not throw)
+      // Re-import to get fresh configuration
+      jest.resetModules();
+      const { authOptions } = await import("../auth");
+
       const oneLoginProvider = authOptions.providers.find(
         (p: any) => p.id === "onelogin",
       );

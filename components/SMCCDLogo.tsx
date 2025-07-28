@@ -34,6 +34,8 @@ export default function SMCCDLogo({
 
   const svgClasses = [
     className,
+    "antialiased",
+    "subpixel-antialiased",
     animate &&
       "transition-all duration-300 hover:scale-105 hover:brightness-110",
     onClick && "cursor-pointer",
@@ -52,6 +54,11 @@ export default function SMCCDLogo({
       onClick={onClick}
       aria-label={ariaLabel}
       role={onClick ? "button" : "img"}
+      style={{
+        shapeRendering: "geometricPrecision",
+        textRendering: "optimizeLegibility",
+        imageRendering: "optimizeQuality",
+      }}
       {...props}
     >
       <g fill={color}>

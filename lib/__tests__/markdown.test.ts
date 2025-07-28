@@ -1,25 +1,30 @@
 // Mock dependencies first
-const mockMarked = jest.fn();
-const mockHighlight = jest.fn();
-const mockGetLanguage = jest.fn();
-
 jest.mock("marked", () => ({
-  marked: mockMarked,
+  marked: {
+    setOptions: jest.fn(),
+    parse: jest.fn(),
+  },
 }));
 
 jest.mock("highlight.js", () => ({
-  getLanguage: mockGetLanguage,
-  highlight: mockHighlight,
+  getLanguage: jest.fn(),
+  highlight: jest.fn(),
 }));
 
 import { parseMarkdown } from "../markdown";
+import { marked } from "marked";
+import hljs from "highlight.js";
+
+const mockParse = marked.parse as jest.MockedFunction<typeof marked.parse>;
+const mockGetLanguage = hljs.getLanguage as jest.MockedFunction<typeof hljs.getLanguage>;
+const mockHighlight = hljs.highlight as jest.MockedFunction<typeof hljs.highlight>;
 
 describe("Markdown Utils", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockMarked.mockImplementation((text: string) => `<p>${text}</p>`);
+    mockParse.mockImplementation((text: string) => `<p>${text}</p>`);
     mockGetLanguage.mockReturnValue(true);
-    mockHighlight.mockReturnValue({ value: "highlighted-code" });
+    mockHighlight.mockReturnValue({ value: "highlighted-code" } as any);
   });
 
   describe("parseMarkdown", () => {
@@ -28,14 +33,14 @@ describe("Markdown Utils", () => {
       const result = parseMarkdown(markdown);
 
       expect(result).toBe("<p>Hello **world**</p>");
-      expect(mockMarked).toHaveBeenCalledWith(markdown);
+      expect(mockParse).toHaveBeenCalledWith(markdown);
     });
 
     it("should handle empty markdown", () => {
       const result = parseMarkdown("");
 
       expect(result).toBe("<p></p>");
-      expect(mockMarked).toHaveBeenCalledWith("");
+      expect(mockParse).toHaveBeenCalledWith("");
     });
 
     it("should handle markdown with line breaks", () => {
@@ -46,7 +51,7 @@ describe("Markdown Utils", () => {
     });
 
     it("should handle errors gracefully", () => {
-      mockMarked.mockImplementation(() => {
+      mockParse.mockImplementation(() => {
         throw new Error("Parsing error");
       });
 

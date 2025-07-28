@@ -107,9 +107,9 @@ export function NavDropdown({
 
         <DropdownMenuSeparator />
 
-        <div className="px-2 py-1">
+        <DropdownMenuItem className="p-0">
           <DarkModeToggle />
-        </div>
+        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 

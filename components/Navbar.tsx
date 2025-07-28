@@ -42,14 +42,17 @@ export default async function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
         <Link
           href="/"
-          className="flex flex-row sm:flex-col items-center gap-2 sm:gap-0.5"
           prefetch={false}
+          className="flex flex-row sm:flex-col items-center gap-3 sm:gap-2 group"
         >
-          <SMCCDLogo height={40} className="w-[140px] sm:w-[160px]" />
-          <div className="hidden sm:block w-1/3 h-px bg-white/30 my-0.5"></div>
-          <span className="text-sm sm:text-base font-heading font-semibold tracking-wide text-center">
+          <SMCCDLogo
+            height={100}
+            width={225}
+            className="transition mb-[-20px] duration-300 sm:group-hover:brightness-125"
+          />
+          <div className="text-xs sm:text-sm md:text-base font-heading font-semibold tracking-wide text-center text-white/90 group-hover:text-white transition-colors duration-300">
             Faculty Doorcard
-          </span>
+          </div>
         </Link>
 
         <div className="hidden lg:flex flex-1 items-center justify-center gap-x-6">

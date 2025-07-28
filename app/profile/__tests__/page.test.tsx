@@ -49,18 +49,20 @@ jest.mock("@/components/ui/card", () => ({
 
 jest.mock("@/components/ui/select", () => ({
   Select: ({ children, onValueChange, value }: any) => (
-    <div data-testid="select">
-      <select onChange={(e) => onValueChange(e.target.value)} value={value}>
-        {children}
-      </select>
-    </div>
+    <select 
+      data-testid="select"
+      onChange={(e) => onValueChange?.(e.target.value)} 
+      value={value}
+    >
+      {children}
+    </select>
   ),
-  SelectContent: ({ children }: any) => <div>{children}</div>,
+  SelectContent: ({ children }: any) => <>{children}</>,
   SelectItem: ({ children, value }: any) => (
     <option value={value}>{children}</option>
   ),
-  SelectTrigger: ({ children }: any) => <div>{children}</div>,
-  SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
+  SelectTrigger: ({ children }: any) => <>{children}</>,
+  SelectValue: ({ placeholder }: any) => <>{placeholder}</>,
 }));
 
 // Remove separator mock as it's not used in the component
