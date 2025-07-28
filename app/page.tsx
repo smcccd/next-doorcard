@@ -121,11 +121,11 @@ export default function Home() {
         {/* Hero Content */}
         <div className="relative px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
           <div className="text-center max-w-7xl mx-auto">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-              Find Your Professor
-            </h1>
-            <p className="text-xl sm:text-2xl text-blue-100 mb-4 leading-relaxed">
+            <h1 className="text-2xl sm:text-3xl text-blue-100 mb-4 leading-relaxed">
               Office Hours & Contact Information
+            </h1>
+            <p className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+              Find Your Professor
             </p>
             <p className="text-blue-200 text-base sm:text-lg mb-8">
               San Mateo County Community College District

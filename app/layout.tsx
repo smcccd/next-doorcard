@@ -92,7 +92,7 @@ export default async function RootLayout({
 
               <main
                 id="main-content"
-                className="w-full flex-1 bg-white dark:bg-gray-900"
+                className="w-full flex-1 bg-gray-50 dark:bg-gray-900"
               >
                 <section className="min-h-[400px] px-4 sm:px-6 lg:px-8 py-10 max-w-7xl mx-auto">
                   {children}
