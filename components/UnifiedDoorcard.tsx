@@ -6,6 +6,7 @@ import {
   formatTimeRange,
   extractCourseCode,
 } from "@/lib/doorcard-constants";
+import { formatDisplayName } from "@/lib/display-name";
 import type { AppointmentCategory, DayOfWeek } from "@prisma/client";
 
 /* -------------------------------------------------------------------------- */
@@ -30,6 +31,15 @@ export interface DoorcardLite {
   year?: string;
   college?: string | null;
   appointments: AppointmentLite[];
+  user?: {
+    name?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
+    title?: string | null;
+    pronouns?: string | null;
+    displayFormat?: any;
+    website?: string | null;
+  };
 }
 
 interface UnifiedDoorcardProps {
@@ -92,7 +102,7 @@ export function UnifiedDoorcard({
     <div id={containerId} className="space-y-4">
       <header className="border-b pb-2">
         <h1 className="text-xl font-bold text-red-700">
-          {doorcard.name || "Faculty Name"}
+          {doorcard.user ? formatDisplayName(doorcard.user) : doorcard.name || "Faculty Name"}
         </h1>
         <div className="mt-1 flex flex-wrap gap-x-6 text-xs">
           <div>
@@ -106,14 +116,27 @@ export function UnifiedDoorcard({
               <strong>College:</strong> {doorcard.college}
             </div>
           )}
+          {doorcard.user?.website && (
+            <div>
+              <strong>Website:</strong>{" "}
+              <a 
+                href={doorcard.user.website.startsWith('http') ? doorcard.user.website : `https://${doorcard.user.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                Faculty Website
+              </a>
+            </div>
+          )}
         </div>
       </header>
 
-      <div className="overflow-hidden rounded border border-gray-300 bg-white">
-        <table className="w-full border-collapse">
+      <div className="overflow-hidden rounded border border-gray-300 bg-white" role="presentation">
+        <table className="w-full border-collapse" role="presentation">
           <thead>
             <tr>
-              <th className="w-20 p-2 text-xs font-medium" aria-label="Time">
+              <th className="w-20 p-2 text-xs font-medium">
                 Time
               </th>
               {days.map((d) => (

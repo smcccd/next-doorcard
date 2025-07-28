@@ -1,0 +1,134 @@
+.markdown-content h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.markdown-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.markdown-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.markdown-content p {
+  color: #374151;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.markdown-content ul, 
+.markdown-content ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  color: #374151;
+}
+
+.markdown-content li {
+  margin: 0.25rem 0;
+  line-height: 1.6;
+}
+
+.markdown-content blockquote {
+  border-left: 4px solid #3b82f6;
+  background-color: #eff6ff;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  color: #1e40af;
+}
+
+.markdown-content code {
+  background-color: #eff6ff;
+  color: #2563eb;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-family: ui-monospace, monospace;
+}
+
+.markdown-content pre {
+  background-color: #1f2937;
+  color: #e5e7eb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.markdown-content pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.markdown-content a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.markdown-content a:hover {
+  text-decoration: underline;
+}
+
+.markdown-content hr {
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+  margin: 2rem 0;
+}
+
+.markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.markdown-content th {
+  text-align: left;
+  padding: 0.5rem 1rem;
+  border-bottom: 2px solid #e5e7eb;
+  font-weight: 600;
+  color: #111827;
+}
+
+.markdown-content td {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.markdown-content strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Ensure first h1 has no top margin */
+.markdown-content > *:first-child {
+  margin-top: 0;
+}
+
+/* Reduce spacing after hr elements */
+.markdown-content hr + * {
+  margin-top: 1rem;
+}
+
+/* Consistent spacing for nested lists */
+.markdown-content ul ul,
+.markdown-content ol ol,
+.markdown-content ul ol,
+.markdown-content ol ul {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}

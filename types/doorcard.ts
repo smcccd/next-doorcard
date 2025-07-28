@@ -2,7 +2,6 @@ import type {
   Prisma,
   User as PrismaUser,
   Appointment as PrismaAppointment,
-  DoorcardDraft as PrismaDoorcardDraft,
   DoorcardAnalytics as PrismaDoorcardAnalytics,
   DoorcardMetrics as PrismaDoorcardMetrics,
   Term as PrismaTerm,
@@ -66,7 +65,6 @@ export const COLLEGE_META: Record<College, { label: string }> = {
 // Base models (no relations). These come directly from the generated client.
 export type User = PrismaUser;
 export type Appointment = PrismaAppointment;
-export type DoorcardDraft = PrismaDoorcardDraft;
 export type DoorcardAnalytics = PrismaDoorcardAnalytics;
 export type DoorcardMetrics = PrismaDoorcardMetrics;
 export type Term = PrismaTerm;

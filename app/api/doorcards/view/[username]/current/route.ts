@@ -4,7 +4,7 @@ import { requireAuthUserAPI } from "@/lib/require-auth-user";
 
 export async function GET(
   _req: Request,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
     // Auth (admin / internal view)
@@ -13,7 +13,8 @@ export async function GET(
       return NextResponse.json({ error: auth.error }, { status: 401 });
     }
 
-    const { username } = params;
+    const resolvedParams = await params;
+    const { username } = resolvedParams;
 
     // Find the target user (allow username, email, or name contains)
     const user = await prisma.user.findFirst({

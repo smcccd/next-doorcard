@@ -3,9 +3,9 @@ import ResumeDoorcard from "./ResumeDoorcard";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useState, useTransition } from "react";
-import type { DoorcardDraft } from "@prisma/client";
+import type { Doorcard } from "@prisma/client";
 
-export default function DraftList({ drafts }: { drafts: DoorcardDraft[] }) {
+export default function DraftList({ drafts }: { drafts: Doorcard[] }) {
   const [items, setItems] = useState(drafts);
   const [pending, start] = useTransition();
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -48,9 +48,9 @@ export default function DraftList({ drafts }: { drafts: DoorcardDraft[] }) {
             key={d.id}
             draft={{
               id: d.id,
-              name: (d.data as any)?.doorcardName || "Untitled Draft",
+              name: d.doorcardName || "Untitled Draft",
               completionPercentage: 0, // compute if needed
-              lastUpdated: d.lastUpdated.toString(),
+              lastUpdated: d.updatedAt.toString(),
             }}
             onDelete={() => deleteOne(d.id)}
             isDeleting={deletingId === d.id}

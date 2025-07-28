@@ -13,7 +13,6 @@ export default withAuth(
       cookies: req.cookies.getAll().map((c) => c.name),
     });
 
-    // Redirect authenticated users away from /login and / to /dashboard
     if (
       sessionToken &&
       (req.nextUrl.pathname === "/login" || req.nextUrl.pathname === "/")
@@ -29,18 +28,18 @@ export default withAuth(
     pages: {
       signIn: "/login",
     },
+    callbacks: {
+      authorized: ({ token }) => !!token, // Allow any authenticated user
+    },
   }
 );
 
 export const config = {
   matcher: [
-    // Protect everything except:
-    // - API routes
-    // - _next (static files)
-    // - public files (favicon, etc)
-    // - login and register pages
-    // - view routes (public doorcard pages)
-    "/((?!api|_next/static|_next/image|favicon.ico|login|register|view|.*\\.svg$|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.webp$|.*\\.ico$|.*\\.css$|.*\\.js$|.*\\.txt$|.*\\.xml$|.*\\.json$).*)",
-    "/",
+    // Protect specific routes that need authentication
+    "/dashboard/:path*",
+    "/doorcard/:path*", 
+    "/admin/:path*",
+    "/profile/:path*",
   ],
 };

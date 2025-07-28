@@ -266,7 +266,6 @@ export const TERM_SEASONS = {
   FALL: "Fall",
   SPRING: "Spring",
   SUMMER: "Summer",
-  WINTER: "Winter",
 } as const;
 
 // Helper function to generate term name

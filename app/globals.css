@@ -184,10 +184,29 @@
     display: none !important;
   }
 
-  /* Hide the specific Navbar and Footer components */
-  .min-h-full.bg-gray-50 > div:first-child,
-  .min-h-full.bg-gray-50 > div:last-child {
+  /* Hide accessibility elements in print */
+  .sr-only, [aria-live], #aria-live-region {
     display: none !important;
+  }
+
+  /* Hide layout wrapper elements that create unwanted styling in print */
+  .min-h-screen, .min-h-full, .flex-col, .max-w-7xl, .shadow-md, .rounded-lg, .shadow-sm {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    min-height: auto !important;
+    max-width: none !important;
+    display: block !important;
+  }
+
+  /* Remove all layout containers and their styling */
+  body > div, main, section {
+    background: white !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
   }
 
   /* Hide the main container wrapper but keep the content */
@@ -211,7 +230,40 @@
   }
 
   /* Hide buttons and interactive elements */
-  button, .btn, input[type="button"], input[type="submit"] {
+  button, .btn, input[type="button"], input[type="submit"], 
+  [role="button"], .cursor-pointer {
+    display: none !important;
+  }
+
+  /* Hide badges and status indicators in print */
+  .badge, [class*="badge"], .bg-green-100, .bg-amber-200, 
+  .text-green-800, .text-amber-700 {
+    display: none !important;
+  }
+
+  /* Hide all interactive UI elements */
+  .print\\:hidden, [class*="print:hidden"] {
+    display: none !important;
+  }
+
+  /* Ensure clean page layout for doorcard view pages */
+  .min-h-screen.bg-white {
+    background: white !important;
+    min-height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Hide the header section with badges and buttons in view pages */
+  .border-b.border-gray-200 {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .border-b.border-gray-200 .flex, 
+  .border-b.border-gray-200 .gap-4,
+  .border-b.border-gray-200 .gap-2 {
     display: none !important;
   }
 

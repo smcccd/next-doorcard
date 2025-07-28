@@ -109,9 +109,12 @@ export async function GET(req: Request) {
       engagementScore += maintenanceScore;
     }
 
-    // Get draft count
-    const totalDrafts = await prisma.doorcardDraft.count({
-      where: { userId: user.id },
+    // Get draft count (inactive doorcards)
+    const totalDrafts = await prisma.doorcard.count({
+      where: { 
+        userId: user.id,
+        isActive: false
+      },
     });
 
     const metrics = {

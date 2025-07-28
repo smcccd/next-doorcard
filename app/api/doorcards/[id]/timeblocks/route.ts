@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 // GET /api/doorcards/[id]/timeblocks - Get appointments (timeblocks) for a doorcard
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
@@ -13,7 +13,8 @@ export async function GET(
   }
 
   try {
-    const { id } = params;
+    const resolvedParams = await params;
+    const { id } = resolvedParams;
 
     const appointments = await prisma.appointment.findMany({
       where: { doorcardId: id },

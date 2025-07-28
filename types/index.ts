@@ -10,7 +10,7 @@ export * from "./components/layout";
 // Page types
 export * from "./pages/dashboard";
 export * from "./pages/public";
-export * from "./pages/admin";
+// export * from "./pages/admin";
 export * from "./pages/view";
 
 // Store types (removed - no longer using Zustand store)

@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
+import { TermSeason } from "@prisma/client";
 
 // GET /api/doorcards/view/[username]/[termSlug]
 export async function GET(
   _req: Request,
-  { params }: { params: { username: string; termSlug: string } }
+  { params }: { params: Promise<{ username: string; termSlug: string }> }
 ) {
   try {
     // Require authentication (admin/internal view)
@@ -17,7 +18,8 @@ export async function GET(
       );
     }
 
-    const { username, termSlug } = params;
+    const resolvedParams = await params;
+    const { username, termSlug } = resolvedParams;
 
     // Find the target user (allow username, email, or partial name)
     const user = await prisma.user.findFirst({
@@ -45,11 +47,10 @@ export async function GET(
     }
 
     const [, rawSeason, year] = match;
-    const term =
-      rawSeason.charAt(0).toUpperCase() + rawSeason.slice(1).toLowerCase(); // e.g. Fall
+    const term = rawSeason.toUpperCase() as TermSeason; // e.g. FALL
 
     const doorcard = await prisma.doorcard.findFirst({
-      where: { userId: user.id, term, year },
+      where: { userId: user.id, term, year: parseInt(year) },
       include: {
         user: { select: { name: true, college: true } },
         appointments: { orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }] },

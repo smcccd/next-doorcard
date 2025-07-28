@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
+import { ProfileSetupProvider } from "@/components/ProfileSetupProvider";
 import { Toaster } from "@/components/ui/toaster";
-import Link from "next/link";
 import { ReactNode, Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -37,15 +37,6 @@ function Footer() {
     <footer className="bg-gray-800 text-white p-5 mt-auto">
       <div className="text-center text-gray-300 text-sm">
         <p>© {CURRENT_YEAR} San Mateo County Community College District</p>
-        <p className="mt-2">
-          <Link
-            href="/login"
-            className="text-blue-400 hover:text-blue-300 underline underline-offset-2"
-            prefetch={false}
-          >
-            Faculty Login
-          </Link>
-        </p>
       </div>
     </footer>
   );
@@ -71,22 +62,32 @@ export default async function RootLayout({
         </a>
 
         <AuthProvider session={session}>
-          {/* Wrap Navbar in Suspense if it does async work */}
-          <Suspense fallback={<div className="h-16" />}>
-            <Navbar />
-          </Suspense>
+          <ProfileSetupProvider>
+            {/* Wrap Navbar in Suspense if it does async work */}
+            <Suspense fallback={<div className="h-16" />}>
+              <Navbar />
+            </Suspense>
 
-          <main
-            id="main-content"
-            className="w-full max-w-7xl flex-1 mx-auto px-4 sm:px-6 lg:px-8 py-10"
-          >
-            <section className="bg-white rounded-lg shadow-md p-4 min-h-[400px] flex flex-col">
-              {children}
-            </section>
-          </main>
+            <main
+              id="main-content"
+              className="w-full max-w-7xl flex-1 mx-auto px-4 sm:px-6 lg:px-8 py-10"
+            >
+              <section className="bg-white rounded-lg shadow-md p-4 min-h-[400px] flex flex-col">
+                {children}
+              </section>
+            </main>
 
-          <Footer />
-          <Toaster />
+            <Footer />
+            <Toaster />
+            
+            {/* ARIA live region for announcements */}
+            <div
+              id="aria-live-region"
+              aria-live="assertive"
+              aria-atomic="true"
+              className="sr-only"
+            />
+          </ProfileSetupProvider>
         </AuthProvider>
       </body>
     </html>

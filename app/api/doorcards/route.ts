@@ -20,14 +20,14 @@ export async function POST(req: Request) {
     try {
       const validatedData = doorcardSchema.parse(json);
 
-      // Check for existing doorcard with same college/term/year combination
+      // Check for existing doorcard with same college/term/year combination (per user)
       const existingDoorcard = await prisma.doorcard.findFirst({
         where: {
           userId: user.id,
           college: validatedData.college,
           term: validatedData.term,
           year: validatedData.year,
-          isActive: true, // Only check active doorcards
+          // Check ALL doorcards for this user/college/term/year, not just active ones
         },
       });
 
@@ -67,6 +67,8 @@ export async function POST(req: Request) {
           term: validatedData.term,
           year: validatedData.year,
           college: validatedData.college,
+          isActive: validatedData.isActive,
+          isPublic: validatedData.isPublic,
           slug: cleanSlug,
           userId: user.id,
           appointments: {

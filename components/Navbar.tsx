@@ -3,12 +3,27 @@ import Image from "next/image";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { SignOutButton } from "./SignOutButton";
+import { NavDropdown } from "./NavDropdown";
+import { prisma } from "@/lib/prisma";
 
 export default async function Navbar() {
   const session = await getServerSession(authOptions);
   const userDisplay =
     session?.user?.name || session?.user?.email || "Faculty Member";
+  
+  // Check if user is admin
+  let isAdmin = false;
+  if (session?.user?.email) {
+    try {
+      const user = await prisma.user.findUnique({
+        where: { email: session.user.email },
+        select: { role: true }
+      });
+      isAdmin = user?.role === "ADMIN";
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+    }
+  }
 
   return (
     <nav
@@ -34,19 +49,14 @@ export default async function Navbar() {
 
         <div className="flex items-center gap-4">
           {session ? (
-            <>
-              <span className="text-sm text-gray-200">
-                Welcome, <span className="font-medium">{userDisplay}</span>
-              </span>
-              <SignOutButton />
-            </>
+            <NavDropdown userDisplay={userDisplay} isAdmin={isAdmin} />
           ) : (
             <Link
               href="/login"
               className="rounded bg-blue-600 px-3 py-1 text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
               prefetch={false}
             >
-              Login
+              Faculty Login
             </Link>
           )}
         </div>

@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { z } from "zod";
 import { COLLEGES } from "@/types/doorcard";
-import { Prisma } from "@prisma/client";
+import { Prisma, College, TermSeason } from "@prisma/client";
+import { getTermStatus } from "@/lib/doorcard-status";
 
 /* ----------------------------------------------------------------------------
  * Schemas / Helpers
@@ -79,15 +80,16 @@ function includeDoorcard(): Prisma.DoorcardInclude {
  * -------------------------------------------------------------------------- */
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
 
+  const resolvedParams = await params;
   const doorcard = await prisma.doorcard.findFirst({
-    where: { id: params.id, userId: auth.user.id },
+    where: { id: resolvedParams.id, userId: auth.user.id },
     include: includeDoorcard(),
   });
 
@@ -104,7 +106,7 @@ export async function GET(
  * -------------------------------------------------------------------------- */
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
@@ -115,9 +117,10 @@ export async function PUT(
     const body = await req.json();
     const parsed = requestSchemaPUT.parse(body);
 
-    // Ensure doorcard belongs to user
+    const resolvedParams = await params;
+    // Ensure doorcard belongs to user and is not archived
     const exists = await prisma.doorcard.findFirst({
-      where: { id: params.id, userId: auth.user.id },
+      where: { id: resolvedParams.id, userId: auth.user.id },
     });
     if (!exists) {
       return NextResponse.json(
@@ -126,17 +129,26 @@ export async function PUT(
       );
     }
 
-    await replaceAppointments(params.id, parsed.timeBlocks);
+    // Prevent editing archived doorcards
+    const termStatus = getTermStatus(exists);
+    if (termStatus === "past") {
+      return NextResponse.json(
+        { error: "Cannot edit archived doorcards. Archived doorcards are read-only to maintain data integrity." },
+        { status: 403 }
+      );
+    }
+
+    await replaceAppointments(resolvedParams.id, parsed.timeBlocks);
 
     const doorcard = await prisma.doorcard.update({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       data: {
         name: parsed.name,
         doorcardName: parsed.doorcardName,
         officeNumber: parsed.officeNumber,
-        term: parsed.term,
-        year: parsed.year,
-        college: parsed.college,
+        term: parsed.term as TermSeason,
+        year: parsed.year ? parseInt(parsed.year.toString()) : undefined,
+        college: parsed.college as College,
       },
       include: includeDoorcard(),
     });
@@ -163,7 +175,7 @@ export async function PUT(
  * -------------------------------------------------------------------------- */
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
@@ -174,8 +186,9 @@ export async function PATCH(
     const body = await req.json();
     const parsed = requestSchemaPATCH.parse(body);
 
+    const resolvedParams = await params;
     const exists = await prisma.doorcard.findFirst({
-      where: { id: params.id, userId: auth.user.id },
+      where: { id: resolvedParams.id, userId: auth.user.id },
     });
     if (!exists) {
       return NextResponse.json(
@@ -184,23 +197,28 @@ export async function PATCH(
       );
     }
 
-    await replaceAppointments(params.id, parsed.timeblocks);
+    // Prevent editing archived doorcards
+    const termStatus = getTermStatus(exists);
+    if (termStatus === "past") {
+      return NextResponse.json(
+        { error: "Cannot edit archived doorcards. Archived doorcards are read-only to maintain data integrity." },
+        { status: 403 }
+      );
+    }
+
+    await replaceAppointments(resolvedParams.id, parsed.timeblocks);
 
     const doorcard = await prisma.doorcard.update({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       data: {
         name: parsed.name,
         doorcardName: parsed.doorcardName,
         officeNumber: parsed.officeNumber,
-        term: parsed.term,
-        year: parsed.year,
-        college: parsed.college,
+        term: parsed.term as any,
+        year: parsed.year ? parseInt(parsed.year.toString()) : undefined,
+        college: parsed.college as any,
         isPublic: parsed.isPublic ?? exists.isPublic,
         isActive: parsed.isActive ?? exists.isActive,
-        startDate: parsed.startDate
-          ? new Date(parsed.startDate)
-          : exists.startDate,
-        endDate: parsed.endDate ? new Date(parsed.endDate) : exists.endDate,
       },
       include: includeDoorcard(),
     });
@@ -226,7 +244,7 @@ export async function PATCH(
  * -------------------------------------------------------------------------- */
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
@@ -234,8 +252,9 @@ export async function DELETE(
   }
 
   try {
+    const resolvedParams = await params;
     await prisma.doorcard.delete({
-      where: { id: params.id, userId: auth.user.id },
+      where: { id: resolvedParams.id, userId: auth.user.id },
     });
     return NextResponse.json({ message: "Doorcard deleted successfully" });
   } catch (err) {

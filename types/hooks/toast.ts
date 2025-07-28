@@ -1,5 +1,3 @@
-// Toast Hook Types
-
 import type { ToastProps } from "@/components/ui/toast";
 
 export type ToasterToast = ToastProps & {
@@ -40,4 +38,4 @@ export interface State {
   toasts: ToasterToast[];
 }
 
-export type Toast = Omit<ToasterToast, "id">; 
+export type Toast = Omit<ToasterToast, "id">;

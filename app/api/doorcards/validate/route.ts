@@ -3,6 +3,7 @@ import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { COLLEGE_META, type College } from "@/types/doorcard";
+import { TermSeason } from "@prisma/client";
 
 const validateSchema = z.object({
   college: z.enum(["SKYLINE", "CSM", "CANADA"]),
@@ -43,9 +44,9 @@ export async function POST(req: Request) {
     const existing = await prisma.doorcard.findFirst({
       where: {
         userId: user.id,
-        college,
-        term,
-        year,
+        college: college as College,
+        term: term as TermSeason,
+        year: parseInt(year),
         isActive: true,
         ...(excludeDoorcardId && { NOT: { id: excludeDoorcardId } }),
       },

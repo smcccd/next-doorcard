@@ -1,6 +1,3 @@
-// Form Component Types
-import type { Appointment, Doorcard, TimeBlock } from "../doorcard";
-
 // Basic Info Form
 export interface BasicInfoFormProps {
   sessionName?: string | null | undefined;
@@ -32,10 +29,3 @@ export interface ResumeDoorCardProps {
   onDelete: (id: string) => void;
   isDeleting?: boolean;
 }
-
-// Print Page Types
-// Note: Using Appointment from types/doorcard.ts
-
-// Note: Using TimeBlock from types/doorcard.ts
-
-// Note: Using Doorcard from types/doorcard.ts

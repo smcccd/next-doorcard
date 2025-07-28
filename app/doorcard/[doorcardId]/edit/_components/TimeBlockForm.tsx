@@ -49,6 +49,8 @@ const DAYS: DayOfWeek[] = [
   "WEDNESDAY",
   "THURSDAY",
   "FRIDAY",
+  "SATURDAY",
+  "SUNDAY",
 ];
 const DAY_LABEL: Record<DayOfWeek, string> = {
   MONDAY: "Monday",
@@ -81,6 +83,7 @@ type Errors = {
   endTime?: string;
   activity?: string;
   location?: string;
+  category?: string;
   days?: string;
   conflict?: string;
 };
@@ -308,8 +311,10 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                           variant="outline"
                           type="button"
                           onClick={() => handleRemove(b.id)}
+                          aria-label={`Remove ${b.activity} time block`}
                         >
                           <X className="h-4 w-4" />
+                          <span className="sr-only">Remove</span>
                         </Button>
                       </div>
                     </div>
@@ -362,14 +367,21 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                   ? "Add Single Block"
                   : "Add Repeating Block"}
               </h4>
-              <Button size="sm" variant="ghost" type="button" onClick={reset}>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                type="button" 
+                onClick={reset}
+                aria-label="Close form"
+              >
                 <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
               </Button>
             </div>
 
             {/* Days */}
             <div>
-              <Label className="mb-1 block">
+              <Label htmlFor="day" className="mb-1 block">
                 {mode === "single" ? "Day" : "Days"}{" "}
                 <span className="text-red-500">*</span>
               </Label>
@@ -379,6 +391,10 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                   onValueChange={(v) => setSelectedDays([v as DayOfWeek])}
                 >
                   <SelectTrigger
+                    id="day"
+                    aria-invalid={!!errors.days}
+                    aria-required="true"
+                    aria-describedby={errors.days ? "day-error" : undefined}
                     className={errors.days ? "border-red-500" : undefined}
                   >
                     <SelectValue placeholder="Select day" />
@@ -392,7 +408,7 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                   </SelectContent>
                 </Select>
               ) : (
-                <div className="flex flex-wrap gap-2">
+                <div role="group" aria-labelledby="day-label" className="flex flex-wrap gap-2">
                   {DAYS.map((d) => {
                     const active = selectedDays.includes(d);
                     return (
@@ -414,7 +430,7 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                 </div>
               )}
               {errors.days && (
-                <p className="mt-1 text-xs text-red-600">{errors.days}</p>
+                <p id="day-error" role="alert" className="mt-1 text-xs text-red-600">{errors.days}</p>
               )}
             </div>
 
@@ -423,33 +439,41 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
               <div className="space-y-4">
                 <div className="flex gap-2">
                   <div className="flex-1">
-                    <Label>Start</Label>
+                    <Label htmlFor="startTime">Start <span className="text-red-500">*</span></Label>
                     <Input
+                      id="startTime"
                       type="time"
                       value={draft.startTime}
                       onChange={(e) =>
                         setDraft((d) => ({ ...d, startTime: e.target.value }))
                       }
+                      aria-invalid={!!errors.startTime}
+                      aria-required="true"
+                      aria-describedby={errors.startTime ? "startTime-error" : undefined}
                       className={errors.startTime ? "border-red-500" : ""}
                     />
                     {errors.startTime && (
-                      <p className="mt-1 text-xs text-red-600">
+                      <p id="startTime-error" role="alert" className="mt-1 text-xs text-red-600">
                         {errors.startTime}
                       </p>
                     )}
                   </div>
                   <div className="flex-1">
-                    <Label>End</Label>
+                    <Label htmlFor="endTime">End <span className="text-red-500">*</span></Label>
                     <Input
+                      id="endTime"
                       type="time"
                       value={draft.endTime}
                       onChange={(e) =>
                         setDraft((d) => ({ ...d, endTime: e.target.value }))
                       }
+                      aria-invalid={!!errors.endTime}
+                      aria-required="true"
+                      aria-describedby={errors.endTime ? "endTime-error" : undefined}
                       className={errors.endTime ? "border-red-500" : ""}
                     />
                     {errors.endTime && (
-                      <p className="mt-1 text-xs text-red-600">
+                      <p id="endTime-error" role="alert" className="mt-1 text-xs text-red-600">
                         {errors.endTime}
                       </p>
                     )}
@@ -457,7 +481,7 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                 </div>
 
                 <div>
-                  <Label>Type</Label>
+                  <Label htmlFor="category">Type <span className="text-red-500">*</span></Label>
                   <Select
                     value={draft.category}
                     onValueChange={(v) =>
@@ -468,7 +492,12 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                       }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger
+                      id="category"
+                      aria-invalid={!!errors.category}
+                      aria-required="true"
+                      aria-describedby={errors.category ? "category-error" : undefined}
+                    >
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -484,12 +513,14 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
 
               <div className="space-y-4">
                 <div>
-                  <Label>
+                  <Label htmlFor="activity">
                     {draft.category === "OFFICE_HOURS"
                       ? "Title (optional)"
                       : "Activity / Course"}
+                    {draft.category !== "OFFICE_HOURS" && <span className="text-red-500">*</span>}
                   </Label>
                   <Input
+                    id="activity"
                     value={draft.activity}
                     placeholder={
                       draft.category === "OFFICE_HOURS"
@@ -499,28 +530,34 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                     onChange={(e) =>
                       setDraft((d) => ({ ...d, activity: e.target.value }))
                     }
+                    aria-invalid={!!errors.activity}
+                    aria-required={draft.category !== "OFFICE_HOURS"}
+                    aria-describedby={errors.activity ? "activity-error" : undefined}
                     className={errors.activity ? "border-red-500" : ""}
                   />
                   {errors.activity && (
-                    <p className="mt-1 text-xs text-red-600">
+                    <p id="activity-error" role="alert" className="mt-1 text-xs text-red-600">
                       {errors.activity}
                     </p>
                   )}
                 </div>
                 <div>
-                  <Label>
+                  <Label htmlFor="location">
                     Location <span className="text-gray-400">(optional)</span>
                   </Label>
                   <Input
+                    id="location"
                     value={draft.location}
                     onChange={(e) =>
                       setDraft((d) => ({ ...d, location: e.target.value }))
                     }
                     placeholder="Building / Room"
+                    aria-invalid={!!errors.location}
+                    aria-describedby={errors.location ? "location-error" : undefined}
                     className={errors.location ? "border-red-500" : ""}
                   />
                   {errors.location && (
-                    <p className="mt-1 text-xs text-red-600">
+                    <p id="location-error" role="alert" className="mt-1 text-xs text-red-600">
                       {errors.location}
                     </p>
                   )}
@@ -529,7 +566,7 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
             </div>
 
             {errors.conflict && (
-              <p className="text-sm text-red-600">{errors.conflict}</p>
+              <p role="alert" className="text-sm text-red-600">{errors.conflict}</p>
             )}
 
             <div className="flex gap-2 pt-2">

@@ -37,7 +37,7 @@ const rules: Record<
   { min: number; max: number; label: string }
 > = {
   name: { min: 2, max: 100, label: "Full name" },
-  doorcardName: { min: 2, max: 50, label: "Doorcard name" },
+  doorcardName: { min: 2, max: 50, label: "Doorcard title" },
   officeNumber: { min: 2, max: 100, label: "Office location" },
 };
 
@@ -108,7 +108,7 @@ export default function BasicInfoForm({ doorcard }: Props) {
       <div className="flex items-start gap-3">
         <CheckCircle2 className="h-5 w-5 text-blue-500 mt-1 shrink-0" />
         <div>
-          <h3 className="font-medium text-gray-900">Enter Your Information</h3>
+          <h2 className="text-lg font-medium text-gray-900">Enter Your Information</h2>
           <p className="text-sm text-gray-500">
             These details appear on the public doorcard.
           </p>
@@ -147,13 +147,13 @@ export default function BasicInfoForm({ doorcard }: Props) {
           {/* Doorcard name */}
           <Field
             id="doorcardName"
-            label="Doorcard Name"
+            label="Doorcard Title"
             icon={<UserSquare2 className="h-4 w-4 text-gray-400" />}
             value={doorcardName}
-            placeholder="Prof. Smith"
+            placeholder="Fall 2024 Doorcard"
             error={errors.doorcardName}
             onChange={(v) => handleChange("doorcardName", v)}
-            help="How students should address you"
+            help="Title for this doorcard (e.g., Fall 2024 Doorcard)"
           />
           {/* Office location */}
           <div className="md:col-span-2">
@@ -210,6 +210,9 @@ function Field({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
+          aria-invalid={!!error}
+          aria-required="true"
+          aria-describedby={error ? `${id}-error` : help ? `${id}-help` : undefined}
           className={`pl-10 ${
             error
               ? "border-red-300 focus:border-red-500 focus:ring-red-500"
@@ -218,9 +221,9 @@ function Field({
         />
       </div>
       {error ? (
-        <p className="text-xs text-red-600">{error}</p>
+        <p id={`${id}-error`} role="alert" className="text-xs text-red-600">{error}</p>
       ) : (
-        help && <p className="text-xs text-gray-500">{help}</p>
+        help && <p id={`${id}-help`} className="text-xs text-gray-600">{help}</p>
       )}
     </div>
   );
@@ -228,8 +231,8 @@ function Field({
 
 function Alert({ message }: { message: string }) {
   return (
-    <div className="flex gap-2 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-      <AlertCircle className="h-4 w-4 shrink-0" /> {message}
+    <div role="alert" className="flex gap-2 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+      <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" /> {message}
     </div>
   );
 }

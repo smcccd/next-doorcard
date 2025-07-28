@@ -6,23 +6,26 @@ import { redirect } from "next/navigation";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 import { timeBlockSchema } from "@/lib/validations/doorcard-edit";
+import type { College, TermSeason } from "@prisma/client";
 
 /* -------------------------------------------------------------------------- */
 /* Schemas / helpers                                                          */
 /* -------------------------------------------------------------------------- */
 
 const CAMPUS_VALUES = ["SKYLINE", "CSM", "CANADA"] as const;
+const TERM_DISPLAY = ["Fall", "Spring", "Summer"] as const;
 
 const campusTermSchema = z.object({
-  term: z.string().min(1, "Term is required"),
-  year: z.string().min(1, "Year is required"),
-  college: z
-    .string()
-    .min(1, "Campus is required")
-    .refine((val) => CAMPUS_VALUES.includes(val as any), {
-      message: "Campus is required",
-    }),
+  term: z.enum(TERM_DISPLAY),
+  year: z.coerce.number().int().min(2000).max(2100), // coerce form value to number
+  college: z.enum(CAMPUS_VALUES, {
+    errorMap: () => ({ message: "Campus is required" }),
+  }),
 });
+
+function toEnumSeason(display: (typeof TERM_DISPLAY)[number]): TermSeason {
+  return display.toUpperCase() as TermSeason; // "Fall" -> "FALL"
+}
 
 const personalInfoSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -73,23 +76,22 @@ function handleActionError(err: unknown): ActionResult {
 
 export async function validateCampusTerm(
   doorcardId: string,
-  _prevState: any,
+  _prevState: ActionResult,
   formData: FormData
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
-
     const data = campusTermSchema.parse({
-      term: formData.get("term")?.toString() || "",
-      year: formData.get("year")?.toString() || "",
-      college: formData.get("college")?.toString() || "",
+      term: formData.get("term"),
+      year: formData.get("year"),
+      college: formData.get("college"),
     });
 
     const existing = await prisma.doorcard.findFirst({
       where: {
         userId: user.id,
-        college: data.college as any,
-        term: data.term,
+        college: data.college as College,
+        term: toEnumSeason(data.term),
         year: data.year,
         isActive: true,
         NOT: { id: doorcardId },
@@ -108,7 +110,11 @@ export async function validateCampusTerm(
 
     await prisma.doorcard.update({
       where: { id: doorcardId, userId: user.id },
-      data: { term: data.term, year: data.year, college: data.college as any },
+      data: {
+        term: toEnumSeason(data.term),
+        year: data.year,
+        college: data.college as College,
+      },
     });
   } catch (err) {
     return handleActionError(err);
@@ -120,16 +126,15 @@ export async function validateCampusTerm(
 
 export async function updateBasicInfo(
   doorcardId: string,
-  _prevState: any,
+  _prevState: ActionResult,
   formData: FormData
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
-
     const data = personalInfoSchema.parse({
-      name: formData.get("name")?.toString() || "",
-      doorcardName: formData.get("doorcardName")?.toString() || "",
-      officeNumber: formData.get("officeNumber")?.toString() || "",
+      name: formData.get("name"),
+      doorcardName: formData.get("doorcardName"),
+      officeNumber: formData.get("officeNumber"),
     });
 
     await prisma.doorcard.update({
@@ -150,11 +155,22 @@ export async function updateBasicInfo(
 
 export async function updateTimeBlocks(
   doorcardId: string,
-  _prevState: any,
+  _prevState: ActionResult,
   formData: FormData
 ): Promise<ActionResult> {
   try {
-    await requireAuth();
+    const user = await requireAuth();
+
+    const doorcard = await prisma.doorcard.findFirst({
+      where: { id: doorcardId, userId: user.id },
+      select: { id: true },
+    });
+    if (!doorcard) {
+      return {
+        success: false,
+        message: "Not authorized to modify this doorcard.",
+      };
+    }
 
     const json = formData.get("timeBlocks")?.toString();
     if (!json) return { success: false, message: "No time blocks provided" };
@@ -184,66 +200,36 @@ export async function updateTimeBlocks(
   redirect(`/doorcard/${doorcardId}/edit?step=3`);
 }
 
-/**
- * Optional legacy draft creation (kept if needed).
- */
-export async function createDoorcardDraft(): Promise<string> {
-  const user = await requireAuth();
-  const newDraft = await prisma.doorcard.create({
-    data: {
-      name: "",
-      doorcardName: "",
-      officeNumber: "",
-      term: "",
-      year: "",
-      college: null,
-      isActive: false,
-      isPublic: false,
-      userId: user.id,
-    },
-  });
-  return `/doorcard/${newDraft.id}/edit?step=0`;
-}
-
 export async function publishDoorcard(doorcardId: string) {
-  try {
-    const user = await requireAuth();
-    await prisma.doorcard.update({
-      where: { id: doorcardId, userId: user.id },
-      data: { isActive: true, isPublic: true },
-    });
-  } catch (err) {
-    // Allow redirect errors to bubble if any occur later
-    console.error("Error publishing doorcard:", err);
-    throw err;
-  }
+  const user = await requireAuth();
+  await prisma.doorcard.update({
+    where: { id: doorcardId, userId: user.id },
+    data: { isActive: true, isPublic: true },
+  });
 
   revalidatePath(`/doorcard/${doorcardId}/edit`);
   revalidatePath("/dashboard");
   redirect("/dashboard");
 }
 
-/**
- * Creates a doorcard only AFTER campus/term validation.
- */
 export async function createDoorcardWithCampusTerm(
-  _prevState: any,
+  _prevState: ActionResult,
   formData: FormData
 ): Promise<ActionResult> {
+  let newDoorcardId: string | null = null;
   try {
     const user = await requireAuth();
-
     const data = campusTermSchema.parse({
-      term: formData.get("term")?.toString() || "",
-      year: formData.get("year")?.toString() || "",
-      college: formData.get("college")?.toString() || "",
+      term: formData.get("term"),
+      year: formData.get("year"),
+      college: formData.get("college"),
     });
 
     const existing = await prisma.doorcard.findFirst({
       where: {
         userId: user.id,
-        college: data.college as any,
-        term: data.term,
+        college: data.college as College,
+        term: toEnumSeason(data.term),
         year: data.year,
         isActive: true,
       },
@@ -253,29 +239,62 @@ export async function createDoorcardWithCampusTerm(
         success: false,
         message: `You already have a doorcard for ${campusLabel(
           data.college
-        )} - ${data.term} ${data.year}. Please edit your existing doorcard "${
+        )} - ${data.term} ${data.year}. Please edit "${
           existing.doorcardName
         }" instead.`,
       };
     }
 
+    // Get user's profile info for smart defaults
+    const userProfile = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { 
+        firstName: true, 
+        lastName: true, 
+        title: true,
+        name: true,
+        college: true
+      }
+    });
+
+    // Create smart default display name
+    let defaultDisplayName = "";
+    if (userProfile?.firstName && userProfile?.lastName) {
+      // Use firstName/lastName if available
+      if (userProfile.title && userProfile.title !== "none") {
+        defaultDisplayName = `${userProfile.title} ${userProfile.firstName} ${userProfile.lastName}`;
+      } else {
+        defaultDisplayName = `${userProfile.firstName} ${userProfile.lastName}`;
+      }
+    } else if (userProfile?.name) {
+      // Fallback to legacy name field
+      defaultDisplayName = userProfile.name;
+    } else {
+      // Ultimate fallback
+      defaultDisplayName = user.email?.split('@')[0] || "Faculty Member";
+    }
+
+    // Create smart default doorcard title
+    const defaultDoorcardTitle = `${defaultDisplayName}'s ${data.term} ${data.year} Doorcard`;
+
     const newDoorcard = await prisma.doorcard.create({
       data: {
-        name: "",
-        doorcardName: "",
+        name: defaultDisplayName,
+        doorcardName: defaultDoorcardTitle,
         officeNumber: "",
-        term: data.term,
+        term: toEnumSeason(data.term),
         year: data.year,
-        college: data.college as any,
+        college: data.college as College,
         isActive: false,
         isPublic: false,
         userId: user.id,
       },
     });
-
-    revalidatePath(`/doorcard/${newDoorcard.id}/edit`);
-    redirect(`/doorcard/${newDoorcard.id}/edit?step=1`);
+    newDoorcardId = newDoorcard.id;
   } catch (err) {
     return handleActionError(err);
   }
+
+  revalidatePath(`/doorcard/${newDoorcardId}/edit`);
+  redirect(`/doorcard/${newDoorcardId}/edit?step=1`);
 }

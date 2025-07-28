@@ -4,6 +4,7 @@ import type { DayOfWeek } from "@/types/doorcard";
 // Enum validation schemas
 export const collegeSchema = z.enum(["SKYLINE", "CSM", "CANADA"]);
 export const userRoleSchema = z.enum(["FACULTY", "ADMIN", "STAFF"]);
+export const termSeasonSchema = z.enum(["FALL", "SPRING", "SUMMER"]);
 export const dayOfWeekSchema = z.enum([
   "MONDAY",
   "TUESDAY",
@@ -23,7 +24,7 @@ export const appointmentCategorySchema = z.enum([
 ]);
 
 // Time validation (24-hour format)
-export const timeSchema = z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, {
+export const timeSchema = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/, {
   message: "Time must be in HH:MM format (24-hour)",
 });
 
@@ -67,8 +68,8 @@ export const basicInfoSchema = z
     name: z.string().min(1, "Name is required").max(100),
     doorcardName: z.string().min(1, "Doorcard name is required").max(100),
     officeNumber: z.string().min(1, "Office number is required").max(20),
-    term: z.string().min(1, "Term is required").max(50),
-    year: z.string().min(4, "Year must be at least 4 characters").max(4),
+    term: termSeasonSchema,
+    year: z.number().int().min(2020).max(2030),
     college: collegeSchema,
     startDate: z.date().optional(),
     endDate: z.date().optional(),
@@ -92,13 +93,14 @@ export const doorcardSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   doorcardName: z.string().min(1, "Doorcard name is required").max(100),
   officeNumber: z.string().min(1, "Office number is required").max(20),
-  term: z.string().min(1, "Term is required").max(50),
-  year: z.string().min(4, "Year must be at least 4 characters").max(4),
+  term: termSeasonSchema,
+  year: z.number().int().min(2020).max(2030),
   college: collegeSchema,
   startDate: z.date().optional(),
   endDate: z.date().optional(),
   appointments: z.array(baseAppointmentSchema).default([]),
-  isActive: z.boolean().default(true),
+  isActive: z.boolean().default(false), // New doorcards start as drafts
+  isPublic: z.boolean().default(false), // New doorcards start as private
 });
 
 // Create doorcard schema (for API)
@@ -118,12 +120,8 @@ export const updateDoorcardSchema = z.object({
     .min(1, "Office number is required")
     .max(20)
     .optional(),
-  term: z.string().min(1, "Term is required").max(50).optional(),
-  year: z
-    .string()
-    .min(4, "Year must be at least 4 characters")
-    .max(4)
-    .optional(),
+  term: termSeasonSchema.optional(),
+  year: z.number().int().min(2020).max(2030).optional(),
   college: collegeSchema.optional(),
   startDate: z.date().optional(),
   endDate: z.date().optional(),
