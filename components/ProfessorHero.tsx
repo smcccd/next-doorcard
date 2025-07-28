@@ -1,5 +1,3 @@
-// app/components/ProfessorHero.tsx
-
 import { Search } from "lucide-react";
 
 // A simple SVG dot pattern to use as a background mask
@@ -57,7 +55,7 @@ export default function ProfessorHero() {
                 </h2>
                 <p className="mt-1 font-sans text-sm text-blue-100">
                   Find their office hours, location, and contact details. Each
-                  faculty profile shows when they're available for student
+                  faculty profile shows when they&apos;re available for student
                   meetings, their office number, and how to reach them across
                   our three campuses.
                 </p>
