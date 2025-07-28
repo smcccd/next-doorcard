@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type College } from "@/types/doorcard";
 import { Search, Clock, MapPin, Calendar } from "lucide-react";
-import CollegeLogo from "@/components/CollegeLogo";
 
 // Custom hook for debounced values
 function useDebounce<T>(value: T, delay: number): T {
@@ -87,7 +86,7 @@ export default function Home() {
         (dc) =>
           dc.name.toLowerCase().includes(term) ||
           dc.doorcardName.toLowerCase().includes(term) ||
-          dc.user.name?.toLowerCase().includes(term),
+          dc.user.name?.toLowerCase().includes(term)
       );
     }
 
@@ -103,12 +102,71 @@ export default function Home() {
   };
 
   return (
-    <div>
+    <div className="bg-gray-50 dark:bg-gray-900 -mx-4 sm:-mx-6 lg:-mx-8 -my-10">
+      {/* Full Viewport Width Hero Section */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 dark:from-blue-800 dark:via-blue-900 dark:to-gray-900">
+        {/* Background Pattern - Light mode uses blue dots, dark mode uses white */}
+        <div
+          className="absolute inset-0 opacity-10 dark:opacity-10"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='3'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: "60px 60px",
+          }}
+        ></div>
+
+        {/* Overlay gradient for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent dark:from-black/20"></div>
+
+        {/* Hero Content */}
+        <div className="relative px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+          <div className="text-center max-w-7xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl font-medium text-blue-100 dark:text-blue-200 mb-2 tracking-wide uppercase letter-spacing-wider">
+              Office Hours & Contact Information
+            </p>
+            <h1
+              className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-light text-white mb-4 leading-tight drop-shadow-lg tracking-tight"
+              style={{
+                fontFamily: 'Georgia, "Times New Roman", serif',
+                fontWeight: 300,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              Find Your Professor
+            </h1>
+            <p className="text-sm sm:text-base lg:text-lg font-light text-blue-200 dark:text-blue-300 tracking-wide mb-6">
+              San Mateo County Community College District
+            </p>
+
+            {/* Enhanced Info Card in Hero */}
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-white/15 dark:bg-white/10 backdrop-blur-sm border border-white/30 dark:border-white/20 rounded-xl p-4 sm:p-6 text-left shadow-lg">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-white/25 dark:bg-white/20 rounded-lg flex items-center justify-center">
+                    <Search className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-semibold text-base sm:text-lg mb-2">
+                      Need to meet with a professor?
+                    </h3>
+                    <p className="text-blue-50 dark:text-blue-100 text-xs sm:text-sm leading-relaxed">
+                      Find their office hours, location, and contact details.
+                      Each faculty profile shows when they&apos;re available for
+                      student meetings, their office number, and how to reach
+                      them across our three campuses.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Content Section with proper spacing */}
-      <div className="px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="px-4 sm:px-6 lg:px-8 space-y-8 bg-gray-50 dark:bg-gray-900">
         {/* Search and Filter */}
-        <div className="max-w-4xl mx-auto -mt-8">
-          <Card className="border-2 border-blue-100 dark:border-blue-800 dark:bg-gray-800 shadow-lg relative z-10">
+        <div className="max-w-4xl mx-auto -mt-6">
+          <Card className="border-2 border-blue-100 dark:border-blue-800 bg-white dark:bg-gray-800 shadow-xl relative z-10">
             <CardHeader className="pb-4">
               <h2 className="font-semibold leading-none tracking-tight flex items-center gap-2 text-lg">
                 <Search className="h-5 w-5 text-blue-400 dark:text-blue-400" />
@@ -143,7 +201,7 @@ export default function Home() {
                       setSelectedCampus(value as College | "ALL")
                     }
                   >
-                    <TabsList className="flex w-full h-12 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg border-0">
+                    <TabsList className="flex w-full h-12 bg-gray-100 dark:bg-gray-700 p-3  rounded-lg border-0">
                       <TabsTrigger
                         value="ALL"
                         className="flex-1 text-sm font-medium text-gray-700 dark:text-gray-300 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-sm rounded-md transition-all duration-200 hover:text-gray-900 dark:hover:text-white"
@@ -229,7 +287,7 @@ export default function Home() {
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {filteredDoorcards.map((doorcard) => (
                     <Card
                       key={doorcard.id}

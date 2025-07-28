@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import CollegeLogo from './CollegeLogo';
 
 const meta = {
@@ -14,15 +14,9 @@ const meta = {
       options: ['CSM', 'SKYLINE', 'CANADA'],
       description: 'The college to display the logo for',
     },
-    variant: {
-      control: { type: 'select' },
-      options: ['full', 'icon', 'inline'],
-      description: 'The display variant of the logo',
-    },
-    size: {
-      control: { type: 'select' },
-      options: ['sm', 'md', 'lg'],
-      description: 'The size of the logo',
+    height: {
+      control: { type: 'number' },
+      description: 'The height of the logo in pixels',
     },
     className: {
       control: 'text',
@@ -41,6 +35,9 @@ export const Default: Story = {
 };
 
 export const AllColleges: Story = {
+  args: {
+    college: 'SKYLINE',
+  },
   render: () => (
     <div className="space-y-8">
       <div className="space-y-2">
@@ -60,6 +57,9 @@ export const AllColleges: Story = {
 };
 
 export const Variants: Story = {
+  args: {
+    college: 'SKYLINE',
+  },
   render: () => (
     <div className="space-y-8">
       <div className="space-y-4">
@@ -91,6 +91,9 @@ export const Variants: Story = {
 };
 
 export const Sizes: Story = {
+  args: {
+    college: 'SKYLINE',
+  },
   render: () => (
     <div className="space-y-8">
       <div className="space-y-4">

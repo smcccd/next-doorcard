@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import UnifiedDoorcard, { type DoorcardLite, type AppointmentLite } from './UnifiedDoorcard';
 import type { AppointmentCategory, DayOfWeek } from '@prisma/client';
 
