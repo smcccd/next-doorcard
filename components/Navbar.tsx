@@ -27,7 +27,7 @@ export default async function Navbar() {
 
   return (
     <nav
-      className="bg-gray-800 text-white px-6 py-4 shadow-sm"
+      className="bg-gray-800 dark:bg-gray-950 text-white px-6 py-4 shadow-sm"
       aria-label="Primary"
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6">
@@ -53,7 +53,7 @@ export default async function Navbar() {
           ) : (
             <Link
               href="/login"
-              className="rounded bg-blue-600 px-3 py-1 text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="rounded bg-blue-500 px-3 py-1 text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
               prefetch={false}
             >
               Faculty Login

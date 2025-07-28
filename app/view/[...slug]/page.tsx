@@ -142,6 +142,13 @@ export default async function PublicDoorcardView({
   const { doorcard } = result;
   const isSpecificTerm = Boolean(termSlug);
 
+  // Convert doorcard to match DoorcardLite interface
+  const doorcardLite = {
+    ...doorcard,
+    year: String(doorcard.year), // Convert number to string
+    term: doorcard.term || undefined,
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Auto-print handler */}
@@ -241,7 +248,7 @@ export default async function PublicDoorcardView({
                   </Link>
                 </Button>
               )}
-              <DoorcardActions doorcard={doorcard} doorcardId={doorcard.id} />
+              <DoorcardActions doorcard={doorcardLite} doorcardId={doorcard.id} />
             </div>
           </div>
         </div>
@@ -253,12 +260,12 @@ export default async function PublicDoorcardView({
           <>
             {/* Screen version - full schedule with all features */}
             <div className="w-full print:hidden">
-              <UnifiedDoorcard doorcard={doorcard} />
+              <UnifiedDoorcard doorcard={doorcardLite} />
             </div>
             
             {/* Print version - optimized for single page */}
             <div className="hidden print:block">
-              <PrintOptimizedDoorcard doorcard={doorcard} />
+              <PrintOptimizedDoorcard doorcard={doorcardLite} />
             </div>
           </>
         ) : (

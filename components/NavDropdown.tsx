@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
+import { DarkModeToggle } from "./DarkModeToggle";
 
 interface NavDropdownProps {
   userDisplay: string;
@@ -80,6 +81,12 @@ export function NavDropdown({ userDisplay, isAdmin = false }: NavDropdownProps) 
             Help
           </Link>
         </DropdownMenuItem>
+        
+        <DropdownMenuSeparator />
+        
+        <div className="px-2 py-1">
+          <DarkModeToggle />
+        </div>
         
         <DropdownMenuSeparator />
         

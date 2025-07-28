@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import * as ReactDOM from 'react-dom';
 import BasicInfoForm from '../BasicInfoForm';
 import { updateBasicInfo } from '@/app/doorcard/actions';
 
@@ -238,7 +239,7 @@ describe('BasicInfoForm', () => {
 
     it('should show loading state during submission', async () => {
       // Mock useFormStatus to return pending state
-      jest.spyOn(require('react-dom'), 'useFormStatus').mockReturnValue({ pending: true });
+      jest.spyOn(ReactDOM, 'useFormStatus').mockReturnValue({ pending: true });
 
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 

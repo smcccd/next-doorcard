@@ -35,7 +35,7 @@ export const authOptions: NextAuthOptions = {
           const redirectUri = `${process.env.NEXTAUTH_URL}/api/auth/callback/onelogin`;
           const tokenParams = new URLSearchParams({
             grant_type: "authorization_code",
-            code: params.code,
+            code: params.code || "",
             redirect_uri: redirectUri,
           });
           
@@ -49,7 +49,8 @@ export const authOptions: NextAuthOptions = {
             client_id: clientId,
           });
           
-          const response = await fetch(provider.token.url, {
+          const tokenUrl = typeof provider.token === 'string' ? provider.token : provider.token?.url || "";
+          const response = await fetch(tokenUrl, {
             method: "POST",
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
@@ -73,7 +74,8 @@ export const authOptions: NextAuthOptions = {
         async request({ tokens, provider }) {
           console.log("UserInfo request with token:", tokens.access_token?.substring(0, 20) + "...");
           
-          const response = await fetch(provider.userinfo.url, {
+          const userinfoUrl = typeof provider.userinfo === 'string' ? provider.userinfo : provider.userinfo?.url || "";
+          const response = await fetch(userinfoUrl, {
             headers: {
               Authorization: `Bearer ${tokens.access_token}`,
             },
@@ -198,9 +200,9 @@ export const authOptions: NextAuthOptions = {
               await prisma.user.update({
                 where: { email: user.email! },
                 data: {
-                  name: user.name || `${profile?.given_name} ${profile?.family_name}`,
-                  firstName: profile?.given_name,
-                  lastName: profile?.family_name,
+                  name: user.name || `${(profile as any)?.given_name || ''} ${(profile as any)?.family_name || ''}`.trim(),
+                  firstName: (profile as any)?.given_name,
+                  lastName: (profile as any)?.family_name,
                 },
               });
             }
@@ -237,7 +239,7 @@ export const authOptions: NextAuthOptions = {
           });
           if (userDetails) {
             token.role = userDetails.role;
-            token.college = userDetails.college;
+            token.college = userDetails.college || undefined;
           }
         } catch (error) {
           console.error("Error fetching user details:", error);

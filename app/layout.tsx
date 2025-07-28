@@ -6,6 +6,7 @@ import AuthProvider from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
 import { ProfileSetupProvider } from "@/components/ProfileSetupProvider";
 import { Toaster } from "@/components/ui/toaster";
+import { DarkModeProvider } from "@/components/DarkModeProvider";
 import { ReactNode, Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -34,7 +35,7 @@ const CURRENT_YEAR = new Date().getFullYear();
 
 function Footer() {
   return (
-    <footer className="bg-gray-800 text-white p-5 mt-auto">
+    <footer className="bg-gray-800 dark:bg-gray-950 text-white p-5 mt-auto">
       <div className="text-center text-gray-300 text-sm">
         <p>© {CURRENT_YEAR} San Mateo County Community College District</p>
       </div>
@@ -51,7 +52,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body
-        className={`${inter.className} bg-gray-50 min-h-screen flex flex-col antialiased`}
+        className={`${inter.className} bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col antialiased`}
       >
         {/* Skip link for accessibility */}
         <a
@@ -61,34 +62,36 @@ export default async function RootLayout({
           Skip to main content
         </a>
 
-        <AuthProvider session={session}>
-          <ProfileSetupProvider>
+        <DarkModeProvider>
+          <AuthProvider session={session}>
+            <ProfileSetupProvider>
             {/* Wrap Navbar in Suspense if it does async work */}
             <Suspense fallback={<div className="h-16" />}>
               <Navbar />
             </Suspense>
 
-            <main
-              id="main-content"
-              className="w-full max-w-7xl flex-1 mx-auto px-4 sm:px-6 lg:px-8 py-10"
-            >
-              <section className="bg-white rounded-lg shadow-md p-4 min-h-[400px] flex flex-col">
-                {children}
-              </section>
-            </main>
+              <main
+                id="main-content"
+                className="w-full flex-1 bg-white dark:bg-gray-900"
+              >
+                <section className="min-h-[400px] px-4 sm:px-6 lg:px-8 py-10 max-w-7xl mx-auto">
+                  {children}
+                </section>
+              </main>
 
-            <Footer />
-            <Toaster />
-            
-            {/* ARIA live region for announcements */}
-            <div
-              id="aria-live-region"
-              aria-live="assertive"
-              aria-atomic="true"
-              className="sr-only"
-            />
-          </ProfileSetupProvider>
-        </AuthProvider>
+              <Footer />
+              <Toaster />
+              
+              {/* ARIA live region for announcements */}
+              <div
+                id="aria-live-region"
+                aria-live="assertive"
+                aria-atomic="true"
+                className="sr-only"
+              />
+            </ProfileSetupProvider>
+          </AuthProvider>
+        </DarkModeProvider>
       </body>
     </html>
   );

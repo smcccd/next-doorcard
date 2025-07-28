@@ -170,7 +170,7 @@ async function analyzeCampusDistribution() {
     const rank = (index + 1).toString().padStart(2);
     const campus = user.userCampus;
     const name = user.userName || user.email.split('@')[0];
-    console.log(`${rank}. ${name.substring(0, 25).padEnd(25)} | ${campus.padEnd(9)} | Score: ${user.totalActivity.toString().padStart(4)} (V:${user.totalViews} P:${user.totalPrints} S:${user.totalShares})`);
+    console.log(`${rank}. ${name.substring(0, 25).padEnd(25)} | ${(campus || 'UNKNOWN').padEnd(9)} | Score: ${user.totalActivity.toString().padStart(4)} (V:${user.totalViews} P:${user.totalPrints} S:${user.totalShares})`);
   });
 
   // 4. Analyze top 10 users' campus distribution
@@ -180,7 +180,8 @@ async function analyzeCampusDistribution() {
   let topUsersNoCampus = 0;
 
   topUsers.forEach(user => {
-    topUsersCampusCount.set(user.userCampus, (topUsersCampusCount.get(user.userCampus) || 0) + 1);
+    const campus = user.userCampus || 'UNKNOWN';
+    topUsersCampusCount.set(campus, (topUsersCampusCount.get(campus) || 0) + 1);
   });
 
   ['SKYLINE', 'CSM', 'CANADA'].forEach(campus => {
@@ -220,7 +221,7 @@ async function analyzeCampusDistribution() {
 
   // Aggregate metrics by campus
   userActivityMap.forEach(userData => {
-    const campus = userData.userCampus;
+    const campus = userData.userCampus || 'UNKNOWN';
     if (campusActivityStats.has(campus)) {
       const stats = campusActivityStats.get(campus)!;
       stats.totalViews += userData.totalViews;

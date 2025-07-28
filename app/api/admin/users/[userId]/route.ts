@@ -5,9 +5,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const resolvedParams = await params;
     const session = await getServerSession(authOptions);
     
     if (!session?.user?.email) {
@@ -26,7 +27,7 @@ export async function GET(
 
     // Get detailed user information
     const user = await prisma.user.findUnique({
-      where: { id: params.userId },
+      where: { id: resolvedParams.userId },
       select: {
         id: true,
         email: true,

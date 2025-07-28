@@ -23,12 +23,13 @@ describe('AnalyticsTracker', () => {
   });
 
   describe('Session Management', () => {
-    it('should create a new session ID when none exists', () => {
+    it('should create a new session ID when none exists', async () => {
       mockSessionStorage.getItem.mockReturnValue(null);
       
       // Reset module to trigger new initialization
       jest.resetModules();
-      const { analytics: newAnalytics } = require('../analytics');
+      const analyticsModule = await import('../analytics');
+      const newAnalytics = analyticsModule.analytics;
       
       expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
         'doorcard-session-id',
@@ -173,8 +174,8 @@ describe('AnalyticsTracker', () => {
       delete (global as any).window;
 
       // This should not throw an error
-      expect(() => {
-        const analyticsModule = require('../analytics');
+      expect(async () => {
+        const analyticsModule = await import('../analytics');
         expect(analyticsModule.analytics).toBeDefined();
       }).not.toThrow();
 

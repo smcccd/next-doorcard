@@ -120,7 +120,7 @@ export function DoorcardActions({
   function share() {
     // Track share event
     if (doorcardId) {
-      const method = navigator.share ? "native" : "clipboard";
+      const method = typeof navigator !== 'undefined' && 'share' in navigator ? "native" : "clipboard";
       analytics.trackShare(doorcardId, method);
     }
     

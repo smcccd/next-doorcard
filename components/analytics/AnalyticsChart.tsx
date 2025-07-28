@@ -220,7 +220,7 @@ export function AnalyticsChart({
                           cy="50%"
                           outerRadius={80}
                           dataKey="value"
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                         >
                           {pieData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
@@ -243,7 +243,7 @@ export function AnalyticsChart({
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip />
-                        <Bar dataKey="value" fill={(entry) => entry.color} />
+                        <Bar dataKey="value" fill="#3b82f6" />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>

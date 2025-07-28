@@ -4,6 +4,14 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { Session } from "next-auth";
 
+interface SessionWithId extends Session {
+  user: {
+    id: string;
+    email: string;
+    name?: string | null;
+  };
+}
+
 /**
  * Columns we need from User. Selecting avoids requesting removed columns.
  */

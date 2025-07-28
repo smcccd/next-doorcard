@@ -271,7 +271,7 @@ function groupByDay(appointments: any[]) {
 
 function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
   const byDay = groupByDay(doorcard.appointments);
-  const displayName = formatDisplayName(doorcard.user);
+  const displayName = doorcard.user ? formatDisplayName(doorcard.user) : (doorcard.name || "Faculty Member");
   const categories = [...new Set(doorcard.appointments.map(apt => apt.category))];
 
   return (

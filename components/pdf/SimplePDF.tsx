@@ -11,21 +11,23 @@ interface SimplePDFProps {
   onDownload?: () => void;
 }
 
-// Category colors and labels
+// Category colors and labels - matching the database schema
 const CATEGORY_COLORS = {
   OFFICE_HOURS: '#3b82f6',
-  CLASS: '#10b981',
-  MEETING: '#8b5cf6',
-  RESEARCH: '#f59e0b',
-  OTHER: '#6b7280',
+  IN_CLASS: '#10b981',
+  LECTURE: '#8b5cf6',
+  LAB: '#f59e0b',
+  HOURS_BY_ARRANGEMENT: '#06b6d4',
+  REFERENCE: '#6b7280',
 };
 
 const CATEGORY_LABELS = {
   OFFICE_HOURS: 'Office Hours',
-  CLASS: 'Class',
-  MEETING: 'Meeting',
-  RESEARCH: 'Research',
-  OTHER: 'Other',
+  IN_CLASS: 'In Class',
+  LECTURE: 'Lecture',
+  LAB: 'Lab',
+  HOURS_BY_ARRANGEMENT: 'Hours by Arrangement',
+  REFERENCE: 'Reference',
 };
 
 const DAYS = [
@@ -48,7 +50,7 @@ const TIME_SLOTS = Array.from({ length: 29 }, (_, i) => {
 });
 
 function generatePrintableHTML(doorcard: DoorcardLite): string {
-  const displayName = formatDisplayName(doorcard.user);
+  const displayName = doorcard.user ? formatDisplayName(doorcard.user) : (doorcard.name || "Faculty Member");
   
   // Group appointments by day
   const byDay: Record<string, any[]> = {};
@@ -233,28 +235,33 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
       margin-top: 1px;
     }
     
-    /* Category-specific colors - matching your request */
+    /* Category-specific colors - matching database schema */
     .appointment.office-hours {
       background: #dbeafe !important;
       color: #1e40af !important;
     }
     
-    .appointment.class {
+    .appointment.in-class {
       background: #dcfce7 !important;
       color: #166534 !important;
     }
     
-    .appointment.meeting {
+    .appointment.lecture {
       background: #f3e8ff !important;
       color: #7c2d12 !important;
     }
     
-    .appointment.research {
+    .appointment.lab {
       background: #fed7aa !important;
       color: #ea580c !important;
     }
     
-    .appointment.other {
+    .appointment.hours-by-arrangement {
+      background: #cffafe !important;
+      color: #0e7490 !important;
+    }
+    
+    .appointment.reference {
       background: #f3f4f6 !important;
       color: #374151 !important;
     }
@@ -399,20 +406,22 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
       ${categories.map(category => {
         const colorMap = {
           'OFFICE_HOURS': '#dbeafe',
-          'CLASS': '#dcfce7', 
-          'MEETING': '#f3e8ff',
-          'RESEARCH': '#fed7aa',
-          'OTHER': '#f3f4f6'
+          'IN_CLASS': '#dcfce7', 
+          'LECTURE': '#f3e8ff',
+          'LAB': '#fed7aa',
+          'HOURS_BY_ARRANGEMENT': '#cffafe',
+          'REFERENCE': '#f3f4f6'
         };
         const textColorMap = {
           'OFFICE_HOURS': '#1e40af',
-          'CLASS': '#166534', 
-          'MEETING': '#7c2d12',
-          'RESEARCH': '#ea580c',
-          'OTHER': '#374151'
+          'IN_CLASS': '#166534', 
+          'LECTURE': '#7c2d12',
+          'LAB': '#ea580c',
+          'HOURS_BY_ARRANGEMENT': '#0e7490',
+          'REFERENCE': '#374151'
         };
-        const bgColor = colorMap[category as keyof typeof colorMap] || colorMap.OTHER;
-        const textColor = textColorMap[category as keyof typeof textColorMap] || textColorMap.OTHER;
+        const bgColor = colorMap[category as keyof typeof colorMap] || colorMap.REFERENCE;
+        const textColor = textColorMap[category as keyof typeof textColorMap] || textColorMap.REFERENCE;
         return `
         <div class="legend-item">
           <div class="legend-color" style="background-color: ${bgColor}; border: 1px solid #d1d5db; color: ${textColor}; padding: 2px 4px; font-size: 7px; font-weight: 600;">${CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS] || category}</div>

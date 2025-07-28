@@ -449,7 +449,7 @@ export default function ProfilePage() {
               <div className="flex justify-end pt-4">
                 <Button 
                   type="submit" 
-                  disabled={isSubmitting || !firstName.trim() || !lastName.trim() || (website && !isValidWebsite(website))}
+                  disabled={isSubmitting || firstName.trim().length === 0 || lastName.trim().length === 0 || (website.length > 0 && !isValidWebsite(website))}
                   className="flex items-center gap-2"
                 >
                   {isSubmitting ? (

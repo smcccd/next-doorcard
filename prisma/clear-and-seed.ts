@@ -308,8 +308,8 @@ async function main() {
             faculty.name.split(" ")[0] === "Dr." ? "Dr." : "Prof."
           } ${faculty.name.split(" ").slice(-1)[0]}`,
           officeNumber: getRandomOfficeNumber(faculty.college),
-          term,
-          year,
+          term: term as any,
+          year: parseInt(year),
           college: faculty.college,
           slug,
           isPublic,

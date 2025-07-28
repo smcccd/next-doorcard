@@ -121,7 +121,7 @@ function parseTermAndYear(termStr: string): {
     if (seasonCode === "03") season = TermSeason.SPRING;
     else if (seasonCode === "05") season = TermSeason.SUMMER;
     else if (seasonCode === "08") season = TermSeason.FALL;
-    else if (seasonCode === "01") season = TermSeason.WINTER;
+    else if (seasonCode === "01") season = TermSeason.SPRING; // Map WINTER to SPRING
     
     return { season, year };
   }
@@ -130,7 +130,7 @@ function parseTermAndYear(termStr: string): {
   if (upperTerm.includes("FALL")) season = TermSeason.FALL;
   else if (upperTerm.includes("SPRING")) season = TermSeason.SPRING;
   else if (upperTerm.includes("SUMMER")) season = TermSeason.SUMMER;
-  else if (upperTerm.includes("WINTER")) season = TermSeason.WINTER;
+  else if (upperTerm.includes("WINTER")) season = TermSeason.SPRING; // Map WINTER to SPRING
 
   // Extract year - look for 4-digit year or 2-digit year
   const yearMatch = termStr.match(/\b(19|20)\d{2}\b|\b\d{2}\b/);
@@ -279,7 +279,9 @@ async function processUsers(
               });
 
               for (const user of createdUsers) {
-                userIdMap.set(user.username, user.id);
+                if (user.username) {
+                  userIdMap.set(user.username, user.id);
+                }
               }
             } catch (error) {
               console.error(`❌ Batch insert failed for users batch ${Math.floor(i/batchSize) + 1}:`, error);
@@ -760,7 +762,9 @@ async function createMissingUsers(
         });
 
         for (const user of createdUsers) {
-          userIdMap.set(user.username, user.id);
+          if (user.username) {
+            userIdMap.set(user.username, user.id);
+          }
         }
       } catch (error) {
         console.error(`❌ Batch insert failed:`, error);
