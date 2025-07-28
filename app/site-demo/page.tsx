@@ -24,7 +24,7 @@ export default function SiteDemoPage() {
             </h2>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-600 dark:text-gray-300">
-                This is a sample section for letter <strong>{letter}</strong>. 
+                This is a sample section for letter <strong>{letter}</strong>.
                 In a real implementation, this could contain:
               </p>
               <ul className="mt-4 space-y-2 text-gray-600 dark:text-gray-300">
@@ -34,8 +34,9 @@ export default function SiteDemoPage() {
                 <li>• Resources and services starting with "{letter}"</li>
               </ul>
               <p className="mt-4 text-gray-600 dark:text-gray-300">
-                The Site Index provides quick navigation to help users find content 
-                alphabetically, similar to the legacy SMCCD website structure.
+                The Site Index provides quick navigation to help users find
+                content alphabetically, similar to the legacy SMCCD website
+                structure.
               </p>
             </div>
           </section>

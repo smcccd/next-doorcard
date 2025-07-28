@@ -5,12 +5,14 @@ This document provides comprehensive guidance on testing the DoorCard applicatio
 ## 🧪 **Testing Stack**
 
 ### **Unit Testing**
+
 - **Jest 29** - JavaScript testing framework
 - **React Testing Library 16** - React component testing utilities
 - **@testing-library/jest-dom** - Custom Jest matchers for DOM assertions
 - **@testing-library/user-event** - User interaction simulation
 
 ### **E2E Testing**
+
 - **Cypress 14** - End-to-end testing framework
 - **cypress-axe** - Accessibility testing
 - **cypress-real-events** - Real user event simulation
@@ -61,12 +63,14 @@ project/
 ## 🎯 **Coverage Targets & Current Status**
 
 ### **Coverage Targets**
+
 - **Utility Functions**: 100% (easy wins)
 - **Components**: 85-95% (focus on user interactions)
 - **API Routes**: 90-100% (critical business logic)
 - **Overall Target**: 80-85% (sweet spot for ROI)
 
 ### **Current Coverage Status**
+
 Based on the latest test run, we have excellent coverage in key areas:
 
 - **✅ Form Validation (`lib/validations`)**: 84.94% lines, 90% branches
@@ -75,6 +79,7 @@ Based on the latest test run, we have excellent coverage in key areas:
 - **✅ Utility Functions**: High coverage with comprehensive edge case testing
 
 ### **Areas Needing Attention**
+
 - **🔄 API Routes**: Need basic functionality tests
 - **🔄 Dashboard Components**: Core user interface testing
 - **🔄 Form Components**: User interaction and validation testing
@@ -82,11 +87,12 @@ Based on the latest test run, we have excellent coverage in key areas:
 ## 📝 **Testing Best Practices**
 
 ### **1. Test Structure (AAA Pattern)**
+
 ```typescript
 describe('Component/Function Name', () => {
   // Arrange
   const mockData = { ... }
-  
+
   beforeEach(() => {
     // Setup
   })
@@ -94,10 +100,10 @@ describe('Component/Function Name', () => {
   it('should do something specific', () => {
     // Arrange
     const input = 'test input'
-    
+
     // Act
     const result = functionUnderTest(input)
-    
+
     // Assert
     expect(result).toBe('expected output')
   })
@@ -105,6 +111,7 @@ describe('Component/Function Name', () => {
 ```
 
 ### **2. Component Testing**
+
 ```typescript
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -121,7 +128,7 @@ describe('MyComponent', () => {
   it('handles user interactions', async () => {
     const mockOnClick = jest.fn()
     render(<MyComponent onClick={mockOnClick} />)
-    
+
     await user.click(screen.getByRole('button'))
     expect(mockOnClick).toHaveBeenCalledTimes(1)
   })
@@ -129,64 +136,68 @@ describe('MyComponent', () => {
 ```
 
 ### **3. API Route Testing**
-```typescript
-import { NextRequest } from 'next/server'
-import { GET, POST } from './route'
 
-describe('/api/endpoint', () => {
-  it('returns data for GET request', async () => {
-    const request = new NextRequest('http://localhost:3000/api/endpoint')
-    const response = await GET(request)
-    const data = await response.json()
-    
-    expect(response.status).toBe(200)
-    expect(data).toHaveProperty('expectedField')
-  })
-})
+```typescript
+import { NextRequest } from "next/server";
+import { GET, POST } from "./route";
+
+describe("/api/endpoint", () => {
+  it("returns data for GET request", async () => {
+    const request = new NextRequest("http://localhost:3000/api/endpoint");
+    const response = await GET(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty("expectedField");
+  });
+});
 ```
 
 ### **4. Form Validation Testing**
+
 ```typescript
-import { userSchema } from './validation'
+import { userSchema } from "./validation";
 
-describe('User Validation', () => {
-  it('accepts valid user data', () => {
-    const validUser = { email: 'test@example.com', name: 'Test User' }
-    expect(() => userSchema.parse(validUser)).not.toThrow()
-  })
+describe("User Validation", () => {
+  it("accepts valid user data", () => {
+    const validUser = { email: "test@example.com", name: "Test User" };
+    expect(() => userSchema.parse(validUser)).not.toThrow();
+  });
 
-  it('rejects invalid email', () => {
-    const invalidUser = { email: 'invalid-email', name: 'Test User' }
-    expect(() => userSchema.parse(invalidUser)).toThrow('Invalid email')
-  })
-})
+  it("rejects invalid email", () => {
+    const invalidUser = { email: "invalid-email", name: "Test User" };
+    expect(() => userSchema.parse(invalidUser)).toThrow("Invalid email");
+  });
+});
 ```
 
 ## 🛠 **Mocking Strategies**
 
 ### **Next.js Specific Mocks**
+
 ```typescript
 // Mock Next.js router
-jest.mock('next/navigation', () => ({
+jest.mock("next/navigation", () => ({
   useRouter: () => ({
     push: jest.fn(),
     replace: jest.fn(),
   }),
   useSearchParams: () => new URLSearchParams(),
-}))
+}));
 
 // Mock NextAuth
-jest.mock('next-auth/react', () => ({
-  useSession: jest.fn(() => ({ data: null, status: 'unauthenticated' })),
+jest.mock("next-auth/react", () => ({
+  useSession: jest.fn(() => ({ data: null, status: "unauthenticated" })),
   signIn: jest.fn(),
   signOut: jest.fn(),
-}))
+}));
 ```
 
 ### **Database Mocking**
+
 ```typescript
 // Mock Prisma
-jest.mock('@/lib/prisma', () => ({
+jest.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
       findUnique: jest.fn(),
@@ -194,60 +205,72 @@ jest.mock('@/lib/prisma', () => ({
       update: jest.fn(),
     },
   },
-}))
+}));
 ```
 
 ### **Custom Hooks and Context**
+
 ```typescript
 // Mock custom hooks
-jest.mock('@/hooks/useToast', () => ({
+jest.mock("@/hooks/useToast", () => ({
   useToast: () => ({
     toast: jest.fn(),
     dismiss: jest.fn(),
   }),
-}))
+}));
 ```
 
 ## 📊 **Test Categories & Examples**
 
 ### **Unit Tests (87% of total tests)**
 
-#### **1. Utility Functions** 
+#### **1. Utility Functions**
+
 `lib/__tests__/require-auth-user.test.ts`
+
 - ✅ Authentication state management
 - ✅ Error handling for unauthorized access
 - ✅ Session validation logic
 - ✅ Client-side auth helpers
 
 `lib/__tests__/term-management.test.ts`
+
 - ✅ Academic term lifecycle management
 - ✅ Term transition logic
 - ✅ Database transaction handling
 - ✅ Business rule validation
 
 #### **2. Form Validation**
+
 `lib/validations/__tests__/doorcard.test.ts`
+
 - ✅ Schema validation for all form types
 - ✅ Custom validation rules (time overlap, date ranges)
 - ✅ Error message generation
 - ✅ Edge case handling (boundary values, malformed input)
 
 #### **3. UI Components**
+
 `components/ui/__tests__/button.test.tsx`
+
 - ✅ Variant and size combinations
 - ✅ Accessibility compliance
 - ✅ Event handling (click, keyboard, focus)
 - ✅ Forwarded refs and custom props
 
 #### **4. Page Components**
+
 `app/login/__tests__/page.test.tsx`
+
 - ✅ Form validation and submission
 - ✅ Authentication flow testing
 - ✅ Error state handling
 - ✅ Loading states and disabled controls
 
 #### **5. API Routes**
+
 `app/api/doorcards/__tests__/route.test.ts`
+
 - ✅ CRUD operations
 - ✅ Authentication and authorization
 - ✅ Input validation
@@ -256,7 +279,9 @@ jest.mock('@/hooks/useToast', () => ({
 ### **Integration Tests (8% of total tests)**
 
 #### **Component Integration**
+
 `app/doorcard/new/__tests__/NewDoorcardForm.test.tsx`
+
 - ✅ Multi-step form workflow
 - ✅ Server action integration
 - ✅ Navigation and routing
@@ -265,6 +290,7 @@ jest.mock('@/hooks/useToast', () => ({
 ### **End-to-End Tests (5% of total tests)**
 
 #### **Complete User Workflows**
+
 - ✅ Authentication flows
 - ✅ Doorcard creation/editing
 - ✅ Dashboard interactions
@@ -274,6 +300,7 @@ jest.mock('@/hooks/useToast', () => ({
 ## 🚦 **Test Quality Guidelines**
 
 ### **✅ Good Test Practices**
+
 - Test behavior, not implementation
 - Use descriptive test names
 - Test edge cases and error conditions
@@ -283,6 +310,7 @@ jest.mock('@/hooks/useToast', () => ({
 - Test accessibility features
 
 ### **❌ Anti-Patterns to Avoid**
+
 - Testing implementation details
 - Overly complex test setup
 - Shared mutable state between tests
@@ -293,33 +321,35 @@ jest.mock('@/hooks/useToast', () => ({
 ## 🔧 **Configuration**
 
 ### **Jest Configuration** (`jest.config.js`)
+
 ```javascript
-const nextJest = require('next/jest')
+const nextJest = require("next/jest");
 
 const createJestConfig = nextJest({
-  dir: './',
-})
+  dir: "./",
+});
 
 const customJestConfig = {
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+  testEnvironment: "jsdom",
   moduleNameMapping: {
-    '^@/(.*)$': '<rootDir>/$1',
+    "^@/(.*)$": "<rootDir>/$1",
   },
   coverageThreshold: {
     global: {
       branches: 80,
       functions: 80,
       lines: 85,
-      statements: 85
-    }
+      statements: 85,
+    },
   },
-}
+};
 
-module.exports = createJestConfig(customJestConfig)
+module.exports = createJestConfig(customJestConfig);
 ```
 
 ### **Test Setup** (`jest.setup.js`)
+
 - Global mocks for Next.js, NextAuth, Prisma
 - Custom matchers from `@testing-library/jest-dom`
 - Environment variable configuration
@@ -328,17 +358,20 @@ module.exports = createJestConfig(customJestConfig)
 ## 📈 **Coverage Analysis**
 
 ### **How to Read Coverage Reports**
+
 ```bash
 npm run test:coverage
 ```
 
 **Coverage Metrics:**
+
 - **Lines**: Percentage of executable lines covered
 - **Functions**: Percentage of functions called
 - **Branches**: Percentage of conditional branches tested
 - **Statements**: Percentage of statements executed
 
 **Current Coverage Highlights:**
+
 - **Form Validation**: 94% lines, 100% functions - Excellent!
 - **Login Component**: 100% across all metrics - Perfect!
 - **UI Components**: High coverage with accessibility testing
@@ -347,11 +380,13 @@ npm run test:coverage
 ### **Improving Coverage**
 
 **Focus Areas for 90%+ Coverage:**
+
 1. **API Routes** - Add tests for error handling and edge cases
 2. **Dashboard Components** - Test user interactions and state changes
 3. **Form Components** - Cover validation scenarios and user workflows
 
 **Tips for Higher Coverage:**
+
 - Add tests for error boundaries
 - Test loading and empty states
 - Cover keyboard navigation
@@ -363,37 +398,42 @@ npm run test:coverage
 ### **Common Issues & Solutions**
 
 **1. Import/Module Errors**
+
 ```bash
 # Error: Cannot find module '@/lib/...'
 # Solution: Check moduleNameMapping in jest.config.js
 ```
 
 **2. Async Operation Issues**
+
 ```typescript
 // Use waitFor for async updates
 await waitFor(() => {
-  expect(screen.getByText('Updated text')).toBeInTheDocument()
-})
+  expect(screen.getByText("Updated text")).toBeInTheDocument();
+});
 ```
 
 **3. Mock Issues**
+
 ```typescript
 // Clear mocks between tests
 beforeEach(() => {
-  jest.clearAllMocks()
-})
+  jest.clearAllMocks();
+});
 ```
 
 **4. DOM Cleanup**
+
 ```typescript
 // React Testing Library handles cleanup automatically
 // But for manual cleanup:
 afterEach(() => {
-  cleanup()
-})
+  cleanup();
+});
 ```
 
 ### **Debugging Commands**
+
 ```bash
 # Run specific test file
 npm test -- MyComponent.test.tsx
@@ -411,6 +451,7 @@ npm test -- --verbose
 ## 🎯 **Next Steps for 100% Coverage**
 
 ### **High-Impact Additions**
+
 1. **Dashboard Component Tests** (30+ potential tests)
    - Grid rendering and interactions
    - Search and filter functionality
@@ -430,6 +471,7 @@ npm test -- --verbose
    - Draft auto-save functionality
 
 ### **Maintenance Tasks**
+
 - Update tests when features change
 - Monitor coverage trends
 - Refactor brittle tests
@@ -449,11 +491,13 @@ npm test -- --verbose
 ## ✅ **Current Test Suite Status**
 
 **Total Tests**: 105+ tests across the application
+
 - **✅ 87 Passing**: Excellent foundation established
 - **🔄 18 Failing**: Configuration and minor issues to resolve
 - **📊 Coverage**: 80%+ in tested areas, targeting 85% overall
 
 **Quality Indicators**:
+
 - ✅ Comprehensive utility function testing
 - ✅ Form validation with edge cases
 - ✅ Component accessibility testing

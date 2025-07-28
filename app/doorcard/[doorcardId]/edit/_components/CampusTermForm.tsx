@@ -25,7 +25,7 @@ const TERM_OPTIONS = ["Fall", "Spring", "Summer"] as const;
 const COLLEGE_OPTIONS = Object.keys(COLLEGE_META) as College[];
 const CURRENT_YEAR = new Date().getFullYear();
 const YEAR_OPTIONS = Array.from({ length: 5 }, (_, i) =>
-  (CURRENT_YEAR + i).toString()
+  (CURRENT_YEAR + i).toString(),
 );
 
 type FieldErrors = { college?: string; term?: string; year?: string };
@@ -53,13 +53,26 @@ function SubmitButton() {
   );
 }
 
-function ErrorText({ children, id }: { children: React.ReactNode; id?: string }) {
-  return <p id={id} role="alert" className="mt-1 text-xs text-red-600">{children}</p>;
+function ErrorText({
+  children,
+  id,
+}: {
+  children: React.ReactNode;
+  id?: string;
+}) {
+  return (
+    <p id={id} role="alert" className="mt-1 text-xs text-red-600">
+      {children}
+    </p>
+  );
 }
 
 function Alert({ children }: { children: React.ReactNode }) {
   return (
-    <div role="alert" className="flex gap-2 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+    <div
+      role="alert"
+      className="flex gap-2 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+    >
       <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
       <div>{children}</div>
     </div>
@@ -79,14 +92,14 @@ export default function CampusTermForm({ doorcard }: Props) {
 
   const [state, serverAction] = useActionState<ActionState, FormData>(
     validateCampusTerm.bind(null, doorcard.id),
-    { success: true }
+    { success: true },
   );
 
   /* ------------------------------ Validation ------------------------------ */
 
   const validateField = (
     name: keyof FieldErrors,
-    value: string
+    value: string,
   ): string | undefined => {
     if (!value) return "Required";
     switch (name) {
@@ -170,7 +183,9 @@ export default function CampusTermForm({ doorcard }: Props) {
                 id="college"
                 aria-invalid={!!fieldErrors.college}
                 aria-required="true"
-                aria-describedby={fieldErrors.college ? "college-error" : undefined}
+                aria-describedby={
+                  fieldErrors.college ? "college-error" : undefined
+                }
                 className={fieldErrors.college ? errorClass : "mt-1.5"}
               >
                 <SelectValue placeholder="Select campus" />
@@ -221,7 +236,9 @@ export default function CampusTermForm({ doorcard }: Props) {
                 ))}
               </SelectContent>
             </Select>
-            {fieldErrors.term && <ErrorText id="term-error">{fieldErrors.term}</ErrorText>}
+            {fieldErrors.term && (
+              <ErrorText id="term-error">{fieldErrors.term}</ErrorText>
+            )}
           </div>
 
           {/* Year */}
@@ -257,7 +274,9 @@ export default function CampusTermForm({ doorcard }: Props) {
                 ))}
               </SelectContent>
             </Select>
-            {fieldErrors.year && <ErrorText id="year-error">{fieldErrors.year}</ErrorText>}
+            {fieldErrors.year && (
+              <ErrorText id="year-error">{fieldErrors.year}</ErrorText>
+            )}
           </div>
         </div>
 

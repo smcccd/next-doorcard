@@ -10,17 +10,21 @@ export default function ClarityInit() {
       try {
         // Initialize Microsoft Clarity
         Clarity.init(process.env.NEXT_PUBLIC_CLARITY_ID);
-        
-        console.log("✅ Microsoft Clarity initialized successfully with ID:", process.env.NEXT_PUBLIC_CLARITY_ID);
-        
+
+        console.log(
+          "✅ Microsoft Clarity initialized successfully with ID:",
+          process.env.NEXT_PUBLIC_CLARITY_ID,
+        );
+
         // Optional: Add a custom event to verify it's working
         Clarity.event("clarity_initialized");
-        
       } catch (error) {
         console.error("❌ Failed to initialize Microsoft Clarity:", error);
       }
     } else {
-      console.warn("⚠️ Microsoft Clarity not initialized - missing project ID or not in browser environment");
+      console.warn(
+        "⚠️ Microsoft Clarity not initialized - missing project ID or not in browser environment",
+      );
     }
   }, []);
 

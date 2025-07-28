@@ -83,13 +83,14 @@
     @apply border-border;
   }
 
-  html, body {
+  html,
+  body {
     @apply bg-gray-50 dark:bg-gray-900 text-foreground;
     height: 100%;
     margin: 0;
     padding: 0;
   }
-  
+
   #__next {
     height: 100%;
   }
@@ -149,7 +150,8 @@
   }
 
   /* Override gray backgrounds for print */
-  html, body {
+  html,
+  body {
     background: white !important;
     background-color: white !important;
     margin: 0 !important;
@@ -157,25 +159,32 @@
   }
 
   /* Remove all gray backgrounds during print */
-  .bg-gray-50, .bg-gray-100, .bg-gray-200 {
+  .bg-gray-50,
+  .bg-gray-100,
+  .bg-gray-200 {
     background: white !important;
     background-color: white !important;
   }
 
   /* Ensure main page containers are white */
-  .min-h-screen, .min-h-full {
+  .min-h-screen,
+  .min-h-full {
     background: white !important;
     background-color: white !important;
     min-height: auto !important;
   }
 
   /* Hide navigation, footer, and other UI elements in print */
-  nav, header, footer, .navbar, .footer {
+  nav,
+  header,
+  footer,
+  .navbar,
+  .footer {
     display: none !important;
   }
 
   /* Hide specific site navigation elements */
-  .bg-gray-800, 
+  .bg-gray-800,
   .text-white.text-2xl.p-5,
   [class*="navbar"],
   [class*="header"],
@@ -185,12 +194,20 @@
   }
 
   /* Hide accessibility elements in print */
-  .sr-only, [aria-live], #aria-live-region {
+  .sr-only,
+  [aria-live],
+  #aria-live-region {
     display: none !important;
   }
 
   /* Hide layout wrapper elements that create unwanted styling in print */
-  .min-h-screen, .min-h-full, .flex-col, .max-w-7xl, .shadow-md, .rounded-lg, .shadow-sm {
+  .min-h-screen,
+  .min-h-full,
+  .flex-col,
+  .max-w-7xl,
+  .shadow-md,
+  .rounded-lg,
+  .shadow-sm {
     box-shadow: none !important;
     border-radius: 0 !important;
     min-height: auto !important;
@@ -199,7 +216,9 @@
   }
 
   /* Remove all layout containers and their styling */
-  body > div, main, section {
+  body > div,
+  main,
+  section {
     background: white !important;
     box-shadow: none !important;
     border-radius: 0 !important;
@@ -230,19 +249,28 @@
   }
 
   /* Hide buttons and interactive elements */
-  button, .btn, input[type="button"], input[type="submit"], 
-  [role="button"], .cursor-pointer {
+  button,
+  .btn,
+  input[type="button"],
+  input[type="submit"],
+  [role="button"],
+  .cursor-pointer {
     display: none !important;
   }
 
   /* Hide badges and status indicators in print */
-  .badge, [class*="badge"], .bg-green-100, .bg-amber-200, 
-  .text-green-800, .text-amber-700 {
+  .badge,
+  [class*="badge"],
+  .bg-green-100,
+  .bg-amber-200,
+  .text-green-800,
+  .text-amber-700 {
     display: none !important;
   }
 
   /* Hide all interactive UI elements */
-  .print\\:hidden, [class*="print:hidden"] {
+  .print\\:hidden,
+  [class*="print:hidden"] {
     display: none !important;
   }
 
@@ -261,7 +289,7 @@
     margin: 0 !important;
   }
 
-  .border-b.border-gray-200 .flex, 
+  .border-b.border-gray-200 .flex,
   .border-b.border-gray-200 .gap-4,
   .border-b.border-gray-200 .gap-2 {
     display: none !important;
@@ -333,7 +361,12 @@
   }
 
   /* Remove container padding and margins */
-  .w-full, .max-w-4xl, .mx-auto, .px-4, .py-8, .p-8 {
+  .w-full,
+  .max-w-4xl,
+  .mx-auto,
+  .px-4,
+  .py-8,
+  .p-8 {
     padding: 0 !important;
     margin: 0 !important;
     max-width: none !important;
@@ -371,28 +404,39 @@
   }
 
   /* Reduce padding and margins */
-  .p-4, .px-4, .py-4 {
+  .p-4,
+  .px-4,
+  .py-4 {
     padding: 0.25rem !important;
   }
 
-  .p-6, .px-6, .py-6 {
+  .p-6,
+  .px-6,
+  .py-6 {
     padding: 0.375rem !important;
   }
 
-  .p-8, .px-8, .py-8 {
+  .p-8,
+  .px-8,
+  .py-8 {
     padding: 0.5rem !important;
   }
 
-  .m-4, .mx-4, .my-4 {
+  .m-4,
+  .mx-4,
+  .my-4 {
     margin: 0.25rem !important;
   }
 
-  .m-6, .mx-6, .my-6 {
+  .m-6,
+  .mx-6,
+  .my-6 {
     margin: 0.375rem !important;
   }
 
-  .m-8, .mx-8, .my-8 {
+  .m-8,
+  .mx-8,
+  .my-8 {
     margin: 0.5rem !important;
   }
 }
-

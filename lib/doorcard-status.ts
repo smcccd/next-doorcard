@@ -12,10 +12,13 @@ interface TermPeriod {
 /**
  * Define academic term periods
  */
-const TERM_PERIODS: Record<TermSeason, { startMonth: number; endMonth: number }> = {
-  SPRING: { startMonth: 1, endMonth: 5 },    // January - May
-  SUMMER: { startMonth: 6, endMonth: 8 },    // June - August  
-  FALL: { startMonth: 9, endMonth: 12 },     // September - December
+const TERM_PERIODS: Record<
+  TermSeason,
+  { startMonth: number; endMonth: number }
+> = {
+  SPRING: { startMonth: 1, endMonth: 5 }, // January - May
+  SUMMER: { startMonth: 6, endMonth: 8 }, // June - August
+  FALL: { startMonth: 9, endMonth: 12 }, // September - December
 };
 
 /**
@@ -41,28 +44,30 @@ export function getCurrentAcademicTerm(): { season: TermSeason; year: number } {
  */
 export function compareTerms(
   term1: { season: TermSeason; year: number },
-  term2: { season: TermSeason; year: number }
+  term2: { season: TermSeason; year: number },
 ): number {
   if (term1.year !== term2.year) {
     return term1.year - term2.year;
   }
-  
+
   const season1Start = TERM_PERIODS[term1.season].startMonth;
   const season2Start = TERM_PERIODS[term2.season].startMonth;
-  
+
   return season1Start - season2Start;
 }
 
 /**
  * Determine if a term is in the past, current, or future
  */
-export function getTermStatus(doorcard: Pick<Doorcard, "term" | "year">): "past" | "current" | "future" {
+export function getTermStatus(
+  doorcard: Pick<Doorcard, "term" | "year">,
+): "past" | "current" | "future" {
   const currentTerm = getCurrentAcademicTerm();
   const comparison = compareTerms(
     { season: doorcard.term as TermSeason, year: doorcard.year },
-    currentTerm
+    currentTerm,
   );
-  
+
   if (comparison < 0) return "past";
   if (comparison > 0) return "future";
   return "current";
@@ -75,10 +80,10 @@ export function categorizeDoorcards<T extends Doorcard>(doorcards: T[]) {
   const current: T[] = [];
   const archived: T[] = [];
   const upcoming: T[] = [];
-  
+
   for (const doorcard of doorcards) {
     const termStatus = getTermStatus(doorcard);
-    
+
     switch (termStatus) {
       case "current":
         current.push(doorcard);
@@ -91,24 +96,26 @@ export function categorizeDoorcards<T extends Doorcard>(doorcards: T[]) {
         break;
     }
   }
-  
+
   return { current, archived, upcoming };
 }
 
 /**
  * Check if a doorcard is complete (has necessary information)
  */
-function isDoorcardComplete(doorcard: Doorcard & { appointments?: any[] }): boolean {
+function isDoorcardComplete(
+  doorcard: Doorcard & { appointments?: any[] },
+): boolean {
   // Basic info should be present
   if (!doorcard.doorcardName || !doorcard.officeNumber) {
     return false;
   }
-  
+
   // Should have at least one appointment/time block
   if (!doorcard.appointments || doorcard.appointments.length === 0) {
     return false;
   }
-  
+
   return true;
 }
 
@@ -120,16 +127,18 @@ function isDoorcardComplete(doorcard: Doorcard & { appointments?: any[] }): bool
  * "Archived" means it's from a past term
  * "Upcoming" means it's from a future term
  */
-export function getDoorcardDisplayStatus(doorcard: Doorcard & { appointments?: any[] }): {
+export function getDoorcardDisplayStatus(
+  doorcard: Doorcard & { appointments?: any[] },
+): {
   status: "live" | "draft" | "incomplete" | "archived" | "upcoming";
   label: string;
   description: string;
 } {
   const termStatus = getTermStatus(doorcard);
-  
+
   // Check if doorcard is complete first (applies to all terms)
   const isComplete = isDoorcardComplete(doorcard);
-  
+
   // Past terms are always archived regardless of flags
   if (termStatus === "past") {
     return {
@@ -138,7 +147,7 @@ export function getDoorcardDisplayStatus(doorcard: Doorcard & { appointments?: a
       description: `From ${doorcard.term} ${doorcard.year}`,
     };
   }
-  
+
   // If doorcard is incomplete, show that regardless of term
   if (!isComplete) {
     return {
@@ -147,16 +156,16 @@ export function getDoorcardDisplayStatus(doorcard: Doorcard & { appointments?: a
       description: "Missing office hours or basic information",
     };
   }
-  
+
   // Future terms that are complete are upcoming
   if (termStatus === "future") {
     return {
-      status: "upcoming", 
+      status: "upcoming",
       label: "Upcoming",
       description: `Ready for ${doorcard.term} ${doorcard.year}`,
     };
   }
-  
+
   // Current term: check visibility flags
   if (doorcard.isActive && doorcard.isPublic) {
     return {
@@ -165,10 +174,10 @@ export function getDoorcardDisplayStatus(doorcard: Doorcard & { appointments?: a
       description: "Publicly visible on your doorcard page",
     };
   }
-  
+
   return {
     status: "draft",
-    label: "Draft", 
+    label: "Draft",
     description: "Complete but not yet published",
   };
 }

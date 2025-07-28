@@ -25,7 +25,7 @@ const getCurrentAcademicYear = () => {
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth() + 1; // 0-indexed to 1-indexed
-  
+
   // If it's January-July, we're likely planning for the same academic year
   // If it's August-December, we're planning for next academic year primarily
   return month >= 8 ? year : year;
@@ -33,7 +33,7 @@ const getCurrentAcademicYear = () => {
 
 const CURRENT_YEAR = getCurrentAcademicYear();
 const BASE_YEARS = Array.from({ length: 5 }, (_, i) =>
-  (CURRENT_YEAR + i).toString()
+  (CURRENT_YEAR + i).toString(),
 );
 
 type FieldErrors = { college?: string; term?: string; year?: string };
@@ -81,7 +81,7 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
       : BASE_YEARS;
 
   const [college, setCollege] = useState<College | "">(
-    (doorcard?.college as College) ?? (userCollege as College) ?? ""
+    (doorcard?.college as College) ?? (userCollege as College) ?? "",
   );
   const [term, setTerm] = useState(doorcard?.term ?? "");
   const [year, setYear] = useState(existingYear ?? "");
@@ -94,17 +94,17 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
       doorcard
         ? validateCampusTerm(doorcard.id, prev, formData) // edit flow
         : createDoorcardWithCampusTerm(prev, formData), // new flow
-    [doorcard]
+    [doorcard],
   );
 
   const [state, serverAction] = useActionState<ActionState, FormData>(
     actionFn,
-    { success: true }
+    { success: true },
   );
 
   const validateField = (
     name: keyof FieldErrors,
-    value: string
+    value: string,
   ): string | undefined => {
     if (!value) return "Required";
     if (name === "college" && !COLLEGE_OPTIONS.includes(value as College))
@@ -163,115 +163,127 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
             Campus and Term Selection
           </legend>
           <div className="grid gap-6 md:grid-cols-3 mt-4">
-          {/* Campus */}
-          <div>
-            <Label htmlFor="college" className="text-sm font-medium">
-              Campus <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={college}
-              onValueChange={(v) => {
-                setCollege(v as College);
-                if (clientTried)
-                  setFieldErrors((p) => ({
-                    ...p,
-                    college: validateField("college", v),
-                  }));
-              }}
-            >
-              <SelectTrigger
-                id="college"
-                aria-invalid={!!fieldErrors.college}
-                aria-describedby={fieldErrors.college ? "college-error" : undefined}
-                aria-required="true"
-                className={fieldErrors.college ? errorClass : "mt-1.5"}
+            {/* Campus */}
+            <div>
+              <Label htmlFor="college" className="text-sm font-medium">
+                Campus <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={college}
+                onValueChange={(v) => {
+                  setCollege(v as College);
+                  if (clientTried)
+                    setFieldErrors((p) => ({
+                      ...p,
+                      college: validateField("college", v),
+                    }));
+                }}
               >
-                <SelectValue placeholder="Select campus" />
-              </SelectTrigger>
-              <SelectContent>
-                {COLLEGE_OPTIONS.map((c) => (
-                  <SelectItem key={c} value={c}>
-                    {COLLEGE_META[c].label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {fieldErrors.college && (
-              <ErrorText id="college-error" role="alert">{fieldErrors.college}</ErrorText>
-            )}
-          </div>
+                <SelectTrigger
+                  id="college"
+                  aria-invalid={!!fieldErrors.college}
+                  aria-describedby={
+                    fieldErrors.college ? "college-error" : undefined
+                  }
+                  aria-required="true"
+                  className={fieldErrors.college ? errorClass : "mt-1.5"}
+                >
+                  <SelectValue placeholder="Select campus" />
+                </SelectTrigger>
+                <SelectContent>
+                  {COLLEGE_OPTIONS.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {COLLEGE_META[c].label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {fieldErrors.college && (
+                <ErrorText id="college-error" role="alert">
+                  {fieldErrors.college}
+                </ErrorText>
+              )}
+            </div>
 
-          {/* Term */}
-          <div>
-            <Label htmlFor="term" className="text-sm font-medium">
-              Term <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={term}
-              onValueChange={(v) => {
-                setTerm(v);
-                if (clientTried)
-                  setFieldErrors((p) => ({
-                    ...p,
-                    term: validateField("term", v),
-                  }));
-              }}
-            >
-              <SelectTrigger
-                id="term"
-                aria-invalid={!!fieldErrors.term}
-                aria-describedby={fieldErrors.term ? "term-error" : undefined}
-                aria-required="true"
-                className={fieldErrors.term ? errorClass : "mt-1.5"}
+            {/* Term */}
+            <div>
+              <Label htmlFor="term" className="text-sm font-medium">
+                Term <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={term}
+                onValueChange={(v) => {
+                  setTerm(v);
+                  if (clientTried)
+                    setFieldErrors((p) => ({
+                      ...p,
+                      term: validateField("term", v),
+                    }));
+                }}
               >
-                <SelectValue placeholder="Select term" />
-              </SelectTrigger>
-              <SelectContent>
-                {TERM_OPTIONS.map((t) => (
-                  <SelectItem key={t} value={t}>
-                    {t}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {fieldErrors.term && <ErrorText id="term-error" role="alert">{fieldErrors.term}</ErrorText>}
-          </div>
+                <SelectTrigger
+                  id="term"
+                  aria-invalid={!!fieldErrors.term}
+                  aria-describedby={fieldErrors.term ? "term-error" : undefined}
+                  aria-required="true"
+                  className={fieldErrors.term ? errorClass : "mt-1.5"}
+                >
+                  <SelectValue placeholder="Select term" />
+                </SelectTrigger>
+                <SelectContent>
+                  {TERM_OPTIONS.map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {fieldErrors.term && (
+                <ErrorText id="term-error" role="alert">
+                  {fieldErrors.term}
+                </ErrorText>
+              )}
+            </div>
 
-          {/* Year */}
-          <div>
-            <Label htmlFor="year" className="text-sm font-medium">
-              Year <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={year}
-              onValueChange={(v) => {
-                setYear(v);
-                if (clientTried)
-                  setFieldErrors((p) => ({
-                    ...p,
-                    year: validateField("year", v),
-                  }));
-              }}
-            >
-              <SelectTrigger
-                id="year"
-                aria-invalid={!!fieldErrors.year}
-                aria-describedby={fieldErrors.year ? "year-error" : undefined}
-                aria-required="true"
-                className={fieldErrors.year ? errorClass : "mt-1.5"}
+            {/* Year */}
+            <div>
+              <Label htmlFor="year" className="text-sm font-medium">
+                Year <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={year}
+                onValueChange={(v) => {
+                  setYear(v);
+                  if (clientTried)
+                    setFieldErrors((p) => ({
+                      ...p,
+                      year: validateField("year", v),
+                    }));
+                }}
               >
-                <SelectValue placeholder="Select year" />
-              </SelectTrigger>
-              <SelectContent>
-                {YEAR_OPTIONS.map((y) => (
-                  <SelectItem key={y} value={y}>
-                    {y}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {fieldErrors.year && <ErrorText id="year-error" role="alert">{fieldErrors.year}</ErrorText>}
-          </div>
+                <SelectTrigger
+                  id="year"
+                  aria-invalid={!!fieldErrors.year}
+                  aria-describedby={fieldErrors.year ? "year-error" : undefined}
+                  aria-required="true"
+                  className={fieldErrors.year ? errorClass : "mt-1.5"}
+                >
+                  <SelectValue placeholder="Select year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {YEAR_OPTIONS.map((y) => (
+                    <SelectItem key={y} value={y}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {fieldErrors.year && (
+                <ErrorText id="year-error" role="alert">
+                  {fieldErrors.year}
+                </ErrorText>
+              )}
+            </div>
           </div>
         </fieldset>
 

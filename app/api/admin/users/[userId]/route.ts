@@ -5,12 +5,12 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     const resolvedParams = await params;
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -18,11 +18,14 @@ export async function GET(
     // Check if user is admin
     const adminUser = await prisma.user.findUnique({
       where: { email: session.user.email },
-      select: { role: true }
+      select: { role: true },
     });
 
     if (adminUser?.role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden - Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Forbidden - Admin access required" },
+        { status: 403 },
+      );
     }
 
     // Get detailed user information
@@ -58,8 +61,8 @@ export async function GET(
             updatedAt: true,
             _count: {
               select: {
-                appointments: true
-              }
+                appointments: true,
+              },
             },
             appointments: {
               select: {
@@ -69,22 +72,19 @@ export async function GET(
                 endTime: true,
                 dayOfWeek: true,
                 category: true,
-                location: true
+                location: true,
               },
-              orderBy: [
-                { dayOfWeek: 'asc' },
-                { startTime: 'asc' }
-              ]
-            }
+              orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
+            },
           },
           orderBy: [
-            { isActive: 'desc' },
-            { year: 'desc' },
-            { term: 'desc' },
-            { createdAt: 'desc' }
-          ]
-        }
-      }
+            { isActive: "desc" },
+            { year: "desc" },
+            { term: "desc" },
+            { createdAt: "desc" },
+          ],
+        },
+      },
     });
 
     if (!user) {
@@ -107,7 +107,7 @@ export async function GET(
       displayFormat: user.displayFormat,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
-      doorcards: user.doorcards.map(doorcard => ({
+      doorcards: user.doorcards.map((doorcard) => ({
         id: doorcard.id,
         name: doorcard.name,
         doorcardName: doorcard.doorcardName,
@@ -120,13 +120,14 @@ export async function GET(
         createdAt: doorcard.createdAt.toISOString(),
         updatedAt: doorcard.updatedAt.toISOString(),
         appointmentCount: doorcard._count.appointments,
-        appointments: doorcard.appointments
+        appointments: doorcard.appointments,
       })),
       totalDoorcards: user.doorcards.length,
-      activeDoorcards: user.doorcards.filter(d => d.isActive).length,
-      totalAppointments: user.doorcards.reduce((total, doorcard) => 
-        total + doorcard._count.appointments, 0
-      )
+      activeDoorcards: user.doorcards.filter((d) => d.isActive).length,
+      totalAppointments: user.doorcards.reduce(
+        (total, doorcard) => total + doorcard._count.appointments,
+        0,
+      ),
     };
 
     return NextResponse.json(processedUser);
@@ -134,7 +135,7 @@ export async function GET(
     console.error("Admin user detail error:", error);
     return NextResponse.json(
       { error: "Failed to fetch user details" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

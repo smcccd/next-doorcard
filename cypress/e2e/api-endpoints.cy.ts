@@ -20,7 +20,7 @@ describe("API Endpoints", () => {
   it("should handle API requests with authentication", () => {
     cy.request({
       url: "/api/auth/session",
-      failOnStatusCode: false
+      failOnStatusCode: false,
     }).then((response) => {
       expect(response.status).to.be.oneOf([200, 401]);
     });

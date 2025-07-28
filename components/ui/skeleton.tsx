@@ -9,7 +9,7 @@ function Skeleton({ className }: SkeletonProps) {
         "before:absolute before:inset-0",
         "before:bg-gradient-to-r before:from-transparent before:via-white/40 before:to-transparent",
         "before:-translate-x-full before:animate-shimmer",
-        className
+        className,
       )}
     />
   );

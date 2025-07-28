@@ -51,7 +51,7 @@ export const appointmentSchema = baseAppointmentSchema.refine(
   {
     message: "End time must be after start time",
     path: ["endTime"],
-  }
+  },
 );
 
 // Create appointment schema (for API)
@@ -85,7 +85,7 @@ export const basicInfoSchema = z
     {
       message: "End date must be after start date",
       path: ["endDate"],
-    }
+    },
   );
 
 // Full doorcard validation - simplified without refinement extend
@@ -165,16 +165,23 @@ export function validateTimeSlot(startTime: string, endTime: string): boolean {
 }
 
 export function validateAppointmentOverlap(
-  appointments: Array<{ dayOfWeek: string; startTime: string; endTime: string }>
+  appointments: Array<{
+    dayOfWeek: string;
+    startTime: string;
+    endTime: string;
+  }>,
 ): boolean {
   // Group by day
-  const appointmentsByDay = appointments.reduce((acc, appointment) => {
-    if (!acc[appointment.dayOfWeek]) {
-      acc[appointment.dayOfWeek] = [];
-    }
-    acc[appointment.dayOfWeek].push(appointment);
-    return acc;
-  }, {} as Record<string, typeof appointments>);
+  const appointmentsByDay = appointments.reduce(
+    (acc, appointment) => {
+      if (!acc[appointment.dayOfWeek]) {
+        acc[appointment.dayOfWeek] = [];
+      }
+      acc[appointment.dayOfWeek].push(appointment);
+      return acc;
+    },
+    {} as Record<string, typeof appointments>,
+  );
 
   // Check for overlaps within each day
   for (const dayAppointments of Object.values(appointmentsByDay)) {
@@ -208,7 +215,7 @@ export function validateTimeBlockOverlap(
     endTime: string;
     activity: string;
   }>,
-  editingId?: string | null
+  editingId?: string | null,
 ): string | null {
   // Validate that end time is after start time
   if (!validateTimeSlot(newBlock.startTime, newBlock.endTime)) {

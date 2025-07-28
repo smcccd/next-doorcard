@@ -4,7 +4,11 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { ProfileSetupModal } from "./ProfileSetupModal";
 
-export function ProfileSetupProvider({ children }: { children: React.ReactNode }) {
+export function ProfileSetupProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { data: session, status } = useSession();
   const [showModal, setShowModal] = useState(false);
   const [hasChecked, setHasChecked] = useState(false);
@@ -16,19 +20,23 @@ export function ProfileSetupProvider({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     if (status === "loading" || hasChecked || !mounted) return;
-    
+
     if (session?.user) {
       // Check if user has already interacted with the modal (persistent)
       const dismissalKey = `profile-setup-dismissed-${session.user.id}`;
-      const wasDismissed = typeof window !== 'undefined' ? localStorage.getItem(dismissalKey) : null;
-      
+      const wasDismissed =
+        typeof window !== "undefined"
+          ? localStorage.getItem(dismissalKey)
+          : null;
+
       if (!wasDismissed) {
         // Check if user needs to complete profile setup
-        const hasGenericName = !session.user.name || 
-          session.user.name === session.user.email?.split('@')[0] ||
+        const hasGenericName =
+          !session.user.name ||
+          session.user.name === session.user.email?.split("@")[0] ||
           session.user.name === (session.user as any).username ||
-          session.user.name.split(' ').length < 2; // Single name suggests incomplete profile
-        
+          session.user.name.split(" ").length < 2; // Single name suggests incomplete profile
+
         if (hasGenericName) {
           setShowModal(true);
         }
@@ -41,7 +49,10 @@ export function ProfileSetupProvider({ children }: { children: React.ReactNode }
     setShowModal(false);
     // Store dismissal permanently so it doesn't show again until they visit profile page
     if (session?.user?.id) {
-      localStorage.setItem(`profile-setup-dismissed-${session.user.id}`, 'true');
+      localStorage.setItem(
+        `profile-setup-dismissed-${session.user.id}`,
+        "true",
+      );
     }
   };
 
@@ -52,11 +63,12 @@ export function ProfileSetupProvider({ children }: { children: React.ReactNode }
     }
   };
 
-
   return (
     <>
       {children}
-      {mounted && <ProfileSetupModal isOpen={showModal} onComplete={handleComplete} />}
+      {mounted && (
+        <ProfileSetupModal isOpen={showModal} onComplete={handleComplete} />
+      )}
     </>
   );
 }

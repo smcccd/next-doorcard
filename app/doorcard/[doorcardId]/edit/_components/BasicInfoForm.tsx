@@ -43,7 +43,7 @@ const rules: Record<
 
 function validateField(
   key: keyof FieldErrors,
-  value: string
+  value: string,
 ): string | undefined {
   const v = value.trim();
   if (!v) return `${rules[key].label} is required`;
@@ -72,7 +72,7 @@ export default function BasicInfoForm({ doorcard }: Props) {
 
   const [state, action] = useActionState(
     updateBasicInfo.bind(null, doorcard.id),
-    { success: true } as { success: boolean; message?: string }
+    { success: true } as { success: boolean; message?: string },
   );
 
   const handleChange = (field: keyof FieldErrors, value: string) => {
@@ -108,7 +108,9 @@ export default function BasicInfoForm({ doorcard }: Props) {
       <div className="flex items-start gap-3">
         <CheckCircle2 className="h-5 w-5 text-blue-500 mt-1 shrink-0" />
         <div>
-          <h2 className="text-lg font-medium text-gray-900">Enter Your Information</h2>
+          <h2 className="text-lg font-medium text-gray-900">
+            Enter Your Information
+          </h2>
           <p className="text-sm text-gray-500">
             These details appear on the public doorcard.
           </p>
@@ -212,7 +214,9 @@ function Field({
           placeholder={placeholder}
           aria-invalid={!!error}
           aria-required="true"
-          aria-describedby={error ? `${id}-error` : help ? `${id}-help` : undefined}
+          aria-describedby={
+            error ? `${id}-error` : help ? `${id}-help` : undefined
+          }
           className={`pl-10 ${
             error
               ? "border-red-300 focus:border-red-500 focus:ring-red-500"
@@ -221,9 +225,15 @@ function Field({
         />
       </div>
       {error ? (
-        <p id={`${id}-error`} role="alert" className="text-xs text-red-600">{error}</p>
+        <p id={`${id}-error`} role="alert" className="text-xs text-red-600">
+          {error}
+        </p>
       ) : (
-        help && <p id={`${id}-help`} className="text-xs text-gray-600">{help}</p>
+        help && (
+          <p id={`${id}-help`} className="text-xs text-gray-600">
+            {help}
+          </p>
+        )
       )}
     </div>
   );
@@ -231,7 +241,10 @@ function Field({
 
 function Alert({ message }: { message: string }) {
   return (
-    <div role="alert" className="flex gap-2 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+    <div
+      role="alert"
+      className="flex gap-2 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+    >
       <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" /> {message}
     </div>
   );

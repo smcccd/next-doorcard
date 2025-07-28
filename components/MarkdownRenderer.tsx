@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useMemo } from 'react';
-import { parseMarkdown } from '@/lib/markdown';
-import 'highlight.js/styles/github-dark.css';
-import './markdown.css';
+import { useState, useMemo } from "react";
+import { parseMarkdown } from "@/lib/markdown";
+import "highlight.js/styles/github-dark.css";
+import "./markdown.css";
 
 interface MarkdownRendererProps {
   content: string;
@@ -19,7 +19,8 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
       setError(null);
       return parseMarkdown(content);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error parsing markdown';
+      const errorMessage =
+        err instanceof Error ? err.message : "Unknown error parsing markdown";
       setError(errorMessage);
       return '<p class="text-red-600">Error parsing content</p>';
     }

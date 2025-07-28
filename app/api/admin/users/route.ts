@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -14,38 +14,41 @@ export async function GET(req: NextRequest) {
     // Check if user is admin
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      select: { role: true }
+      select: { role: true },
     });
 
     if (user?.role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden - Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Forbidden - Admin access required" },
+        { status: 403 },
+      );
     }
 
     // Get URL parameters for pagination and filtering
     const { searchParams } = new URL(req.url);
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
-    const search = searchParams.get('search') || '';
-    const campus = searchParams.get('campus') || '';
+    const limit = parseInt(searchParams.get("limit") || "50");
+    const offset = parseInt(searchParams.get("offset") || "0");
+    const search = searchParams.get("search") || "";
+    const campus = searchParams.get("campus") || "";
 
     // Build where clause
     const where: any = {};
-    
+
     if (search) {
       where.OR = [
-        { email: { contains: search, mode: 'insensitive' } },
-        { name: { contains: search, mode: 'insensitive' } },
-        { username: { contains: search, mode: 'insensitive' } },
-        { firstName: { contains: search, mode: 'insensitive' } },
-        { lastName: { contains: search, mode: 'insensitive' } }
+        { email: { contains: search, mode: "insensitive" } },
+        { name: { contains: search, mode: "insensitive" } },
+        { username: { contains: search, mode: "insensitive" } },
+        { firstName: { contains: search, mode: "insensitive" } },
+        { lastName: { contains: search, mode: "insensitive" } },
       ];
     }
 
-    if (campus && campus !== 'all') {
+    if (campus && campus !== "all") {
       where.doorcards = {
         some: {
-          college: campus
-        }
+          college: campus,
+        },
       };
     }
 
@@ -64,36 +67,35 @@ export async function GET(req: NextRequest) {
         createdAt: true,
         _count: {
           select: {
-            doorcards: true
-          }
+            doorcards: true,
+          },
         },
         doorcards: {
           select: {
             college: true,
             _count: {
               select: {
-                appointments: true
-              }
-            }
-          }
-        }
+                appointments: true,
+              },
+            },
+          },
+        },
       },
-      orderBy: [
-        { createdAt: 'desc' }
-      ],
+      orderBy: [{ createdAt: "desc" }],
       take: limit,
-      skip: offset
+      skip: offset,
     });
 
     // Process the data to include computed fields
-    const processedUsers = users.map(user => {
+    const processedUsers = users.map((user) => {
       const doorcardCount = user._count.doorcards;
-      const appointmentCount = user.doorcards.reduce((total, doorcard) => 
-        total + doorcard._count.appointments, 0
+      const appointmentCount = user.doorcards.reduce(
+        (total, doorcard) => total + doorcard._count.appointments,
+        0,
       );
-      
+
       // Get primary campus from doorcards
-      const campuses = user.doorcards.map(d => d.college).filter(Boolean);
+      const campuses = user.doorcards.map((d) => d.college).filter(Boolean);
       const primaryCampus = campuses.length > 0 ? campuses[0] : user.college;
 
       return {
@@ -108,7 +110,7 @@ export async function GET(req: NextRequest) {
         createdAt: user.createdAt.toISOString(),
         doorcardCount,
         appointmentCount,
-        lastActive: null // TODO: Add last login tracking
+        lastActive: null, // TODO: Add last login tracking
       };
     });
 
@@ -117,7 +119,7 @@ export async function GET(req: NextRequest) {
     console.error("Admin users error:", error);
     return NextResponse.json(
       { error: "Failed to fetch users" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -3,18 +3,22 @@
 import { useEffect, useState } from "react";
 import { AnalyticsChart } from "@/components/analytics/AnalyticsChart";
 import { TestChart } from "@/components/analytics/TestChart";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Activity, 
-  Eye, 
-  FileDown, 
-  Share2, 
-  RefreshCw, 
+import {
+  Activity,
+  Eye,
+  FileDown,
+  Share2,
+  RefreshCw,
   TrendingUp,
-  Users,
-  Calendar
 } from "lucide-react";
 
 interface SystemStats {
@@ -57,11 +61,11 @@ export function AdminAnalytics() {
     try {
       setLoading(true);
       const response = await fetch("/api/admin/analytics");
-      
+
       if (!response.ok) {
         throw new Error("Failed to fetch analytics");
       }
-      
+
       const analyticsData = await response.json();
       setData(analyticsData);
       setError("");
@@ -96,7 +100,9 @@ export function AdminAnalytics() {
         <CardContent className="p-12 text-center">
           <Activity className="h-12 w-12 mx-auto text-red-500 mb-4" />
           <h3 className="text-lg font-semibold mb-2">Analytics Error</h3>
-          <p className="text-red-600 mb-4">{error || "Failed to load analytics"}</p>
+          <p className="text-red-600 mb-4">
+            {error || "Failed to load analytics"}
+          </p>
           <Button onClick={fetchAnalytics} variant="outline">
             <RefreshCw className="h-4 w-4 mr-2" />
             Retry
@@ -112,15 +118,19 @@ export function AdminAnalytics() {
     <div className="space-y-6">
       {/* Test Chart */}
       <TestChart />
-      
+
       {/* Header with refresh button */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Platform Analytics</h2>
-          <p className="text-gray-600">System-wide usage statistics and insights</p>
+          <p className="text-gray-600">
+            System-wide usage statistics and insights
+          </p>
         </div>
         <Button onClick={fetchAnalytics} variant="outline" disabled={loading}>
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw
+            className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+          />
           Refresh
         </Button>
       </div>
@@ -133,7 +143,9 @@ export function AdminAnalytics() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{systemStats.totalEvents.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {systemStats.totalEvents.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">
               {systemStats.recentEvents} in last 30 days
             </p>
@@ -146,7 +158,9 @@ export function AdminAnalytics() {
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.totalViews.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {analytics.totalViews.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">
               {analytics.uniqueViews.toLocaleString()} unique views
             </p>
@@ -159,9 +173,12 @@ export function AdminAnalytics() {
             <FileDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.totalPrints.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {analytics.totalPrints.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">
-              {systemStats.eventBreakdown.PRINT_PREVIEW || 0} previews, {systemStats.eventBreakdown.PRINT_DOWNLOAD || 0} downloads
+              {systemStats.eventBreakdown.PRINT_PREVIEW || 0} previews,{" "}
+              {systemStats.eventBreakdown.PRINT_DOWNLOAD || 0} downloads
             </p>
           </CardContent>
         </Card>
@@ -172,7 +189,9 @@ export function AdminAnalytics() {
             <Share2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.totalShares.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {analytics.totalShares.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">
               {systemStats.eventBreakdown.SHARE || 0} share events
             </p>
@@ -181,7 +200,7 @@ export function AdminAnalytics() {
       </div>
 
       {/* Main Analytics Chart */}
-      <AnalyticsChart 
+      <AnalyticsChart
         data={analytics}
         doorcardAnalytics={doorcards}
         title="Platform Analytics Dashboard"
@@ -205,23 +224,39 @@ export function AdminAnalytics() {
               <table className="w-full">
                 <thead className="border-b bg-gray-50">
                   <tr>
-                    <th className="text-left p-3 text-sm font-medium">Doorcard</th>
-                    <th className="text-left p-3 text-sm font-medium">Faculty</th>
-                    <th className="text-left p-3 text-sm font-medium">Campus</th>
+                    <th className="text-left p-3 text-sm font-medium">
+                      Doorcard
+                    </th>
+                    <th className="text-left p-3 text-sm font-medium">
+                      Faculty
+                    </th>
+                    <th className="text-left p-3 text-sm font-medium">
+                      Campus
+                    </th>
                     <th className="text-left p-3 text-sm font-medium">Views</th>
-                    <th className="text-left p-3 text-sm font-medium">Downloads</th>
-                    <th className="text-left p-3 text-sm font-medium">Shares</th>
-                    <th className="text-left p-3 text-sm font-medium">Last Activity</th>
+                    <th className="text-left p-3 text-sm font-medium">
+                      Downloads
+                    </th>
+                    <th className="text-left p-3 text-sm font-medium">
+                      Shares
+                    </th>
+                    <th className="text-left p-3 text-sm font-medium">
+                      Last Activity
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {doorcards.slice(0, 15).map((doorcard) => (
                     <tr key={doorcard.doorcardId} className="border-b">
                       <td className="p-3">
-                        <div className="font-medium">{doorcard.doorcardName}</div>
+                        <div className="font-medium">
+                          {doorcard.doorcardName}
+                        </div>
                       </td>
                       <td className="p-3">
-                        <div className="font-medium">{doorcard.facultyName}</div>
+                        <div className="font-medium">
+                          {doorcard.facultyName}
+                        </div>
                       </td>
                       <td className="p-3">
                         <Badge variant="outline">{doorcard.college}</Badge>
@@ -229,27 +264,34 @@ export function AdminAnalytics() {
                       <td className="p-3">
                         <div className="flex items-center gap-1">
                           <Eye className="h-4 w-4 text-blue-600" />
-                          <span className="font-medium">{doorcard.totalViews}</span>
+                          <span className="font-medium">
+                            {doorcard.totalViews}
+                          </span>
                         </div>
                       </td>
                       <td className="p-3">
                         <div className="flex items-center gap-1">
                           <FileDown className="h-4 w-4 text-green-600" />
-                          <span className="font-medium">{doorcard.totalPrints}</span>
+                          <span className="font-medium">
+                            {doorcard.totalPrints}
+                          </span>
                         </div>
                       </td>
                       <td className="p-3">
                         <div className="flex items-center gap-1">
                           <Share2 className="h-4 w-4 text-yellow-600" />
-                          <span className="font-medium">{doorcard.totalShares}</span>
+                          <span className="font-medium">
+                            {doorcard.totalShares}
+                          </span>
                         </div>
                       </td>
                       <td className="p-3">
                         <div className="text-sm text-gray-500">
-                          {doorcard.lastViewedAt 
-                            ? new Date(doorcard.lastViewedAt).toLocaleDateString()
-                            : "Never"
-                          }
+                          {doorcard.lastViewedAt
+                            ? new Date(
+                                doorcard.lastViewedAt,
+                              ).toLocaleDateString()
+                            : "Never"}
                         </div>
                       </td>
                     </tr>
@@ -279,14 +321,21 @@ export function AdminAnalytics() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {Object.entries(systemStats.eventBreakdown).map(([eventType, count]) => (
-              <div key={eventType} className="text-center p-4 border rounded-lg">
-                <div className="text-2xl font-bold text-indigo-600">{count}</div>
-                <div className="text-sm text-gray-600 capitalize">
-                  {eventType.toLowerCase().replace('_', ' ')}
+            {Object.entries(systemStats.eventBreakdown).map(
+              ([eventType, count]) => (
+                <div
+                  key={eventType}
+                  className="text-center p-4 border rounded-lg"
+                >
+                  <div className="text-2xl font-bold text-indigo-600">
+                    {count}
+                  </div>
+                  <div className="text-sm text-gray-600 capitalize">
+                    {eventType.toLowerCase().replace("_", " ")}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ),
+            )}
           </div>
         </CardContent>
       </Card>

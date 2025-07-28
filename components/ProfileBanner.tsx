@@ -15,8 +15,9 @@ export function ProfileBanner() {
   }
 
   // Check if user has a generic username as their name or no name
-  const hasGenericName = !session.user.name || 
-    session.user.name === session.user.email?.split('@')[0] ||
+  const hasGenericName =
+    !session.user.name ||
+    session.user.name === session.user.email?.split("@")[0] ||
     session.user.name === (session.user as any).username;
 
   if (!hasGenericName) {
@@ -35,14 +36,13 @@ export function ProfileBanner() {
           </h3>
           <div className="mt-2 text-sm text-blue-700">
             <p>
-              Add your name and optional website to personalize your doorcard and help students find you.
+              Add your name and optional website to personalize your doorcard
+              and help students find you.
             </p>
           </div>
           <div className="mt-3">
             <Button size="sm" asChild>
-              <Link href="/profile">
-                Update Profile
-              </Link>
+              <Link href="/profile">Update Profile</Link>
             </Button>
           </div>
         </div>

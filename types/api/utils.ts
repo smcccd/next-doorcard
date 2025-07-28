@@ -40,4 +40,4 @@ export interface WhereClause {
     doorcardName?: { contains: string; mode: "insensitive" };
     user?: { name: { contains: string; mode: "insensitive" } };
   }>;
-} 
+}

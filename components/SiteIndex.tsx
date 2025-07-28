@@ -1,11 +1,35 @@
 "use client";
 
-import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 const ALPHABET_LETTERS = [
-  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-  'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
 ];
 
 export default function SiteIndex() {
@@ -27,9 +51,11 @@ export default function SiteIndex() {
                   className="text-white hover:text-blue-200 hover:bg-blue-700 transition-all duration-200 px-2 py-1 rounded text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
                   onClick={() => {
                     // Scroll to section or filter content by letter
-                    const element = document.getElementById(`section-${letter.toLowerCase()}`);
+                    const element = document.getElementById(
+                      `section-${letter.toLowerCase()}`,
+                    );
                     if (element) {
-                      element.scrollIntoView({ behavior: 'smooth' });
+                      element.scrollIntoView({ behavior: "smooth" });
                     }
                   }}
                 >
@@ -51,13 +77,13 @@ export default function SiteIndex() {
             <span className="font-medium text-sm tracking-wide">
               Site Index
             </span>
-            <ChevronDown 
+            <ChevronDown
               className={`w-5 h-5 transform transition-transform duration-200 ${
-                isExpanded ? 'rotate-180' : ''
+                isExpanded ? "rotate-180" : ""
               }`}
             />
           </button>
-          
+
           {isExpanded && (
             <div className="pb-4 animate-in slide-in-from-top-2 duration-200">
               <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2">
@@ -67,9 +93,11 @@ export default function SiteIndex() {
                     className="text-white hover:text-blue-200 hover:bg-blue-700 transition-all duration-200 py-2 px-1 rounded text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50 text-center"
                     onClick={() => {
                       // Scroll to section or filter content by letter
-                      const element = document.getElementById(`section-${letter.toLowerCase()}`);
+                      const element = document.getElementById(
+                        `section-${letter.toLowerCase()}`,
+                      );
                       if (element) {
-                        element.scrollIntoView({ behavior: 'smooth' });
+                        element.scrollIntoView({ behavior: "smooth" });
                       }
                       setIsExpanded(false); // Close on mobile after selection
                     }}

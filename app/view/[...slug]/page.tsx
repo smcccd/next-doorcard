@@ -11,7 +11,14 @@ import { AutoPrintHandler } from "@/components/AutoPrintHandler";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { User, MapPin, Calendar, Building, ArrowLeft, Globe } from "lucide-react";
+import {
+  User,
+  MapPin,
+  Calendar,
+  Building,
+  ArrowLeft,
+  Globe,
+} from "lucide-react";
 import { formatDisplayName } from "@/lib/display-name";
 
 /* ----------------------------------------------------------------------------
@@ -21,7 +28,7 @@ import { formatDisplayName } from "@/lib/display-name";
 async function fetchDoorcard(
   username: string,
   termSlug: string | undefined,
-  useAuth: boolean
+  useAuth: boolean,
 ) {
   // If ?auth=true is passed, we allow viewing non-public doorcards (must be signed in)
   const session = await getServerSession(authOptions);
@@ -34,27 +41,28 @@ async function fetchDoorcard(
     where: { username },
     select: { id: true, name: true, college: true, email: true },
   });
-  
+
   // If not found by username, try finding by name slug
   if (!user) {
     // Convert slug back to potential name patterns
     const namePatterns = [
-      username.replace(/-/g, ' '), // "john-ortiz" -> "john ortiz"
-      username.split('-').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1)
-      ).join(' '), // "john-ortiz" -> "John Ortiz"
+      username.replace(/-/g, " "), // "john-ortiz" -> "john ortiz"
+      username
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" "), // "john-ortiz" -> "John Ortiz"
     ];
-    
+
     user = await prisma.user.findFirst({
       where: {
-        OR: namePatterns.map(name => ({
-          name: { equals: name, mode: 'insensitive' as const }
-        }))
+        OR: namePatterns.map((name) => ({
+          name: { equals: name, mode: "insensitive" as const },
+        })),
       },
       select: { id: true, name: true, college: true, email: true },
     });
   }
-  
+
   if (!user) return { error: "Doorcard not found" } as const;
 
   // If termSlug is provided we need to find the matching doorcard
@@ -68,11 +76,22 @@ async function fetchDoorcard(
           { slug: termSlug }, // Exact match
           { slug: { endsWith: `-${termSlug}` } }, // Ends with term slug
           { slug: { contains: termSlug } }, // Contains term slug
-        ]
+        ],
       },
       include: {
         appointments: true,
-        user: { select: { name: true, firstName: true, lastName: true, title: true, pronouns: true, displayFormat: true, college: true, website: true } },
+        user: {
+          select: {
+            name: true,
+            firstName: true,
+            lastName: true,
+            title: true,
+            pronouns: true,
+            displayFormat: true,
+            college: true,
+            website: true,
+          },
+        },
       },
     });
     if (!doorcard) return { error: "Doorcard not found" } as const;
@@ -86,7 +105,18 @@ async function fetchDoorcard(
       orderBy: { updatedAt: "desc" },
       include: {
         appointments: true,
-        user: { select: { name: true, firstName: true, lastName: true, title: true, pronouns: true, displayFormat: true, college: true, website: true } },
+        user: {
+          select: {
+            name: true,
+            firstName: true,
+            lastName: true,
+            title: true,
+            pronouns: true,
+            displayFormat: true,
+            college: true,
+            website: true,
+          },
+        },
       },
     });
     if (!doorcard) return { error: "Doorcard not found" } as const;
@@ -113,7 +143,7 @@ export default async function PublicDoorcardView({
 }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
-  
+
   const slugArray = resolvedParams.slug;
   if (!Array.isArray(slugArray) || slugArray.length === 0) notFound();
 
@@ -153,7 +183,7 @@ export default async function PublicDoorcardView({
     <div className="min-h-screen bg-white">
       {/* Auto-print handler */}
       <AutoPrintHandler autoPrint={autoPrint} />
-      
+
       {/* Analytics tracker (client) */}
       <DoorcardViewTracker
         doorcardId={doorcard.id}
@@ -184,7 +214,10 @@ export default async function PublicDoorcardView({
                     </Badge>
                   )}
                   {doorcard.isActive ? (
-                    <Badge variant="default" className="text-xs bg-green-100 text-green-800">
+                    <Badge
+                      variant="default"
+                      className="text-xs bg-green-100 text-green-800"
+                    >
                       Live
                     </Badge>
                   ) : (
@@ -193,7 +226,10 @@ export default async function PublicDoorcardView({
                     </Badge>
                   )}
                   {!doorcard.isPublic && (
-                    <Badge variant="outline" className="text-xs border-amber-200 text-amber-700">
+                    <Badge
+                      variant="outline"
+                      className="text-xs border-amber-200 text-amber-700"
+                    >
                       Private
                     </Badge>
                   )}
@@ -203,7 +239,9 @@ export default async function PublicDoorcardView({
                 <div className="flex items-center gap-1">
                   <User className="h-4 w-4" />
                   <span className="font-medium">
-                    {doorcard.user ? formatDisplayName(doorcard.user) : doorcard.name}
+                    {doorcard.user
+                      ? formatDisplayName(doorcard.user)
+                      : doorcard.name}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -225,8 +263,12 @@ export default async function PublicDoorcardView({
                 {doorcard.user?.website && (
                   <div className="flex items-center gap-1">
                     <Globe className="h-4 w-4" />
-                    <a 
-                      href={doorcard.user.website.startsWith('http') ? doorcard.user.website : `https://${doorcard.user.website}`}
+                    <a
+                      href={
+                        doorcard.user.website.startsWith("http")
+                          ? doorcard.user.website
+                          : `https://${doorcard.user.website}`
+                      }
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 hover:underline"
@@ -248,7 +290,10 @@ export default async function PublicDoorcardView({
                   </Link>
                 </Button>
               )}
-              <DoorcardActions doorcard={doorcardLite} doorcardId={doorcard.id} />
+              <DoorcardActions
+                doorcard={doorcardLite}
+                doorcardId={doorcard.id}
+              />
             </div>
           </div>
         </div>
@@ -262,7 +307,7 @@ export default async function PublicDoorcardView({
             <div className="w-full print:hidden">
               <UnifiedDoorcard doorcard={doorcardLite} />
             </div>
-            
+
             {/* Print version - optimized for single page */}
             <div className="hidden print:block">
               <PrintOptimizedDoorcard doorcard={doorcardLite} />

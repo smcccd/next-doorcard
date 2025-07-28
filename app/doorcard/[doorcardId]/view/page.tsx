@@ -27,7 +27,7 @@ export default async function DoorcardViewById({
 }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
-  
+
   const doorcardId = resolvedParams.doorcardId;
   const useAuth = resolvedSearchParams.auth === "true";
   const autoPrint = resolvedSearchParams.print === "true";
@@ -38,8 +38,12 @@ export default async function DoorcardViewById({
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="bg-white rounded-lg shadow p-8 max-w-md text-center">
-          <h1 className="text-xl font-semibold mb-2">Authentication Required</h1>
-          <p className="text-gray-600 mb-6">Please sign in to view this doorcard.</p>
+          <h1 className="text-xl font-semibold mb-2">
+            Authentication Required
+          </h1>
+          <p className="text-gray-600 mb-6">
+            Please sign in to view this doorcard.
+          </p>
           <Button asChild>
             <Link href="/login">Sign In</Link>
           </Button>
@@ -55,9 +59,9 @@ export default async function DoorcardViewById({
       appointments: {
         orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
       },
-      user: { 
-        select: { 
-          name: true, 
+      user: {
+        select: {
+          name: true,
           firstName: true,
           lastName: true,
           title: true,
@@ -65,8 +69,8 @@ export default async function DoorcardViewById({
           displayFormat: true,
           username: true,
           college: true,
-          website: true 
-        } 
+          website: true,
+        },
       },
     },
   });
@@ -81,7 +85,9 @@ export default async function DoorcardViewById({
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="bg-white rounded-lg shadow p-8 max-w-md text-center">
           <h1 className="text-xl font-semibold mb-2">Doorcard Not Available</h1>
-          <p className="text-gray-600 mb-6">This doorcard is not publicly accessible.</p>
+          <p className="text-gray-600 mb-6">
+            This doorcard is not publicly accessible.
+          </p>
           <Button asChild>
             <Link href="/">Browse Doorcards</Link>
           </Button>
@@ -96,7 +102,7 @@ export default async function DoorcardViewById({
     <div className="min-h-screen bg-white">
       {/* Auto-print handler */}
       <AutoPrintHandler autoPrint={autoPrint} />
-      
+
       {/* Analytics tracker (client) */}
       <DoorcardViewTracker
         doorcardId={doorcard.id}
@@ -124,22 +130,27 @@ export default async function DoorcardViewById({
                   <Badge variant="outline" className="text-xs">
                     {doorcard.term} {doorcard.year}
                   </Badge>
-                  <Badge 
-                    variant={displayStatus.status === "live" ? "default" : "secondary"} 
+                  <Badge
+                    variant={
+                      displayStatus.status === "live" ? "default" : "secondary"
+                    }
                     className={`text-xs ${
-                      displayStatus.status === "live" 
-                        ? "bg-green-100 text-green-800" 
+                      displayStatus.status === "live"
+                        ? "bg-green-100 text-green-800"
                         : displayStatus.status === "archived"
-                        ? "bg-gray-100 text-gray-600"
-                        : displayStatus.status === "upcoming"
-                        ? "bg-blue-100 text-blue-800"
-                        : ""
+                          ? "bg-gray-100 text-gray-600"
+                          : displayStatus.status === "upcoming"
+                            ? "bg-blue-100 text-blue-800"
+                            : ""
                     }`}
                   >
                     {displayStatus.label}
                   </Badge>
                   {!doorcard.isPublic && (
-                    <Badge variant="outline" className="text-xs border-amber-200 text-amber-700">
+                    <Badge
+                      variant="outline"
+                      className="text-xs border-amber-200 text-amber-700"
+                    >
                       Private
                     </Badge>
                   )}
@@ -179,11 +190,11 @@ export default async function DoorcardViewById({
                   </Link>
                 </Button>
               )}
-              <DoorcardActions 
+              <DoorcardActions
                 doorcard={{
                   ...doorcard,
-                  year: doorcard.year.toString()
-                }} 
+                  year: doorcard.year.toString(),
+                }}
                 doorcardId={doorcard.id}
               />
             </div>
@@ -197,18 +208,22 @@ export default async function DoorcardViewById({
           <>
             {/* Screen version - full schedule with all features */}
             <div className="w-full print:hidden">
-              <UnifiedDoorcard doorcard={{
-                ...doorcard,
-                year: doorcard.year.toString()
-              }} />
+              <UnifiedDoorcard
+                doorcard={{
+                  ...doorcard,
+                  year: doorcard.year.toString(),
+                }}
+              />
             </div>
-            
+
             {/* Print version - optimized for single page */}
             <div className="hidden print:block">
-              <PrintOptimizedDoorcard doorcard={{
-                ...doorcard,
-                year: doorcard.year.toString()
-              }} />
+              <PrintOptimizedDoorcard
+                doorcard={{
+                  ...doorcard,
+                  year: doorcard.year.toString(),
+                }}
+              />
             </div>
           </>
         ) : (

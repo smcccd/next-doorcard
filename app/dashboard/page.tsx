@@ -39,7 +39,9 @@ function StatsCards({
       <Card>
         <CardContent className="p-6 flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Live Doorcards</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Live Doorcards
+            </p>
             <p className="text-3xl font-bold">{liveCount}</p>
           </div>
           <Eye className="h-8 w-8 text-green-600" />
@@ -48,7 +50,9 @@ function StatsCards({
       <Card>
         <CardContent className="p-6 flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Total Views</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Total Views
+            </p>
             <p className="text-3xl font-bold">{metrics?.totalViews ?? 0}</p>
           </div>
           <Eye className="h-8 w-8 text-green-600" />
@@ -85,14 +89,16 @@ export default async function DashboardPage() {
   return (
     <div className="px-6 py-8 space-y-8">
       <ProfileBanner />
-      
+
       <header className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">My Doorcards</h1>
         <NewDoorcardButton />
       </header>
 
       <section aria-labelledby="stats-heading">
-        <h2 id="stats-heading" className="sr-only">Dashboard Statistics</h2>
+        <h2 id="stats-heading" className="sr-only">
+          Dashboard Statistics
+        </h2>
         <StatsCards doorcards={doorcards} metrics={metrics._sum} />
       </section>
 

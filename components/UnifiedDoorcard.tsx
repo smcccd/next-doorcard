@@ -94,7 +94,7 @@ export function UnifiedDoorcard({
   containerId = "doorcard-schedule",
 }: UnifiedDoorcardProps) {
   const days = DAY_LABELS.filter((d) =>
-    showWeekendDays ? true : d.key !== "SATURDAY" && d.key !== "SUNDAY"
+    showWeekendDays ? true : d.key !== "SATURDAY" && d.key !== "SUNDAY",
   );
   const byDay = groupByDay(doorcard.appointments);
 
@@ -102,7 +102,9 @@ export function UnifiedDoorcard({
     <div id={containerId} className="space-y-4">
       <header className="border-b border-gray-300 dark:border-gray-600 pb-2">
         <h1 className="text-xl font-bold text-red-700 dark:text-red-400">
-          {doorcard.user ? formatDisplayName(doorcard.user) : doorcard.name || "Faculty Name"}
+          {doorcard.user
+            ? formatDisplayName(doorcard.user)
+            : doorcard.name || "Faculty Name"}
         </h1>
         <div className="mt-1 flex flex-wrap gap-x-6 text-xs text-gray-700 dark:text-gray-300">
           <div>
@@ -119,8 +121,12 @@ export function UnifiedDoorcard({
           {doorcard.user?.website && (
             <div>
               <strong>Website:</strong>{" "}
-              <a 
-                href={doorcard.user.website.startsWith('http') ? doorcard.user.website : `https://${doorcard.user.website}`}
+              <a
+                href={
+                  doorcard.user.website.startsWith("http")
+                    ? doorcard.user.website
+                    : `https://${doorcard.user.website}`
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline"
@@ -136,9 +142,7 @@ export function UnifiedDoorcard({
         <table className="w-full border-collapse">
           <thead>
             <tr>
-              <th className="w-20 p-2 text-xs font-medium">
-                Time
-              </th>
+              <th className="w-20 p-2 text-xs font-medium">Time</th>
               {days.map((d) => (
                 <th key={d.key} className="p-2 text-center text-xs font-medium">
                   {d.label}
@@ -182,7 +186,7 @@ export function UnifiedDoorcard({
                     list.some(
                       (a) =>
                         isSlotCovered(a, slot.value) &&
-                        a.startTime !== slot.value
+                        a.startTime !== slot.value,
                     )
                   ) {
                     return null;

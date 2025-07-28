@@ -1,10 +1,10 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function sampleDataCheck() {
-  console.log('🔍 Sample Data Check');
-  console.log('='.repeat(50));
+  console.log("🔍 Sample Data Check");
+  console.log("=".repeat(50));
 
   // Get a few sample users
   const sampleUsers = await prisma.user.findMany({
@@ -14,12 +14,14 @@ async function sampleDataCheck() {
       name: true,
       email: true,
       college: true,
-    }
+    },
   });
 
-  console.log('\n👥 Sample Users:');
+  console.log("\n👥 Sample Users:");
   sampleUsers.forEach((user, index) => {
-    console.log(`${index + 1}. ${user.name || user.email} - Campus: ${user.college || 'NO CAMPUS'}`);
+    console.log(
+      `${index + 1}. ${user.name || user.email} - Campus: ${user.college || "NO CAMPUS"}`,
+    );
   });
 
   // Get a few sample doorcards
@@ -30,18 +32,20 @@ async function sampleDataCheck() {
         select: {
           name: true,
           email: true,
-          college: true
-        }
-      }
-    }
+          college: true,
+        },
+      },
+    },
   });
 
-  console.log('\n🚪 Sample Doorcards:');
+  console.log("\n🚪 Sample Doorcards:");
   sampleDoorcards.forEach((doorcard, index) => {
-    console.log(`${index + 1}. ${doorcard.name} (${doorcard.term} ${doorcard.year})`);
-    console.log(`   User Campus: ${doorcard.user.college || 'NO CAMPUS'}`);
+    console.log(
+      `${index + 1}. ${doorcard.name} (${doorcard.term} ${doorcard.year})`,
+    );
+    console.log(`   User Campus: ${doorcard.user.college || "NO CAMPUS"}`);
     console.log(`   Doorcard Campus: ${doorcard.college}`);
-    console.log('   ---');
+    console.log("   ---");
   });
 
   // Check total counts
@@ -49,9 +53,9 @@ async function sampleDataCheck() {
   const usersWithCampus = await prisma.user.count({
     where: {
       college: {
-        not: null
-      }
-    }
+        not: null,
+      },
+    },
   });
 
   console.log(`\n📊 User Campus Stats:`);
@@ -63,20 +67,20 @@ async function sampleDataCheck() {
   const recentDoorcards = await prisma.doorcard.findMany({
     where: {
       OR: [
-        { term: 'FALL', year: 2024 },
-        { term: 'SPRING', year: 2025 },
-        { term: 'SUMMER', year: 2025 }
-      ]
-    }
+        { term: "FALL", year: 2024 },
+        { term: "SPRING", year: 2025 },
+        { term: "SUMMER", year: 2025 },
+      ],
+    },
   });
 
   const campusCount = {
     SKYLINE: 0,
     CSM: 0,
-    CANADA: 0
+    CANADA: 0,
   };
 
-  recentDoorcards.forEach(doorcard => {
+  recentDoorcards.forEach((doorcard) => {
     campusCount[doorcard.college]++;
   });
 
@@ -89,7 +93,7 @@ async function sampleDataCheck() {
 
 sampleDataCheck()
   .catch((error) => {
-    console.error('❌ Error:', error);
+    console.error("❌ Error:", error);
   })
   .finally(async () => {
     await prisma.$disconnect();

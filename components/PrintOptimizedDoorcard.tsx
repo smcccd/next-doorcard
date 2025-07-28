@@ -7,7 +7,10 @@ import {
 } from "@/lib/doorcard-constants";
 import { formatDisplayName } from "@/lib/display-name";
 import type { AppointmentCategory, DayOfWeek } from "@prisma/client";
-import type { AppointmentLite, DoorcardLite } from "@/components/UnifiedDoorcard";
+import type {
+  AppointmentLite,
+  DoorcardLite,
+} from "@/components/UnifiedDoorcard";
 
 // Compact time slots for print (8 AM to 6 PM, 30-min intervals)
 const PRINT_TIME_SLOTS = Array.from({ length: 21 }, (_, i) => {
@@ -52,7 +55,11 @@ function groupByDay(appts: AppointmentLite[]) {
   const map: Partial<Record<DayOfWeek, AppointmentLite[]>> = {};
   for (const a of appts) {
     // Only include weekday appointments in print view
-    if (["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"].includes(a.dayOfWeek)) {
+    if (
+      ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"].includes(
+        a.dayOfWeek,
+      )
+    ) {
       (map[a.dayOfWeek] ||= []).push(a);
     }
   }
@@ -62,9 +69,11 @@ function groupByDay(appts: AppointmentLite[]) {
   return map;
 }
 
-function getUsedCategories(appointments: AppointmentLite[]): AppointmentCategory[] {
+function getUsedCategories(
+  appointments: AppointmentLite[],
+): AppointmentCategory[] {
   const used = new Set<AppointmentCategory>();
-  appointments.forEach(apt => used.add(apt.category));
+  appointments.forEach((apt) => used.add(apt.category));
   return Array.from(used);
 }
 
@@ -76,9 +85,13 @@ export function PrintOptimizedDoorcard({
   const usedCategories = getUsedCategories(doorcard.appointments);
 
   return (
-    <div id={containerId} className="print-doorcard max-w-[8.5in] mx-auto bg-white p-4 shadow-lg print:shadow-none print:p-0 print:max-h-screen print:overflow-hidden">
-      <style dangerouslySetInnerHTML={{
-        __html: `
+    <div
+      id={containerId}
+      className="print-doorcard max-w-[8.5in] mx-auto bg-white p-4 shadow-lg print:shadow-none print:p-0 print:max-h-screen print:overflow-hidden"
+    >
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
           @media print {
             .print-doorcard { font-size: 11px; line-height: 1.2; }
             .print-header { margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid #dc2626; }
@@ -97,18 +110,25 @@ export function PrintOptimizedDoorcard({
             * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             @page { margin: 0.5in; size: letter; }
           }
-        `
-      }} />
+        `,
+        }}
+      />
 
       {/* Compact Header */}
       <header className="print-header">
-        <h1>{doorcard.user ? formatDisplayName(doorcard.user) : doorcard.name || "Faculty Name"}</h1>
+        <h1>
+          {doorcard.user
+            ? formatDisplayName(doorcard.user)
+            : doorcard.name || "Faculty Name"}
+        </h1>
         <div className="print-info">
-          <strong>{doorcard.term} {doorcard.year}</strong> • 
-          Office: {doorcard.officeNumber}
+          <strong>
+            {doorcard.term} {doorcard.year}
+          </strong>{" "}
+          • Office: {doorcard.officeNumber}
           {doorcard.college && <span> • {doorcard.college}</span>}
           {doorcard.user?.website && (
-            <span> • {doorcard.user.website.replace(/^https?:\/\//, '')}</span>
+            <span> • {doorcard.user.website.replace(/^https?:\/\//, "")}</span>
           )}
         </div>
       </header>
@@ -136,7 +156,8 @@ export function PrintOptimizedDoorcard({
                       key={`${d.key}-${slot.value}`}
                       rowSpan={durationRows(active)}
                       style={{
-                        backgroundColor: CATEGORY_COLORS[active.category] ?? "#f0f0f0",
+                        backgroundColor:
+                          CATEGORY_COLORS[active.category] ?? "#f0f0f0",
                       }}
                     >
                       <div className="print-appointment">
@@ -155,7 +176,7 @@ export function PrintOptimizedDoorcard({
                   list.some(
                     (a) =>
                       isSlotCovered(a, slot.value) &&
-                      a.startTime !== slot.value
+                      a.startTime !== slot.value,
                   )
                 ) {
                   return null;

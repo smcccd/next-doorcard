@@ -20,7 +20,9 @@ jest.mock("@/lib/prisma", () => ({
   },
 }));
 
-const mockGetServerSession = getServerSession as jest.MockedFunction<typeof getServerSession>;
+const mockGetServerSession = getServerSession as jest.MockedFunction<
+  typeof getServerSession
+>;
 const mockRedirect = redirect as jest.MockedFunction<typeof redirect>;
 const mockPrismaUserFindUnique = prisma.user.findUnique as jest.MockedFunction<
   typeof prisma.user.findUnique
@@ -203,7 +205,9 @@ describe("require-auth-user utilities", () => {
     describe("getUserEmail", () => {
       it("should return email for valid session", () => {
         const session = { user: { email: "test@example.com", id: "123" } };
-        expect(clientAuthHelpers.getUserEmail(session)).toBe("test@example.com");
+        expect(clientAuthHelpers.getUserEmail(session)).toBe(
+          "test@example.com",
+        );
       });
 
       it("should return undefined for null session", () => {
@@ -236,7 +240,9 @@ describe("require-auth-user utilities", () => {
   describe("error handling", () => {
     it("should handle database errors gracefully", async () => {
       mockGetServerSession.mockResolvedValueOnce(mockSession);
-      mockPrismaUserFindUnique.mockRejectedValueOnce(new Error("Database error"));
+      mockPrismaUserFindUnique.mockRejectedValueOnce(
+        new Error("Database error"),
+      );
 
       await expect(requireAuthUser()).rejects.toThrow("Database error");
     });

@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import type { Doorcard, User } from "@prisma/client";
 
 type DoorcardWithUser = Doorcard & {
-  user?: Pick<User, 'email' | 'name'>;
+  user?: Pick<User, "email" | "name">;
 };
 
 export default function SimpleAdminPage() {
@@ -69,7 +69,9 @@ export default function SimpleAdminPage() {
     <div className="container mx-auto py-8 max-w-7xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="text-gray-600">Manage terms and oversee faculty doorcards</p>
+        <p className="text-gray-600">
+          Manage terms and oversee faculty doorcards
+        </p>
       </div>
 
       <div className="space-y-6">
@@ -100,19 +102,24 @@ export default function SimpleAdminPage() {
           <h2 className="text-lg font-semibold mb-4">Recent Doorcards</h2>
           <div className="space-y-2">
             {doorcards.slice(0, 10).map((doorcard) => (
-              <div key={doorcard.id} className="flex justify-between items-center p-2 border-b">
+              <div
+                key={doorcard.id}
+                className="flex justify-between items-center p-2 border-b"
+              >
                 <div>
                   <span className="font-medium">{doorcard.doorcardName}</span>
                   <span className="text-gray-500 ml-2">
                     {doorcard.term} {doorcard.year}
                   </span>
                 </div>
-                <span className={`px-2 py-1 rounded text-xs ${
-                  doorcard.isActive 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-gray-100 text-gray-600'
-                }`}>
-                  {doorcard.isActive ? 'Active' : 'Inactive'}
+                <span
+                  className={`px-2 py-1 rounded text-xs ${
+                    doorcard.isActive
+                      ? "bg-green-100 text-green-800"
+                      : "bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  {doorcard.isActive ? "Active" : "Inactive"}
                 </span>
               </div>
             ))}

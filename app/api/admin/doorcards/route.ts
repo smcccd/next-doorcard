@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -14,39 +14,44 @@ export async function GET(req: NextRequest) {
     // Check if user is admin
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      select: { role: true }
+      select: { role: true },
     });
 
     if (user?.role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden - Admin access required" }, { status: 403 });
+      return NextResponse.json(
+        { error: "Forbidden - Admin access required" },
+        { status: 403 },
+      );
     }
 
     // Get URL parameters for pagination and filtering
     const { searchParams } = new URL(req.url);
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
-    const search = searchParams.get('search') || '';
-    const campus = searchParams.get('campus') || '';
-    const term = searchParams.get('term') || '';
-    const active = searchParams.get('active');
+    const limit = parseInt(searchParams.get("limit") || "50");
+    const offset = parseInt(searchParams.get("offset") || "0");
+    const search = searchParams.get("search") || "";
+    const campus = searchParams.get("campus") || "";
+    const term = searchParams.get("term") || "";
+    const active = searchParams.get("active");
 
     // Build where clause
     const where: Record<string, unknown> = {};
-    
+
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { doorcardName: { contains: search, mode: 'insensitive' } },
-        { user: { 
-          OR: [
-            { email: { contains: search, mode: 'insensitive' } },
-            { name: { contains: search, mode: 'insensitive' } }
-          ]
-        }}
+        { name: { contains: search, mode: "insensitive" } },
+        { doorcardName: { contains: search, mode: "insensitive" } },
+        {
+          user: {
+            OR: [
+              { email: { contains: search, mode: "insensitive" } },
+              { name: { contains: search, mode: "insensitive" } },
+            ],
+          },
+        },
       ];
     }
 
-    if (campus && campus !== 'all') {
+    if (campus && campus !== "all") {
       where.college = campus;
     }
 
@@ -54,9 +59,9 @@ export async function GET(req: NextRequest) {
       where.term = term;
     }
 
-    if (active === 'true') {
+    if (active === "true") {
       where.isActive = true;
-    } else if (active === 'false') {
+    } else if (active === "false") {
       where.isActive = false;
     }
 
@@ -79,24 +84,22 @@ export async function GET(req: NextRequest) {
             email: true,
             name: true,
             firstName: true,
-            lastName: true
-          }
+            lastName: true,
+          },
         },
         _count: {
           select: {
-            appointments: true
-          }
-        }
+            appointments: true,
+          },
+        },
       },
-      orderBy: [
-        { createdAt: 'desc' }
-      ],
+      orderBy: [{ createdAt: "desc" }],
       take: limit,
-      skip: offset
+      skip: offset,
     });
 
     // Process the data
-    const processedDoorcards = doorcards.map(doorcard => ({
+    const processedDoorcards = doorcards.map((doorcard) => ({
       id: doorcard.id,
       name: doorcard.name,
       doorcardName: doorcard.doorcardName,
@@ -110,10 +113,11 @@ export async function GET(req: NextRequest) {
       createdAt: doorcard.createdAt.toISOString(),
       user: {
         email: doorcard.user.email,
-        name: doorcard.user.firstName && doorcard.user.lastName 
-          ? `${doorcard.user.firstName} ${doorcard.user.lastName}`
-          : doorcard.user.name
-      }
+        name:
+          doorcard.user.firstName && doorcard.user.lastName
+            ? `${doorcard.user.firstName} ${doorcard.user.lastName}`
+            : doorcard.user.name,
+      },
     }));
 
     return NextResponse.json(processedDoorcards);
@@ -121,7 +125,7 @@ export async function GET(req: NextRequest) {
     console.error("Admin doorcards error:", error);
     return NextResponse.json(
       { error: "Failed to fetch doorcards" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

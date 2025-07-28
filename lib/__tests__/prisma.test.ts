@@ -1,7 +1,7 @@
 // Import the actual prisma module to test
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 
-describe('Prisma Client Configuration', () => {
+describe("Prisma Client Configuration", () => {
   const originalEnv = process.env.NODE_ENV;
 
   afterEach(() => {
@@ -9,13 +9,13 @@ describe('Prisma Client Configuration', () => {
     jest.clearAllMocks();
   });
 
-  describe('Prisma Instance', () => {
-    it('should export a prisma instance', () => {
+  describe("Prisma Instance", () => {
+    it("should export a prisma instance", () => {
       expect(prisma).toBeDefined();
-      expect(typeof prisma).toBe('object');
+      expect(typeof prisma).toBe("object");
     });
 
-    it('should have all required database models', () => {
+    it("should have all required database models", () => {
       expect(prisma.user).toBeDefined();
       expect(prisma.doorcard).toBeDefined();
       expect(prisma.appointment).toBeDefined();
@@ -23,20 +23,19 @@ describe('Prisma Client Configuration', () => {
       expect(prisma.term).toBeDefined();
     });
 
-    it('should have transaction support', () => {
+    it("should have transaction support", () => {
       expect(prisma.$transaction).toBeDefined();
-      expect(typeof prisma.$transaction).toBe('function');
+      expect(typeof prisma.$transaction).toBe("function");
     });
 
-    it('should have disconnect functionality', () => {
+    it("should have disconnect functionality", () => {
       expect(prisma.$disconnect).toBeDefined();
-      expect(typeof prisma.$disconnect).toBe('function');
+      expect(typeof prisma.$disconnect).toBe("function");
     });
-
   });
 
-  describe('Database Operations', () => {
-    it('should support user operations', () => {
+  describe("Database Operations", () => {
+    it("should support user operations", () => {
       expect(prisma.user.findUnique).toBeDefined();
       expect(prisma.user.findMany).toBeDefined();
       expect(prisma.user.create).toBeDefined();
@@ -44,7 +43,7 @@ describe('Prisma Client Configuration', () => {
       expect(prisma.user.delete).toBeDefined();
     });
 
-    it('should support doorcard operations', () => {
+    it("should support doorcard operations", () => {
       expect(prisma.doorcard.findUnique).toBeDefined();
       expect(prisma.doorcard.findFirst).toBeDefined();
       expect(prisma.doorcard.findMany).toBeDefined();
@@ -55,7 +54,7 @@ describe('Prisma Client Configuration', () => {
       expect(prisma.doorcard.deleteMany).toBeDefined();
     });
 
-    it('should support term operations', () => {
+    it("should support term operations", () => {
       expect(prisma.term.findFirst).toBeDefined();
       expect(prisma.term.findMany).toBeDefined();
       expect(prisma.term.findUnique).toBeDefined();

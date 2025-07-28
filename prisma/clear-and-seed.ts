@@ -389,7 +389,7 @@ async function main() {
 
       createdCount++;
       console.log(
-        `✅ Created doorcard ${createdCount}: ${faculty.name} - ${term} ${year} (${faculty.college})`
+        `✅ Created doorcard ${createdCount}: ${faculty.name} - ${term} ${year} (${faculty.college})`,
       );
     }
   }

@@ -13,14 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  CalendarDays,
-  Clock,
-  Plus,
-  X,
-  Building2,
-  AlertCircle,
-} from "lucide-react";
+import { CalendarDays, Clock, Plus, X, AlertCircle } from "lucide-react";
 import { updateTimeBlocks } from "@/app/doorcard/actions";
 import type { AppointmentCategory, DayOfWeek } from "@prisma/client";
 
@@ -122,7 +115,7 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
 
   const [serverState, serverAction] = useActionState(
     updateTimeBlocks.bind(null, doorcard.id),
-    { success: true } as { success: boolean; message?: string }
+    { success: true } as { success: boolean; message?: string },
   );
 
   /* ---------------------------------------------------------------------- */
@@ -196,8 +189,8 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                 category: draft.category,
                 day: selectedDays[0],
               }
-            : b
-        )
+            : b,
+        ),
       );
     } else {
       const newOnes = selectedDays.map<TimeBlock>((d) => ({
@@ -364,13 +357,13 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                 {editingId
                   ? "Edit Time Block"
                   : mode === "single"
-                  ? "Add Single Block"
-                  : "Add Repeating Block"}
+                    ? "Add Single Block"
+                    : "Add Repeating Block"}
               </h4>
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                type="button" 
+              <Button
+                size="sm"
+                variant="ghost"
+                type="button"
                 onClick={reset}
                 aria-label="Close form"
               >
@@ -408,7 +401,11 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                   </SelectContent>
                 </Select>
               ) : (
-                <div role="group" aria-labelledby="day-label" className="flex flex-wrap gap-2">
+                <div
+                  role="group"
+                  aria-labelledby="day-label"
+                  className="flex flex-wrap gap-2"
+                >
                   {DAYS.map((d) => {
                     const active = selectedDays.includes(d);
                     return (
@@ -419,7 +416,7 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                         variant={active ? "default" : "outline"}
                         onClick={() =>
                           setSelectedDays((prev) =>
-                            active ? prev.filter((x) => x !== d) : [...prev, d]
+                            active ? prev.filter((x) => x !== d) : [...prev, d],
                           )
                         }
                       >
@@ -430,7 +427,13 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                 </div>
               )}
               {errors.days && (
-                <p id="day-error" role="alert" className="mt-1 text-xs text-red-600">{errors.days}</p>
+                <p
+                  id="day-error"
+                  role="alert"
+                  className="mt-1 text-xs text-red-600"
+                >
+                  {errors.days}
+                </p>
               )}
             </div>
 
@@ -439,7 +442,9 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
               <div className="space-y-4">
                 <div className="flex gap-2">
                   <div className="flex-1">
-                    <Label htmlFor="startTime">Start <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="startTime">
+                      Start <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="startTime"
                       type="time"
@@ -449,17 +454,25 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                       }
                       aria-invalid={!!errors.startTime}
                       aria-required="true"
-                      aria-describedby={errors.startTime ? "startTime-error" : undefined}
+                      aria-describedby={
+                        errors.startTime ? "startTime-error" : undefined
+                      }
                       className={errors.startTime ? "border-red-500" : ""}
                     />
                     {errors.startTime && (
-                      <p id="startTime-error" role="alert" className="mt-1 text-xs text-red-600">
+                      <p
+                        id="startTime-error"
+                        role="alert"
+                        className="mt-1 text-xs text-red-600"
+                      >
                         {errors.startTime}
                       </p>
                     )}
                   </div>
                   <div className="flex-1">
-                    <Label htmlFor="endTime">End <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="endTime">
+                      End <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="endTime"
                       type="time"
@@ -469,11 +482,17 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                       }
                       aria-invalid={!!errors.endTime}
                       aria-required="true"
-                      aria-describedby={errors.endTime ? "endTime-error" : undefined}
+                      aria-describedby={
+                        errors.endTime ? "endTime-error" : undefined
+                      }
                       className={errors.endTime ? "border-red-500" : ""}
                     />
                     {errors.endTime && (
-                      <p id="endTime-error" role="alert" className="mt-1 text-xs text-red-600">
+                      <p
+                        id="endTime-error"
+                        role="alert"
+                        className="mt-1 text-xs text-red-600"
+                      >
                         {errors.endTime}
                       </p>
                     )}
@@ -481,7 +500,9 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                 </div>
 
                 <div>
-                  <Label htmlFor="category">Type <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="category">
+                    Type <span className="text-red-500">*</span>
+                  </Label>
                   <Select
                     value={draft.category}
                     onValueChange={(v) =>
@@ -496,7 +517,9 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                       id="category"
                       aria-invalid={!!errors.category}
                       aria-required="true"
-                      aria-describedby={errors.category ? "category-error" : undefined}
+                      aria-describedby={
+                        errors.category ? "category-error" : undefined
+                      }
                     >
                       <SelectValue />
                     </SelectTrigger>
@@ -517,7 +540,9 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                     {draft.category === "OFFICE_HOURS"
                       ? "Title (optional)"
                       : "Activity / Course"}
-                    {draft.category !== "OFFICE_HOURS" && <span className="text-red-500">*</span>}
+                    {draft.category !== "OFFICE_HOURS" && (
+                      <span className="text-red-500">*</span>
+                    )}
                   </Label>
                   <Input
                     id="activity"
@@ -532,11 +557,17 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                     }
                     aria-invalid={!!errors.activity}
                     aria-required={draft.category !== "OFFICE_HOURS"}
-                    aria-describedby={errors.activity ? "activity-error" : undefined}
+                    aria-describedby={
+                      errors.activity ? "activity-error" : undefined
+                    }
                     className={errors.activity ? "border-red-500" : ""}
                   />
                   {errors.activity && (
-                    <p id="activity-error" role="alert" className="mt-1 text-xs text-red-600">
+                    <p
+                      id="activity-error"
+                      role="alert"
+                      className="mt-1 text-xs text-red-600"
+                    >
                       {errors.activity}
                     </p>
                   )}
@@ -553,11 +584,17 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                     }
                     placeholder="Building / Room"
                     aria-invalid={!!errors.location}
-                    aria-describedby={errors.location ? "location-error" : undefined}
+                    aria-describedby={
+                      errors.location ? "location-error" : undefined
+                    }
                     className={errors.location ? "border-red-500" : ""}
                   />
                   {errors.location && (
-                    <p id="location-error" role="alert" className="mt-1 text-xs text-red-600">
+                    <p
+                      id="location-error"
+                      role="alert"
+                      className="mt-1 text-xs text-red-600"
+                    >
                       {errors.location}
                     </p>
                   )}
@@ -566,7 +603,9 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
             </div>
 
             {errors.conflict && (
-              <p role="alert" className="text-sm text-red-600">{errors.conflict}</p>
+              <p role="alert" className="text-sm text-red-600">
+                {errors.conflict}
+              </p>
             )}
 
             <div className="flex gap-2 pt-2">
@@ -578,8 +617,8 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                 {editingId
                   ? "Update Block"
                   : mode === "single"
-                  ? "Add Block"
-                  : "Add Blocks"}
+                    ? "Add Block"
+                    : "Add Blocks"}
               </Button>
               <Button
                 type="button"

@@ -24,48 +24,53 @@ interface SimplePDFProps {
 
 // Category colors and labels - matching the database schema
 const CATEGORY_COLORS = {
-  OFFICE_HOURS: '#3b82f6',
-  IN_CLASS: '#10b981',
-  LECTURE: '#8b5cf6',
-  LAB: '#f59e0b',
-  HOURS_BY_ARRANGEMENT: '#06b6d4',
-  REFERENCE: '#6b7280',
+  OFFICE_HOURS: "#3b82f6",
+  IN_CLASS: "#10b981",
+  LECTURE: "#8b5cf6",
+  LAB: "#f59e0b",
+  HOURS_BY_ARRANGEMENT: "#06b6d4",
+  REFERENCE: "#6b7280",
 };
 
 const CATEGORY_LABELS = {
-  OFFICE_HOURS: 'Office Hours',
-  IN_CLASS: 'In Class',
-  LECTURE: 'Lecture',
-  LAB: 'Lab',
-  HOURS_BY_ARRANGEMENT: 'Hours by Arrangement',
-  REFERENCE: 'Reference',
+  OFFICE_HOURS: "Office Hours",
+  IN_CLASS: "In Class",
+  LECTURE: "Lecture",
+  LAB: "Lab",
+  HOURS_BY_ARRANGEMENT: "Hours by Arrangement",
+  REFERENCE: "Reference",
 };
 
 const DAYS = [
-  { key: 'MONDAY', label: 'Monday' },
-  { key: 'TUESDAY', label: 'Tuesday' },
-  { key: 'WEDNESDAY', label: 'Wednesday' },
-  { key: 'THURSDAY', label: 'Thursday' },
-  { key: 'FRIDAY', label: 'Friday' },
+  { key: "MONDAY", label: "Monday" },
+  { key: "TUESDAY", label: "Tuesday" },
+  { key: "WEDNESDAY", label: "Wednesday" },
+  { key: "THURSDAY", label: "Thursday" },
+  { key: "FRIDAY", label: "Friday" },
 ];
 
 // Generate time slots from 7 AM to 9 PM
 const TIME_SLOTS = Array.from({ length: 29 }, (_, i) => {
   const hour = Math.floor(7 + i / 2);
-  const minute = i % 2 === 0 ? '00' : '30';
-  const time24 = `${hour.toString().padStart(2, '0')}:${minute}`;
-  const display = hour > 12 ? `${hour - 12}:${minute} PM` : 
-                 hour === 12 ? `12:${minute} PM` : 
-                 `${hour}:${minute} AM`;
+  const minute = i % 2 === 0 ? "00" : "30";
+  const time24 = `${hour.toString().padStart(2, "0")}:${minute}`;
+  const display =
+    hour > 12
+      ? `${hour - 12}:${minute} PM`
+      : hour === 12
+        ? `12:${minute} PM`
+        : `${hour}:${minute} AM`;
   return { time24, display };
 });
 
 function generatePrintableHTML(doorcard: DoorcardLite): string {
-  const displayName = doorcard.user ? formatDisplayName(doorcard.user) : (doorcard.name || "Faculty Member");
-  
+  const displayName = doorcard.user
+    ? formatDisplayName(doorcard.user)
+    : doorcard.name || "Faculty Member";
+
   // Group appointments by day
   const byDay: Record<string, AppointmentForPDF[]> = {};
-  doorcard.appointments.forEach(apt => {
+  doorcard.appointments.forEach((apt) => {
     if (!byDay[apt.dayOfWeek]) {
       byDay[apt.dayOfWeek] = [];
     }
@@ -74,13 +79,13 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
 
   // Helper to calculate rowspan for appointments
   const getRowspan = (appointment: AppointmentForPDF) => {
-    const [startHour, startMin] = appointment.startTime.split(':').map(Number);
-    const [endHour, endMin] = appointment.endTime.split(':').map(Number);
-    
+    const [startHour, startMin] = appointment.startTime.split(":").map(Number);
+    const [endHour, endMin] = appointment.endTime.split(":").map(Number);
+
     const startMinutes = startHour * 60 + startMin;
     const endMinutes = endHour * 60 + endMin;
     const durationMinutes = endMinutes - startMinutes;
-    
+
     return Math.ceil(durationMinutes / 30); // Each slot is 30 minutes
   };
 
@@ -91,19 +96,21 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
 
   // Helper to check if appointment covers time slot
   const isSlotCovered = (appointment: AppointmentForPDF, slot: string) => {
-    const [slotHour, slotMin] = slot.split(':').map(Number);
-    const [startHour, startMin] = appointment.startTime.split(':').map(Number);
-    const [endHour, endMin] = appointment.endTime.split(':').map(Number);
-    
+    const [slotHour, slotMin] = slot.split(":").map(Number);
+    const [startHour, startMin] = appointment.startTime.split(":").map(Number);
+    const [endHour, endMin] = appointment.endTime.split(":").map(Number);
+
     const slotMinutes = slotHour * 60 + slotMin;
     const startMinutes = startHour * 60 + startMin;
     const endMinutes = endHour * 60 + endMin;
-    
+
     return slotMinutes >= startMinutes && slotMinutes < endMinutes;
   };
 
   // Get unique categories for legend
-  const categories = [...new Set(doorcard.appointments.map(apt => apt.category))];
+  const categories = [
+    ...new Set(doorcard.appointments.map((apt) => apt.category)),
+  ];
 
   return `
 <!DOCTYPE html>
@@ -345,56 +352,64 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
   </div>
 
   <div class="faculty-name">${displayName}</div>
-  ${doorcard.user?.title ? `<div class="faculty-title">${doorcard.user.title}</div>` : ''}
+  ${doorcard.user?.title ? `<div class="faculty-title">${doorcard.user.title}</div>` : ""}
 
   <div class="office-info">
     <div class="office-item">
       <div class="office-label">Office</div>
-      <div class="office-value">${doorcard.officeNumber || 'TBA'}</div>
+      <div class="office-value">${doorcard.officeNumber || "TBA"}</div>
     </div>
     <div class="office-item">
       <div class="office-label">Campus</div>
       <div class="office-value">${doorcard.college}</div>
     </div>
-    ${doorcard.user?.website ? `
+    ${
+      doorcard.user?.website
+        ? `
     <div class="office-item">
       <div class="office-label">Website</div>
       <div class="office-value" style="color: #3b82f6; font-size: 10px;">
-        ${doorcard.user.website.replace(/^https?:\/\//, '')}
+        ${doorcard.user.website.replace(/^https?:\/\//, "")}
       </div>
     </div>
-    ` : ''}
+    `
+        : ""
+    }
   </div>
 
   <table class="schedule-table">
     <thead>
       <tr>
         <th class="time-cell">Time</th>
-        ${DAYS.map(day => `<th class="day-header">${day.label}</th>`).join('')}
+        ${DAYS.map((day) => `<th class="day-header">${day.label}</th>`).join("")}
       </tr>
     </thead>
     <tbody>
       ${TIME_SLOTS.map((slot, index) => {
         // Only show time labels every hour for cleaner look
         const showTime = index % 2 === 0;
-        
+
         let html = `<tr>`;
-        
+
         // Time cell
-        html += `<td class="time-cell">${showTime ? slot.display : ''}</td>`;
-        
+        html += `<td class="time-cell">${showTime ? slot.display : ""}</td>`;
+
         // Day columns
-        DAYS.forEach(day => {
-          const appointment = byDay[day.key]?.find(apt => isSlotCovered(apt, slot.time24));
-          
+        DAYS.forEach((day) => {
+          const appointment = byDay[day.key]?.find((apt) =>
+            isSlotCovered(apt, slot.time24),
+          );
+
           if (appointment && isAppointmentStart(appointment, slot.time24)) {
             // This is the start of an appointment - create cell with rowspan
             const rowspan = getRowspan(appointment);
-            const categoryClass = appointment.category.toLowerCase().replace('_', '-');
+            const categoryClass = appointment.category
+              .toLowerCase()
+              .replace("_", "-");
             html += `
               <td rowspan="${rowspan}" class="appointment ${categoryClass}">
                 ${appointment.name}
-                ${appointment.location ? `<br><span class="appointment-location">${appointment.location}</span>` : ''}
+                ${appointment.location ? `<br><span class="appointment-location">${appointment.location}</span>` : ""}
               </td>
             `;
           } else if (!appointment) {
@@ -403,45 +418,54 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
           }
           // If appointment exists but is not the start, we don't add a cell (covered by rowspan)
         });
-        
+
         html += `</tr>`;
         return html;
-      }).join('')}
+      }).join("")}
     </tbody>
   </table>
 
-  ${categories.length > 0 ? `
+  ${
+    categories.length > 0
+      ? `
   <div class="legend">
     <div class="legend-title">Activity Types</div>
     <div class="legend-items">
-      ${categories.map(category => {
-        const colorMap = {
-          'OFFICE_HOURS': '#dbeafe',
-          'IN_CLASS': '#dcfce7', 
-          'LECTURE': '#f3e8ff',
-          'LAB': '#fed7aa',
-          'HOURS_BY_ARRANGEMENT': '#cffafe',
-          'REFERENCE': '#f3f4f6'
-        };
-        const textColorMap = {
-          'OFFICE_HOURS': '#1e40af',
-          'IN_CLASS': '#166534', 
-          'LECTURE': '#7c2d12',
-          'LAB': '#ea580c',
-          'HOURS_BY_ARRANGEMENT': '#0e7490',
-          'REFERENCE': '#374151'
-        };
-        const bgColor = colorMap[category as keyof typeof colorMap] || colorMap.REFERENCE;
-        const textColor = textColorMap[category as keyof typeof textColorMap] || textColorMap.REFERENCE;
-        return `
+      ${categories
+        .map((category) => {
+          const colorMap = {
+            OFFICE_HOURS: "#dbeafe",
+            IN_CLASS: "#dcfce7",
+            LECTURE: "#f3e8ff",
+            LAB: "#fed7aa",
+            HOURS_BY_ARRANGEMENT: "#cffafe",
+            REFERENCE: "#f3f4f6",
+          };
+          const textColorMap = {
+            OFFICE_HOURS: "#1e40af",
+            IN_CLASS: "#166534",
+            LECTURE: "#7c2d12",
+            LAB: "#ea580c",
+            HOURS_BY_ARRANGEMENT: "#0e7490",
+            REFERENCE: "#374151",
+          };
+          const bgColor =
+            colorMap[category as keyof typeof colorMap] || colorMap.REFERENCE;
+          const textColor =
+            textColorMap[category as keyof typeof textColorMap] ||
+            textColorMap.REFERENCE;
+          return `
         <div class="legend-item">
           <div class="legend-color" style="background-color: ${bgColor}; border: 1px solid #d1d5db; color: ${textColor}; padding: 2px 4px; font-size: 7px; font-weight: 600;">${CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS] || category}</div>
         </div>
       `;
-      }).join('')}
+        })
+        .join("")}
     </div>
   </div>
-  ` : ''}
+  `
+      : ""
+  }
 
   <div class="footer">
     <div>Generated from Faculty Doorcard System • ${new Date().toLocaleDateString()}</div>
@@ -452,19 +476,23 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
   `;
 }
 
-export function SimplePDF({ doorcard, doorcardId, onDownload }: SimplePDFProps) {
+export function SimplePDF({
+  doorcard,
+  doorcardId,
+  onDownload,
+}: SimplePDFProps) {
   const handleDownload = () => {
     onDownload?.();
-    
+
     // Generate the HTML
     const htmlContent = generatePrintableHTML(doorcard);
-    
+
     // Create a new window and print
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     if (printWindow) {
       printWindow.document.write(htmlContent);
       printWindow.document.close();
-      
+
       // Wait for content to load, then print
       printWindow.onload = () => {
         setTimeout(() => {
@@ -476,7 +504,10 @@ export function SimplePDF({ doorcard, doorcardId, onDownload }: SimplePDFProps) 
   };
 
   return (
-    <Button onClick={handleDownload} className="bg-blue-600 hover:bg-blue-700 text-white">
+    <Button
+      onClick={handleDownload}
+      className="bg-blue-600 hover:bg-blue-700 text-white"
+    >
       <FileDown className="h-4 w-4 mr-1" />
       Download PDF
     </Button>

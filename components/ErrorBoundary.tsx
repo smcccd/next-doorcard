@@ -5,7 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 
-import type { ErrorBoundaryState, ErrorBoundaryProps } from "@/types/components/ui";
+import type {
+  ErrorBoundaryState,
+  ErrorBoundaryProps,
+} from "@/types/components/ui";
 
 class ErrorBoundary extends React.Component<
   ErrorBoundaryProps,

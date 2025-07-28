@@ -4,7 +4,7 @@ import { requireAuthUserAPI } from "@/lib/require-auth-user";
 
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ username: string }> }
+  { params }: { params: Promise<{ username: string }> },
 ) {
   try {
     // Auth (admin / internal view)
@@ -47,7 +47,7 @@ export async function GET(
     if (!doorcard) {
       return NextResponse.json(
         { error: "No active doorcard found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -56,7 +56,7 @@ export async function GET(
     console.error("Error fetching current doorcard:", error);
     return NextResponse.json(
       { error: "Failed to fetch doorcard" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

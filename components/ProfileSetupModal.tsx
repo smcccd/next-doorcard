@@ -5,7 +5,13 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +20,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { COLLEGE_OPTIONS, ACADEMIC_TITLES, COMMON_PRONOUNS, getDisplayFormatOptions, formatDisplayName } from "@/lib/display-name";
+import {
+  COLLEGE_OPTIONS,
+  ACADEMIC_TITLES,
+  COMMON_PRONOUNS,
+  formatDisplayName,
+} from "@/lib/display-name";
 import type { College, DisplayNameFormat } from "@prisma/client";
 
 interface ProfileSetupModalProps {
@@ -22,7 +33,10 @@ interface ProfileSetupModalProps {
   onComplete: () => void;
 }
 
-export function ProfileSetupModal({ isOpen, onComplete }: ProfileSetupModalProps) {
+export function ProfileSetupModal({
+  isOpen,
+  onComplete,
+}: ProfileSetupModalProps) {
   const { data: session, update } = useSession();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -65,7 +79,7 @@ export function ProfileSetupModal({ isOpen, onComplete }: ProfileSetupModalProps
           title: updatedProfile.title,
           displayFormat: updatedProfile.displayFormat,
         });
-        
+
         await update({
           ...session,
           user: {
@@ -85,16 +99,18 @@ export function ProfileSetupModal({ isOpen, onComplete }: ProfileSetupModalProps
   const isValidWebsite = (url: string) => {
     if (!url || url.trim() === "") return true; // Optional field
     const trimmedUrl = url.trim();
-    
+
     // Basic validation - must contain a dot and no spaces
-    if (!trimmedUrl.includes('.') || trimmedUrl.includes(' ')) {
+    if (!trimmedUrl.includes(".") || trimmedUrl.includes(" ")) {
       return false;
     }
-    
+
     try {
-      const fullUrl = trimmedUrl.startsWith("http") ? trimmedUrl : `https://${trimmedUrl}`;
+      const fullUrl = trimmedUrl.startsWith("http")
+        ? trimmedUrl
+        : `https://${trimmedUrl}`;
       const urlObj = new URL(fullUrl);
-      return urlObj.hostname.includes('.');
+      return urlObj.hostname.includes(".");
     } catch {
       return false;
     }
@@ -102,8 +118,8 @@ export function ProfileSetupModal({ isOpen, onComplete }: ProfileSetupModalProps
 
   return (
     <Dialog open={isOpen} onOpenChange={onComplete}>
-      <DialogContent 
-        className="sm:max-w-[425px] [&>button]:hidden" 
+      <DialogContent
+        className="sm:max-w-[425px] [&>button]:hidden"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
@@ -137,7 +153,7 @@ export function ProfileSetupModal({ isOpen, onComplete }: ProfileSetupModalProps
                 />
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-3 items-end">
               <div className="grid gap-2">
                 <Label htmlFor="title">Academic Title (optional)</Label>
@@ -172,10 +188,13 @@ export function ProfileSetupModal({ isOpen, onComplete }: ProfileSetupModalProps
                 </Select>
               </div>
             </div>
-            
+
             <div className="grid gap-2">
               <Label htmlFor="college">College</Label>
-              <Select value={college} onValueChange={(value: College | "none") => setCollege(value)}>
+              <Select
+                value={college}
+                onValueChange={(value: College | "none") => setCollege(value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select college" />
                 </SelectTrigger>
@@ -189,7 +208,7 @@ export function ProfileSetupModal({ isOpen, onComplete }: ProfileSetupModalProps
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="grid gap-2">
               <Label htmlFor="website">Faculty Website (optional)</Label>
               <Input
@@ -207,17 +226,22 @@ export function ProfileSetupModal({ isOpen, onComplete }: ProfileSetupModalProps
             </div>
           </div>
           <DialogFooter>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               variant="outline"
               onClick={onComplete}
               disabled={isSubmitting}
             >
               Skip for now
             </Button>
-            <Button 
-              type="submit" 
-              disabled={isSubmitting || firstName.trim().length === 0 || lastName.trim().length === 0 || (website.length > 0 && !isValidWebsite(website))}
+            <Button
+              type="submit"
+              disabled={
+                isSubmitting ||
+                firstName.trim().length === 0 ||
+                lastName.trim().length === 0 ||
+                (website.length > 0 && !isValidWebsite(website))
+              }
             >
               {isSubmitting ? "Saving..." : "Complete Setup"}
             </Button>

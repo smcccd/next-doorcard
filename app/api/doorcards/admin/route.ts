@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/doorcards/admin - Get all doorcards for admin oversight
-export async function GET(req: Request) {
+export async function GET() {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
@@ -41,18 +41,18 @@ export async function GET(req: Request) {
     console.log(
       "🔍 Doorcards Admin API: Got doorcards:",
       doorcards.length,
-      "items"
+      "items",
     );
     return NextResponse.json(doorcards);
   } catch (error) {
     console.error("❌ Doorcards Admin API Error:", error);
     console.error(
       "❌ Error stack:",
-      error instanceof Error ? error.stack : "No stack"
+      error instanceof Error ? error.stack : "No stack",
     );
     return NextResponse.json(
       { error: "Failed to fetch doorcards" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

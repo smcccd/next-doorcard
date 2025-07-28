@@ -1,103 +1,103 @@
-import '@testing-library/jest-dom'
-import React from 'react'
+import "@testing-library/jest-dom";
+import React from "react";
 
 // Mock Headers and global objects for testing
 global.Headers = class Headers {
   constructor(init) {
-    this.headers = new Map()
+    this.headers = new Map();
     if (init) {
       if (init instanceof Headers) {
         for (const [key, value] of init.headers) {
-          this.headers.set(key.toLowerCase(), value)
+          this.headers.set(key.toLowerCase(), value);
         }
       } else if (Array.isArray(init)) {
         for (const [key, value] of init) {
-          this.headers.set(key.toLowerCase(), value)
+          this.headers.set(key.toLowerCase(), value);
         }
       } else {
         for (const [key, value] of Object.entries(init)) {
-          this.headers.set(key.toLowerCase(), value)
+          this.headers.set(key.toLowerCase(), value);
         }
       }
     }
   }
-  
+
   get(name) {
-    return this.headers.get(name.toLowerCase()) || null
+    return this.headers.get(name.toLowerCase()) || null;
   }
-  
+
   set(name, value) {
-    this.headers.set(name.toLowerCase(), value)
+    this.headers.set(name.toLowerCase(), value);
   }
-  
+
   has(name) {
-    return this.headers.has(name.toLowerCase())
+    return this.headers.has(name.toLowerCase());
   }
-  
+
   delete(name) {
-    this.headers.delete(name.toLowerCase())
+    this.headers.delete(name.toLowerCase());
   }
-  
+
   *[Symbol.iterator]() {
     for (const [key, value] of this.headers) {
-      yield [key, value]
+      yield [key, value];
     }
   }
-  
+
   entries() {
-    return this.headers.entries()
+    return this.headers.entries();
   }
-}
+};
 
 global.Request = class Request {
   constructor(input, init = {}) {
-    this.url = typeof input === 'string' ? input : input.url
-    this.method = init.method || 'GET'
-    this.headers = new Headers(init.headers)
-    this.body = init.body || null
-    this._bodyText = init.body || null
+    this.url = typeof input === "string" ? input : input.url;
+    this.method = init.method || "GET";
+    this.headers = new Headers(init.headers);
+    this.body = init.body || null;
+    this._bodyText = init.body || null;
   }
-  
+
   async json() {
-    return JSON.parse(this._bodyText)
+    return JSON.parse(this._bodyText);
   }
-  
+
   async text() {
-    return this._bodyText
+    return this._bodyText;
   }
-}
+};
 
 global.Response = class Response {
   constructor(body, init = {}) {
-    this.body = body
-    this.status = init.status || 200
-    this.statusText = init.statusText || 'OK'
-    this.headers = new Headers(init.headers)
+    this.body = body;
+    this.status = init.status || 200;
+    this.statusText = init.statusText || "OK";
+    this.headers = new Headers(init.headers);
   }
-  
+
   static json(body, init = {}) {
     return new Response(JSON.stringify(body), {
       ...init,
       headers: {
-        'content-type': 'application/json',
+        "content-type": "application/json",
         ...init.headers,
       },
-    })
+    });
   }
-  
+
   async json() {
-    return JSON.parse(this.body)
+    return JSON.parse(this.body);
   }
-  
+
   async text() {
-    return this.body
+    return this.body;
   }
-}
+};
 
 // Mock Next.js server utilities
-jest.mock('next/server', () => ({
+jest.mock("next/server", () => ({
   NextRequest: jest.fn().mockImplementation((input, init = {}) => ({
-    nextUrl: new URL(typeof input === 'string' ? input : input.url),
+    nextUrl: new URL(typeof input === "string" ? input : input.url),
     cookies: {
       get: jest.fn(),
       getAll: jest.fn(),
@@ -106,20 +106,18 @@ jest.mock('next/server', () => ({
     },
     geo: {},
     headers: new Headers(init.headers),
-    method: init.method || 'GET',
-    url: typeof input === 'string' ? input : input.url,
+    method: init.method || "GET",
+    url: typeof input === "string" ? input : input.url,
     body: init.body,
     json: jest.fn().mockImplementation(() => {
-      if (!init.body) return Promise.resolve({})
+      if (!init.body) return Promise.resolve({});
       try {
-        return Promise.resolve(JSON.parse(init.body))
+        return Promise.resolve(JSON.parse(init.body));
       } catch (e) {
-        return Promise.reject(e)
+        return Promise.reject(e);
       }
     }),
-    text: jest.fn().mockImplementation(() => 
-      Promise.resolve(init.body || '')
-    ),
+    text: jest.fn().mockImplementation(() => Promise.resolve(init.body || "")),
   })),
   NextResponse: {
     json: jest.fn().mockImplementation((body, init = {}) => ({
@@ -132,10 +130,10 @@ jest.mock('next/server', () => ({
     redirect: jest.fn(),
     rewrite: jest.fn(),
   },
-}))
+}));
 
 // Mock Next.js router
-jest.mock('next/navigation', () => ({
+jest.mock("next/navigation", () => ({
   useRouter() {
     return {
       push: jest.fn(),
@@ -144,66 +142,66 @@ jest.mock('next/navigation', () => ({
       back: jest.fn(),
       forward: jest.fn(),
       refresh: jest.fn(),
-    }
+    };
   },
   useSearchParams() {
-    return new URLSearchParams()
+    return new URLSearchParams();
   },
   usePathname() {
-    return ''
+    return "";
   },
   redirect: jest.fn(),
   notFound: jest.fn(),
-}))
+}));
 
 // Mock NextAuth completely to avoid ESM issues
-jest.mock('next-auth', () => ({
+jest.mock("next-auth", () => ({
   default: jest.fn(),
   getServerSession: jest.fn(),
   AuthOptions: {},
-}))
+}));
 
-jest.mock('next-auth/react', () => ({
+jest.mock("next-auth/react", () => ({
   useSession: jest.fn(() => ({
     data: null,
-    status: 'unauthenticated'
+    status: "unauthenticated",
   })),
   signIn: jest.fn(),
   signOut: jest.fn(),
   getSession: jest.fn(),
   SessionProvider: ({ children }) => children,
-}))
+}));
 
-jest.mock('next-auth/next', () => ({
+jest.mock("next-auth/next", () => ({
   NextAuthHandler: jest.fn(),
   getServerSession: jest.fn(),
-}))
+}));
 
-jest.mock('next-auth/providers/credentials', () => {
+jest.mock("next-auth/providers/credentials", () => {
   return jest.fn(() => ({
-    id: 'credentials',
-    name: 'credentials',
-    type: 'credentials',
+    id: "credentials",
+    name: "credentials",
+    type: "credentials",
     credentials: {},
     authorize: jest.fn(),
-  }))
-})
+  }));
+});
 
 // Mock auth-related dependencies that cause ESM issues
-jest.mock('jose', () => ({
+jest.mock("jose", () => ({
   jwtVerify: jest.fn(),
   SignJWT: jest.fn(),
-}))
+}));
 
 // Mock Prisma adapter - simplified to avoid conflicts with test-specific mocks
-jest.mock('@next-auth/prisma-adapter', () => ({
+jest.mock("@next-auth/prisma-adapter", () => ({
   PrismaAdapter: jest.fn(),
-}))
+}));
 
 // Mock Prisma - simplified to avoid conflicts with test-specific mocks
-jest.mock('@prisma/client', () => ({
+jest.mock("@prisma/client", () => ({
   PrismaClient: jest.fn(),
-}))
+}));
 
 // Mock the singleton prisma instance - use a simple mock that can be overridden in tests
 const mockPrismaInstance = {
@@ -249,25 +247,25 @@ const mockPrismaInstance = {
   $disconnect: jest.fn(),
 };
 
-jest.mock('@/lib/prisma', () => ({
+jest.mock("@/lib/prisma", () => ({
   prisma: mockPrismaInstance,
-}))
+}));
 
 // Mock bcryptjs
-jest.mock('bcryptjs', () => ({
-  hash: jest.fn().mockResolvedValue('hashed-password'),
+jest.mock("bcryptjs", () => ({
+  hash: jest.fn().mockResolvedValue("hashed-password"),
   compare: jest.fn().mockResolvedValue(true),
-}))
+}));
 
 // Mock environment variables
-process.env.NEXTAUTH_SECRET = 'test-secret'
-process.env.NEXTAUTH_URL = 'http://localhost:3000'
-process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test'
+process.env.NEXTAUTH_SECRET = "test-secret";
+process.env.NEXTAUTH_URL = "http://localhost:3000";
+process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
 
 // Mock window.matchMedia for responsive/media query tests
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: jest.fn().mockImplementation(query => ({
+  value: jest.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -277,87 +275,99 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
   })),
-})
+});
 
 // Mock IntersectionObserver
 global.IntersectionObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),
   unobserve: jest.fn(),
   disconnect: jest.fn(),
-}))
+}));
 
 // Mock ResizeObserver
 global.ResizeObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),
   unobserve: jest.fn(),
   disconnect: jest.fn(),
-}))
+}));
 
 // Mock pointer capture methods for JSDOM compatibility
-Element.prototype.hasPointerCapture = jest.fn(() => false)
-Element.prototype.setPointerCapture = jest.fn()
-Element.prototype.releasePointerCapture = jest.fn()
+Element.prototype.hasPointerCapture = jest.fn(() => false);
+Element.prototype.setPointerCapture = jest.fn();
+Element.prototype.releasePointerCapture = jest.fn();
 
 // Mock fetch if needed
-global.fetch = jest.fn()
+global.fetch = jest.fn();
 
 // Suppress console errors for cleaner test output (optional)
-const originalError = console.error
+const originalError = console.error;
 beforeAll(() => {
   console.error = (...args) => {
     if (
-      typeof args[0] === 'string' &&
-      args[0].includes('Warning: ReactDOM.render is no longer supported')
+      typeof args[0] === "string" &&
+      args[0].includes("Warning: ReactDOM.render is no longer supported")
     ) {
-      return
+      return;
     }
-    originalError.call(console, ...args)
-  }
-})
+    originalError.call(console, ...args);
+  };
+});
 
 afterAll(() => {
-  console.error = originalError
-})
+  console.error = originalError;
+});
 
 // Mock the UI components directly to avoid Radix UI complexity in tests
-jest.mock('@/components/ui/select', () => ({
+jest.mock("@/components/ui/select", () => ({
   Select: ({ children, value, onValueChange, ...props }) => {
     const handleChange = (e) => {
-      onValueChange?.(e.target.value)
-    }
-    
+      onValueChange?.(e.target.value);
+    };
+
     // Extract options from SelectContent > SelectItem children recursively
     const extractOptions = (children) => {
-      const options = []
+      const options = [];
       React.Children.forEach(children, (child) => {
         if (React.isValidElement(child)) {
           // Check if this is a SelectContent
-          if (child.type && (child.type.displayName === 'SelectContent' || child.props?.className?.includes('SelectContent'))) {
-            options.push(...extractOptions(child.props.children))
+          if (
+            child.type &&
+            (child.type.displayName === "SelectContent" ||
+              child.props?.className?.includes("SelectContent"))
+          ) {
+            options.push(...extractOptions(child.props.children));
           }
           // Check if this is a SelectItem
-          else if (child.type && (child.type.displayName === 'SelectItem' || child.props?.value !== undefined)) {
+          else if (
+            child.type &&
+            (child.type.displayName === "SelectItem" ||
+              child.props?.value !== undefined)
+          ) {
             options.push({
               value: child.props.value,
-              label: child.props.children
-            })
+              label: child.props.children,
+            });
           }
           // Recursively check children
           else if (child.props?.children) {
-            options.push(...extractOptions(child.props.children))
+            options.push(...extractOptions(child.props.children));
           }
         }
-      })
-      return options
-    }
+      });
+      return options;
+    };
 
-    const options = extractOptions(children)
+    const options = extractOptions(children);
 
     return (
       <div data-testid="select-wrapper" {...props}>
-        <select value={value || ''} onChange={handleChange} data-testid="select">
+        <select
+          value={value || ""}
+          onChange={handleChange}
+          data-testid="select"
+        >
           <option value="">Select...</option>
-          {options.map(option => (
+          {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
@@ -365,7 +375,7 @@ jest.mock('@/components/ui/select', () => ({
         </select>
         {children}
       </div>
-    )
+    );
   },
   SelectTrigger: React.forwardRef(({ children, className, ...props }, ref) => (
     <button ref={ref} className={className} type="button" {...props}>
@@ -373,67 +383,143 @@ jest.mock('@/components/ui/select', () => ({
     </button>
   )),
   SelectContent: ({ children, ...props }) => {
-    const Content = ({ children, ...props }) => <div {...props}>{children}</div>
-    Content.displayName = 'SelectContent'
-    return <Content {...props}>{children}</Content>
+    const Content = ({ children, ...props }) => (
+      <div {...props}>{children}</div>
+    );
+    Content.displayName = "SelectContent";
+    return <Content {...props}>{children}</Content>;
   },
   SelectItem: ({ children, value, ...props }) => {
-    const Item = ({ children, ...props }) => <div {...props}>{children}</div>
-    Item.displayName = 'SelectItem'
-    return <Item value={value} {...props}>{children}</Item>
+    const Item = ({ children, ...props }) => <div {...props}>{children}</div>;
+    Item.displayName = "SelectItem";
+    return (
+      <Item value={value} {...props}>
+        {children}
+      </Item>
+    );
   },
   SelectValue: ({ placeholder, children, ...props }) => (
     <span {...props}>{children || placeholder}</span>
   ),
-}))
+}));
 
-jest.mock('@/components/ui/label', () => ({
+jest.mock("@/components/ui/label", () => ({
   Label: ({ children, ...props }) => <label {...props}>{children}</label>,
-}))
+}));
 
-jest.mock('@/components/ui/button', () => ({
+jest.mock("@/components/ui/button", () => ({
   Button: ({ children, disabled, type, ...props }) => (
     <button disabled={disabled} type={type} {...props}>
       {children}
     </button>
   ),
-}))
+}));
 
 // Mock lucide-react icons
-jest.mock('lucide-react', () => ({
-  ChevronUp: ({ className, ...props }) => <div className={className} data-testid="chevron-up" {...props} />,
-  ChevronDown: ({ className, ...props }) => <div className={className} data-testid="chevron-down" {...props} />,
-  Check: ({ className, ...props }) => <div className={className} data-testid="check" {...props} />,
-  CheckCircle2: ({ className, ...props }) => <div className={className} data-testid="check-circle-2" {...props} />,
-  X: ({ className, ...props }) => <div className={className} data-testid="x" {...props} />,
-  Plus: ({ className, ...props }) => <div className={className} data-testid="plus" {...props} />,
-  Minus: ({ className, ...props }) => <div className={className} data-testid="minus" {...props} />,
-  Calendar: ({ className, ...props }) => <div className={className} data-testid="calendar" {...props} />,
-  Clock: ({ className, ...props }) => <div className={className} data-testid="clock" {...props} />,
-  MapPin: ({ className, ...props }) => <div className={className} data-testid="map-pin" {...props} />,
-  User: ({ className, ...props }) => <div className={className} data-testid="user" {...props} />,
-  Mail: ({ className, ...props }) => <div className={className} data-testid="mail" {...props} />,
-  Phone: ({ className, ...props }) => <div className={className} data-testid="phone" {...props} />,
-  Building: ({ className, ...props }) => <div className={className} data-testid="building" {...props} />,
-  Building2: ({ className, ...props }) => <div className={className} data-testid="building-2" {...props} />,
-  Edit: ({ className, ...props }) => <div className={className} data-testid="edit" {...props} />,
-  Trash: ({ className, ...props }) => <div className={className} data-testid="trash" {...props} />,
-  Eye: ({ className, ...props }) => <div className={className} data-testid="eye" {...props} />,
-  Copy: ({ className, ...props }) => <div className={className} data-testid="copy" {...props} />,
-  Share: ({ className, ...props }) => <div className={className} data-testid="share" {...props} />,
-  Download: ({ className, ...props }) => <div className={className} data-testid="download" {...props} />,
-  ExternalLink: ({ className, ...props }) => <div className={className} data-testid="external-link" {...props} />,
-  FileText: ({ className, ...props }) => <div className={className} data-testid="file-text" {...props} />,
-  Image: ({ className, ...props }) => <div className={className} data-testid="image" {...props} />,
-  AlertCircle: ({ className, ...props }) => <div className={className} data-testid="alert-circle" {...props} />,
-  Info: ({ className, ...props }) => <div className={className} data-testid="info" {...props} />,
-  Search: ({ className, ...props }) => <div className={className} data-testid="search" {...props} />,
-  Filter: ({ className, ...props }) => <div className={className} data-testid="filter" {...props} />,
-  Settings: ({ className, ...props }) => <div className={className} data-testid="settings" {...props} />,
-  MoreHorizontal: ({ className, ...props }) => <div className={className} data-testid="more-horizontal" {...props} />,
-  MoreVertical: ({ className, ...props }) => <div className={className} data-testid="more-vertical" {...props} />,
-  ArrowRight: ({ className, ...props }) => <div className={className} data-testid="arrow-right" {...props} />,
-  ArrowLeft: ({ className, ...props }) => <div className={className} data-testid="arrow-left" {...props} />,
-  Globe: ({ className, ...props }) => <div className={className} data-testid="globe" {...props} />,
-  GraduationCap: ({ className, ...props }) => <div className={className} data-testid="graduation-cap" {...props} />,
-}))
+jest.mock("lucide-react", () => ({
+  ChevronUp: ({ className, ...props }) => (
+    <div className={className} data-testid="chevron-up" {...props} />
+  ),
+  ChevronDown: ({ className, ...props }) => (
+    <div className={className} data-testid="chevron-down" {...props} />
+  ),
+  Check: ({ className, ...props }) => (
+    <div className={className} data-testid="check" {...props} />
+  ),
+  CheckCircle2: ({ className, ...props }) => (
+    <div className={className} data-testid="check-circle-2" {...props} />
+  ),
+  X: ({ className, ...props }) => (
+    <div className={className} data-testid="x" {...props} />
+  ),
+  Plus: ({ className, ...props }) => (
+    <div className={className} data-testid="plus" {...props} />
+  ),
+  Minus: ({ className, ...props }) => (
+    <div className={className} data-testid="minus" {...props} />
+  ),
+  Calendar: ({ className, ...props }) => (
+    <div className={className} data-testid="calendar" {...props} />
+  ),
+  Clock: ({ className, ...props }) => (
+    <div className={className} data-testid="clock" {...props} />
+  ),
+  MapPin: ({ className, ...props }) => (
+    <div className={className} data-testid="map-pin" {...props} />
+  ),
+  User: ({ className, ...props }) => (
+    <div className={className} data-testid="user" {...props} />
+  ),
+  Mail: ({ className, ...props }) => (
+    <div className={className} data-testid="mail" {...props} />
+  ),
+  Phone: ({ className, ...props }) => (
+    <div className={className} data-testid="phone" {...props} />
+  ),
+  Building: ({ className, ...props }) => (
+    <div className={className} data-testid="building" {...props} />
+  ),
+  Building2: ({ className, ...props }) => (
+    <div className={className} data-testid="building-2" {...props} />
+  ),
+  Edit: ({ className, ...props }) => (
+    <div className={className} data-testid="edit" {...props} />
+  ),
+  Trash: ({ className, ...props }) => (
+    <div className={className} data-testid="trash" {...props} />
+  ),
+  Eye: ({ className, ...props }) => (
+    <div className={className} data-testid="eye" {...props} />
+  ),
+  Copy: ({ className, ...props }) => (
+    <div className={className} data-testid="copy" {...props} />
+  ),
+  Share: ({ className, ...props }) => (
+    <div className={className} data-testid="share" {...props} />
+  ),
+  Download: ({ className, ...props }) => (
+    <div className={className} data-testid="download" {...props} />
+  ),
+  ExternalLink: ({ className, ...props }) => (
+    <div className={className} data-testid="external-link" {...props} />
+  ),
+  FileText: ({ className, ...props }) => (
+    <div className={className} data-testid="file-text" {...props} />
+  ),
+  Image: ({ className, ...props }) => (
+    <div className={className} data-testid="image" {...props} />
+  ),
+  AlertCircle: ({ className, ...props }) => (
+    <div className={className} data-testid="alert-circle" {...props} />
+  ),
+  Info: ({ className, ...props }) => (
+    <div className={className} data-testid="info" {...props} />
+  ),
+  Search: ({ className, ...props }) => (
+    <div className={className} data-testid="search" {...props} />
+  ),
+  Filter: ({ className, ...props }) => (
+    <div className={className} data-testid="filter" {...props} />
+  ),
+  Settings: ({ className, ...props }) => (
+    <div className={className} data-testid="settings" {...props} />
+  ),
+  MoreHorizontal: ({ className, ...props }) => (
+    <div className={className} data-testid="more-horizontal" {...props} />
+  ),
+  MoreVertical: ({ className, ...props }) => (
+    <div className={className} data-testid="more-vertical" {...props} />
+  ),
+  ArrowRight: ({ className, ...props }) => (
+    <div className={className} data-testid="arrow-right" {...props} />
+  ),
+  ArrowLeft: ({ className, ...props }) => (
+    <div className={className} data-testid="arrow-left" {...props} />
+  ),
+  Globe: ({ className, ...props }) => (
+    <div className={className} data-testid="globe" {...props} />
+  ),
+  GraduationCap: ({ className, ...props }) => (
+    <div className={className} data-testid="graduation-cap" {...props} />
+  ),
+}));

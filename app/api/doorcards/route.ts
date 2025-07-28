@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     if ("error" in authResult) {
       return NextResponse.json(
         { error: authResult.error },
-        { status: authResult.status }
+        { status: authResult.status },
       );
     }
     const { user } = authResult;
@@ -36,10 +36,10 @@ export async function POST(req: Request) {
           ? validatedData.college === "SKYLINE"
             ? "Skyline College"
             : validatedData.college === "CSM"
-            ? "College of San Mateo"
-            : validatedData.college === "CANADA"
-            ? "Cañada College"
-            : validatedData.college
+              ? "College of San Mateo"
+              : validatedData.college === "CANADA"
+                ? "Cañada College"
+                : validatedData.college
           : "this campus";
 
         return NextResponse.json(
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
             error: `You already have a doorcard for ${campusName} - ${validatedData.term} ${validatedData.year}. Please edit your existing doorcard instead.`,
             existingDoorcardId: existingDoorcard.id,
           },
-          { status: 409 }
+          { status: 409 },
         );
       }
 
@@ -92,7 +92,7 @@ export async function POST(req: Request) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           { error: "Validation error", details: error.errors },
-          { status: 400 }
+          { status: 400 },
         );
       }
       throw error;
@@ -101,7 +101,7 @@ export async function POST(req: Request) {
     console.error("Error creating doorcard:", error);
     return NextResponse.json(
       { error: "Failed to create doorcard" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -112,7 +112,7 @@ export async function GET() {
     if ("error" in authResult) {
       return NextResponse.json(
         { error: authResult.error },
-        { status: authResult.status }
+        { status: authResult.status },
       );
     }
     const { user } = authResult;
@@ -141,7 +141,7 @@ export async function GET() {
     console.error("Error fetching doorcards:", error);
     return NextResponse.json(
       { error: "Failed to fetch doorcards" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

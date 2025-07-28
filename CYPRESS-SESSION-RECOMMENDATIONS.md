@@ -16,29 +16,31 @@ This document provides specific recommendations and solutions for fixing Cypress
 ### 1. Improved Session Validation
 
 **Before:**
+
 ```javascript
 validate: () => {
   cy.request({ url: "/dashboard", failOnStatusCode: false }).then((resp) => {
     expect(resp.status).to.not.eq(401);
   });
-}
+};
 ```
 
 **After:**
+
 ```javascript
 validate: () => {
   // More reliable validation: check both cookie and API response
   cy.getCookie("next-auth.session-token").should("exist");
-  cy.request({ 
-    url: "/api/auth/session", 
+  cy.request({
+    url: "/api/auth/session",
     failOnStatusCode: false,
-    timeout: 10000 
+    timeout: 10000,
   }).then((resp) => {
     expect(resp.status).to.eq(200);
-    expect(resp.body).to.have.property('user');
-    expect(resp.body.user).to.have.property('email');
+    expect(resp.body).to.have.property("user");
+    expect(resp.body.user).to.have.property("email");
   });
-}
+};
 ```
 
 ### 2. Fast JWT-Based Authentication
@@ -50,6 +52,7 @@ cy.fastLogin(userEmail?, userName?) // Much faster than traditional login
 ```
 
 This method:
+
 - Creates JWT tokens directly using NextAuth's encoding
 - Sets the session cookie without going through login forms
 - Reduces test execution time by 80-90%
@@ -79,10 +82,10 @@ Added explicit waits to ensure sessions are cached at the right moment:
 cy.session("user-session", () => {
   // Login steps...
   cy.url({ timeout: 15000 }).should("include", "/dashboard");
-  
+
   // Critical: Wait for session cookie to be set
   cy.getCookie("next-auth.session-token", { timeout: 10000 }).should("exist");
-  
+
   // Additional guard: Ensure async auth processes complete
   cy.wait(1000);
 });
@@ -111,10 +114,10 @@ beforeEach(() => {
 ```javascript
 // Set appropriate timeouts
 cy.getCookie("next-auth.session-token", { timeout: 10000 }).should("exist");
-cy.request({ 
-  url: "/api/auth/session", 
+cy.request({
+  url: "/api/auth/session",
   timeout: 10000,
-  failOnStatusCode: false 
+  failOnStatusCode: false,
 });
 ```
 
@@ -136,60 +139,74 @@ if (process.env.NODE_ENV === "test" || process.env.CYPRESS) {
 
 ## Performance Improvements
 
-| Method | Average Time | Reliability |
-|--------|-------------|-------------|
-| Traditional Login | 8-15 seconds | 70-80% |
-| Fast JWT Login | 1-3 seconds | 95-99% |
+| Method            | Average Time | Reliability |
+| ----------------- | ------------ | ----------- |
+| Traditional Login | 8-15 seconds | 70-80%      |
+| Fast JWT Login    | 1-3 seconds  | 95-99%      |
 
 ## Troubleshooting Common Issues
 
 ### Issue: "cy.session timeout after 4000ms"
+
 **Solution**: Add explicit guards in your session setup function
+
 ```javascript
 cy.getCookie("next-auth.session-token").should("exist");
 cy.wait(1000); // Allow async processes to complete
 ```
 
 ### Issue: Session validation fails randomly
+
 **Solution**: Use the `/api/auth/session` endpoint instead of page requests
+
 ```javascript
-cy.request({ url: "/api/auth/session", timeout: 10000 })
+cy.request({ url: "/api/auth/session", timeout: 10000 });
 ```
 
 ### Issue: Database query timeouts in callbacks
+
 **Solution**: Skip database operations in test environment
+
 ```javascript
 if (process.env.CYPRESS) return token; // Skip DB queries
 ```
 
 ### Issue: Sessions not persisting across tests
+
 **Solution**: Use `cacheAcrossSpecs: true` and proper session validation
+
 ```javascript
-cy.session("session-id", setupFn, { 
+cy.session("session-id", setupFn, {
   cacheAcrossSpecs: true,
-  validate: validationFn 
+  validate: validationFn,
 });
 ```
 
 ## Alternative Approaches
 
 ### 1. Mock Authentication API
+
 For unit/component tests, consider mocking the auth API:
+
 ```javascript
-cy.intercept('GET', '/api/auth/session', { fixture: 'user-session.json' });
+cy.intercept("GET", "/api/auth/session", { fixture: "user-session.json" });
 ```
 
 ### 2. Database Seeding
+
 For E2E tests that need specific user states:
+
 ```javascript
-cy.task('seedDatabase', { userEmail: 'test@example.com' });
+cy.task("seedDatabase", { userEmail: "test@example.com" });
 ```
 
 ### 3. Session Storage Manipulation
+
 For advanced scenarios:
+
 ```javascript
 cy.window().then((win) => {
-  win.localStorage.setItem('auth-state', JSON.stringify(mockState));
+  win.localStorage.setItem("auth-state", JSON.stringify(mockState));
 });
 ```
 
@@ -198,21 +215,23 @@ cy.window().then((win) => {
 ### Updating Existing Tests
 
 1. **Replace login calls:**
+
    ```javascript
    // Old
    cy.loginAsTestUser();
-   
+
    // New (for most tests)
    cy.fastLogin();
    ```
 
 2. **Update session validation:**
+
    ```javascript
    // Add to your existing cy.session() calls
    validate: () => {
      cy.getCookie("next-auth.session-token").should("exist");
      cy.request("/api/auth/session").its("status").should("eq", 200);
-   }
+   };
    ```
 
 3. **Set environment flags:**
@@ -223,6 +242,7 @@ cy.window().then((win) => {
 ## Monitoring and Debugging
 
 ### Session Debug Commands
+
 ```javascript
 // Check current session state
 Cypress.session.getCurrentSessionData();
@@ -235,10 +255,11 @@ Cypress.session.clearAllSavedSessions();
 ```
 
 ### Logging Session Activity
+
 ```javascript
-cy.task('log', 'Session validation started');
+cy.task("log", "Session validation started");
 cy.getCookie("next-auth.session-token").then((cookie) => {
-  cy.task('log', `Session cookie: ${cookie ? 'exists' : 'missing'}`);
+  cy.task("log", `Session cookie: ${cookie ? "exists" : "missing"}`);
 });
 ```
 

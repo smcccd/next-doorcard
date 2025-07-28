@@ -28,7 +28,7 @@ export async function GET() {
     const [totalAnalytics, totalMetrics, recentAnalytics] = await Promise.all([
       // Total analytics events
       prisma.doorcardAnalytics.groupBy({
-        by: ['eventType'],
+        by: ["eventType"],
         _count: {
           eventType: true,
         },
@@ -46,7 +46,7 @@ export async function GET() {
 
       // Recent activity (last 30 days)
       prisma.doorcardAnalytics.groupBy({
-        by: ['eventType'],
+        by: ["eventType"],
         where: {
           createdAt: {
             gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
@@ -79,12 +79,11 @@ export async function GET() {
       },
       orderBy: {
         metrics: {
-          totalViews: 'desc',
+          totalViews: "desc",
         },
       },
       take: 20,
     });
-
 
     // Calculate engagement score for platform
     const totalViews = totalMetrics._sum.totalViews || 0;
@@ -99,8 +98,10 @@ export async function GET() {
       const printScore = Math.min((totalPrints / 100) * 30, 30);
       const shareScore = Math.min((totalShares / 50) * 20, 20);
       const uniqueRatio = uniqueViews > 0 ? (uniqueViews / totalViews) * 10 : 0;
-      
-      engagementScore = Math.round(viewScore + printScore + shareScore + uniqueRatio);
+
+      engagementScore = Math.round(
+        viewScore + printScore + shareScore + uniqueRatio,
+      );
     }
 
     // Format data for charts
@@ -113,12 +114,13 @@ export async function GET() {
       recentActivity: [], // You could enhance this with daily breakdowns
     };
 
-    const doorcardAnalytics = topDoorcards.map(card => ({
+    const doorcardAnalytics = topDoorcards.map((card) => ({
       doorcardId: card.id,
       doorcardName: card.doorcardName,
-      facultyName: card.user.firstName && card.user.lastName 
-        ? `${card.user.firstName} ${card.user.lastName}`
-        : card.user.name || "Unknown",
+      facultyName:
+        card.user.firstName && card.user.lastName
+          ? `${card.user.firstName} ${card.user.lastName}`
+          : card.user.name || "Unknown",
       totalViews: card.metrics?.totalViews || 0,
       totalPrints: card.metrics?.totalPrints || 0,
       totalShares: card.metrics?.totalShares || 0,
@@ -128,12 +130,21 @@ export async function GET() {
 
     // System-wide statistics
     const systemStats = {
-      totalEvents: totalAnalytics.reduce((sum, event) => sum + event._count.eventType, 0),
-      recentEvents: recentAnalytics.reduce((sum, event) => sum + event._count.eventType, 0),
-      eventBreakdown: totalAnalytics.reduce((acc, event) => {
-        acc[event.eventType] = event._count.eventType;
-        return acc;
-      }, {} as Record<string, number>),
+      totalEvents: totalAnalytics.reduce(
+        (sum, event) => sum + event._count.eventType,
+        0,
+      ),
+      recentEvents: recentAnalytics.reduce(
+        (sum, event) => sum + event._count.eventType,
+        0,
+      ),
+      eventBreakdown: totalAnalytics.reduce(
+        (acc, event) => {
+          acc[event.eventType] = event._count.eventType;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
     };
 
     return NextResponse.json({
@@ -145,7 +156,7 @@ export async function GET() {
     console.error("Error fetching admin analytics:", error);
     return NextResponse.json(
       { error: "Failed to fetch analytics" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

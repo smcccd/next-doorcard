@@ -88,7 +88,7 @@ export default function ResumeDoorcard({
           <Badge
             variant="outline"
             className={`text-xs font-medium ${getCompletionColor(
-              draft.completionPercentage
+              draft.completionPercentage,
             )}`}
             aria-label={`${draft.completionPercentage}% complete`}
           >
@@ -127,7 +127,7 @@ export default function ResumeDoorcard({
               />
               <div
                 className={`absolute top-0 left-0 h-2 rounded-full transition-all duration-300 ${getProgressColor(
-                  draft.completionPercentage
+                  draft.completionPercentage,
                 )}`}
                 style={{ width: `${draft.completionPercentage}%` }}
               />

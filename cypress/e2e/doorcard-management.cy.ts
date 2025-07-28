@@ -14,7 +14,7 @@ describe("Doorcard Management", () => {
 
   it("should display form elements", () => {
     cy.visit("/doorcard/new");
-    cy.get('[role="combobox"]').should('have.length.at.least', 3);
+    cy.get('[role="combobox"]').should("have.length.at.least", 3);
     cy.contains("Continue to Basic Info").should("be.visible");
   });
 

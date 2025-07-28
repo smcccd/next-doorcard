@@ -22,10 +22,7 @@ export async function GET() {
           },
         },
       },
-      orderBy: [
-        { college: "asc" },
-        { user: { name: "asc" } },
-      ],
+      orderBy: [{ college: "asc" }, { user: { name: "asc" } }],
     });
 
     const publicDoorcards = doorcards.map((doorcard) => ({
@@ -38,7 +35,7 @@ export async function GET() {
       college: doorcard.college,
       slug: doorcard.slug,
       user: {
-        name: doorcard.user.name || '',
+        name: doorcard.user.name || "",
         username: doorcard.user.username,
         college: doorcard.college,
       },
@@ -55,12 +52,12 @@ export async function GET() {
   } catch (error) {
     console.error("Error fetching public doorcards:", error);
     return NextResponse.json(
-      { 
-        doorcards: [], 
-        success: false, 
-        error: "Failed to fetch doorcards" 
+      {
+        doorcards: [],
+        success: false,
+        error: "Failed to fetch doorcards",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,40 +10,39 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { 
-  Play, 
-  Square, 
-  SkipForward, 
-  SkipBack, 
+} from "@/components/ui/dropdown-menu";
+import {
+  Square,
+  SkipForward,
+  SkipBack,
   HelpCircle,
   ChevronDown,
   Route,
   BookOpen,
   Edit3,
-  Home
-} from 'lucide-react';
-import { useTour } from './TourProvider';
-import { useTourSteps } from './useTourSteps';
+  Home,
+} from "lucide-react";
+import { useTour } from "./TourProvider";
+import { useTourSteps } from "./useTourSteps";
 
 interface TourControlProps {
   className?: string;
   showInHeader?: boolean;
 }
 
-export const TourControl: React.FC<TourControlProps> = ({ 
-  className = '', 
-  showInHeader = false 
+export const TourControl: React.FC<TourControlProps> = ({
+  className = "",
+  showInHeader = false,
 }) => {
-  const { 
-    isActive, 
-    currentStep, 
-    steps, 
-    startTour, 
-    stopTour, 
-    nextStep, 
+  const {
+    isActive,
+    currentStep,
+    steps,
+    startTour,
+    stopTour,
+    nextStep,
     previousStep,
-    checkUserInputComplete
+    checkUserInputComplete,
   } = useTour();
 
   const {
@@ -52,40 +51,38 @@ export const TourControl: React.FC<TourControlProps> = ({
     EDIT_DOORCARD_TOUR_STEPS,
     prepareDashboardForTour,
     prepareNewDoorcardForTour,
-    prepareEditDoorcardForTour
+    prepareEditDoorcardForTour,
   } = useTourSteps();
-
-  const [selectedTour, setSelectedTour] = useState<string>('dashboard');
 
   const tourOptions = [
     {
-      id: 'dashboard',
-      name: 'Dashboard Tour',
-      description: 'Learn the basics of navigating your dashboard',
+      id: "dashboard",
+      name: "Dashboard Tour",
+      description: "Learn the basics of navigating your dashboard",
       icon: Home,
       steps: DASHBOARD_TOUR_STEPS,
-      prepare: prepareDashboardForTour
+      prepare: prepareDashboardForTour,
     },
     {
-      id: 'new-doorcard',
-      name: 'Create Doorcard Tour',
-      description: 'Step-by-step doorcard creation guide',
+      id: "new-doorcard",
+      name: "Create Doorcard Tour",
+      description: "Step-by-step doorcard creation guide",
       icon: BookOpen,
       steps: NEW_DOORCARD_TOUR_STEPS,
-      prepare: prepareNewDoorcardForTour
+      prepare: prepareNewDoorcardForTour,
     },
     {
-      id: 'edit-doorcard',
-      name: 'Edit Doorcard Tour',
-      description: 'Learn how to edit and customize your doorcard',
+      id: "edit-doorcard",
+      name: "Edit Doorcard Tour",
+      description: "Learn how to edit and customize your doorcard",
       icon: Edit3,
       steps: EDIT_DOORCARD_TOUR_STEPS,
-      prepare: prepareEditDoorcardForTour
-    }
+      prepare: prepareEditDoorcardForTour,
+    },
   ];
 
   const handleStartTour = (tourId: string) => {
-    const tour = tourOptions.find(t => t.id === tourId);
+    const tour = tourOptions.find((t) => t.id === tourId);
     if (!tour) return;
 
     // Prepare the page for the tour
@@ -96,17 +93,15 @@ export const TourControl: React.FC<TourControlProps> = ({
       showProgress: true,
       allowClose: true,
       overlayOpacity: 0.7,
-      smoothScroll: true
+      smoothScroll: true,
     });
-
-    setSelectedTour(tourId);
   };
 
   const getCurrentStepInfo = () => {
     if (!isActive || !steps[currentStep]) return null;
-    
+
     const step = steps[currentStep];
-    const isInputComplete = step.popover.waitForUserInput 
+    const isInputComplete = step.popover.waitForUserInput
       ? checkUserInputComplete(step.id)
       : true;
 
@@ -114,7 +109,7 @@ export const TourControl: React.FC<TourControlProps> = ({
       title: step.popover.title,
       inputRequired: step.popover.waitForUserInput,
       inputComplete: isInputComplete,
-      inputType: step.popover.requiredInputType
+      inputType: step.popover.requiredInputType,
     };
   };
 
@@ -183,7 +178,9 @@ export const TourControl: React.FC<TourControlProps> = ({
 
   // Full control panel version
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border p-4 ${className}`}>
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border p-4 ${className}`}
+    >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Route className="h-5 w-5 text-blue-500" />
@@ -203,7 +200,7 @@ export const TourControl: React.FC<TourControlProps> = ({
           <p className="text-sm text-gray-600 dark:text-gray-300">
             Take an interactive tour to learn how to use the app effectively.
           </p>
-          
+
           <div className="grid gap-2">
             {tourOptions.map((tour) => {
               const Icon = tour.icon;
@@ -235,7 +232,7 @@ export const TourControl: React.FC<TourControlProps> = ({
                   {stepInfo.title}
                 </h4>
                 {stepInfo.inputRequired && (
-                  <Badge 
+                  <Badge
                     variant={stepInfo.inputComplete ? "default" : "destructive"}
                     className="text-xs"
                   >
@@ -243,13 +240,17 @@ export const TourControl: React.FC<TourControlProps> = ({
                   </Badge>
                 )}
               </div>
-              
+
               {stepInfo.inputRequired && !stepInfo.inputComplete && (
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  {stepInfo.inputType === 'click' && "Click the highlighted element to continue"}
-                  {stepInfo.inputType === 'input' && "Fill in the highlighted input field"}
-                  {stepInfo.inputType === 'select' && "Make a selection from the highlighted dropdown"}
-                  {stepInfo.inputType === 'custom' && "Complete the required action"}
+                  {stepInfo.inputType === "click" &&
+                    "Click the highlighted element to continue"}
+                  {stepInfo.inputType === "input" &&
+                    "Fill in the highlighted input field"}
+                  {stepInfo.inputType === "select" &&
+                    "Make a selection from the highlighted dropdown"}
+                  {stepInfo.inputType === "custom" &&
+                    "Complete the required action"}
                 </p>
               )}
             </div>
@@ -266,13 +267,13 @@ export const TourControl: React.FC<TourControlProps> = ({
                 <SkipBack className="h-4 w-4 mr-1" />
                 Previous
               </Button>
-              
+
               <Button
                 variant="outline"
                 size="sm"
                 onClick={nextStep}
                 disabled={
-                  currentStep === steps.length - 1 || 
+                  currentStep === steps.length - 1 ||
                   (stepInfo?.inputRequired && !stepInfo?.inputComplete)
                 }
               >
@@ -281,11 +282,7 @@ export const TourControl: React.FC<TourControlProps> = ({
               </Button>
             </div>
 
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={stopTour}
-            >
+            <Button variant="secondary" size="sm" onClick={stopTour}>
               <Square className="h-4 w-4 mr-1" />
               Stop Tour
             </Button>

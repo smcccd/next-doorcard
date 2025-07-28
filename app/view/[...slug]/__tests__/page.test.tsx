@@ -1,25 +1,23 @@
-import { render, screen } from '@testing-library/react';
-import { getServerSession } from 'next-auth/next';
-import { notFound } from 'next/navigation';
-import PublicDoorcardView from '../page';
-import { prisma } from '@/lib/prisma';
+import { render, screen } from "@testing-library/react";
+import { getServerSession } from "next-auth/next";
+import { notFound } from "next/navigation";
+import PublicDoorcardView from "../page";
+import { prisma } from "@/lib/prisma";
 
 // Mock dependencies
-jest.mock('next-auth/next');
-jest.mock('next/navigation');
-jest.mock('@/lib/prisma');
-jest.mock('@/lib/auth');
+jest.mock("next-auth/next");
+jest.mock("next/navigation");
+jest.mock("@/lib/prisma");
+jest.mock("@/lib/auth");
 
 // Mock components
-jest.mock('@/components/UnifiedDoorcard', () => ({
+jest.mock("@/components/UnifiedDoorcard", () => ({
   UnifiedDoorcard: ({ doorcard }: any) => (
-    <div data-testid="unified-doorcard">
-      Doorcard for {doorcard.name}
-    </div>
+    <div data-testid="unified-doorcard">Doorcard for {doorcard.name}</div>
   ),
 }));
 
-jest.mock('@/components/PrintOptimizedDoorcard', () => ({
+jest.mock("@/components/PrintOptimizedDoorcard", () => ({
   PrintOptimizedDoorcard: ({ doorcard }: any) => (
     <div data-testid="print-optimized-doorcard">
       Print version for {doorcard.name}
@@ -27,36 +25,36 @@ jest.mock('@/components/PrintOptimizedDoorcard', () => ({
   ),
 }));
 
-jest.mock('@/components/UnifiedDoorcardActions', () => ({
+jest.mock("@/components/UnifiedDoorcardActions", () => ({
   DoorcardActions: ({ doorcard }: any) => (
     <div data-testid="doorcard-actions">Actions for {doorcard.name}</div>
   ),
 }));
 
-jest.mock('@/components/doorcard/DoorcardViewTracker', () => ({
+jest.mock("@/components/doorcard/DoorcardViewTracker", () => ({
   DoorcardViewTracker: (props: any) => (
     <div data-testid="view-tracker" data-doorcard-id={props.doorcardId} />
   ),
 }));
 
-jest.mock('@/components/AutoPrintHandler', () => ({
+jest.mock("@/components/AutoPrintHandler", () => ({
   AutoPrintHandler: ({ autoPrint }: any) => (
     <div data-testid="auto-print-handler" data-auto-print={autoPrint} />
   ),
 }));
 
-jest.mock('@/lib/display-name', () => ({
+jest.mock("@/lib/display-name", () => ({
   formatDisplayName: (user: any) => `${user.firstName} ${user.lastName}`,
 }));
 
 // Mock UI components
-jest.mock('@/components/ui/badge', () => ({
+jest.mock("@/components/ui/badge", () => ({
   Badge: ({ children, variant, className }: any) => (
     <span className={`badge ${variant} ${className}`}>{children}</span>
   ),
 }));
 
-jest.mock('@/components/ui/button', () => ({
+jest.mock("@/components/ui/button", () => ({
   Button: ({ children, asChild, ...props }: any) => {
     if (asChild) {
       return <div {...props}>{children}</div>;
@@ -65,18 +63,18 @@ jest.mock('@/components/ui/button', () => ({
   },
 }));
 
-jest.mock('next/link', () => {
+jest.mock("next/link", () => {
   const MockLink = ({ children, href, ...props }: any) => (
     <a href={href} {...props}>
       {children}
     </a>
   );
-  MockLink.displayName = 'MockLink';
+  MockLink.displayName = "MockLink";
   return MockLink;
 });
 
 // Mock icons
-jest.mock('lucide-react', () => ({
+jest.mock("lucide-react", () => ({
   User: () => <div data-testid="user-icon" />,
   MapPin: () => <div data-testid="map-pin-icon" />,
   Calendar: () => <div data-testid="calendar-icon" />,
@@ -85,49 +83,51 @@ jest.mock('lucide-react', () => ({
   Globe: () => <div data-testid="globe-icon" />,
 }));
 
-const mockGetServerSession = getServerSession as jest.MockedFunction<typeof getServerSession>;
+const mockGetServerSession = getServerSession as jest.MockedFunction<
+  typeof getServerSession
+>;
 const mockNotFound = notFound as jest.MockedFunction<typeof notFound>;
 const mockPrisma = prisma as any;
 
-describe('PublicDoorcardView', () => {
+describe("PublicDoorcardView", () => {
   const mockDoorcard = {
-    id: 'doorcard-1',
-    name: 'Dr. John Smith',
-    doorcardName: 'Professor John Smith',
-    officeNumber: '123',
-    term: 'Fall',
-    year: '2024',
-    college: 'SKYLINE',
+    id: "doorcard-1",
+    name: "Dr. John Smith",
+    doorcardName: "Professor John Smith",
+    officeNumber: "123",
+    term: "Fall",
+    year: "2024",
+    college: "SKYLINE",
     isActive: true,
     isPublic: true,
-    slug: 'john-smith-fall-2024',
-    userId: 'user-1',
+    slug: "john-smith-fall-2024",
+    userId: "user-1",
     appointments: [
       {
-        id: 'appt-1',
-        dayOfWeek: 'Monday',
-        startTime: '09:00',
-        endTime: '10:00',
-        appointmentType: 'Office Hours',
+        id: "appt-1",
+        dayOfWeek: "Monday",
+        startTime: "09:00",
+        endTime: "10:00",
+        appointmentType: "Office Hours",
       },
     ],
     user: {
-      name: 'Dr. John Smith',
-      firstName: 'John',
-      lastName: 'Smith',
-      title: 'Professor',
-      pronouns: 'he/him',
-      displayFormat: 'FULL_NAME_TITLE',
-      college: 'SKYLINE',
-      website: 'https://example.com',
+      name: "Dr. John Smith",
+      firstName: "John",
+      lastName: "Smith",
+      title: "Professor",
+      pronouns: "he/him",
+      displayFormat: "FULL_NAME_TITLE",
+      college: "SKYLINE",
+      website: "https://example.com",
     },
   };
 
   const mockUser = {
-    id: 'user-1',
-    name: 'Dr. John Smith',
-    college: 'SKYLINE',
-    email: 'john@example.com',
+    id: "user-1",
+    name: "Dr. John Smith",
+    college: "SKYLINE",
+    email: "john@example.com",
   };
 
   beforeEach(() => {
@@ -142,178 +142,186 @@ describe('PublicDoorcardView', () => {
     };
   });
 
-  it('renders doorcard view with all components when doorcard is found', async () => {
+  it("renders doorcard view with all components when doorcard is found", async () => {
     mockPrisma.user.findUnique.mockResolvedValue(mockUser);
     mockPrisma.doorcard.findFirst.mockResolvedValue(mockDoorcard);
 
-    const params = Promise.resolve({ slug: ['john-smith'] });
+    const params = Promise.resolve({ slug: ["john-smith"] });
     const searchParams = Promise.resolve({});
 
     const result = await PublicDoorcardView({ params, searchParams });
     render(result);
 
-    expect(screen.getByText('Professor John Smith')).toBeInTheDocument();
-    expect(screen.getByText('Office 123')).toBeInTheDocument();
-    expect(screen.getByText('Fall 2024')).toBeInTheDocument();
-    expect(screen.getByText('SKYLINE')).toBeInTheDocument();
-    expect(screen.getByTestId('unified-doorcard')).toBeInTheDocument();
-    expect(screen.getByTestId('view-tracker')).toBeInTheDocument();
+    expect(screen.getByText("Professor John Smith")).toBeInTheDocument();
+    expect(screen.getByText("Office 123")).toBeInTheDocument();
+    expect(screen.getByText("Fall 2024")).toBeInTheDocument();
+    expect(screen.getByText("SKYLINE")).toBeInTheDocument();
+    expect(screen.getByTestId("unified-doorcard")).toBeInTheDocument();
+    expect(screen.getByTestId("view-tracker")).toBeInTheDocument();
   });
 
-  it('shows admin view badge when auth=true', async () => {
+  it("shows admin view badge when auth=true", async () => {
     mockGetServerSession.mockResolvedValue({
-      user: { email: 'admin@example.com' },
+      user: { email: "admin@example.com" },
     });
     mockPrisma.user.findUnique.mockResolvedValue(mockUser);
     mockPrisma.doorcard.findFirst.mockResolvedValue(mockDoorcard);
 
-    const params = Promise.resolve({ slug: ['john-smith'] });
-    const searchParams = Promise.resolve({ auth: 'true' });
+    const params = Promise.resolve({ slug: ["john-smith"] });
+    const searchParams = Promise.resolve({ auth: "true" });
 
     const result = await PublicDoorcardView({ params, searchParams });
     render(result);
 
-    expect(screen.getByText('Admin View')).toBeInTheDocument();
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getByText("Admin View")).toBeInTheDocument();
+    expect(screen.getByText("Dashboard")).toBeInTheDocument();
   });
 
-  it('shows specific term badge when term slug is provided', async () => {
+  it("shows specific term badge when term slug is provided", async () => {
     mockPrisma.user.findUnique.mockResolvedValue(mockUser);
     mockPrisma.doorcard.findFirst.mockResolvedValue(mockDoorcard);
 
-    const params = Promise.resolve({ slug: ['john-smith', 'fall-2024'] });
+    const params = Promise.resolve({ slug: ["john-smith", "fall-2024"] });
     const searchParams = Promise.resolve({});
 
     const result = await PublicDoorcardView({ params, searchParams });
     render(result);
 
     // There are multiple "Fall 2024" texts - one in badge, one in info section
-    const fallTexts = screen.getAllByText('Fall 2024');
+    const fallTexts = screen.getAllByText("Fall 2024");
     expect(fallTexts.length).toBeGreaterThan(0);
   });
 
-  it('shows auto print handler when print=true', async () => {
+  it("shows auto print handler when print=true", async () => {
     mockPrisma.user.findUnique.mockResolvedValue(mockUser);
     mockPrisma.doorcard.findFirst.mockResolvedValue(mockDoorcard);
 
-    const params = Promise.resolve({ slug: ['john-smith'] });
-    const searchParams = Promise.resolve({ print: 'true' });
+    const params = Promise.resolve({ slug: ["john-smith"] });
+    const searchParams = Promise.resolve({ print: "true" });
 
     const result = await PublicDoorcardView({ params, searchParams });
     render(result);
 
-    const autoPrintHandler = screen.getByTestId('auto-print-handler');
-    expect(autoPrintHandler).toHaveAttribute('data-auto-print', 'true');
+    const autoPrintHandler = screen.getByTestId("auto-print-handler");
+    expect(autoPrintHandler).toHaveAttribute("data-auto-print", "true");
   });
 
-  it('renders error page when user is not found', async () => {
+  it("renders error page when user is not found", async () => {
     mockPrisma.user.findUnique.mockResolvedValue(null);
     mockPrisma.user.findFirst.mockResolvedValue(null);
 
-    const params = Promise.resolve({ slug: ['nonexistent-user'] });
+    const params = Promise.resolve({ slug: ["nonexistent-user"] });
     const searchParams = Promise.resolve({});
 
     const result = await PublicDoorcardView({ params, searchParams });
     render(result);
 
-    expect(screen.getByText('Doorcard Not Available')).toBeInTheDocument();
-    expect(screen.getByText('Doorcard not found')).toBeInTheDocument();
-    expect(screen.getByText('Browse Doorcards')).toBeInTheDocument();
+    expect(screen.getByText("Doorcard Not Available")).toBeInTheDocument();
+    expect(screen.getByText("Doorcard not found")).toBeInTheDocument();
+    expect(screen.getByText("Browse Doorcards")).toBeInTheDocument();
   });
 
-  it('renders error page when doorcard is not found', async () => {
+  it("renders error page when doorcard is not found", async () => {
     mockPrisma.user.findUnique.mockResolvedValue(mockUser);
     mockPrisma.doorcard.findFirst.mockResolvedValue(null);
 
-    const params = Promise.resolve({ slug: ['john-smith'] });
+    const params = Promise.resolve({ slug: ["john-smith"] });
     const searchParams = Promise.resolve({});
 
     const result = await PublicDoorcardView({ params, searchParams });
     render(result);
 
-    expect(screen.getByText('Doorcard Not Available')).toBeInTheDocument();
-    expect(screen.getByText('Doorcard not found')).toBeInTheDocument();
+    expect(screen.getByText("Doorcard Not Available")).toBeInTheDocument();
+    expect(screen.getByText("Doorcard not found")).toBeInTheDocument();
   });
 
-  it('renders error page when doorcard is private and no auth', async () => {
+  it("renders error page when doorcard is private and no auth", async () => {
     const privateDoorcard = { ...mockDoorcard, isPublic: false };
     mockPrisma.user.findUnique.mockResolvedValue(mockUser);
     mockPrisma.doorcard.findFirst.mockResolvedValue(privateDoorcard);
 
-    const params = Promise.resolve({ slug: ['john-smith'] });
+    const params = Promise.resolve({ slug: ["john-smith"] });
     const searchParams = Promise.resolve({});
 
     const result = await PublicDoorcardView({ params, searchParams });
     render(result);
 
-    expect(screen.getByText('Doorcard Not Available')).toBeInTheDocument();
-    expect(screen.getByText('This doorcard is not publicly accessible')).toBeInTheDocument();
+    expect(screen.getByText("Doorcard Not Available")).toBeInTheDocument();
+    expect(
+      screen.getByText("This doorcard is not publicly accessible"),
+    ).toBeInTheDocument();
   });
 
-  it('allows viewing private doorcard with auth=true and valid session', async () => {
+  it("allows viewing private doorcard with auth=true and valid session", async () => {
     const privateDoorcard = { ...mockDoorcard, isPublic: false };
     mockGetServerSession.mockResolvedValue({
-      user: { email: 'admin@example.com' },
+      user: { email: "admin@example.com" },
     });
     mockPrisma.user.findUnique.mockResolvedValue(mockUser);
     mockPrisma.doorcard.findFirst.mockResolvedValue(privateDoorcard);
 
-    const params = Promise.resolve({ slug: ['john-smith'] });
-    const searchParams = Promise.resolve({ auth: 'true' });
+    const params = Promise.resolve({ slug: ["john-smith"] });
+    const searchParams = Promise.resolve({ auth: "true" });
 
     const result = await PublicDoorcardView({ params, searchParams });
     render(result);
 
-    expect(screen.getByText('Professor John Smith')).toBeInTheDocument();
-    expect(screen.getByText('Private')).toBeInTheDocument();
+    expect(screen.getByText("Professor John Smith")).toBeInTheDocument();
+    expect(screen.getByText("Private")).toBeInTheDocument();
   });
 
-  it('shows draft badge for inactive doorcards', async () => {
+  it("shows draft badge for inactive doorcards", async () => {
     const draftDoorcard = { ...mockDoorcard, isActive: false };
     mockPrisma.user.findUnique.mockResolvedValue(mockUser);
     mockPrisma.doorcard.findFirst.mockResolvedValue(draftDoorcard);
 
-    const params = Promise.resolve({ slug: ['john-smith'] });
+    const params = Promise.resolve({ slug: ["john-smith"] });
     const searchParams = Promise.resolve({});
 
     const result = await PublicDoorcardView({ params, searchParams });
     render(result);
 
-    expect(screen.getByText('Draft')).toBeInTheDocument();
+    expect(screen.getByText("Draft")).toBeInTheDocument();
   });
 
-  it('shows no appointments message when appointments array is empty', async () => {
+  it("shows no appointments message when appointments array is empty", async () => {
     const doorcardWithoutAppointments = { ...mockDoorcard, appointments: [] };
     mockPrisma.user.findUnique.mockResolvedValue(mockUser);
-    mockPrisma.doorcard.findFirst.mockResolvedValue(doorcardWithoutAppointments);
+    mockPrisma.doorcard.findFirst.mockResolvedValue(
+      doorcardWithoutAppointments,
+    );
 
-    const params = Promise.resolve({ slug: ['john-smith'] });
+    const params = Promise.resolve({ slug: ["john-smith"] });
     const searchParams = Promise.resolve({});
 
     const result = await PublicDoorcardView({ params, searchParams });
     render(result);
 
-    expect(screen.getByText('No scheduled appointments or office hours.')).toBeInTheDocument();
+    expect(
+      screen.getByText("No scheduled appointments or office hours."),
+    ).toBeInTheDocument();
   });
 
-  it('calls notFound when slug array is empty', async () => {
+  it("calls notFound when slug array is empty", async () => {
     mockNotFound.mockImplementation(() => {
-      throw new Error('notFound called');
+      throw new Error("notFound called");
     });
 
     const params = Promise.resolve({ slug: [] });
     const searchParams = Promise.resolve({});
 
-    await expect(PublicDoorcardView({ params, searchParams })).rejects.toThrow('notFound called');
+    await expect(PublicDoorcardView({ params, searchParams })).rejects.toThrow(
+      "notFound called",
+    );
     expect(mockNotFound).toHaveBeenCalled();
   });
 
-  it('falls back to name-based search when username not found', async () => {
+  it("falls back to name-based search when username not found", async () => {
     mockPrisma.user.findUnique.mockResolvedValue(null);
     mockPrisma.user.findFirst.mockResolvedValue(mockUser);
     mockPrisma.doorcard.findFirst.mockResolvedValue(mockDoorcard);
 
-    const params = Promise.resolve({ slug: ['john-smith'] });
+    const params = Promise.resolve({ slug: ["john-smith"] });
     const searchParams = Promise.resolve({});
 
     const result = await PublicDoorcardView({ params, searchParams });
@@ -322,39 +330,42 @@ describe('PublicDoorcardView', () => {
     expect(mockPrisma.user.findFirst).toHaveBeenCalledWith({
       where: {
         OR: [
-          { name: { equals: 'john smith', mode: 'insensitive' } },
-          { name: { equals: 'John Smith', mode: 'insensitive' } },
+          { name: { equals: "john smith", mode: "insensitive" } },
+          { name: { equals: "John Smith", mode: "insensitive" } },
         ],
       },
       select: { id: true, name: true, college: true, email: true },
     });
   });
 
-  it('shows faculty website link when available', async () => {
+  it("shows faculty website link when available", async () => {
     mockPrisma.user.findUnique.mockResolvedValue(mockUser);
     mockPrisma.doorcard.findFirst.mockResolvedValue(mockDoorcard);
 
-    const params = Promise.resolve({ slug: ['john-smith'] });
+    const params = Promise.resolve({ slug: ["john-smith"] });
     const searchParams = Promise.resolve({});
 
     const result = await PublicDoorcardView({ params, searchParams });
     render(result);
 
-    const websiteLink = screen.getByText('Faculty Website');
+    const websiteLink = screen.getByText("Faculty Website");
     expect(websiteLink).toBeInTheDocument();
-    expect(websiteLink.closest('a')).toHaveAttribute('href', 'https://example.com');
+    expect(websiteLink.closest("a")).toHaveAttribute(
+      "href",
+      "https://example.com",
+    );
   });
 
-  it('requires authentication for auth=true without valid session', async () => {
+  it("requires authentication for auth=true without valid session", async () => {
     mockGetServerSession.mockResolvedValue(null);
 
-    const params = Promise.resolve({ slug: ['john-smith'] });
-    const searchParams = Promise.resolve({ auth: 'true' });
+    const params = Promise.resolve({ slug: ["john-smith"] });
+    const searchParams = Promise.resolve({ auth: "true" });
 
     const result = await PublicDoorcardView({ params, searchParams });
     render(result);
 
-    expect(screen.getByText('Doorcard Not Available')).toBeInTheDocument();
-    expect(screen.getByText('Authentication required')).toBeInTheDocument();
+    expect(screen.getByText("Doorcard Not Available")).toBeInTheDocument();
+    expect(screen.getByText("Authentication required")).toBeInTheDocument();
   });
 });

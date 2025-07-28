@@ -92,4 +92,4 @@ To migrate existing types:
 2. Move remaining types to appropriate directories
 3. Update all import statements
 4. Remove old type definitions
-5. Run `npm run type-check` to verify everything works 
+5. Run `npm run type-check` to verify everything works

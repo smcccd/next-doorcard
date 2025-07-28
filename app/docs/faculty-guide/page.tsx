@@ -3,8 +3,15 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Faculty Guide - Faculty Doorcard System",
-  description: "Complete user guide for faculty members using the Faculty Doorcard System. Learn how to create doorcards, manage office hours, and customize your profile.",
-  keywords: ["faculty guide", "doorcard creation", "office hours", "profile management", "SMCCD"],
+  description:
+    "Complete user guide for faculty members using the Faculty Doorcard System. Learn how to create doorcards, manage office hours, and customize your profile.",
+  keywords: [
+    "faculty guide",
+    "doorcard creation",
+    "office hours",
+    "profile management",
+    "SMCCD",
+  ],
 };
 
 const facultyGuideContent = `
@@ -189,7 +196,5 @@ That's it! You now know everything you need to create and manage your digital do
 `;
 
 export default function FacultyGuidePage() {
-  return (
-    <DocsPageWrapper content={facultyGuideContent} showToc={true} />
-  );
+  return <DocsPageWrapper content={facultyGuideContent} showToc={true} />;
 }

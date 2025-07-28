@@ -11,7 +11,7 @@ export default async function DocsLayout({
 }) {
   // Check if user is authenticated
   const session = await getServerSession(authOptions);
-  
+
   if (!session?.user?.email) {
     redirect("/login?callbackUrl=/docs");
   }

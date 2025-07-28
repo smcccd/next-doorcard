@@ -64,17 +64,20 @@ async function processUserBatch(users: UserData[]): Promise<WorkerResult> {
     // Get the created users to return ID mappings
     const createdUsers = await prisma.user.findMany({
       where: {
-        email: { in: users.map(u => u.email) }
+        email: { in: users.map((u) => u.email) },
       },
-      select: { id: true, username: true }
+      select: { id: true, username: true },
     });
 
-    const idMappings = createdUsers.reduce((acc, user) => {
-      if (user.username) {
-        acc[user.username] = user.id;
-      }
-      return acc;
-    }, {} as Record<string, string>);
+    const idMappings = createdUsers.reduce(
+      (acc, user) => {
+        if (user.username) {
+          acc[user.username] = user.id;
+        }
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
 
     return {
       success: true,
@@ -91,7 +94,9 @@ async function processUserBatch(users: UserData[]): Promise<WorkerResult> {
   }
 }
 
-async function processDoorcardBatch(doorcards: DoorcardData[]): Promise<WorkerResult> {
+async function processDoorcardBatch(
+  doorcards: DoorcardData[],
+): Promise<WorkerResult> {
   const errors = [];
   const idMappings: Record<string, string> = {};
   let created = 0;
@@ -99,14 +104,14 @@ async function processDoorcardBatch(doorcards: DoorcardData[]): Promise<WorkerRe
   for (const doorcard of doorcards) {
     try {
       const createdDoorcard = await prisma.doorcard.create({
-        data: doorcard.data
+        data: doorcard.data,
       });
       idMappings[doorcard.oldId] = createdDoorcard.id;
       created++;
     } catch (error) {
       errors.push({
         oldId: doorcard.oldId,
-        error: error instanceof Error ? error.message : "Unknown error"
+        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
@@ -119,7 +124,9 @@ async function processDoorcardBatch(doorcards: DoorcardData[]): Promise<WorkerRe
   };
 }
 
-async function processAppointmentBatch(appointments: AppointmentData[]): Promise<WorkerResult> {
+async function processAppointmentBatch(
+  appointments: AppointmentData[],
+): Promise<WorkerResult> {
   try {
     const result = await prisma.appointment.createMany({
       data: appointments,
@@ -148,13 +155,13 @@ async function processWorkerTask() {
     let result: WorkerResult;
 
     switch (taskType) {
-      case 'users':
+      case "users":
         result = await processUserBatch(data);
         break;
-      case 'doorcards':
+      case "doorcards":
         result = await processDoorcardBatch(data);
         break;
-      case 'appointments':
+      case "appointments":
         result = await processAppointmentBatch(data);
         break;
       default:
@@ -162,12 +169,12 @@ async function processWorkerTask() {
     }
 
     parentPort?.postMessage({
-      type: 'result',
+      type: "result",
       result,
     });
   } catch (error) {
     parentPort?.postMessage({
-      type: 'error',
+      type: "error",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   } finally {

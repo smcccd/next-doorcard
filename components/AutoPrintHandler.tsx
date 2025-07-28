@@ -13,7 +13,7 @@ export function AutoPrintHandler({ autoPrint }: AutoPrintHandlerProps) {
       const timer = setTimeout(() => {
         window.print();
       }, 1000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [autoPrint]);

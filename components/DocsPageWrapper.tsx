@@ -15,7 +15,7 @@ export function DocsPageWrapper({ content }: DocsPageWrapperProps) {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
         <MarkdownRenderer content={content} />
       </div>
-      
+
       {/* Help Center Button */}
       <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
         <div className="text-center">

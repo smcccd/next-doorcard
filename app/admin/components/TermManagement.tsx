@@ -47,7 +47,7 @@ export default function TermManagement({
   const upcomingTerms = terms.filter((t) => t.isUpcoming);
   const archivedTerms = terms.filter((t) => t.isArchived);
   const otherTerms = terms.filter(
-    (t) => !t.isActive && !t.isUpcoming && !t.isArchived
+    (t) => !t.isActive && !t.isUpcoming && !t.isArchived,
   );
 
   const getTermStatusBadge = (term: Term) => {
@@ -230,7 +230,9 @@ export default function TermManagement({
         <Card>
           <CardContent className="text-center py-12">
             <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No terms found</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No terms found
+            </h3>
             <p className="text-gray-600 mb-6">
               Create your first academic term to get started
             </p>

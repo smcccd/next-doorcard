@@ -28,7 +28,7 @@ export const authOptions: NextAuthOptions = {
       type: "oauth",
       clientId: process.env.ONELOGIN_CLIENT_ID!,
       clientSecret: process.env.ONELOGIN_CLIENT_SECRET!,
-      
+
       authorization: {
         url: "https://smccd.onelogin.com/oidc/2/auth",
         params: {
@@ -40,11 +40,11 @@ export const authOptions: NextAuthOptions = {
         url: "https://smccd.onelogin.com/oidc/2/token",
         async request(context) {
           const { client, params, checks, provider } = context;
-          
+
           // Get client credentials from the provider config
           const clientId = process.env.ONELOGIN_CLIENT_ID!;
           const clientSecret = process.env.ONELOGIN_CLIENT_SECRET!;
-          
+
           // Try Basic Authentication (common OIDC method)
           const redirectUri = `${process.env.NEXTAUTH_URL}/api/auth/callback/onelogin`;
           const tokenParams = new URLSearchParams({
@@ -52,9 +52,11 @@ export const authOptions: NextAuthOptions = {
             code: params.code || "",
             redirect_uri: redirectUri,
           });
-          
-          const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-          
+
+          const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString(
+            "base64",
+          );
+
           console.log("Token request params (Basic Auth):", {
             grant_type: "authorization_code",
             code: params.code?.substring(0, 10) + "...",
@@ -62,61 +64,77 @@ export const authOptions: NextAuthOptions = {
             auth_method: "Basic",
             client_id: clientId,
           });
-          
-          const tokenUrl = typeof provider.token === 'string' ? provider.token : provider.token?.url || "";
+
+          const tokenUrl =
+            typeof provider.token === "string"
+              ? provider.token
+              : provider.token?.url || "";
           const response = await fetch(tokenUrl, {
             method: "POST",
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
-              "Authorization": `Basic ${basicAuth}`,
+              Authorization: `Basic ${basicAuth}`,
             },
             body: tokenParams,
           });
-          
+
           const tokens = await response.json();
           console.log("Token response:", response.status, tokens);
-          
+
           if (!response.ok) {
-            throw new Error(`Token request failed: ${response.status} ${JSON.stringify(tokens)}`);
+            throw new Error(
+              `Token request failed: ${response.status} ${JSON.stringify(tokens)}`,
+            );
           }
-          
+
           return { tokens };
         },
       },
       userinfo: {
         url: "https://smccd.onelogin.com/oidc/2/me",
         async request({ tokens, provider }) {
-          console.log("UserInfo request with token:", tokens.access_token?.substring(0, 20) + "...");
-          
-          const userinfoUrl = typeof provider.userinfo === 'string' ? provider.userinfo : provider.userinfo?.url || "";
+          console.log(
+            "UserInfo request with token:",
+            tokens.access_token?.substring(0, 20) + "...",
+          );
+
+          const userinfoUrl =
+            typeof provider.userinfo === "string"
+              ? provider.userinfo
+              : provider.userinfo?.url || "";
           const response = await fetch(userinfoUrl, {
             headers: {
               Authorization: `Bearer ${tokens.access_token}`,
             },
           });
-          
+
           const userInfo = await response.json();
           console.log("UserInfo response:", response.status, userInfo);
-          
+
           if (!response.ok) {
-            throw new Error(`UserInfo request failed: ${response.status} ${JSON.stringify(userInfo)}`);
+            throw new Error(
+              `UserInfo request failed: ${response.status} ${JSON.stringify(userInfo)}`,
+            );
           }
-          
+
           return userInfo;
         },
       },
-      
+
       profile(profile) {
         console.log("Profile data received:", profile);
-        
+
         // Ensure we have required fields
         if (!profile.sub && !profile.id) {
           throw new Error("Profile is missing required 'sub' or 'id' field");
         }
-        
+
         return {
           id: profile.sub || profile.id, // OneLogin might use 'id' instead of 'sub'
-          name: profile.name || `${profile.given_name || ''} ${profile.family_name || ''}`.trim() || profile.email,
+          name:
+            profile.name ||
+            `${profile.given_name || ""} ${profile.family_name || ""}`.trim() ||
+            profile.email,
           email: profile.email,
           image: profile.picture,
           // Map OneLogin attributes to our user model
@@ -125,7 +143,7 @@ export const authOptions: NextAuthOptions = {
         };
       },
     },
-    
+
     // Credentials Provider (Development/Fallback)
     CredentialsProvider({
       name: "Credentials",
@@ -148,7 +166,7 @@ export const authOptions: NextAuthOptions = {
 
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
-          user.password
+          user.password,
         );
 
         if (!isPasswordValid) {
@@ -183,13 +201,13 @@ export const authOptions: NextAuthOptions = {
         try {
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email! },
-            include: { accounts: true }
+            include: { accounts: true },
           });
 
           if (existingUser) {
             // Check if OneLogin account is already linked
             const linkedAccount = existingUser.accounts.find(
-              acc => acc.provider === "onelogin"
+              (acc) => acc.provider === "onelogin",
             );
 
             if (!linkedAccount) {
@@ -214,7 +232,9 @@ export const authOptions: NextAuthOptions = {
               await prisma.user.update({
                 where: { email: user.email! },
                 data: {
-                  name: user.name || `${(profile as OneLoginProfile)?.given_name || ''} ${(profile as OneLoginProfile)?.family_name || ''}`.trim(),
+                  name:
+                    user.name ||
+                    `${(profile as OneLoginProfile)?.given_name || ""} ${(profile as OneLoginProfile)?.family_name || ""}`.trim(),
                   firstName: (profile as OneLoginProfile)?.given_name,
                   lastName: (profile as OneLoginProfile)?.family_name,
                 },
@@ -249,7 +269,7 @@ export const authOptions: NextAuthOptions = {
         try {
           const userDetails = await prisma.user.findUnique({
             where: { id: token.id as string },
-            select: { role: true, college: true }
+            select: { role: true, college: true },
           });
           if (userDetails) {
             token.role = userDetails.role;
@@ -275,7 +295,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, isNewUser }) {
       if (isNewUser) {
         console.log(
-          `🎉 New user signed in: ${user.email} via ${account?.provider}`
+          `🎉 New user signed in: ${user.email} via ${account?.provider}`,
         );
       }
     },

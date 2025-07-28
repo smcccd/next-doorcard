@@ -1,7 +1,7 @@
 // app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Source_Sans_3 } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
 import SiteIndex from "@/components/SiteIndex";
@@ -15,7 +15,18 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Analytics } from "@vercel/analytics/react";
 
-const inter = Inter({ subsets: ["latin"], display: "swap" });
+const inter = Inter({ 
+  subsets: ["latin"], 
+  display: "swap",
+  variable: "--font-inter"
+});
+
+const sourceSans = Source_Sans_3({ 
+  subsets: ["latin"], 
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-source-sans"
+});
 
 // Strongly typed metadata with richer SEO
 export const metadata: Metadata = {
@@ -54,7 +65,7 @@ export default async function RootLayout({
 }) {
   const session = await getServerSession(authOptions);
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className={`h-full ${inter.variable} ${sourceSans.variable}`}>
       <body
         className={`${inter.className} bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col antialiased`}
       >

@@ -42,19 +42,20 @@ export default async function Navbar() {
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
         <div className="flex flex-shrink-0 items-center gap-4">
-          <Link href="/" className="flex flex-col items-start" prefetch={false}>
-            <Image
-              src="/smccd-logo-white.svg"
-              alt="San Mateo County Community College District"
-              width={180}
-              height={60}
-              priority
-              className="h-auto w-[150px] sm:w-[180px]"
-            />
-            <div className="w-1/2 h-px bg-white/30 my-1 ml-8 sm:ml-12"></div>
-            <span className="text-base font-semibold sm:text-lg tracking-wide ml-8 sm:ml-12">
-              Faculty Doorcard
-            </span>
+          <Link href="/" className="block" prefetch={false}>
+            <div className="text-center">
+              <Image
+                src="/smccd-logo-white.svg"
+                alt="San Mateo County Community College District"
+                width={140}
+                height={47}
+                priority
+                className="h-auto w-[120px] sm:w-[140px] "
+              />
+              <div className="text-lg font-semibold tracking-wide sm:text-xl mt-1">
+                Faculty Doorcard
+              </div>
+            </div>
           </Link>
         </div>
 

@@ -77,7 +77,7 @@ function handleActionError(err: unknown): ActionResult {
 export async function validateCampusTerm(
   doorcardId: string,
   _prevState: ActionResult,
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -101,7 +101,7 @@ export async function validateCampusTerm(
       return {
         success: false,
         message: `You already have a doorcard for ${campusLabel(
-          data.college
+          data.college,
         )} - ${data.term} ${data.year}. Please edit your existing doorcard "${
           existing.doorcardName
         }" instead.`,
@@ -127,7 +127,7 @@ export async function validateCampusTerm(
 export async function updateBasicInfo(
   doorcardId: string,
   _prevState: ActionResult,
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -156,7 +156,7 @@ export async function updateBasicInfo(
 export async function updateTimeBlocks(
   doorcardId: string,
   _prevState: ActionResult,
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -214,7 +214,7 @@ export async function publishDoorcard(doorcardId: string) {
 
 export async function createDoorcardWithCampusTerm(
   _prevState: ActionResult,
-  formData: FormData
+  formData: FormData,
 ): Promise<ActionResult> {
   let newDoorcardId: string | null = null;
   try {
@@ -238,7 +238,7 @@ export async function createDoorcardWithCampusTerm(
       return {
         success: false,
         message: `You already have a doorcard for ${campusLabel(
-          data.college
+          data.college,
         )} - ${data.term} ${data.year}. Please edit "${
           existing.doorcardName
         }" instead.`,
@@ -248,13 +248,13 @@ export async function createDoorcardWithCampusTerm(
     // Get user's profile info for smart defaults
     const userProfile = await prisma.user.findUnique({
       where: { id: user.id },
-      select: { 
-        firstName: true, 
-        lastName: true, 
+      select: {
+        firstName: true,
+        lastName: true,
         title: true,
         name: true,
-        college: true
-      }
+        college: true,
+      },
     });
 
     // Create smart default display name
@@ -271,7 +271,7 @@ export async function createDoorcardWithCampusTerm(
       defaultDisplayName = userProfile.name;
     } else {
       // Ultimate fallback
-      defaultDisplayName = user.email?.split('@')[0] || "Faculty Member";
+      defaultDisplayName = user.email?.split("@")[0] || "Faculty Member";
     }
 
     // Create smart default doorcard title

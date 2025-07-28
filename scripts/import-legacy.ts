@@ -114,15 +114,15 @@ function parseTermAndYear(termStr: string): {
   if (numericMatch) {
     const yearPart = parseInt(numericMatch[1]);
     const seasonCode = numericMatch[2];
-    
+
     year = yearPart;
-    
+
     // Map season codes
     if (seasonCode === "03") season = TermSeason.SPRING;
     else if (seasonCode === "05") season = TermSeason.SUMMER;
     else if (seasonCode === "08") season = TermSeason.FALL;
     else if (seasonCode === "01") season = TermSeason.SPRING; // Map WINTER to SPRING
-    
+
     return { season, year };
   }
 
@@ -156,7 +156,7 @@ function extractTimeFromDateTime(dateTimeStr: string): string {
     if (timeParts.length >= 2) {
       return `${timeParts[0].padStart(2, "0")}:${timeParts[1].padStart(
         2,
-        "0"
+        "0",
       )}`;
     }
   }
@@ -203,12 +203,11 @@ function extractLocation(appointmentName: string): string | null {
   return null;
 }
 
-
 // CSV processing functions
 async function processUsers(
   filePath: string,
   dryRun: boolean,
-  rejects: RejectedRow[]
+  rejects: RejectedRow[],
 ) {
   console.log("\n📤 Processing Users...");
   const defaultPassword = await bcrypt.hash("changeme123", 10);
@@ -217,7 +216,7 @@ async function processUsers(
 
   return new Promise<void>((resolve, reject) => {
     const rows: UserCSVRow[] = [];
-    
+
     fs.createReadStream(filePath)
       .pipe(parse({ headers: true }))
       .on("data", (row: UserCSVRow) => {
@@ -225,14 +224,16 @@ async function processUsers(
       })
       .on("end", async () => {
         console.log(`📊 Processing ${rows.length} users in batches...`);
-        
+
         const batchSize = 100;
         for (let i = 0; i < rows.length; i += batchSize) {
           const batch = rows.slice(i, i + batchSize);
-          console.log(`📤 Processing users batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(rows.length/batchSize)}`);
-          
+          console.log(
+            `📤 Processing users batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(rows.length / batchSize)}`,
+          );
+
           const validUsers = [];
-          
+
           for (const row of batch) {
             try {
               processed++;
@@ -249,13 +250,14 @@ async function processUsers(
                 });
               } else {
                 console.log(
-                  `[DRY RUN] Would create/update user: ${row.username} (${email})`
+                  `[DRY RUN] Would create/update user: ${row.username} (${email})`,
                 );
               }
             } catch (error) {
               rejects.push({
                 row,
-                reason: error instanceof Error ? error.message : "Unknown error",
+                reason:
+                  error instanceof Error ? error.message : "Unknown error",
                 file: "TBL_USER.csv",
               });
             }
@@ -273,9 +275,9 @@ async function processUsers(
               // Get the created users to populate the ID map
               const createdUsers = await prisma.user.findMany({
                 where: {
-                  email: { in: validUsers.map(u => u.email) }
+                  email: { in: validUsers.map((u) => u.email) },
                 },
-                select: { id: true, username: true }
+                select: { id: true, username: true },
               });
 
               for (const user of createdUsers) {
@@ -284,7 +286,10 @@ async function processUsers(
                 }
               }
             } catch (error) {
-              console.error(`❌ Batch insert failed for users batch ${Math.floor(i/batchSize) + 1}:`, error);
+              console.error(
+                `❌ Batch insert failed for users batch ${Math.floor(i / batchSize) + 1}:`,
+                error,
+              );
               // Fall back to individual inserts for this batch
               for (const userData of validUsers) {
                 try {
@@ -300,8 +305,14 @@ async function processUsers(
                   created++;
                 } catch (individualError) {
                   rejects.push({
-                    row: { username: userData.username, userrole: userData.role },
-                    reason: individualError instanceof Error ? individualError.message : "Unknown error",
+                    row: {
+                      username: userData.username,
+                      userrole: userData.role,
+                    },
+                    reason:
+                      individualError instanceof Error
+                        ? individualError.message
+                        : "Unknown error",
                     file: "TBL_USER.csv",
                   });
                 }
@@ -309,9 +320,9 @@ async function processUsers(
             }
           }
         }
-        
+
         console.log(
-          `✅ Users: Processed ${processed}, Created/Updated ${created}`
+          `✅ Users: Processed ${processed}, Created/Updated ${created}`,
         );
         resolve();
       })
@@ -321,7 +332,7 @@ async function processUsers(
 
 async function processCategories(filePath: string) {
   console.log("\n📤 Processing Categories for mapping...");
-  
+
   return new Promise<void>((resolve, reject) => {
     fs.createReadStream(filePath)
       .pipe(parse({ headers: true }))
@@ -340,14 +351,14 @@ async function processCategories(filePath: string) {
 async function processDoorcards(
   filePath: string,
   dryRun: boolean,
-  rejects: RejectedRow[]
+  rejects: RejectedRow[],
 ) {
   console.log("\n📤 Processing Doorcards...");
   let processed = 0;
 
   return new Promise<void>((resolve, reject) => {
     const rows: DoorcardCSVRow[] = [];
-    
+
     fs.createReadStream(filePath)
       .pipe(parse({ headers: true }))
       .on("data", (row: DoorcardCSVRow) => {
@@ -355,10 +366,10 @@ async function processDoorcards(
       })
       .on("end", async () => {
         console.log(`📊 Processing ${rows.length} doorcards...`);
-        
+
         const validDoorcards = [];
         const userUpdates = [];
-        
+
         for (const row of rows) {
           try {
             processed++;
@@ -393,7 +404,7 @@ async function processDoorcards(
                   isActive: false,
                   isPublic: false,
                   userId,
-                }
+                },
               });
 
               // Don't overwrite user names with doorcard names
@@ -403,7 +414,7 @@ async function processDoorcards(
               // });
             } else {
               console.log(
-                `[DRY RUN] Would create doorcard: ${row.doorcardname} (${season} ${year})`
+                `[DRY RUN] Would create doorcard: ${row.doorcardname} (${season} ${year})`,
               );
             }
           } catch (error) {
@@ -419,25 +430,30 @@ async function processDoorcards(
           try {
             const batchSize = 25; // Smaller batches for better progress visibility
             let created = 0;
-            
-            console.log(`📊 Processing ${validDoorcards.length} doorcards in batches of ${batchSize}...`);
-            
+
+            console.log(
+              `📊 Processing ${validDoorcards.length} doorcards in batches of ${batchSize}...`,
+            );
+
             for (let i = 0; i < validDoorcards.length; i += batchSize) {
               const batch = validDoorcards.slice(i, i + batchSize);
-              console.log(`📤 Processing doorcards batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(validDoorcards.length/batchSize)} (${batch.length} doorcards)`);
-              
+              console.log(
+                `📤 Processing doorcards batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validDoorcards.length / batchSize)} (${batch.length} doorcards)`,
+              );
+
               // Create doorcards individually to get IDs for mapping
               for (const doorcard of batch) {
                 try {
                   const createdDoorcard = await prisma.doorcard.create({
-                    data: doorcard.data
+                    data: doorcard.data,
                   });
                   doorcardIdMap.set(doorcard.oldId, createdDoorcard.id);
                   created++;
                 } catch (error) {
                   rejects.push({
                     row: { doorcardID: doorcard.oldId },
-                    reason: error instanceof Error ? error.message : "Unknown error",
+                    reason:
+                      error instanceof Error ? error.message : "Unknown error",
                     file: "TBL_DOORCARD.csv",
                   });
                 }
@@ -461,14 +477,16 @@ async function processDoorcards(
             //   await Promise.all(updatePromises);
             // }
 
-            console.log(`✅ Doorcards: Processed ${processed}, Created ${created}`);
+            console.log(
+              `✅ Doorcards: Processed ${processed}, Created ${created}`,
+            );
           } catch (error) {
             console.error(`❌ Batch processing failed for doorcards:`, error);
           }
         } else if (dryRun) {
           console.log(`✅ Doorcards: Processed ${processed} (dry run)`);
         }
-        
+
         resolve();
       })
       .on("error", reject);
@@ -478,7 +496,7 @@ async function processDoorcards(
 async function processAppointments(
   filePath: string,
   dryRun: boolean,
-  rejects: RejectedRow[]
+  rejects: RejectedRow[],
 ) {
   console.log("\n📤 Processing Appointments...");
   let processed = 0;
@@ -486,7 +504,7 @@ async function processAppointments(
 
   return new Promise<void>((resolve, reject) => {
     const rows: AppointmentCSVRow[] = [];
-    
+
     fs.createReadStream(filePath)
       .pipe(parse({ headers: true }))
       .on("data", (row: AppointmentCSVRow) => {
@@ -494,19 +512,21 @@ async function processAppointments(
       })
       .on("end", async () => {
         console.log(`📊 Processing ${rows.length} appointments...`);
-        
+
         const validAppointments = [];
-        
+
         for (const row of rows) {
           try {
             processed++;
             // Check if username is valid (not empty)
             if (!row.username || !row.username.trim()) {
-              throw new Error(`Empty username for appointment: ${row.appointname}`);
+              throw new Error(
+                `Empty username for appointment: ${row.appointname}`,
+              );
             }
-            
+
             let doorcardId = doorcardIdMap.get(row.doorcardID);
-            
+
             // If doorcard not found, create a placeholder
             if (!doorcardId) {
               const userId = userIdMap.get(row.username.trim());
@@ -535,10 +555,13 @@ async function processAppointments(
                 placeholdersCreated++;
               } else {
                 console.log(
-                  `[DRY RUN] Would create placeholder doorcard for ID: ${row.doorcardID}`
+                  `[DRY RUN] Would create placeholder doorcard for ID: ${row.doorcardID}`,
                 );
                 // In dry run, still add to map for further processing
-                doorcardIdMap.set(row.doorcardID, `dummy-doorcard-${row.doorcardID}`);
+                doorcardIdMap.set(
+                  row.doorcardID,
+                  `dummy-doorcard-${row.doorcardID}`,
+                );
                 doorcardId = `dummy-doorcard-${row.doorcardID}`;
               }
             }
@@ -569,7 +592,7 @@ async function processAppointments(
               });
             } else {
               console.log(
-                `[DRY RUN] Would create appointment: ${row.appointname} on ${row.appointday}`
+                `[DRY RUN] Would create appointment: ${row.appointname} on ${row.appointday}`,
               );
             }
           } catch (error) {
@@ -585,13 +608,17 @@ async function processAppointments(
           try {
             const batchSize = 100;
             let created = 0;
-            
-            console.log(`📊 Processing ${validAppointments.length} appointments in batches of ${batchSize}...`);
-            
+
+            console.log(
+              `📊 Processing ${validAppointments.length} appointments in batches of ${batchSize}...`,
+            );
+
             for (let i = 0; i < validAppointments.length; i += batchSize) {
               const batch = validAppointments.slice(i, i + batchSize);
-              console.log(`📤 Processing appointments batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(validAppointments.length/batchSize)} (${batch.length} appointments)`);
-              
+              console.log(
+                `📤 Processing appointments batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validAppointments.length / batchSize)} (${batch.length} appointments)`,
+              );
+
               try {
                 const result = await prisma.appointment.createMany({
                   data: batch,
@@ -602,18 +629,25 @@ async function processAppointments(
                 console.error(`❌ Batch insert failed:`, error);
               }
             }
-            
-            console.log(`✅ Appointments: Processed ${processed}, Created ${created}`);
+
+            console.log(
+              `✅ Appointments: Processed ${processed}, Created ${created}`,
+            );
             if (placeholdersCreated > 0) {
-              console.log(`📝 Created ${placeholdersCreated} placeholder doorcards for missing legacy data`);
+              console.log(
+                `📝 Created ${placeholdersCreated} placeholder doorcards for missing legacy data`,
+              );
             }
           } catch (error) {
-            console.error(`❌ Batch processing failed for appointments:`, error);
+            console.error(
+              `❌ Batch processing failed for appointments:`,
+              error,
+            );
           }
         } else if (dryRun) {
           console.log(`✅ Appointments: Processed ${processed} (dry run)`);
         }
-        
+
         resolve();
       })
       .on("error", reject);
@@ -630,36 +664,41 @@ async function writeRejects(rejects: RejectedRow[]) {
   }
 
   // Group rejects by file
-  const rejectsByFile = rejects.reduce((acc, reject) => {
-    if (!acc[reject.file]) acc[reject.file] = [];
-    acc[reject.file].push(reject);
-    return acc;
-  }, {} as Record<string, RejectedRow[]>);
+  const rejectsByFile = rejects.reduce(
+    (acc, reject) => {
+      if (!acc[reject.file]) acc[reject.file] = [];
+      acc[reject.file].push(reject);
+      return acc;
+    },
+    {} as Record<string, RejectedRow[]>,
+  );
 
   for (const [file, fileRejects] of Object.entries(rejectsByFile)) {
     const rejectPath = path.join(rejectsDir, file);
     const writeStream = createWriteStream(rejectPath);
     const csvStream = format({ headers: true });
-    
+
     csvStream.pipe(writeStream);
-    
+
     fileRejects.forEach((reject) => {
       csvStream.write({
         ...reject.row,
         _reject_reason: reject.reason,
       });
     });
-    
+
     csvStream.end();
     console.log(`❌ Written ${fileRejects.length} rejects to ${rejectPath}`);
   }
 }
 
 // Extract all unique usernames from doorcard data
-async function extractUsernamesFromDoorcards(filePath: string): Promise<Set<string>> {
+async function extractUsernamesFromDoorcards(
+  filePath: string,
+): Promise<Set<string>> {
   return new Promise((resolve, reject) => {
     const usernames = new Set<string>();
-    
+
     fs.createReadStream(filePath)
       .pipe(parse({ headers: true }))
       .on("data", (row: DoorcardCSVRow) => {
@@ -668,7 +707,9 @@ async function extractUsernamesFromDoorcards(filePath: string): Promise<Set<stri
         }
       })
       .on("end", () => {
-        console.log(`📊 Found ${usernames.size} unique usernames in doorcard data`);
+        console.log(
+          `📊 Found ${usernames.size} unique usernames in doorcard data`,
+        );
         resolve(usernames);
       })
       .on("error", reject);
@@ -676,10 +717,12 @@ async function extractUsernamesFromDoorcards(filePath: string): Promise<Set<stri
 }
 
 // Extract all unique usernames from appointment data
-async function extractUsernamesFromAppointments(filePath: string): Promise<Set<string>> {
+async function extractUsernamesFromAppointments(
+  filePath: string,
+): Promise<Set<string>> {
   return new Promise((resolve, reject) => {
     const usernames = new Set<string>();
-    
+
     fs.createReadStream(filePath)
       .pipe(parse({ headers: true }))
       .on("data", (row: AppointmentCSVRow) => {
@@ -688,7 +731,9 @@ async function extractUsernamesFromAppointments(filePath: string): Promise<Set<s
         }
       })
       .on("end", () => {
-        console.log(`📊 Found ${usernames.size} unique usernames in appointment data`);
+        console.log(
+          `📊 Found ${usernames.size} unique usernames in appointment data`,
+        );
         resolve(usernames);
       })
       .on("error", reject);
@@ -699,18 +744,22 @@ async function extractUsernamesFromAppointments(filePath: string): Promise<Set<s
 async function createMissingUsers(
   usernames: Set<string>,
   dryRun: boolean,
-  rejects: RejectedRow[]
+  rejects: RejectedRow[],
 ) {
   console.log("\n📤 Creating missing users from doorcard data...");
   const defaultPassword = await bcrypt.hash("changeme123", 10);
 
-  const missingUsernames = Array.from(usernames).filter(username => !userIdMap.has(username));
+  const missingUsernames = Array.from(usernames).filter(
+    (username) => !userIdMap.has(username),
+  );
   console.log(`📊 Creating ${missingUsernames.length} missing users...`);
 
   if (dryRun) {
     for (const username of missingUsernames) {
       const email = generateEmail(username);
-      console.log(`[DRY RUN] Would create missing user: ${username} (${email})`);
+      console.log(
+        `[DRY RUN] Would create missing user: ${username} (${email})`,
+      );
       userIdMap.set(username, `dummy-id-${username}`);
     }
     return;
@@ -739,13 +788,17 @@ async function createMissingUsers(
   if (validUsers.length > 0) {
     const batchSize = 100;
     let created = 0;
-    
-    console.log(`📊 Processing ${validUsers.length} users in batches of ${batchSize}...`);
-    
+
+    console.log(
+      `📊 Processing ${validUsers.length} users in batches of ${batchSize}...`,
+    );
+
     for (let i = 0; i < validUsers.length; i += batchSize) {
       const batch = validUsers.slice(i, i + batchSize);
-      console.log(`📤 Processing users batch ${Math.floor(i/batchSize) + 1}/${Math.ceil(validUsers.length/batchSize)} (${batch.length} users)`);
-      
+      console.log(
+        `📤 Processing users batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validUsers.length / batchSize)} (${batch.length} users)`,
+      );
+
       try {
         const result = await prisma.user.createMany({
           data: batch,
@@ -756,9 +809,9 @@ async function createMissingUsers(
         // Get the created users to populate the ID map
         const createdUsers = await prisma.user.findMany({
           where: {
-            email: { in: batch.map(u => u.email) }
+            email: { in: batch.map((u) => u.email) },
           },
-          select: { id: true, username: true }
+          select: { id: true, username: true },
         });
 
         for (const user of createdUsers) {
@@ -770,7 +823,7 @@ async function createMissingUsers(
         console.error(`❌ Batch insert failed:`, error);
       }
     }
-    
+
     console.log(`✅ Missing users: Created ${created} users`);
   }
 }
@@ -796,19 +849,27 @@ async function importLegacyData(options: { dryRun: boolean }) {
     }
 
     // Skip TBL_USER (AD data) - create users from legacy app data only
-    console.log("⚠️  Skipping TBL_USER.csv (AD data) - creating users from legacy app data");
+    console.log(
+      "⚠️  Skipping TBL_USER.csv (AD data) - creating users from legacy app data",
+    );
 
     // Extract usernames from doorcard data and appointments
     const doorcardPath = path.join(dbItemsPath, "TBL_DOORCARD (1).csv");
     const appointmentPath = path.join(dbItemsPath, "TBL_APPOINTMENT (1).csv");
-    
+
     const doorcardUsernames = await extractUsernamesFromDoorcards(doorcardPath);
-    const appointmentUsernames = await extractUsernamesFromAppointments(appointmentPath);
-    
+    const appointmentUsernames =
+      await extractUsernamesFromAppointments(appointmentPath);
+
     // Combine all usernames from legacy app
-    const allUsernames = new Set([...doorcardUsernames, ...appointmentUsernames]);
-    console.log(`📊 Found ${allUsernames.size} total unique usernames in legacy app data`);
-    
+    const allUsernames = new Set([
+      ...doorcardUsernames,
+      ...appointmentUsernames,
+    ]);
+    console.log(
+      `📊 Found ${allUsernames.size} total unique usernames in legacy app data`,
+    );
+
     await createMissingUsers(allUsernames, options.dryRun, rejects);
 
     // Process doorcards (depends on users)

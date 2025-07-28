@@ -4,9 +4,6 @@
     "isolatedModules": false,
     "types": ["cypress", "mocha", "cypress-axe", "@testing-library/cypress"]
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ],
+  "include": ["**/*.ts", "**/*.tsx"],
   "exclude": []
-} 
+}

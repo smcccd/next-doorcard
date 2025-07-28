@@ -575,7 +575,7 @@ async function main() {
           dayOfWeek: DayOfWeek.THURSDAY,
           category: AppointmentCategory.OFFICE_HOURS,
           doorcardId: doorcard.id,
-        }
+        },
       );
 
       // Add courses
@@ -629,7 +629,7 @@ async function main() {
       });
 
       console.log(
-        `✅ Created doorcard: ${doorcard.slug} with ${appointments.length} appointments`
+        `✅ Created doorcard: ${doorcard.slug} with ${appointments.length} appointments`,
       );
     }
   }

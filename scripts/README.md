@@ -7,15 +7,19 @@ The `import-legacy.ts` script imports legacy doorcard data from CSV files into t
 ## Usage
 
 ### Dry Run (Recommended First)
+
 ```bash
 npm run import-legacy:dry
 ```
+
 This will simulate the import without writing to the database and show what would be imported.
 
 ### Actual Import
+
 ```bash
 npm run import-legacy
 ```
+
 This will perform the actual import to the database.
 
 ## Data Mapping
@@ -52,6 +56,7 @@ The script processes the following CSV files from `/db-items`:
 ## Rejected Rows
 
 Any rows that fail to import are written to:
+
 ```
 /rejects/TBL_USER.csv
 /rejects/TBL_DOORCARD.csv
@@ -64,7 +69,7 @@ Each rejected row includes the original data plus a `_reject_reason` column.
 
 1. **Required Fields**: Users need email and password (generated automatically)
 2. **Missing Data**: Office numbers default to "TBD"
-3. **Default Values**: 
+3. **Default Values**:
    - isActive: false
    - isPublic: false
    - All passwords: "changeme123"
@@ -72,8 +77,9 @@ Each rejected row includes the original data plus a `_reject_reason` column.
 ## Category Mapping
 
 Current category ID mappings:
+
 - 1 → OFFICE_HOURS
-- 2 → IN_CLASS  
+- 2 → IN_CLASS
 - 3 → LECTURE
 - 4 → LAB
 - 5 → HOURS_BY_ARRANGEMENT

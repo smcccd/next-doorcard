@@ -3,6 +3,7 @@
 ## **Phase 1: Pre-Migration Testing**
 
 ### 📊 Data Integrity Verification
+
 ```bash
 # 1. Export current Access DB data
 npm run export-access-data
@@ -15,12 +16,14 @@ npm run test-migration --dry-run
 ```
 
 ### 🔐 Authentication Testing
+
 - [ ] OneLogin SSO integration works
 - [ ] JIT user creation functions correctly
 - [ ] Session management handles 8-hour timeouts
 - [ ] Fallback credentials work in development
 
 ### 🎯 Core Functionality Tests
+
 - [ ] Create new doorcard
 - [ ] Edit existing doorcard
 - [ ] Draft save/restore functionality
@@ -30,6 +33,7 @@ npm run test-migration --dry-run
 ## **Phase 2: Migration Validation**
 
 ### 📈 Data Comparison Testing
+
 ```bash
 # Compare record counts
 npm run compare-record-counts
@@ -42,6 +46,7 @@ npm run audit-migrated-data
 ```
 
 ### 🏃‍♂️ Performance Baseline
+
 ```bash
 # Measure page load times
 npm run performance-audit
@@ -56,6 +61,7 @@ npm run load-test
 ### 🔍 User Acceptance Testing Checklist
 
 #### **Faculty Users**
+
 - [ ] Login via OneLogin SSO
 - [ ] Access existing doorcards from old system
 - [ ] Create new doorcard for current term
@@ -64,6 +70,7 @@ npm run load-test
 - [ ] Share doorcard URL
 
 #### **Admin Users**
+
 - [ ] View all faculty doorcards
 - [ ] Generate reports by term/department
 - [ ] Bulk data operations
@@ -72,6 +79,7 @@ npm run load-test
 ## **Phase 3: Production Readiness**
 
 ### 🚀 Deployment Testing
+
 ```bash
 # Vercel deployment
 npm run deploy:staging
@@ -85,12 +93,14 @@ npm run validate:env:production
 ```
 
 ### 📊 Monitoring Setup
+
 - [ ] Error tracking (Sentry/Vercel Analytics)
 - [ ] Performance monitoring
 - [ ] Database connection monitoring
 - [ ] User activity analytics
 
 ### 🔄 Rollback Testing
+
 - [ ] DNS switch from new → old system
 - [ ] Data export from new system
 - [ ] Import back to Access DB (if needed)
@@ -99,6 +109,7 @@ npm run validate:env:production
 ## **Automated Test Scripts**
 
 ### Data Migration Test
+
 ```bash
 #!/bin/bash
 # scripts/test-migration.sh
@@ -118,6 +129,7 @@ echo "✅ Migration test complete"
 ```
 
 ### Load Testing
+
 ```bash
 # scripts/load-test.sh
 echo "🚚 Running load tests..."
@@ -132,6 +144,7 @@ npm run stress-test-db
 ## **Success Criteria**
 
 ### ✅ Must Pass
+
 - **100% data accuracy** - All records migrated correctly
 - **Zero authentication failures** - OneLogin SSO works flawlessly
 - **Performance parity** - New system ≥ old system speed
@@ -139,6 +152,7 @@ npm run stress-test-db
 - **Mobile compatibility** - Works on tablets/phones
 
 ### 🎯 Nice to Have
+
 - **Performance improvement** - 2x faster than old system
 - **User satisfaction** - 90%+ approval in feedback
 - **Error reduction** - <1% error rate in production
@@ -146,12 +160,14 @@ npm run stress-test-db
 ## **Migration Day Checklist**
 
 ### Pre-Migration (T-24 hours)
+
 - [ ] Backup current Access DB
 - [ ] Deploy to Vercel staging
 - [ ] Run final migration tests
 - [ ] Notify all users of transition
 
 ### Migration Day (T-0)
+
 - [ ] Export final Access DB data
 - [ ] Run production migration
 - [ ] Update DNS records
@@ -159,6 +175,7 @@ npm run stress-test-db
 - [ ] Validate critical user journeys
 
 ### Post-Migration (T+24 hours)
+
 - [ ] Monitor error rates
 - [ ] Collect user feedback
 - [ ] Performance review
@@ -167,6 +184,7 @@ npm run stress-test-db
 ## **Emergency Rollback Plan**
 
 If critical issues occur:
+
 1. **Immediate**: Switch DNS back to old ASP system (5 minutes)
 2. **Short-term**: Export any new data from PostgreSQL
 3. **Recovery**: Import new data back to Access DB
@@ -182,4 +200,4 @@ npm install --save-dev @playwright/test artillery jest
 npm install @vercel/analytics @sentry/nextjs
 ```
 
-Ready to proceed? Would you like me to create any of these specific test scripts? 
+Ready to proceed? Would you like me to create any of these specific test scripts?

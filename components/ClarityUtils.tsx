@@ -47,10 +47,10 @@ export const ClarityUtils = {
    * @param friendlyName - Optional friendly name
    */
   identify: (
-    customId: string, 
-    sessionId?: string, 
-    pageId?: string, 
-    friendlyName?: string
+    customId: string,
+    sessionId?: string,
+    pageId?: string,
+    friendlyName?: string,
   ) => {
     if (typeof window !== "undefined") {
       try {
@@ -75,7 +75,7 @@ export const ClarityUtils = {
         console.error("Failed to set Clarity consent:", error);
       }
     }
-  }
+  },
 };
 
 export default ClarityUtils;

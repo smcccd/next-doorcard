@@ -48,11 +48,11 @@ export interface DoorcardEditorState {
   setMode: (mode: DoorcardMode, doorcardId?: string) => void;
   setBasicInfo: (
     info: Partial<BasicInfoForm>,
-    options?: { skipAutoSave?: boolean }
+    options?: { skipAutoSave?: boolean },
   ) => void;
   setTimeBlocks: (
     timeBlocks: TimeBlockForm[],
-    options?: { skipAutoSave?: boolean }
+    options?: { skipAutoSave?: boolean },
   ) => void;
   addTimeBlock: (timeBlock: TimeBlockForm) => void;
   removeTimeBlock: (id: string) => void;
@@ -75,7 +75,7 @@ export interface DoorcardEditorState {
   shouldAutoSave: () => boolean;
   setLoading: (
     key: keyof DoorcardEditorState["isLoading"],
-    value: boolean
+    value: boolean,
   ) => void;
 }
 

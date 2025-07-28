@@ -94,7 +94,7 @@ jobs:
         with:
           browser: chrome
           start: npm run start
-          wait-on: 'http://localhost:3000'
+          wait-on: "http://localhost:3000"
           wait-on-timeout: 120
           spec: |
             cypress/e2e/doorcard-management.cy.ts

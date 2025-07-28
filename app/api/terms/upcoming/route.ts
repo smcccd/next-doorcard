@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 // GET /api/terms/upcoming - Get upcoming terms for doorcard creation
-export async function GET(req: Request) {
+export async function GET() {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
@@ -77,7 +77,7 @@ export async function GET(req: Request) {
     console.error("Error fetching upcoming terms:", error);
     return NextResponse.json(
       { error: "Failed to fetch upcoming terms" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

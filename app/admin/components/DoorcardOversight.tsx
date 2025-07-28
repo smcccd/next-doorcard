@@ -72,8 +72,12 @@ export default function DoorcardOversight({
     return doorcards.filter((doorcard) => {
       const matchesSearch =
         doorcard.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doorcard.doorcardName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        doorcard.officeNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doorcard.doorcardName
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        doorcard.officeNumber
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
         doorcard.user.email.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCollege =
@@ -95,7 +99,7 @@ export default function DoorcardOversight({
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedDoorcards = filteredDoorcards.slice(
     startIndex,
-    startIndex + ITEMS_PER_PAGE
+    startIndex + ITEMS_PER_PAGE,
   );
 
   // Reset to page 1 when filters change
@@ -196,9 +200,11 @@ export default function DoorcardOversight({
                   <SelectItem value="all">All Colleges</SelectItem>
                   {COLLEGES.map((college) => (
                     <SelectItem key={college} value={college}>
-                      {college === "CSM" ? "College of San Mateo" : 
-                       college === "CANADA" ? "Cañada College" :
-                       "Skyline College"}
+                      {college === "CSM"
+                        ? "College of San Mateo"
+                        : college === "CANADA"
+                          ? "Cañada College"
+                          : "Skyline College"}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -255,7 +261,9 @@ export default function DoorcardOversight({
               <div className="text-gray-400 mb-2">
                 <Users className="h-12 w-12 mx-auto" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No doorcards found</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No doorcards found
+              </h3>
               <p className="text-gray-500">
                 Try adjusting your search terms or filters
               </p>
@@ -305,13 +313,17 @@ export default function DoorcardOversight({
                             </h3>
                             <div className="flex gap-1">
                               <Badge
-                                variant={doorcard.isActive ? "default" : "secondary"}
+                                variant={
+                                  doorcard.isActive ? "default" : "secondary"
+                                }
                                 className="text-xs"
                               >
                                 {doorcard.isActive ? "Active" : "Inactive"}
                               </Badge>
                               <Badge
-                                variant={doorcard.isPublic ? "outline" : "secondary"}
+                                variant={
+                                  doorcard.isPublic ? "outline" : "secondary"
+                                }
                                 className="text-xs"
                               >
                                 {doorcard.isPublic ? "Public" : "Private"}
@@ -319,13 +331,13 @@ export default function DoorcardOversight({
                             </div>
                           </div>
                           <div className="text-sm text-gray-600">
-                            <span className="font-medium">{doorcard.name}</span> • 
-                            Office {doorcard.officeNumber} • 
-                            {doorcard.college} • 
-                            {doorcard.term} {doorcard.year}
+                            <span className="font-medium">{doorcard.name}</span>{" "}
+                            • Office {doorcard.officeNumber} •{doorcard.college}{" "}
+                            •{doorcard.term} {doorcard.year}
                           </div>
                           <div className="text-xs text-gray-500 mt-1">
-                            {doorcard.user.email} • {doorcard._count.appointments} appointments
+                            {doorcard.user.email} •{" "}
+                            {doorcard._count.appointments} appointments
                           </div>
                         </div>
                       </div>
@@ -361,7 +373,8 @@ export default function DoorcardOversight({
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-700">
-            Showing {startIndex + 1} to {Math.min(startIndex + ITEMS_PER_PAGE, filteredDoorcards.length)} of{" "}
+            Showing {startIndex + 1} to{" "}
+            {Math.min(startIndex + ITEMS_PER_PAGE, filteredDoorcards.length)} of{" "}
             {filteredDoorcards.length} results
           </div>
           <div className="flex items-center space-x-2">

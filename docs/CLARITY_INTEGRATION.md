@@ -5,6 +5,7 @@ This document explains how Microsoft Clarity is integrated into the Next.js appl
 ## Overview
 
 Microsoft Clarity is a user behavior analytics tool that provides insights into how users interact with your website through features like:
+
 - Session recordings
 - Heatmaps
 - Click tracking
@@ -59,7 +60,7 @@ The `ClarityInit` component is added to the root layout (`/app/layout.tsx`) to e
 import ClarityInit from "@/components/ClarityInit";
 
 // In your layout's return statement:
-<ClarityInit />
+<ClarityInit />;
 ```
 
 ## Usage Examples
@@ -149,6 +150,7 @@ To verify that Clarity is working:
 ### Debug Mode
 
 The integration includes console logging to help with debugging:
+
 - ✅ Success messages when Clarity initializes
 - 📊 Event tracking confirmations
 - 🏷️ Tag setting confirmations

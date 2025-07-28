@@ -61,4 +61,4 @@ export interface CompletionData {
 export interface LoadingState {
   doorcards: boolean;
   drafts: boolean;
-} 
+}

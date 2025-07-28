@@ -67,13 +67,13 @@ export default async function EditDoorcardPage({
     }),
     prisma.user.findUnique({
       where: { id: user.id },
-      select: { 
-        firstName: true, 
-        lastName: true, 
+      select: {
+        firstName: true,
+        lastName: true,
         title: true,
-        name: true 
-      }
-    })
+        name: true,
+      },
+    }),
   ]);
   if (!doorcard) notFound();
 
@@ -183,8 +183,8 @@ export default async function EditDoorcardPage({
                   step === idx
                     ? "current"
                     : step > idx
-                    ? "complete"
-                    : "upcoming";
+                      ? "complete"
+                      : "upcoming";
                 return (
                   <li key={s.title} className="flex flex-col items-center">
                     <div

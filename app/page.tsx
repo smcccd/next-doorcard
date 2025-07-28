@@ -86,7 +86,7 @@ export default function Home() {
         (dc) =>
           dc.name.toLowerCase().includes(term) ||
           dc.doorcardName.toLowerCase().includes(term) ||
-          dc.user.name?.toLowerCase().includes(term)
+          dc.user.name?.toLowerCase().includes(term),
       );
     }
 
@@ -119,8 +119,8 @@ export default function Home() {
             <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
               <strong>Need to meet with a professor?</strong> Find their office
               hours, location, and contact details. Each faculty profile shows
-              when they&apos;re available for student meetings, their office number,
-              and how to reach them across our three campuses.
+              when they&apos;re available for student meetings, their office
+              number, and how to reach them across our three campuses.
             </p>
           </div>
         </div>
@@ -140,7 +140,9 @@ export default function Home() {
         <CardContent>
           <div className="space-y-4">
             <div>
-              <label htmlFor="professor-search" className="sr-only">Search for professor</label>
+              <label htmlFor="professor-search" className="sr-only">
+                Search for professor
+              </label>
               <Input
                 id="professor-search"
                 placeholder="Type professor's name (e.g., John Smith, Dr. Johnson)..."
@@ -161,7 +163,10 @@ export default function Home() {
                 }
               >
                 <TabsList className="grid w-full grid-cols-4 h-12 bg-gray-200 dark:bg-gray-600">
-                  <TabsTrigger value="ALL" className="text-sm font-medium text-gray-800 dark:text-gray-100 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:text-gray-900 dark:data-[state=active]:text-gray-100">
+                  <TabsTrigger
+                    value="ALL"
+                    className="text-sm font-medium text-gray-800 dark:text-gray-100 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-800 data-[state=active]:text-gray-900 dark:data-[state=active]:text-gray-100"
+                  >
                     All Campuses
                   </TabsTrigger>
                   <TabsTrigger

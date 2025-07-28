@@ -8,9 +8,9 @@ export default async function NewDoorcardPage() {
   // Get user's profile for pre-filling
   const userProfile = await prisma.user.findUnique({
     where: { id: user.id },
-    select: { 
-      college: true
-    }
+    select: {
+      college: true,
+    },
   });
 
   return (

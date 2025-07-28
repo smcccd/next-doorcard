@@ -33,7 +33,9 @@ describe("TermManager", () => {
         ...mockTerm,
         doorcards: [{ id: "doorcard-1" }, { id: "doorcard-2" }],
       };
-      mockPrisma.term.findFirst.mockResolvedValueOnce(mockActiveTermWithDoorcards);
+      mockPrisma.term.findFirst.mockResolvedValueOnce(
+        mockActiveTermWithDoorcards,
+      );
 
       const result = await TermManager.getActiveTerm();
 
@@ -87,7 +89,10 @@ describe("TermManager", () => {
 
     it("should create new term and deactivate others when isActive is true", async () => {
       mockPrisma.term.updateMany.mockResolvedValueOnce({ count: 1 });
-      mockPrisma.term.create.mockResolvedValueOnce({ ...newTermData, id: "new-term-123" });
+      mockPrisma.term.create.mockResolvedValueOnce({
+        ...newTermData,
+        id: "new-term-123",
+      });
 
       const result = await TermManager.createTerm(newTermData);
 
@@ -113,7 +118,10 @@ describe("TermManager", () => {
 
     it("should create term without deactivating others when isActive is false", async () => {
       const inactiveTermData = { ...newTermData, isActive: false };
-      mockPrisma.term.create.mockResolvedValueOnce({ ...inactiveTermData, id: "new-term-456" });
+      mockPrisma.term.create.mockResolvedValueOnce({
+        ...inactiveTermData,
+        id: "new-term-456",
+      });
 
       await TermManager.createTerm(inactiveTermData);
 
@@ -128,7 +136,9 @@ describe("TermManager", () => {
 
     beforeEach(() => {
       // Only set up default mocks, don't pre-configure findUnique
-      mockPrisma.$transaction.mockImplementation((callback) => callback(mockPrisma));
+      mockPrisma.$transaction.mockImplementation((callback) =>
+        callback(mockPrisma),
+      );
     });
 
     it("should transition with default options", async () => {
@@ -166,17 +176,19 @@ describe("TermManager", () => {
     it("should throw error if new term not found", async () => {
       // Clear all previous mocks to start fresh
       jest.clearAllMocks();
-      
+
       // Reset the transaction mock to avoid interference
-      mockPrisma.$transaction.mockImplementation((callback) => callback(mockPrisma));
-      
+      mockPrisma.$transaction.mockImplementation((callback) =>
+        callback(mockPrisma),
+      );
+
       // Mock findUnique to return null for the new term
       mockPrisma.term.findUnique.mockResolvedValueOnce(null);
 
       await expect(TermManager.transitionToNewTerm(newTermId)).rejects.toThrow(
-        "New term not found"
+        "New term not found",
       );
-      
+
       // Verify that findUnique was called with the correct parameters
       expect(mockPrisma.term.findUnique).toHaveBeenCalledWith({
         where: { id: newTermId },
@@ -186,7 +198,7 @@ describe("TermManager", () => {
     it("should respect custom options", async () => {
       // Clear all mocks to avoid interference from previous tests
       jest.clearAllMocks();
-      
+
       const options = {
         archiveOldTerm: false,
         activateNewTerm: false,
@@ -195,7 +207,7 @@ describe("TermManager", () => {
 
       // Mock findUnique to return a valid term
       mockPrisma.term.findUnique.mockResolvedValueOnce(mockTerm);
-      
+
       // Mock the transaction to return the term directly
       mockPrisma.$transaction.mockImplementationOnce(async (callback) => {
         return await callback(mockPrisma);
@@ -214,7 +226,9 @@ describe("TermManager", () => {
     const termId = "term-to-archive";
 
     beforeEach(() => {
-      mockPrisma.$transaction.mockImplementation((callback) => callback(mockPrisma));
+      mockPrisma.$transaction.mockImplementation((callback) =>
+        callback(mockPrisma),
+      );
     });
 
     it("should archive term and doorcards by default", async () => {
@@ -296,7 +310,7 @@ describe("TermManager", () => {
           where: {
             termRelation: { isArchived: true },
           },
-        })
+        }),
       );
     });
 
@@ -308,7 +322,7 @@ describe("TermManager", () => {
           where: {
             termRelation: { isUpcoming: true },
           },
-        })
+        }),
       );
     });
   });
@@ -343,10 +357,14 @@ describe("TermManager", () => {
       ];
 
       // Mock getTermsNeedingArchive
-      jest.spyOn(TermManager, "getTermsNeedingArchive").mockResolvedValueOnce(expiredTerms);
+      jest
+        .spyOn(TermManager, "getTermsNeedingArchive")
+        .mockResolvedValueOnce(expiredTerms);
 
       // Mock archiveTerm
-      const archiveTermSpy = jest.spyOn(TermManager, "archiveTerm").mockResolvedValue(mockTerm);
+      const archiveTermSpy = jest
+        .spyOn(TermManager, "archiveTerm")
+        .mockResolvedValue(mockTerm);
 
       const result = await TermManager.autoArchiveExpiredTerms();
 
@@ -357,7 +375,9 @@ describe("TermManager", () => {
     });
 
     it("should return 0 when no expired terms", async () => {
-      jest.spyOn(TermManager, "getTermsNeedingArchive").mockResolvedValueOnce([]);
+      jest
+        .spyOn(TermManager, "getTermsNeedingArchive")
+        .mockResolvedValueOnce([]);
 
       const result = await TermManager.autoArchiveExpiredTerms();
 
@@ -409,7 +429,9 @@ describe("TermManager", () => {
       const upcomingCount = 2;
       const totalCount = 10;
 
-      jest.spyOn(TermManager, "getActiveTerm").mockResolvedValueOnce(activeTerm);
+      jest
+        .spyOn(TermManager, "getActiveTerm")
+        .mockResolvedValueOnce(activeTerm);
       mockPrisma.term.count
         .mockResolvedValueOnce(archivedCount)
         .mockResolvedValueOnce(upcomingCount)

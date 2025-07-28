@@ -21,7 +21,7 @@ export default defineConfig({
     },
     setupNodeEvents(on, config) {
       // Server health check
-      on('task', {
+      on("task", {
         log(message) {
           console.log(message);
           return null;
@@ -32,52 +32,63 @@ export default defineConfig({
         },
         async ping() {
           try {
-            const response = await fetch(config.baseUrl || 'http://localhost:3000');
+            const response = await fetch(
+              config.baseUrl || "http://localhost:3000",
+            );
             return response.ok;
           } catch (error) {
             return false;
           }
         },
-        async createAuthToken({ email, name, id = 'test-user-id', role = 'ADMIN' }) {
+        async createAuthToken({
+          email,
+          name,
+          id = "test-user-id",
+          role = "ADMIN",
+        }) {
           try {
             // Create a JWT token for NextAuth.js
-            const { encode } = require('next-auth/jwt');
-            
-            const secret = process.env.NEXTAUTH_SECRET || 'development-secret-key';
-            
+            const { encode } = require("next-auth/jwt");
+
+            const secret =
+              process.env.NEXTAUTH_SECRET || "development-secret-key";
+
             const tokenPayload = {
               sub: id,
               name: name,
               email: email,
               role: role,
-              college: 'SKYLINE',
+              college: "SKYLINE",
               iat: Math.floor(Date.now() / 1000),
-              exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60), // 24 hours
+              exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
               jti: `test-${Date.now()}`,
             };
-            
-            console.log('Creating auth token with payload:', tokenPayload);
-            
+
+            console.log("Creating auth token with payload:", tokenPayload);
+
             const token = await encode({
               token: tokenPayload,
               secret: secret,
             });
-            
-            console.log('Token created successfully:', token?.substring(0, 50) + '...');
+
+            console.log(
+              "Token created successfully:",
+              token?.substring(0, 50) + "...",
+            );
             return token;
           } catch (error) {
-            console.error('Error creating auth token:', error);
+            console.error("Error creating auth token:", error);
             throw error;
           }
-        }
+        },
       });
 
       // Performance metrics collection
-      on('before:browser:launch', (browser, launchOptions) => {
-        if (browser.name === 'chrome' && browser.isHeadless) {
-          launchOptions.args.push('--disable-dev-shm-usage');
-          launchOptions.args.push('--no-sandbox');
-          launchOptions.args.push('--disable-web-security');
+      on("before:browser:launch", (browser, launchOptions) => {
+        if (browser.name === "chrome" && browser.isHeadless) {
+          launchOptions.args.push("--disable-dev-shm-usage");
+          launchOptions.args.push("--no-sandbox");
+          launchOptions.args.push("--disable-web-security");
         }
         return launchOptions;
       });

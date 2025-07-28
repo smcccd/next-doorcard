@@ -5,11 +5,36 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertCircle, CheckCircle2, User, Globe, GraduationCap, Building2 } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertCircle,
+  CheckCircle2,
+  User,
+  Globe,
+  GraduationCap,
+  Building2,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getDisplayFormatOptions, COLLEGE_OPTIONS, ACADEMIC_TITLES, COMMON_PRONOUNS, formatDisplayName } from "@/lib/display-name";
+import {
+  getDisplayFormatOptions,
+  COLLEGE_OPTIONS,
+  ACADEMIC_TITLES,
+  COMMON_PRONOUNS,
+  formatDisplayName,
+} from "@/lib/display-name";
 import type { DisplayNameFormat, College } from "@prisma/client";
 
 interface UserProfile {
@@ -35,7 +60,8 @@ export default function ProfilePage() {
   const [lastName, setLastName] = useState("");
   const [title, setTitle] = useState("none");
   const [pronouns, setPronouns] = useState("none");
-  const [displayFormat, setDisplayFormat] = useState<DisplayNameFormat>("FULL_NAME");
+  const [displayFormat, setDisplayFormat] =
+    useState<DisplayNameFormat>("FULL_NAME");
   const [college, setCollege] = useState<College | "none">("none");
   const [website, setWebsite] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -45,22 +71,25 @@ export default function ProfilePage() {
     try {
       console.log("[Profile] Fetching profile data...");
       console.log("[Profile] Session status:", session?.user?.email);
-      
+
       if (!session?.user?.email) {
         console.log("[Profile] No session available, skipping API call");
         setIsLoading(false);
         return;
       }
-      
+
       const response = await fetch("/api/user/profile");
       console.log("[Profile] Response status:", response.status);
-      console.log("[Profile] Response headers:", Object.fromEntries(response.headers.entries()));
-      
+      console.log(
+        "[Profile] Response headers:",
+        Object.fromEntries(response.headers.entries()),
+      );
+
       if (response.ok) {
         const data = await response.json();
         console.log("[Profile] Profile data received:", data);
         setProfile(data);
-        
+
         // Use firstName/lastName if available, otherwise parse legacy name
         if (data.firstName && data.lastName) {
           setFirstName(data.firstName);
@@ -70,13 +99,17 @@ export default function ProfilePage() {
           setFirstName(nameParts[0] || "");
           setLastName(nameParts.slice(1).join(" ") || "");
         }
-        
+
         setTitle(data.title || "");
         setPronouns(data.pronouns || "");
         setDisplayFormat(data.displayFormat || "FULL_NAME");
         setWebsite(data.website || "");
       } else {
-        console.error("[Profile] API request failed:", response.status, response.statusText);
+        console.error(
+          "[Profile] API request failed:",
+          response.status,
+          response.statusText,
+        );
         toast({
           title: "Error",
           description: "Failed to load profile information",
@@ -96,17 +129,22 @@ export default function ProfilePage() {
   }, [session, toast]);
 
   useEffect(() => {
-    console.log("[Profile] Session status changed:", status, "Email:", session?.user?.email);
-    
+    console.log(
+      "[Profile] Session status changed:",
+      status,
+      "Email:",
+      session?.user?.email,
+    );
+
     if (status === "loading") {
       console.log("[Profile] Session is still loading, waiting...");
       return;
     }
-    
+
     if (status === "authenticated" && session?.user?.email) {
       console.log("[Profile] Session authenticated, fetching profile");
       fetchProfile();
-      
+
       // Reset profile setup dismissal when user visits profile page
       // This allows the modal to show again if they still have incomplete profile
       if (session.user.id) {
@@ -121,12 +159,21 @@ export default function ProfilePage() {
   // Validate display format when title or pronouns change
   useEffect(() => {
     if (firstName && lastName) {
-      const availableOptions = getDisplayFormatOptions(firstName, lastName, title, pronouns);
-      const currentFormatAvailable = availableOptions.some(option => option.value === displayFormat);
-      
+      const availableOptions = getDisplayFormatOptions(
+        firstName,
+        lastName,
+        title,
+        pronouns,
+      );
+      const currentFormatAvailable = availableOptions.some(
+        (option) => option.value === displayFormat,
+      );
+
       if (!currentFormatAvailable) {
         // Reset to the first available format
-        setDisplayFormat(availableOptions[0]?.value as DisplayNameFormat || "FULL_NAME");
+        setDisplayFormat(
+          (availableOptions[0]?.value as DisplayNameFormat) || "FULL_NAME",
+        );
       }
     }
   }, [firstName, lastName, title, pronouns, displayFormat]);
@@ -153,9 +200,9 @@ export default function ProfilePage() {
         college: college === "none" ? null : college,
         website: website.trim() || null,
       };
-      
+
       console.log("[Profile] Submitting:", updateData);
-      
+
       const response = await fetch("/api/user/profile", {
         method: "PATCH",
         headers: {
@@ -170,7 +217,7 @@ export default function ProfilePage() {
         const updatedProfile = await response.json();
         console.log("[Profile] Updated profile:", updatedProfile);
         setProfile(updatedProfile);
-        
+
         // Update the session with new name
         console.log("[Profile] Updating session...");
         const displayName = formatDisplayName({
@@ -179,7 +226,7 @@ export default function ProfilePage() {
           title: updatedProfile.title,
           displayFormat: updatedProfile.displayFormat,
         });
-        
+
         await update({
           ...session,
           user: {
@@ -212,26 +259,29 @@ export default function ProfilePage() {
   const isValidWebsite = (url: string) => {
     if (!url || url.trim() === "") return true; // Optional field
     const trimmedUrl = url.trim();
-    
+
     // Basic validation - must contain a dot and no spaces
-    if (!trimmedUrl.includes('.') || trimmedUrl.includes(' ')) {
+    if (!trimmedUrl.includes(".") || trimmedUrl.includes(" ")) {
       return false;
     }
-    
+
     try {
-      const fullUrl = trimmedUrl.startsWith("http") ? trimmedUrl : `https://${trimmedUrl}`;
+      const fullUrl = trimmedUrl.startsWith("http")
+        ? trimmedUrl
+        : `https://${trimmedUrl}`;
       const urlObj = new URL(fullUrl);
-      return urlObj.hostname.includes('.');
+      return urlObj.hostname.includes(".");
     } catch {
       return false;
     }
   };
 
-  const hasGenericName = (!profile?.firstName || !profile?.lastName) && 
-    (!profile?.name || 
-     profile.name === profile.email?.split('@')[0] ||
-     profile.name === profile.username ||
-     profile.name.split(' ').length < 2);
+  const hasGenericName =
+    (!profile?.firstName || !profile?.lastName) &&
+    (!profile?.name ||
+      profile.name === profile.email?.split("@")[0] ||
+      profile.name === profile.username ||
+      profile.name.split(" ").length < 2);
 
   if (isLoading || status === "loading") {
     return (
@@ -270,9 +320,12 @@ export default function ProfilePage() {
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
           <div>
-            <h3 className="font-medium text-yellow-800">Complete Your Profile</h3>
+            <h3 className="font-medium text-yellow-800">
+              Complete Your Profile
+            </h3>
             <p className="text-yellow-700 text-sm mt-1">
-              Please provide your name to personalize your doorcard and improve your profile.
+              Please provide your name to personalize your doorcard and improve
+              your profile.
             </p>
           </div>
         </div>
@@ -290,21 +343,33 @@ export default function ProfilePage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium text-gray-700">Email</Label>
+                <Label className="text-sm font-medium text-gray-700">
+                  Email
+                </Label>
                 <p className="text-sm text-gray-900 mt-1">{profile?.email}</p>
               </div>
               <div>
-                <Label className="text-sm font-medium text-gray-700">Username</Label>
-                <p className="text-sm text-gray-900 mt-1">{profile?.username || "Not set"}</p>
+                <Label className="text-sm font-medium text-gray-700">
+                  Username
+                </Label>
+                <p className="text-sm text-gray-900 mt-1">
+                  {profile?.username || "Not set"}
+                </p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium text-gray-700">Role</Label>
-                <p className="text-sm text-gray-900 mt-1 capitalize">{profile?.role?.toLowerCase()}</p>
+                <Label className="text-sm font-medium text-gray-700">
+                  Role
+                </Label>
+                <p className="text-sm text-gray-900 mt-1 capitalize">
+                  {profile?.role?.toLowerCase()}
+                </p>
               </div>
               <div>
-                <Label className="text-sm font-medium text-gray-700">Current Display Name</Label>
+                <Label className="text-sm font-medium text-gray-700">
+                  Current Display Name
+                </Label>
                 <p className="text-sm text-gray-900 mt-1">
                   {profile ? formatDisplayName(profile) : "Not set"}
                 </p>
@@ -389,14 +454,30 @@ export default function ProfilePage() {
               {/* Display Format - Full Width */}
               <div className="space-y-2">
                 <Label htmlFor="displayFormat">Display Name Format</Label>
-                <Select value={displayFormat} onValueChange={(value: DisplayNameFormat) => setDisplayFormat(value)}>
+                <Select
+                  value={displayFormat}
+                  onValueChange={(value: DisplayNameFormat) =>
+                    setDisplayFormat(value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue>
-                      {getDisplayFormatOptions(firstName, lastName, title, pronouns).find(opt => opt.value === displayFormat)?.description || "Select format"}
+                      {getDisplayFormatOptions(
+                        firstName,
+                        lastName,
+                        title,
+                        pronouns,
+                      ).find((opt) => opt.value === displayFormat)
+                        ?.description || "Select format"}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {getDisplayFormatOptions(firstName, lastName, title, pronouns).map((option) => (
+                    {getDisplayFormatOptions(
+                      firstName,
+                      lastName,
+                      title,
+                      pronouns,
+                    ).map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.description}
                       </SelectItem>
@@ -411,7 +492,10 @@ export default function ProfilePage() {
                   <Building2 className="h-4 w-4" />
                   College/Campus
                 </Label>
-                <Select value={college} onValueChange={(value: College | "none") => setCollege(value)}>
+                <Select
+                  value={college}
+                  onValueChange={(value: College | "none") => setCollege(value)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select your college" />
                   </SelectTrigger>
@@ -425,7 +509,7 @@ export default function ProfilePage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               {/* Website */}
               <div className="space-y-2">
                 <Label htmlFor="website" className="flex items-center gap-2">
@@ -445,14 +529,20 @@ export default function ProfilePage() {
                   </p>
                 )}
                 <p className="text-sm text-gray-500">
-                  This will be displayed on your doorcard for students to find more information about you
+                  This will be displayed on your doorcard for students to find
+                  more information about you
                 </p>
               </div>
 
               <div className="flex justify-end pt-4">
-                <Button 
-                  type="submit" 
-                  disabled={isSubmitting || firstName.trim().length === 0 || lastName.trim().length === 0 || (website.length > 0 && !isValidWebsite(website))}
+                <Button
+                  type="submit"
+                  disabled={
+                    isSubmitting ||
+                    firstName.trim().length === 0 ||
+                    lastName.trim().length === 0 ||
+                    (website.length > 0 && !isValidWebsite(website))
+                  }
                   className="flex items-center gap-2"
                 >
                   {isSubmitting ? (

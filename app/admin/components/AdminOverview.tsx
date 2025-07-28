@@ -3,15 +3,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Calendar, 
-  Archive, 
-  Users, 
-  FileText, 
-  CheckCircle, 
+import {
+  Calendar,
+  Archive,
+  Users,
+  FileText,
+  CheckCircle,
   Plus,
   Download,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 
 interface Term {
@@ -43,11 +43,11 @@ interface AdminOverviewProps {
   onExportDoorcards: () => void;
 }
 
-export default function AdminOverview({ 
-  terms, 
-  doorcards, 
-  onCreateTerm, 
-  onExportDoorcards 
+export default function AdminOverview({
+  terms,
+  doorcards,
+  onCreateTerm,
+  onExportDoorcards,
 }: AdminOverviewProps) {
   const activeTerm = terms.find((t) => t.isActive);
   const archivedTerms = terms.filter((t) => t.isArchived);
@@ -59,7 +59,9 @@ export default function AdminOverview({
     {
       title: "Active Term",
       value: activeTerm ? activeTerm.name : "None",
-      subtitle: activeTerm ? `${activeTerm._count.doorcards} doorcards` : "No active term",
+      subtitle: activeTerm
+        ? `${activeTerm._count.doorcards} doorcards`
+        : "No active term",
       icon: Calendar,
       color: "text-blue-600",
       bgColor: "bg-blue-50",
@@ -96,7 +98,9 @@ export default function AdminOverview({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage terms and oversee faculty doorcards</p>
+          <p className="text-gray-600">
+            Manage terms and oversee faculty doorcards
+          </p>
         </div>
         <div className="flex gap-2">
           <Button onClick={onExportDoorcards} variant="outline" size="sm">
@@ -119,8 +123,12 @@ export default function AdminOverview({
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                    <p className="text-sm font-medium text-gray-600">
+                      {stat.title}
+                    </p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {stat.value}
+                    </p>
                     <p className="text-xs text-gray-500">{stat.subtitle}</p>
                   </div>
                   <div className={`p-3 rounded-full ${stat.bgColor}`}>
@@ -147,7 +155,10 @@ export default function AdminOverview({
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-semibold">{activeTerm.name}</h3>
-                  <Badge variant="default" className="bg-green-100 text-green-800">
+                  <Badge
+                    variant="default"
+                    className="bg-green-100 text-green-800"
+                  >
                     Active
                   </Badge>
                 </div>
@@ -171,20 +182,22 @@ export default function AdminOverview({
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="h-auto p-4 flex flex-col items-start gap-2"
               onClick={onCreateTerm}
             >
               <Plus className="h-5 w-5 text-blue-600" />
               <div className="text-left">
                 <div className="font-medium">Create New Term</div>
-                <div className="text-xs text-gray-500">Add a new academic term</div>
+                <div className="text-xs text-gray-500">
+                  Add a new academic term
+                </div>
               </div>
             </Button>
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               className="h-auto p-4 flex flex-col items-start gap-2"
               onClick={onExportDoorcards}
             >
@@ -198,7 +211,9 @@ export default function AdminOverview({
             <div className="p-4 border border-dashed border-gray-300 rounded-lg flex flex-col items-start gap-2 text-gray-500">
               <Archive className="h-5 w-5" />
               <div className="text-left">
-                <div className="font-medium text-gray-700">Archive Management</div>
+                <div className="font-medium text-gray-700">
+                  Archive Management
+                </div>
                 <div className="text-xs">Automated term archiving</div>
               </div>
             </div>
