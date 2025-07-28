@@ -17,7 +17,7 @@ export default async function AdminLayout({
   // Check if user has admin role
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    select: { role: true, name: true }
+    select: { role: true, name: true },
   });
 
   if (user?.role !== "ADMIN") {
@@ -35,16 +35,16 @@ export default async function AdminLayout({
               </div>
               <div>
                 <h2 className="font-semibold">Admin Panel</h2>
-                <p className="text-sm text-gray-600">Welcome, {user?.name || session.user.name}</p>
+                <p className="text-sm text-gray-600">
+                  Welcome, {user?.name || session.user.name}
+                </p>
               </div>
             </div>
-            <div className="text-xs text-gray-500">
-              Role: ADMIN
-            </div>
+            <div className="text-xs text-gray-500">Role: ADMIN</div>
           </div>
         </div>
       </div>
-      <main>{children}</main>
+      <main className="container mx-auto px-6 py-4">{children}</main>
     </div>
   );
 }

@@ -174,7 +174,8 @@ describe('AnalyticsTracker', () => {
 
       // This should not throw an error
       expect(() => {
-        const { analytics: ssrAnalytics } = require('../analytics');
+        const analyticsModule = require('../analytics');
+        expect(analyticsModule.analytics).toBeDefined();
       }).not.toThrow();
 
       // Restore window

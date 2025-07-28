@@ -179,10 +179,13 @@ export default async function DoorcardViewById({
                   </Link>
                 </Button>
               )}
-              <DoorcardActions doorcard={{
-                ...doorcard,
-                year: doorcard.year.toString()
-              }} />
+              <DoorcardActions 
+                doorcard={{
+                  ...doorcard,
+                  year: doorcard.year.toString()
+                }} 
+                doorcardId={doorcard.id}
+              />
             </div>
           </div>
         </div>

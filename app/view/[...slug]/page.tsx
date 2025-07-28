@@ -241,7 +241,7 @@ export default async function PublicDoorcardView({
                   </Link>
                 </Button>
               )}
-              <DoorcardActions doorcard={doorcard} />
+              <DoorcardActions doorcard={doorcard} doorcardId={doorcard.id} />
             </div>
           </div>
         </div>

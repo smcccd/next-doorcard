@@ -1,15 +1,50 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { AlertCircle, Users, Calendar, MapPin, Activity, Search, Download, RefreshCw, CheckCircle, XCircle, Eye, Clock, Building, Mail, User, Globe } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertCircle,
+  Users,
+  Calendar,
+  MapPin,
+  Activity,
+  Search,
+  Download,
+  RefreshCw,
+  CheckCircle,
+  XCircle,
+  Eye,
+  Clock,
+  Building,
+  Mail,
+  User,
+  Globe,
+} from "lucide-react";
+import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 
 interface AdminStats {
   totalUsers: number;
@@ -163,7 +198,7 @@ export default function AdminPage() {
     try {
       setLoadingUserDetails(true);
       const response = await fetch(`/api/admin/users/${userId}`);
-      
+
       if (response.ok) {
         const userData = await response.json();
         setSelectedUser(userData);
@@ -189,63 +224,67 @@ export default function AdminPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const formatTime = (timeString: string) => {
-    return new Date(`1970-01-01T${timeString}`).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
+    return new Date(`1970-01-01T${timeString}`).toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
     });
   };
 
   const getDayName = (dayOfWeek: string) => {
     const days = {
-      MONDAY: 'Monday',
-      TUESDAY: 'Tuesday', 
-      WEDNESDAY: 'Wednesday',
-      THURSDAY: 'Thursday',
-      FRIDAY: 'Friday',
-      SATURDAY: 'Saturday',
-      SUNDAY: 'Sunday'
+      MONDAY: "Monday",
+      TUESDAY: "Tuesday",
+      WEDNESDAY: "Wednesday",
+      THURSDAY: "Thursday",
+      FRIDAY: "Friday",
+      SATURDAY: "Saturday",
+      SUNDAY: "Sunday",
     };
     return days[dayOfWeek as keyof typeof days] || dayOfWeek;
   };
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      OFFICE_HOURS: 'bg-blue-100 text-blue-800',
-      CLASS: 'bg-green-100 text-green-800',
-      MEETING: 'bg-purple-100 text-purple-800',
-      RESEARCH: 'bg-orange-100 text-orange-800',
-      OTHER: 'bg-gray-100 text-gray-800'
+      OFFICE_HOURS: "bg-blue-100 text-blue-800",
+      CLASS: "bg-green-100 text-green-800",
+      MEETING: "bg-purple-100 text-purple-800",
+      RESEARCH: "bg-orange-100 text-orange-800",
+      OTHER: "bg-gray-100 text-gray-800",
     };
     return colors[category as keyof typeof colors] || colors.OTHER;
   };
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = !searchQuery || 
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      !searchQuery ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.username.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesCampus = campusFilter === "all" || user.college === campusFilter;
-    
+
+    const matchesCampus =
+      campusFilter === "all" || user.college === campusFilter;
+
     return matchesSearch && matchesCampus;
   });
 
-  const filteredDoorcards = doorcards.filter(doorcard => {
-    const matchesSearch = !searchQuery ||
+  const filteredDoorcards = doorcards.filter((doorcard) => {
+    const matchesSearch =
+      !searchQuery ||
       doorcard.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       doorcard.user.email.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesCampus = campusFilter === "all" || doorcard.college === campusFilter;
-    
+
+    const matchesCampus =
+      campusFilter === "all" || doorcard.college === campusFilter;
+
     return matchesSearch && matchesCampus;
   });
 
@@ -268,7 +307,9 @@ export default function AdminPage() {
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
           <div className="flex items-center gap-2">
             <AlertCircle className="h-5 w-5 text-red-600" />
-            <h2 className="text-lg font-semibold text-red-800">Admin Dashboard Error</h2>
+            <h2 className="text-lg font-semibold text-red-800">
+              Admin Dashboard Error
+            </h2>
           </div>
           <p className="text-red-600 mt-2">{error}</p>
           <Button onClick={fetchAdminData} className="mt-4" variant="outline">
@@ -282,12 +323,13 @@ export default function AdminPage() {
 
   return (
     <div className="container mx-auto py-8 max-w-7xl">
-      {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <p className="text-gray-600">Faculty Doorcard Platform Administration</p>
+            <p className="text-gray-600">
+              Faculty Doorcard Platform Administration
+            </p>
           </div>
           <div className="flex gap-2">
             <Button onClick={fetchAdminData} variant="outline">
@@ -302,7 +344,11 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
@@ -316,11 +362,15 @@ export default function AdminPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Users
+                  </CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">
+                    {stats.totalUsers.toLocaleString()}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     {stats.activeUsers} active users
                   </p>
@@ -329,11 +379,15 @@ export default function AdminPage() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Doorcards</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Doorcards
+                  </CardTitle>
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalDoorcards.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">
+                    {stats.totalDoorcards.toLocaleString()}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     {stats.activeDoorcards} currently active
                   </p>
@@ -342,11 +396,15 @@ export default function AdminPage() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Appointments</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Appointments
+                  </CardTitle>
                   <Activity className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalAppointments.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">
+                    {stats.totalAppointments.toLocaleString()}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     All scheduled appointments
                   </p>
@@ -355,11 +413,15 @@ export default function AdminPage() {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Recent Activity
+                  </CardTitle>
                   <MapPin className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.recentActivity.newUsers}</div>
+                  <div className="text-2xl font-bold">
+                    {stats.recentActivity.newUsers}
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     New users this week
                   </p>
@@ -377,25 +439,31 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {Object.entries(stats.campusBreakdown).map(([campus, data]) => (
-                    <div key={campus} className="p-4 border rounded-lg">
-                      <h3 className="font-semibold mb-2">{campus}</h3>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span>Users:</span>
-                          <span className="font-medium">{data.users}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Doorcards:</span>
-                          <span className="font-medium">{data.doorcards}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Appointments:</span>
-                          <span className="font-medium">{data.appointments}</span>
+                  {Object.entries(stats.campusBreakdown).map(
+                    ([campus, data]) => (
+                      <div key={campus} className="p-4 border rounded-lg">
+                        <h3 className="font-semibold mb-2">{campus}</h3>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span>Users:</span>
+                            <span className="font-medium">{data.users}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Doorcards:</span>
+                            <span className="font-medium">
+                              {data.doorcards}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Appointments:</span>
+                            <span className="font-medium">
+                              {data.appointments}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -446,11 +514,21 @@ export default function AdminPage() {
                   <table className="w-full">
                     <thead className="border-b bg-gray-50">
                       <tr>
-                        <th className="text-left p-3 text-sm font-medium">User</th>
-                        <th className="text-left p-3 text-sm font-medium">Campus</th>
-                        <th className="text-left p-3 text-sm font-medium">Activity</th>
-                        <th className="text-left p-3 text-sm font-medium">Status</th>
-                        <th className="text-left p-3 text-sm font-medium">Actions</th>
+                        <th className="text-left p-3 text-sm font-medium">
+                          User
+                        </th>
+                        <th className="text-left p-3 text-sm font-medium">
+                          Campus
+                        </th>
+                        <th className="text-left p-3 text-sm font-medium">
+                          Activity
+                        </th>
+                        <th className="text-left p-3 text-sm font-medium">
+                          Status
+                        </th>
+                        <th className="text-left p-3 text-sm font-medium">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -459,11 +537,13 @@ export default function AdminPage() {
                           <td className="p-3">
                             <div>
                               <div className="font-medium">
-                                {user.firstName && user.lastName 
-                                  ? `${user.firstName} ${user.lastName}` 
+                                {user.firstName && user.lastName
+                                  ? `${user.firstName} ${user.lastName}`
                                   : user.name || user.username}
                               </div>
-                              <div className="text-sm text-gray-500">{user.email}</div>
+                              <div className="text-sm text-gray-500">
+                                {user.email}
+                              </div>
                             </div>
                           </td>
                           <td className="p-3">
@@ -476,25 +556,31 @@ export default function AdminPage() {
                           <td className="p-3">
                             <div className="text-sm">
                               <div>{user.doorcardCount} doorcards</div>
-                              <div className="text-gray-500">{user.appointmentCount} appointments</div>
+                              <div className="text-gray-500">
+                                {user.appointmentCount} appointments
+                              </div>
                             </div>
                           </td>
                           <td className="p-3">
                             {user.doorcardCount > 0 ? (
-                              <Badge className="bg-green-100 text-green-800">Active</Badge>
+                              <Badge className="bg-green-100 text-green-800">
+                                Active
+                              </Badge>
                             ) : (
                               <Badge variant="secondary">Inactive</Badge>
                             )}
                           </td>
                           <td className="p-3">
-                            <Button 
-                              variant="outline" 
+                            <Button
+                              variant="outline"
                               size="sm"
                               onClick={() => fetchUserDetails(user.id)}
                               disabled={loadingUserDetails}
                             >
                               <Eye className="h-4 w-4 mr-1" />
-                              {loadingUserDetails ? "Loading..." : "View Details"}
+                              {loadingUserDetails
+                                ? "Loading..."
+                                : "View Details"}
                             </Button>
                           </td>
                         </tr>
@@ -516,7 +602,9 @@ export default function AdminPage() {
           <Card>
             <CardHeader>
               <CardTitle>Doorcard Management</CardTitle>
-              <CardDescription>Monitor and manage faculty doorcards</CardDescription>
+              <CardDescription>
+                Monitor and manage faculty doorcards
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex gap-4 mb-4">
@@ -555,13 +643,27 @@ export default function AdminPage() {
                   <table className="w-full">
                     <thead className="border-b bg-gray-50">
                       <tr>
-                        <th className="text-left p-3 text-sm font-medium">Doorcard</th>
-                        <th className="text-left p-3 text-sm font-medium">Faculty</th>
-                        <th className="text-left p-3 text-sm font-medium">Term</th>
-                        <th className="text-left p-3 text-sm font-medium">Campus</th>
-                        <th className="text-left p-3 text-sm font-medium">Status</th>
-                        <th className="text-left p-3 text-sm font-medium">Activity</th>
-                        <th className="text-left p-3 text-sm font-medium">Actions</th>
+                        <th className="text-left p-3 text-sm font-medium">
+                          Doorcard
+                        </th>
+                        <th className="text-left p-3 text-sm font-medium">
+                          Faculty
+                        </th>
+                        <th className="text-left p-3 text-sm font-medium">
+                          Term
+                        </th>
+                        <th className="text-left p-3 text-sm font-medium">
+                          Campus
+                        </th>
+                        <th className="text-left p-3 text-sm font-medium">
+                          Status
+                        </th>
+                        <th className="text-left p-3 text-sm font-medium">
+                          Activity
+                        </th>
+                        <th className="text-left p-3 text-sm font-medium">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -569,14 +671,22 @@ export default function AdminPage() {
                         <tr key={doorcard.id} className="border-b">
                           <td className="p-3">
                             <div>
-                              <div className="font-medium">{doorcard.doorcardName}</div>
-                              <div className="text-sm text-gray-500">Office: {doorcard.officeNumber}</div>
+                              <div className="font-medium">
+                                {doorcard.doorcardName}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                Office: {doorcard.officeNumber}
+                              </div>
                             </div>
                           </td>
                           <td className="p-3">
                             <div>
-                              <div className="font-medium">{doorcard.user.name || "Unknown"}</div>
-                              <div className="text-sm text-gray-500">{doorcard.user.email}</div>
+                              <div className="font-medium">
+                                {doorcard.user.name || "Unknown"}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {doorcard.user.email}
+                              </div>
                             </div>
                           </td>
                           <td className="p-3">
@@ -625,21 +735,7 @@ export default function AdminPage() {
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Platform Analytics</CardTitle>
-              <CardDescription>Usage patterns and trends</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12">
-                <Activity className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Analytics Coming Soon</h3>
-                <p className="text-gray-600">
-                  Detailed analytics and reporting features will be available in the next release.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <AdminAnalytics />
         </TabsContent>
       </Tabs>
 
@@ -652,7 +748,7 @@ export default function AdminPage() {
               User Details
             </DialogTitle>
           </DialogHeader>
-          
+
           {selectedUser && (
             <div className="space-y-6">
               {/* User Information */}
@@ -666,47 +762,65 @@ export default function AdminPage() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-sm font-medium text-gray-500">Display Name</Label>
-                      <p className="text-sm">{formatUserDisplayName(selectedUser)}</p>
+                      <Label className="text-sm font-medium text-gray-500">
+                        Display Name
+                      </Label>
+                      <p className="text-sm">
+                        {formatUserDisplayName(selectedUser)}
+                      </p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium text-gray-500">Email</Label>
+                      <Label className="text-sm font-medium text-gray-500">
+                        Email
+                      </Label>
                       <div className="flex items-center gap-2">
                         <Mail className="h-4 w-4 text-gray-400" />
                         <p className="text-sm">{selectedUser.email}</p>
                       </div>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium text-gray-500">Username</Label>
+                      <Label className="text-sm font-medium text-gray-500">
+                        Username
+                      </Label>
                       <p className="text-sm">{selectedUser.username}</p>
                     </div>
                     <div>
-                      <Label className="text-sm font-medium text-gray-500">Role</Label>
+                      <Label className="text-sm font-medium text-gray-500">
+                        Role
+                      </Label>
                       <Badge variant="outline">{selectedUser.role}</Badge>
                     </div>
                     {selectedUser.college && (
                       <div>
-                        <Label className="text-sm font-medium text-gray-500">Campus</Label>
+                        <Label className="text-sm font-medium text-gray-500">
+                          Campus
+                        </Label>
                         <div className="flex items-center gap-2">
                           <Building className="h-4 w-4 text-gray-400" />
-                          <Badge variant="outline">{selectedUser.college}</Badge>
+                          <Badge variant="outline">
+                            {selectedUser.college}
+                          </Badge>
                         </div>
                       </div>
                     )}
                     {selectedUser.pronouns && (
                       <div>
-                        <Label className="text-sm font-medium text-gray-500">Pronouns</Label>
+                        <Label className="text-sm font-medium text-gray-500">
+                          Pronouns
+                        </Label>
                         <p className="text-sm">{selectedUser.pronouns}</p>
                       </div>
                     )}
                     {selectedUser.website && (
                       <div>
-                        <Label className="text-sm font-medium text-gray-500">Website</Label>
+                        <Label className="text-sm font-medium text-gray-500">
+                          Website
+                        </Label>
                         <div className="flex items-center gap-2">
                           <Globe className="h-4 w-4 text-gray-400" />
-                          <a 
-                            href={selectedUser.website} 
-                            target="_blank" 
+                          <a
+                            href={selectedUser.website}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm text-blue-600 hover:underline"
                           >
@@ -716,20 +830,32 @@ export default function AdminPage() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="pt-4 border-t">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <Label className="text-sm font-medium text-gray-500">Total Doorcards</Label>
-                        <p className="text-2xl font-bold text-blue-600">{selectedUser.totalDoorcards}</p>
+                        <Label className="text-sm font-medium text-gray-500">
+                          Total Doorcards
+                        </Label>
+                        <p className="text-2xl font-bold text-blue-600">
+                          {selectedUser.totalDoorcards}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-500">Active Doorcards</Label>
-                        <p className="text-2xl font-bold text-green-600">{selectedUser.activeDoorcards}</p>
+                        <Label className="text-sm font-medium text-gray-500">
+                          Active Doorcards
+                        </Label>
+                        <p className="text-2xl font-bold text-green-600">
+                          {selectedUser.activeDoorcards}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-500">Total Appointments</Label>
-                        <p className="text-2xl font-bold text-purple-600">{selectedUser.totalAppointments}</p>
+                        <Label className="text-sm font-medium text-gray-500">
+                          Total Appointments
+                        </Label>
+                        <p className="text-2xl font-bold text-purple-600">
+                          {selectedUser.totalAppointments}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -737,12 +863,20 @@ export default function AdminPage() {
                   <div className="pt-4 border-t">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-500">
                       <div>
-                        <Label className="text-sm font-medium text-gray-500">Account Created</Label>
-                        <p className="text-sm">{formatDate(selectedUser.createdAt)}</p>
+                        <Label className="text-sm font-medium text-gray-500">
+                          Account Created
+                        </Label>
+                        <p className="text-sm">
+                          {formatDate(selectedUser.createdAt)}
+                        </p>
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-500">Last Updated</Label>
-                        <p className="text-sm">{formatDate(selectedUser.updatedAt)}</p>
+                        <Label className="text-sm font-medium text-gray-500">
+                          Last Updated
+                        </Label>
+                        <p className="text-sm">
+                          {formatDate(selectedUser.updatedAt)}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -766,31 +900,47 @@ export default function AdminPage() {
                   ) : (
                     <div className="space-y-4">
                       {selectedUser.doorcards.map((doorcard) => (
-                        <Card key={doorcard.id} className="border-l-4 border-l-blue-500">
+                        <Card
+                          key={doorcard.id}
+                          className="border-l-4 border-l-blue-500"
+                        >
                           <CardContent className="pt-4">
                             <div className="flex items-start justify-between mb-4">
                               <div>
-                                <h4 className="font-semibold">{doorcard.doorcardName}</h4>
-                                <p className="text-sm text-gray-600">{doorcard.name}</p>
+                                <h4 className="font-semibold">
+                                  {doorcard.doorcardName}
+                                </h4>
+                                <p className="text-sm text-gray-600">
+                                  {doorcard.name}
+                                </p>
                                 <div className="flex items-center gap-2 mt-2">
                                   <Badge variant="outline">
                                     {doorcard.term} {doorcard.year}
                                   </Badge>
-                                  <Badge variant="outline">{doorcard.college}</Badge>
+                                  <Badge variant="outline">
+                                    {doorcard.college}
+                                  </Badge>
                                   {doorcard.isActive ? (
-                                    <Badge className="bg-green-100 text-green-800">Active</Badge>
+                                    <Badge className="bg-green-100 text-green-800">
+                                      Active
+                                    </Badge>
                                   ) : (
                                     <Badge variant="secondary">Inactive</Badge>
                                   )}
                                   {doorcard.isPublic && (
-                                    <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                                    <Badge
+                                      variant="outline"
+                                      className="bg-blue-50 text-blue-700"
+                                    >
                                       Public
                                     </Badge>
                                   )}
                                 </div>
                               </div>
                               <div className="text-right text-sm text-gray-500">
-                                <p>Office: {doorcard.officeNumber || "Not set"}</p>
+                                <p>
+                                  Office: {doorcard.officeNumber || "Not set"}
+                                </p>
                                 <p>{doorcard.appointmentCount} appointments</p>
                                 <p>Created: {formatDate(doorcard.createdAt)}</p>
                               </div>
@@ -801,11 +951,12 @@ export default function AdminPage() {
                               <div className="border-t pt-4">
                                 <h5 className="font-medium mb-3 flex items-center gap-2">
                                   <Clock className="h-4 w-4" />
-                                  Schedule ({doorcard.appointments.length} appointments)
+                                  Schedule ({doorcard.appointments.length}{" "}
+                                  appointments)
                                 </h5>
                                 <div className="grid gap-2">
                                   {doorcard.appointments.map((appointment) => (
-                                    <div 
+                                    <div
                                       key={appointment.id}
                                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                                     >
@@ -814,18 +965,24 @@ export default function AdminPage() {
                                           {getDayName(appointment.dayOfWeek)}
                                         </div>
                                         <div className="text-sm text-gray-600">
-                                          {formatTime(appointment.startTime)} - {formatTime(appointment.endTime)}
+                                          {formatTime(appointment.startTime)} -{" "}
+                                          {formatTime(appointment.endTime)}
                                         </div>
                                         <div className="text-sm font-medium">
                                           {appointment.name}
                                         </div>
                                       </div>
                                       <div className="flex items-center gap-2">
-                                        <Badge 
-                                          className={getCategoryColor(appointment.category)}
+                                        <Badge
+                                          className={getCategoryColor(
+                                            appointment.category
+                                          )}
                                           variant="secondary"
                                         >
-                                          {appointment.category.replace('_', ' ')}
+                                          {appointment.category.replace(
+                                            "_",
+                                            " "
+                                          )}
                                         </Badge>
                                         {appointment.location && (
                                           <div className="flex items-center gap-1 text-sm text-gray-500">

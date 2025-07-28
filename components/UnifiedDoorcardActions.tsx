@@ -15,20 +15,29 @@ import { useToast } from "@/hooks/use-toast";
 import { renderToStaticMarkup } from "react-dom/server";
 import { DoorcardLite } from "./UnifiedDoorcard";
 import { PrintOptimizedDoorcard } from "./PrintOptimizedDoorcard";
+import { SimplePDF } from "./pdf/SimplePDF";
+import { analytics } from "@/lib/analytics";
 
 interface DoorcardActionsProps {
   doorcard: DoorcardLite;
+  doorcardId?: string; // Add doorcardId for analytics tracking
   containerId?: string;
 }
 
 export function DoorcardActions({
   doorcard,
+  doorcardId,
   containerId = "doorcard-schedule",
 }: DoorcardActionsProps) {
   const { toast } = useToast();
   const [htmlExport, setHtmlExport] = useState("");
 
   async function handlePdf() {
+    // Track PDF download event
+    if (doorcardId) {
+      analytics.trackPrint(doorcardId, "download");
+    }
+    
     // Create a temporary container with the print-optimized doorcard
     const tempContainer = document.createElement('div');
     tempContainer.style.position = 'absolute';
@@ -109,6 +118,12 @@ export function DoorcardActions({
   }
 
   function share() {
+    // Track share event
+    if (doorcardId) {
+      const method = navigator.share ? "native" : "clipboard";
+      analytics.trackShare(doorcardId, method);
+    }
+    
     if (navigator.share) {
       navigator.share({
         title: doorcard.doorcardName || "Faculty Doorcard",
@@ -122,12 +137,23 @@ export function DoorcardActions({
 
   return (
     <div className="flex gap-2 print:hidden mb-4">
-      <Button variant="outline" onClick={() => window.print()}>
+      <Button variant="outline" onClick={() => {
+        if (doorcardId) {
+          analytics.trackPrint(doorcardId, "preview");
+        }
+        window.print();
+      }}>
         <Printer className="h-4 w-4 mr-1" /> Print
       </Button>
-      <Button onClick={handlePdf}>
-        <FileDown className="h-4 w-4 mr-1" /> PDF
-      </Button>
+      <SimplePDF 
+        doorcard={doorcard} 
+        doorcardId={doorcardId}
+        onDownload={() => {
+          if (doorcardId) {
+            analytics.trackPrint(doorcardId, "download");
+          }
+        }}
+      />
       <Button variant="outline" onClick={share}>
         <Share2 className="h-4 w-4 mr-1" /> Share
       </Button>

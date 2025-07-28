@@ -26,8 +26,8 @@ export function NavDropdown({ userDisplay, isAdmin = false }: NavDropdownProps) 
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button 
-          variant="ghost" 
-          className="text-white hover:bg-gray-700 focus:bg-gray-700 gap-2"
+          variant="outline" 
+          className="text-white hover:text-white focus:text-white hover:bg-gray-900 focus:bg-gray-900 gap-2 bg-transparent border-gray-600 hover:border-gray-400 focus:border-gray-400"
         >
           {/* Show different content on mobile vs desktop */}
           <span className="hidden sm:block text-sm">
