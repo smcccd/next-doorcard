@@ -14,6 +14,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "prisma db seed",
+    "build:production": "npm run db:generate && npm run build",
     "type-check": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",

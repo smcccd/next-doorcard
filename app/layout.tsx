@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
+import SiteIndex from "@/components/SiteIndex";
 import { ProfileSetupProvider } from "@/components/ProfileSetupProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { DarkModeProvider } from "@/components/DarkModeProvider";
@@ -69,6 +70,9 @@ export default async function RootLayout({
             <Suspense fallback={<div className="h-16" />}>
               <Navbar />
             </Suspense>
+            
+            {/* Site Index - Modern version of legacy subheader */}
+            <SiteIndex />
 
               <main
                 id="main-content"

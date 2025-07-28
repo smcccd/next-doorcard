@@ -129,19 +129,22 @@ export default function Home() {
       {/* Search and Filter */}
       <Card className="border-2 border-blue-100 dark:border-blue-800 dark:bg-gray-800">
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg">
+          <h2 className="font-semibold leading-none tracking-tight flex items-center gap-2 text-lg">
             <Search className="h-5 w-5 text-blue-400 dark:text-blue-400" />
             Search for Your Professor
-          </CardTitle>
-          <p className="text-sm text-gray-600 mt-1">
+          </h2>
+          <p className="text-sm text-gray-700 dark:text-gray-100 mt-1">
             Enter your professor's name or browse by campus
           </p>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div>
+              <label htmlFor="professor-search" className="sr-only">Search for professor</label>
               <Input
+                id="professor-search"
                 placeholder="Type professor's name (e.g., John Smith, Dr. Johnson)..."
+                aria-label="Search for professor by name"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full text-base py-3 px-4 border-2 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-400 dark:text-gray-100 dark:focus:border-blue-400 dark:placeholder:text-gray-300"
@@ -192,8 +195,8 @@ export default function Home() {
       {/* Directory */}
       <Card className="dark:bg-gray-800">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span className="text-xl">
+          <h2 className="font-semibold leading-none tracking-tight flex items-center justify-between text-xl">
+            <span>
               {searchTerm || selectedCampus !== "ALL"
                 ? "Search Results"
                 : "All Faculty"}
@@ -204,7 +207,7 @@ export default function Home() {
                 {filteredDoorcards.length !== 1 ? "s" : ""}
               </Badge>
             </div>
-          </CardTitle>
+          </h2>
           {!loading && filteredDoorcards.length > 0 && (
             <p className="text-sm text-gray-700 dark:text-gray-100 mt-1">
               Click on any professor to view their office hours and contact

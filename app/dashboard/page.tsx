@@ -39,7 +39,7 @@ function StatsCards({
       <Card>
         <CardContent className="p-6 flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-600">Live Doorcards</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Live Doorcards</p>
             <p className="text-3xl font-bold">{liveCount}</p>
           </div>
           <Eye className="h-8 w-8 text-green-600" />
@@ -48,7 +48,7 @@ function StatsCards({
       <Card>
         <CardContent className="p-6 flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-600">Total Views</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Total Views</p>
             <p className="text-3xl font-bold">{metrics?.totalViews ?? 0}</p>
           </div>
           <Eye className="h-8 w-8 text-green-600" />

@@ -6,18 +6,28 @@ import { authOptions } from "@/lib/auth";
 import { NavDropdown } from "./NavDropdown";
 import { prisma } from "@/lib/prisma";
 
+const navLinks = [
+  { href: "//smccd.edu/", text: "Home" },
+  { href: "//smccd.edu/aboutus/", text: "About Us" },
+  { href: "//smccd.edu/boardoftrustees/", text: "Board of Trustees" },
+  { href: "//smccd.edu/departments/", text: "Departments" },
+  { href: "https://jobs.smccd.edu/", text: "Employment" },
+  { href: "http://foundation.smccd.edu", text: "Foundation" },
+  { href: "//smccd.edu/aboutus/contactus.php", text: "Contact Us" },
+];
+
 export default async function Navbar() {
   const session = await getServerSession(authOptions);
   const userDisplay =
     session?.user?.name || session?.user?.email || "Faculty Member";
-  
+
   // Check if user is admin
   let isAdmin = false;
   if (session?.user?.email) {
     try {
       const user = await prisma.user.findUnique({
         where: { email: session.user.email },
-        select: { role: true }
+        select: { role: true },
       });
       isAdmin = user?.role === "ADMIN";
     } catch (error) {
@@ -45,6 +55,20 @@ export default async function Navbar() {
               Faculty Doorcard
             </span>
           </Link>
+        </div>
+
+        <div className="hidden lg:flex items-center gap-6">
+          {navLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+            >
+              {link.text}
+            </a>
+          ))}
         </div>
 
         <div className="flex items-center gap-4">

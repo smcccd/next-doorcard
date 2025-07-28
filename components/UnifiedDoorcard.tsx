@@ -100,11 +100,11 @@ export function UnifiedDoorcard({
 
   return (
     <div id={containerId} className="space-y-4">
-      <header className="border-b pb-2">
-        <h1 className="text-xl font-bold text-red-700">
+      <header className="border-b border-gray-300 dark:border-gray-600 pb-2">
+        <h1 className="text-xl font-bold text-red-700 dark:text-red-400">
           {doorcard.user ? formatDisplayName(doorcard.user) : doorcard.name || "Faculty Name"}
         </h1>
-        <div className="mt-1 flex flex-wrap gap-x-6 text-xs">
+        <div className="mt-1 flex flex-wrap gap-x-6 text-xs text-gray-700 dark:text-gray-300">
           <div>
             <strong>Semester:</strong> {doorcard.term} {doorcard.year}
           </div>
@@ -123,7 +123,7 @@ export function UnifiedDoorcard({
                 href={doorcard.user.website.startsWith('http') ? doorcard.user.website : `https://${doorcard.user.website}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 hover:underline"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline"
               >
                 Faculty Website
               </a>
@@ -132,8 +132,8 @@ export function UnifiedDoorcard({
         </div>
       </header>
 
-      <div className="overflow-hidden rounded border border-gray-300 bg-white" role="presentation">
-        <table className="w-full border-collapse" role="presentation">
+      <div className="overflow-hidden rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800">
+        <table className="w-full border-collapse">
           <thead>
             <tr>
               <th className="w-20 p-2 text-xs font-medium">
