@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { parseMarkdown } from "@/lib/markdown";
-import "highlight.js/styles/github-dark.css";
+import "highlight.js/styles/github.css";
 import "./markdown.css";
 
 interface MarkdownRendererProps {

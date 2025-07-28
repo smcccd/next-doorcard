@@ -9,23 +9,22 @@ import { ProfileSetupProvider } from "@/components/ProfileSetupProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { DarkModeProvider } from "@/components/DarkModeProvider";
 import ClarityInit from "@/components/ClarityInit";
-import { TourProvider } from "@/components/tour/TourProvider";
 import { ReactNode, Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Analytics } from "@vercel/analytics/react";
 
-const inter = Inter({ 
-  subsets: ["latin"], 
+const inter = Inter({
+  subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter"
+  variable: "--font-inter",
 });
 
-const sourceSans = Source_Sans_3({ 
-  subsets: ["latin"], 
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
   display: "swap",
   weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-source-sans"
+  variable: "--font-source-sans",
 });
 
 // Strongly typed metadata with richer SEO
@@ -65,7 +64,10 @@ export default async function RootLayout({
 }) {
   const session = await getServerSession(authOptions);
   return (
-    <html lang="en" className={`h-full ${inter.variable} ${sourceSans.variable}`}>
+    <html
+      lang="en"
+      className={`h-full ${inter.variable} ${sourceSans.variable}`}
+    >
       <body
         className={`${inter.className} bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col antialiased`}
       >
@@ -79,40 +81,38 @@ export default async function RootLayout({
 
         <DarkModeProvider>
           <AuthProvider session={session}>
-            <TourProvider>
-              <ProfileSetupProvider>
-                {/* Wrap Navbar in Suspense if it does async work */}
-                <Suspense fallback={<div className="h-16" />}>
-                  <Navbar />
-                </Suspense>
+            <ProfileSetupProvider>
+              {/* Wrap Navbar in Suspense if it does async work */}
+              <Suspense fallback={<div className="h-16" />}>
+                <Navbar />
+              </Suspense>
 
-                {/* Site Index - Modern version of legacy subheader */}
-                <SiteIndex />
+              {/* Site Index - Modern version of legacy subheader */}
+              <SiteIndex />
 
-                <main
-                  id="main-content"
-                  className="w-full flex-1 bg-white dark:bg-gray-900"
-                >
-                  <section className="min-h-[400px] px-4 sm:px-6 lg:px-8 py-10 max-w-7xl mx-auto">
-                    {children}
-                  </section>
-                </main>
+              <main
+                id="main-content"
+                className="w-full flex-1 bg-white dark:bg-gray-900"
+              >
+                <section className="min-h-[400px] px-4 sm:px-6 lg:px-8 py-10 max-w-7xl mx-auto">
+                  {children}
+                </section>
+              </main>
 
-                <Footer />
-                <Toaster />
+              <Footer />
+              <Toaster />
 
-                {/* Microsoft Clarity Analytics */}
-                <ClarityInit />
+              {/* Microsoft Clarity Analytics */}
+              <ClarityInit />
 
-                {/* ARIA live region for announcements */}
-                <div
-                  id="aria-live-region"
-                  aria-live="assertive"
-                  aria-atomic="true"
-                  className="sr-only"
-                />
-              </ProfileSetupProvider>
-            </TourProvider>
+              {/* ARIA live region for announcements */}
+              <div
+                id="aria-live-region"
+                aria-live="assertive"
+                aria-atomic="true"
+                className="sr-only"
+              />
+            </ProfileSetupProvider>
           </AuthProvider>
         </DarkModeProvider>
         <Analytics />

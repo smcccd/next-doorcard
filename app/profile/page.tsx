@@ -287,8 +287,8 @@ export default function ProfilePage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-2">Loading profile...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mx-auto"></div>
+          <p className="mt-2 text-gray-900 dark:text-gray-100">Loading profile...</p>
         </div>
       </div>
     );
@@ -298,7 +298,7 @@ export default function ProfilePage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <p className="text-red-600">Please log in to view your profile.</p>
+          <p className="text-red-600 dark:text-red-400">Please log in to view your profile.</p>
         </div>
       </div>
     );
@@ -307,23 +307,23 @@ export default function ProfilePage() {
   return (
     <div className="container mx-auto py-8 max-w-2xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
+        <h1 className="text-3xl font-bold flex items-center gap-2 text-gray-900 dark:text-gray-100">
           <User className="h-8 w-8" />
           Profile Settings
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
           Manage your personal information and preferences
         </p>
       </div>
 
       {hasGenericName && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+        <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-950/30 border border-yellow-200 dark:border-yellow-800/50 rounded-lg flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
           <div>
-            <h3 className="font-medium text-yellow-800">
+            <h3 className="font-medium text-yellow-800 dark:text-yellow-200">
               Complete Your Profile
             </h3>
-            <p className="text-yellow-700 text-sm mt-1">
+            <p className="text-yellow-700 dark:text-yellow-300 text-sm mt-1">
               Please provide your name to personalize your doorcard and improve
               your profile.
             </p>
@@ -333,44 +333,44 @@ export default function ProfilePage() {
 
       <div className="space-y-6">
         {/* Account Information */}
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-gray-900 dark:text-gray-100">Account Information</CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-400">
               Your account details and login information
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Email
                 </Label>
-                <p className="text-sm text-gray-900 mt-1">{profile?.email}</p>
+                <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">{profile?.email}</p>
               </div>
               <div>
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Username
                 </Label>
-                <p className="text-sm text-gray-900 mt-1">
+                <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
                   {profile?.username || "Not set"}
                 </p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Role
                 </Label>
-                <p className="text-sm text-gray-900 mt-1 capitalize">
+                <p className="text-sm text-gray-900 dark:text-gray-100 mt-1 capitalize">
                   {profile?.role?.toLowerCase()}
                 </p>
               </div>
               <div>
-                <Label className="text-sm font-medium text-gray-700">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Current Display Name
                 </Label>
-                <p className="text-sm text-gray-900 mt-1">
+                <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
                   {profile ? formatDisplayName(profile) : "Not set"}
                 </p>
               </div>
@@ -379,10 +379,10 @@ export default function ProfilePage() {
         </Card>
 
         {/* Personal Information */}
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Personal Information</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-gray-900 dark:text-gray-100">Personal Information</CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-400">
               Update your name and contact information
             </CardDescription>
           </CardHeader>
@@ -391,23 +391,25 @@ export default function ProfilePage() {
               {/* Name Fields */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name *</Label>
+                  <Label htmlFor="firstName" className="text-gray-700 dark:text-gray-300">First Name *</Label>
                   <Input
                     id="firstName"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="Bryan"
                     required
+                    className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-400"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name *</Label>
+                  <Label htmlFor="lastName" className="text-gray-700 dark:text-gray-300">Last Name *</Label>
                   <Input
                     id="lastName"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Besnyi"
                     required
+                    className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-400"
                   />
                 </div>
               </div>
@@ -415,15 +417,15 @@ export default function ProfilePage() {
               {/* Title and Pronouns */}
               <div className="grid grid-cols-2 gap-4 items-end">
                 <div className="space-y-2">
-                  <Label htmlFor="title" className="flex items-center gap-2">
+                  <Label htmlFor="title" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                     <GraduationCap className="h-4 w-4" />
                     Academic Title (optional)
                   </Label>
                   <Select value={title} onValueChange={setTitle}>
-                    <SelectTrigger>
+                    <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                       <SelectValue placeholder="Select title" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
                       <SelectItem value="none">No title</SelectItem>
                       {ACADEMIC_TITLES.map((titleOption) => (
                         <SelectItem key={titleOption} value={titleOption}>
@@ -434,12 +436,12 @@ export default function ProfilePage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="pronouns">Pronouns (optional)</Label>
+                  <Label htmlFor="pronouns" className="text-gray-700 dark:text-gray-300">Pronouns (optional)</Label>
                   <Select value={pronouns} onValueChange={setPronouns}>
-                    <SelectTrigger>
+                    <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                       <SelectValue placeholder="Select pronouns" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
                       <SelectItem value="none">Not specified</SelectItem>
                       {COMMON_PRONOUNS.map((pronounOption) => (
                         <SelectItem key={pronounOption} value={pronounOption}>
@@ -453,14 +455,14 @@ export default function ProfilePage() {
 
               {/* Display Format - Full Width */}
               <div className="space-y-2">
-                <Label htmlFor="displayFormat">Display Name Format</Label>
+                <Label htmlFor="displayFormat" className="text-gray-700 dark:text-gray-300">Display Name Format</Label>
                 <Select
                   value={displayFormat}
                   onValueChange={(value: DisplayNameFormat) =>
                     setDisplayFormat(value)
                   }
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                     <SelectValue>
                       {getDisplayFormatOptions(
                         firstName,
@@ -471,7 +473,7 @@ export default function ProfilePage() {
                         ?.description || "Select format"}
                     </SelectValue>
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
                     {getDisplayFormatOptions(
                       firstName,
                       lastName,
@@ -488,7 +490,7 @@ export default function ProfilePage() {
 
               {/* College Selection */}
               <div className="space-y-2">
-                <Label htmlFor="college" className="flex items-center gap-2">
+                <Label htmlFor="college" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <Building2 className="h-4 w-4" />
                   College/Campus
                 </Label>
@@ -496,10 +498,10 @@ export default function ProfilePage() {
                   value={college}
                   onValueChange={(value: College | "none") => setCollege(value)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                     <SelectValue placeholder="Select your college" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
                     <SelectItem value="none">Not specified</SelectItem>
                     {COLLEGE_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
@@ -512,7 +514,7 @@ export default function ProfilePage() {
 
               {/* Website */}
               <div className="space-y-2">
-                <Label htmlFor="website" className="flex items-center gap-2">
+                <Label htmlFor="website" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <Globe className="h-4 w-4" />
                   Faculty Website (optional)
                 </Label>
@@ -522,13 +524,14 @@ export default function ProfilePage() {
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
                   placeholder="https://yourwebsite.com"
+                  className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-400"
                 />
                 {website && !isValidWebsite(website) && (
-                  <p className="text-sm text-red-600">
+                  <p className="text-sm text-red-600 dark:text-red-400">
                     Please enter a valid website URL
                   </p>
                 )}
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   This will be displayed on your doorcard for students to find
                   more information about you
                 </p>

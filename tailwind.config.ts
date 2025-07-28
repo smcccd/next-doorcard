@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 import typography from "@tailwindcss/typography";
+import { fontFamily } from "tailwindcss/defaultTheme";
 
 export default {
   darkMode: ["class"],
@@ -14,6 +15,7 @@ export default {
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        "hero-blue": "#223c8c", // A sample color from your image
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -54,8 +56,9 @@ export default {
         },
       },
       fontFamily: {
-        'sans': ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        'heading': ['var(--font-source-sans)', 'system-ui', 'sans-serif'],
+        sans: ["var(--font-inter)", ...fontFamily.sans],
+        heading: ["var(--font-source-sans)", "system-ui", "sans-serif"],
+        "source-sans": ["var(--font-source-sans)"],
       },
       borderRadius: {
         lg: "var(--radius)",
