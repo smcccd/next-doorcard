@@ -1,7 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Printer, Edit, ExternalLink, XCircle, Eye, Clock, Archive, AlertTriangle } from "lucide-react";
+import {
+  Printer,
+  Edit,
+  ExternalLink,
+  XCircle,
+  Eye,
+  Clock,
+  Archive,
+  AlertTriangle,
+} from "lucide-react";
 import { COLLEGE_META, type College } from "@/types/doorcard";
 import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
 import type { Doorcard, Appointment, User } from "@prisma/client";
@@ -26,7 +35,9 @@ export default function DoorcardGrid({
     <section className="space-y-4">
       <h2 className="text-lg font-semibold">{title}</h2>
       {doorcards.length === 0 ? (
-        <p className="text-sm text-gray-600">{emptyMessage}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {emptyMessage}
+        </p>
       ) : variant === "grid" ? (
         <div className="grid gap-6 md:grid-cols-2">
           {doorcards.map((dc) => (
@@ -69,21 +80,21 @@ function DoorcardCard({
   doorcard: Doorcard & { appointments: Appointment[]; user?: any };
 }) {
   const displayStatus = getDoorcardDisplayStatus(doorcard);
-  
+
   // Determine the correct view URL based on doorcard status
   const getViewUrl = () => {
     const username = publicSlug(doorcard.user);
-    
+
     // For live doorcards, link to current view
     if (displayStatus.status === "live") {
       return `/view/${username}`;
     }
-    
+
     // For admin viewing non-public doorcards, use doorcard ID for reliability
     // This avoids slug mismatches and username issues
     return `/doorcard/${doorcard.id}/view?auth=true`;
   };
-  
+
   // Determine badge appearance based on status
   const getBadgeProps = (status: typeof displayStatus.status) => {
     switch (status) {
@@ -126,9 +137,9 @@ function DoorcardCard({
     <Card className="hover:shadow-sm">
       <CardHeader className="pb-2">
         <div className="flex justify-between">
-          <Badge 
-            variant={badgeProps.variant} 
-            className={`flex items-center gap-1 ${badgeProps.className}`} 
+          <Badge
+            variant={badgeProps.variant}
+            className={`flex items-center gap-1 ${badgeProps.className}`}
             data-testid="status-badge"
             title={displayStatus.description}
           >
@@ -137,10 +148,14 @@ function DoorcardCard({
           </Badge>
         </div>
         <CardTitle as="h3" className="text-base">
-          {doorcard.doorcardName || `${doorcard.name || "Faculty Member"}'s ${doorcard.term} ${doorcard.year} Doorcard`}
+          {doorcard.doorcardName ||
+            `${doorcard.name || "Faculty Member"}'s ${doorcard.term} ${
+              doorcard.year
+            } Doorcard`}
         </CardTitle>
         <p className="text-xs text-gray-600">
-          {doorcard.name || "Faculty Member"} • {doorcard.officeNumber || "Office TBD"}
+          {doorcard.name || "Faculty Member"} •{" "}
+          {doorcard.officeNumber || "Office TBD"}
         </p>
       </CardHeader>
       <CardContent className="text-xs space-y-2">
@@ -166,7 +181,8 @@ function DoorcardCard({
               className="inline-flex items-center text-xs text-orange-700 bg-orange-50 border border-orange-200 rounded px-3 py-2 hover:bg-orange-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
               aria-label={`Complete setup for ${doorcard.doorcardName}`}
             >
-              <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Complete Setup
+              <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Complete
+              Setup
             </Link>
           ) : (
             // For complete doorcards, show all actions
@@ -177,7 +193,8 @@ function DoorcardCard({
                 target="_blank"
                 aria-label={`View doorcard for ${doorcard.doorcardName}`}
               >
-                <ExternalLink className="h-4 w-4 mr-1" aria-hidden="true" /> View
+                <ExternalLink className="h-4 w-4 mr-1" aria-hidden="true" />{" "}
+                View
               </Link>
               {displayStatus.status !== "archived" && (
                 <Link
@@ -214,21 +231,21 @@ function DoorcardRow({
   doorcard: Doorcard & { appointments: Appointment[]; user?: any };
 }) {
   const displayStatus = getDoorcardDisplayStatus(doorcard);
-  
+
   // Determine the correct view URL based on doorcard status
   const getViewUrl = () => {
     const username = publicSlug(doorcard.user);
-    
+
     // For live doorcards, link to current view
     if (displayStatus.status === "live") {
       return `/view/${username}`;
     }
-    
+
     // For admin viewing non-public doorcards, use doorcard ID for reliability
     // This avoids slug mismatches and username issues
     return `/doorcard/${doorcard.id}/view?auth=true`;
   };
-  
+
   // Determine badge appearance based on status
   const getBadgeProps = (status: typeof displayStatus.status) => {
     switch (status) {
@@ -273,11 +290,14 @@ function DoorcardRow({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <p className="font-medium">
-              {doorcard.doorcardName || `${doorcard.name || "Faculty Member"}'s ${doorcard.term} ${doorcard.year} Doorcard`}
+              {doorcard.doorcardName ||
+                `${doorcard.name || "Faculty Member"}'s ${doorcard.term} ${
+                  doorcard.year
+                } Doorcard`}
             </p>
-            <Badge 
-              variant={badgeProps.variant} 
-              className={`flex items-center gap-1 ${badgeProps.className}`} 
+            <Badge
+              variant={badgeProps.variant}
+              className={`flex items-center gap-1 ${badgeProps.className}`}
               data-testid="status-badge"
               title={displayStatus.description}
             >
@@ -286,7 +306,8 @@ function DoorcardRow({
             </Badge>
           </div>
           <p className="text-xs text-gray-600">
-            {doorcard.name || "Faculty Member"} • {doorcard.officeNumber || "Office TBD"} • {doorcard.term}{" "}
+            {doorcard.name || "Faculty Member"} •{" "}
+            {doorcard.officeNumber || "Office TBD"} • {doorcard.term}{" "}
             {doorcard.year}
           </p>
         </div>
@@ -298,7 +319,8 @@ function DoorcardRow({
               className="text-orange-700 bg-orange-50 border border-orange-200 rounded px-3 py-2 hover:bg-orange-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 flex items-center"
               aria-label={`Complete setup for ${doorcard.doorcardName}`}
             >
-              <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Complete Setup
+              <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Complete
+              Setup
             </Link>
           ) : (
             // For complete doorcards, show all actions
@@ -309,7 +331,8 @@ function DoorcardRow({
                 className="underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 rounded flex items-center px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
                 aria-label={`View doorcard for ${doorcard.doorcardName}`}
               >
-                <ExternalLink className="h-4 w-4 mr-1" aria-hidden="true" /> View
+                <ExternalLink className="h-4 w-4 mr-1" aria-hidden="true" />{" "}
+                View
               </Link>
               {displayStatus.status !== "archived" && (
                 <Link

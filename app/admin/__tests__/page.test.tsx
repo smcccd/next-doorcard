@@ -1,20 +1,21 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AdminPage from '../page';
+import type { ReactNode } from 'react';
 
 // Mock fetch globally
 global.fetch = jest.fn();
 
 // Mock UI components
 jest.mock('@/components/ui/card', () => ({
-  Card: ({ children, ...props }: any) => <div data-testid="card" {...props}>{children}</div>,
-  CardContent: ({ children }: any) => <div data-testid="card-content">{children}</div>,
-  CardDescription: ({ children }: any) => <div data-testid="card-description">{children}</div>,
-  CardHeader: ({ children }: any) => <div data-testid="card-header">{children}</div>,
-  CardTitle: ({ children }: any) => <h2 data-testid="card-title">{children}</h2>,
+  Card: ({ children, ...props }: {children: ReactNode; [key: string]: unknown}) => <div data-testid="card" {...props}>{children}</div>,
+  CardContent: ({ children }: {children: ReactNode}) => <div data-testid="card-content">{children}</div>,
+  CardDescription: ({ children }: {children: ReactNode}) => <div data-testid="card-description">{children}</div>,
+  CardHeader: ({ children }: {children: ReactNode}) => <div data-testid="card-header">{children}</div>,
+  CardTitle: ({ children }: {children: ReactNode}) => <h2 data-testid="card-title">{children}</h2>,
 }));
 
 jest.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, variant, size, ...props }: any) => (
+  Button: ({ children, onClick, variant, size, ...props }: {children: ReactNode; onClick?: () => void; variant?: string; size?: string; [key: string]: unknown}) => (
     <button onClick={onClick} data-variant={variant} data-size={size} {...props}>
       {children}
     </button>
@@ -22,7 +23,7 @@ jest.mock('@/components/ui/button', () => ({
 }));
 
 jest.mock('@/components/ui/badge', () => ({
-  Badge: ({ children, variant, className }: any) => (
+  Badge: ({ children, variant, className }: {children: ReactNode; variant?: string; className?: string}) => (
     <span data-testid="badge" data-variant={variant} className={className}>
       {children}
     </span>
@@ -30,40 +31,40 @@ jest.mock('@/components/ui/badge', () => ({
 }));
 
 jest.mock('@/components/ui/input', () => ({
-  Input: ({ ...props }: any) => <input data-testid="input" {...props} />,
+  Input: ({ ...props }: {[key: string]: unknown}) => <input data-testid="input" {...props} />,
 }));
 
 jest.mock('@/components/ui/label', () => ({
-  Label: ({ children, ...props }: any) => <label {...props}>{children}</label>,
+  Label: ({ children, ...props }: {children: ReactNode; [key: string]: unknown}) => <label {...props}>{children}</label>,
 }));
 
 jest.mock('@/components/ui/select', () => ({
-  Select: ({ children, onValueChange, value }: any) => (
+  Select: ({ children, onValueChange, value }: {children: ReactNode; onValueChange?: (value: string) => void; value?: string}) => (
     <div data-testid="select">
-      <select onChange={(e) => onValueChange(e.target.value)} value={value}>
+      <select onChange={(e) => onValueChange?.(e.target.value)} value={value}>
         {children}
       </select>
     </div>
   ),
-  SelectContent: ({ children }: any) => <div>{children}</div>,
-  SelectItem: ({ children, value }: any) => <option value={value}>{children}</option>,
-  SelectTrigger: ({ children }: any) => <div>{children}</div>,
-  SelectValue: ({ placeholder }: any) => <span>{placeholder}</span>,
+  SelectContent: ({ children }: {children: ReactNode}) => <div>{children}</div>,
+  SelectItem: ({ children, value }: {children: ReactNode; value?: string}) => <option value={value}>{children}</option>,
+  SelectTrigger: ({ children }: {children: ReactNode}) => <div>{children}</div>,
+  SelectValue: ({ placeholder }: {placeholder?: string}) => <span>{placeholder}</span>,
 }));
 
 jest.mock('@/components/ui/tabs', () => ({
-  Tabs: ({ children, value, onValueChange }: any) => (
+  Tabs: ({ children, value, onValueChange }: {children: ReactNode; value?: string; onValueChange?: (value: string) => void}) => (
     <div data-testid="tabs" data-value={value}>
-      <div onClick={() => onValueChange && onValueChange('users')}>
+      <div onClick={() => onValueChange?.('users')}>
         {children}
       </div>
     </div>
   ),
-  TabsContent: ({ children, value }: any) => (
+  TabsContent: ({ children, value }: {children: ReactNode; value?: string}) => (
     <div data-testid={`tab-content-${value}`}>{children}</div>
   ),
-  TabsList: ({ children }: any) => <div data-testid="tabs-list">{children}</div>,
-  TabsTrigger: ({ children, value }: any) => (
+  TabsList: ({ children }: {children: ReactNode}) => <div data-testid="tabs-list">{children}</div>,
+  TabsTrigger: ({ children, value }: {children: ReactNode; value?: string}) => (
     <button data-testid={`tab-trigger-${value}`}>{children}</button>
   ),
 }));

@@ -8,6 +8,7 @@ import SiteIndex from "@/components/SiteIndex";
 import { ProfileSetupProvider } from "@/components/ProfileSetupProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { DarkModeProvider } from "@/components/DarkModeProvider";
+import ClarityInit from "@/components/ClarityInit";
 import { ReactNode, Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -85,6 +86,9 @@ export default async function RootLayout({
 
               <Footer />
               <Toaster />
+              
+              {/* Microsoft Clarity Analytics */}
+              <ClarityInit />
               
               {/* ARIA live region for announcements */}
               <div

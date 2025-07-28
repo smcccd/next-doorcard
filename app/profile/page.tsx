@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,43 +41,7 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    console.log("[Profile] Session status changed:", status, "Email:", session?.user?.email);
-    
-    if (status === "loading") {
-      console.log("[Profile] Session is still loading, waiting...");
-      return;
-    }
-    
-    if (status === "authenticated" && session?.user?.email) {
-      console.log("[Profile] Session authenticated, fetching profile");
-      fetchProfile();
-      
-      // Reset profile setup dismissal when user visits profile page
-      // This allows the modal to show again if they still have incomplete profile
-      if (session.user.id) {
-        localStorage.removeItem(`profile-setup-dismissed-${session.user.id}`);
-      }
-    } else if (status === "unauthenticated") {
-      console.log("[Profile] User not authenticated");
-      setIsLoading(false);
-    }
-  }, [session, status]);
-
-  // Validate display format when title or pronouns change
-  useEffect(() => {
-    if (firstName && lastName) {
-      const availableOptions = getDisplayFormatOptions(firstName, lastName, title, pronouns);
-      const currentFormatAvailable = availableOptions.some(option => option.value === displayFormat);
-      
-      if (!currentFormatAvailable) {
-        // Reset to the first available format
-        setDisplayFormat(availableOptions[0]?.value as DisplayNameFormat || "FULL_NAME");
-      }
-    }
-  }, [firstName, lastName, title, pronouns, displayFormat]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       console.log("[Profile] Fetching profile data...");
       console.log("[Profile] Session status:", session?.user?.email);
@@ -107,14 +71,17 @@ export default function ProfilePage() {
           setLastName(nameParts.slice(1).join(" ") || "");
         }
         
-        setTitle(data.title || "none");
-        setPronouns(data.pronouns || "none");
+        setTitle(data.title || "");
+        setPronouns(data.pronouns || "");
         setDisplayFormat(data.displayFormat || "FULL_NAME");
-        setCollege(data.college || "none");
         setWebsite(data.website || "");
       } else {
-        const errorData = await response.json();
-        console.error("[Profile] Error response:", errorData);
+        console.error("[Profile] API request failed:", response.status, response.statusText);
+        toast({
+          title: "Error",
+          description: "Failed to load profile information",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error("Failed to fetch profile:", error);
@@ -126,7 +93,43 @@ export default function ProfilePage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session, toast]);
+
+  useEffect(() => {
+    console.log("[Profile] Session status changed:", status, "Email:", session?.user?.email);
+    
+    if (status === "loading") {
+      console.log("[Profile] Session is still loading, waiting...");
+      return;
+    }
+    
+    if (status === "authenticated" && session?.user?.email) {
+      console.log("[Profile] Session authenticated, fetching profile");
+      fetchProfile();
+      
+      // Reset profile setup dismissal when user visits profile page
+      // This allows the modal to show again if they still have incomplete profile
+      if (session.user.id) {
+        localStorage.removeItem(`profile-setup-dismissed-${session.user.id}`);
+      }
+    } else if (status === "unauthenticated") {
+      console.log("[Profile] User not authenticated");
+      setIsLoading(false);
+    }
+  }, [session, status, fetchProfile]);
+
+  // Validate display format when title or pronouns change
+  useEffect(() => {
+    if (firstName && lastName) {
+      const availableOptions = getDisplayFormatOptions(firstName, lastName, title, pronouns);
+      const currentFormatAvailable = availableOptions.some(option => option.value === displayFormat);
+      
+      if (!currentFormatAvailable) {
+        // Reset to the first available format
+        setDisplayFormat(availableOptions[0]?.value as DisplayNameFormat || "FULL_NAME");
+      }
+    }
+  }, [firstName, lastName, title, pronouns, displayFormat]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

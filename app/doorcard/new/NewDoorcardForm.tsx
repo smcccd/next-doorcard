@@ -94,7 +94,7 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
       doorcard
         ? validateCampusTerm(doorcard.id, prev, formData) // edit flow
         : createDoorcardWithCampusTerm(prev, formData), // new flow
-    [doorcard?.id]
+    [doorcard]
   );
 
   const [state, serverAction] = useActionState<ActionState, FormData>(

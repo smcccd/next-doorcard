@@ -40,38 +40,39 @@ export default async function Navbar() {
       className="bg-gray-800 dark:bg-gray-950 text-white px-6 py-4 shadow-sm"
       aria-label="Primary"
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-4" prefetch={false}>
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+        <div className="flex flex-shrink-0 items-center gap-4">
+          <Link href="/" className="flex flex-col items-start" prefetch={false}>
             <Image
               src="/smccd-logo-white.svg"
               alt="San Mateo County Community College District"
               width={180}
               height={60}
               priority
-              className="h-auto w-[180px]"
+              className="h-auto w-[150px] sm:w-[180px]"
             />
-            <span className="text-xl font-semibold tracking-tight">
+            <div className="w-1/2 h-px bg-white/30 my-1 ml-8 sm:ml-12"></div>
+            <span className="text-base font-semibold sm:text-lg tracking-wide ml-8 sm:ml-12">
               Faculty Doorcard
             </span>
           </Link>
         </div>
 
-        <div className="hidden lg:flex items-center gap-6">
+        <div className="hidden lg:flex flex-1 items-center justify-center gap-x-4">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white transition-colors text-sm font-medium"
+              className="text-gray-300 hover:text-white transition-colors text-sm font-medium whitespace-nowrap"
             >
               {link.text}
             </a>
           ))}
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-shrink-0 items-center gap-4">
           {session ? (
             <NavDropdown userDisplay={userDisplay} isAdmin={isAdmin} />
           ) : (

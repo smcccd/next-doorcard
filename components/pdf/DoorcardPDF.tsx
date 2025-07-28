@@ -244,8 +244,19 @@ interface DoorcardPDFProps {
   doorcard: DoorcardLite;
 }
 
+// Appointment interface for PDF generation
+interface AppointmentForPDF {
+  id: string;
+  name: string;
+  startTime: string;
+  endTime: string;
+  dayOfWeek: string;
+  category: string;
+  location?: string | null;
+}
+
 // Helper function to check if appointment covers time slot
-function isSlotCovered(appointment: any, slot: string) {
+function isSlotCovered(appointment: AppointmentForPDF, slot: string) {
   const [slotHour, slotMin] = slot.split(':').map(Number);
   const [startHour, startMin] = appointment.startTime.split(':').map(Number);
   const [endHour, endMin] = appointment.endTime.split(':').map(Number);
@@ -258,8 +269,8 @@ function isSlotCovered(appointment: any, slot: string) {
 }
 
 // Group appointments by day
-function groupByDay(appointments: any[]) {
-  const grouped: Record<string, any[]> = {};
+function groupByDay(appointments: AppointmentForPDF[]) {
+  const grouped: Record<string, AppointmentForPDF[]> = {};
   appointments.forEach(apt => {
     if (!grouped[apt.dayOfWeek]) {
       grouped[apt.dayOfWeek] = [];

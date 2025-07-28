@@ -5,6 +5,17 @@ import { FileDown } from "lucide-react";
 import { DoorcardLite } from "../UnifiedDoorcard";
 import { formatDisplayName } from "@/lib/display-name";
 
+// Appointment interface for PDF generation
+interface AppointmentForPDF {
+  id: string;
+  name: string;
+  startTime: string;
+  endTime: string;
+  dayOfWeek: string;
+  category: string;
+  location?: string | null;
+}
+
 interface SimplePDFProps {
   doorcard: DoorcardLite;
   doorcardId?: string;
@@ -53,7 +64,7 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
   const displayName = doorcard.user ? formatDisplayName(doorcard.user) : (doorcard.name || "Faculty Member");
   
   // Group appointments by day
-  const byDay: Record<string, any[]> = {};
+  const byDay: Record<string, AppointmentForPDF[]> = {};
   doorcard.appointments.forEach(apt => {
     if (!byDay[apt.dayOfWeek]) {
       byDay[apt.dayOfWeek] = [];
@@ -62,7 +73,7 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
   });
 
   // Helper to calculate rowspan for appointments
-  const getRowspan = (appointment: any) => {
+  const getRowspan = (appointment: AppointmentForPDF) => {
     const [startHour, startMin] = appointment.startTime.split(':').map(Number);
     const [endHour, endMin] = appointment.endTime.split(':').map(Number);
     
@@ -74,12 +85,12 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
   };
 
   // Helper to check if this is the start of an appointment
-  const isAppointmentStart = (appointment: any, slot: string) => {
+  const isAppointmentStart = (appointment: AppointmentForPDF, slot: string) => {
     return appointment.startTime === slot;
   };
 
   // Helper to check if appointment covers time slot
-  const isSlotCovered = (appointment: any, slot: string) => {
+  const isSlotCovered = (appointment: AppointmentForPDF, slot: string) => {
     const [slotHour, slotMin] = slot.split(':').map(Number);
     const [startHour, startMin] = appointment.startTime.split(':').map(Number);
     const [endHour, endMin] = appointment.endTime.split(':').map(Number);

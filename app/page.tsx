@@ -3,11 +3,11 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { COLLEGES, type College } from "@/types/doorcard";
+import { type College } from "@/types/doorcard";
 import { Search, Clock, MapPin, Calendar } from "lucide-react";
 
 // Custom hook for debounced values
@@ -119,7 +119,7 @@ export default function Home() {
             <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
               <strong>Need to meet with a professor?</strong> Find their office
               hours, location, and contact details. Each faculty profile shows
-              when they're available for student meetings, their office number,
+              when they&apos;re available for student meetings, their office number,
               and how to reach them across our three campuses.
             </p>
           </div>
@@ -134,7 +134,7 @@ export default function Home() {
             Search for Your Professor
           </h2>
           <p className="text-sm text-gray-700 dark:text-gray-100 mt-1">
-            Enter your professor's name or browse by campus
+            Enter your professor&apos;s name or browse by campus
           </p>
         </CardHeader>
         <CardContent>
@@ -335,7 +335,7 @@ export default function Home() {
                     offices, especially on your first visit
                   </p>
                   <p>
-                    <strong>Contact info:</strong> Each professor's page
+                    <strong>Contact info:</strong> Each professor&apos;s page
                     includes their preferred contact method
                   </p>
                   <p>

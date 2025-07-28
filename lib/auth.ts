@@ -4,6 +4,20 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
+// OneLogin profile interface
+interface OneLoginProfile {
+  sub?: string;
+  id?: string;
+  name?: string;
+  email: string;
+  picture?: string;
+  given_name?: string;
+  family_name?: string;
+  role?: string;
+  college?: string;
+  department?: string;
+}
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -200,9 +214,9 @@ export const authOptions: NextAuthOptions = {
               await prisma.user.update({
                 where: { email: user.email! },
                 data: {
-                  name: user.name || `${(profile as any)?.given_name || ''} ${(profile as any)?.family_name || ''}`.trim(),
-                  firstName: (profile as any)?.given_name,
-                  lastName: (profile as any)?.family_name,
+                  name: user.name || `${(profile as OneLoginProfile)?.given_name || ''} ${(profile as OneLoginProfile)?.family_name || ''}`.trim(),
+                  firstName: (profile as OneLoginProfile)?.given_name,
+                  lastName: (profile as OneLoginProfile)?.family_name,
                 },
               });
             }
