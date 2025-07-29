@@ -364,5 +364,4 @@ export const authOptions: NextAuthOptions = {
       }
     },
   },
-  debug: process.env.NODE_ENV === "development",
 };
