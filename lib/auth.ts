@@ -68,6 +68,7 @@ function CustomPrismaAdapter(): Adapter {
 }
 
 export const authOptions: NextAuthOptions = {
+  debug: process.env.NEXTAUTH_DEBUG === "true",
   adapter: CustomPrismaAdapter(),
   providers: [
     // OneLogin OIDC Provider - Custom OAuth Configuration
@@ -95,7 +96,8 @@ export const authOptions: NextAuthOptions = {
           const clientSecret = process.env.ONELOGIN_CLIENT_SECRET!;
 
           // Try Basic Authentication (common OIDC method)
-          const redirectUri = `${process.env.NEXTAUTH_URL}/api/auth/callback/onelogin`;
+          const baseUrl = process.env.NEXTAUTH_URL || (process.env.NODE_ENV === 'production' ? 'https://doorcard.vercel.app' : 'http://localhost:3000');
+          const redirectUri = `${baseUrl}/api/auth/callback/onelogin`;
           const tokenParams = new URLSearchParams({
             grant_type: "authorization_code",
             code: params.code || "",
@@ -233,6 +235,18 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
     maxAge: 8 * 60 * 60, // 8 hours for production
+  },
+  cookies: {
+    state: {
+      name: `next-auth.state`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 900, // 15 minutes
+      },
+    },
   },
   pages: {
     signIn: "/login",
