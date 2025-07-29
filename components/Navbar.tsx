@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { NavDropdown } from "./NavDropdown";
 import { prisma } from "@/lib/prisma";
 import SMCCDLogo from "./SMCCDLogo";
+import MobileNav from "./MobileNav";
 
 const navLinks = [
   { href: "https://smccd.edu/", text: "Home" },
@@ -36,14 +37,14 @@ export default async function Navbar() {
 
   return (
     <nav
-      className="bg-gray-800 dark:bg-gray-950 text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-2 shadow-lg border-b border-gray-700 dark:border-gray-800"
+      className="bg-gray-800 dark:bg-gray-950 text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-2 shadow-lg border-b border-gray-700 dark:border-gray-800 relative"
       aria-label="Primary"
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-center">
+      <div className="mx-auto flex max-w-7xl items-center justify-between">
         <Link
           href="/"
           prefetch={false}
-          className="flex items-center justify-center gap-2 sm:gap-3 group"
+          className="flex items-center gap-2 sm:gap-3 group flex-shrink-0"
         >
           <div className="flex-shrink-0">
             <SMCCDLogo
@@ -73,18 +74,21 @@ export default async function Navbar() {
           ))}
         </div>
 
-        <div className="flex flex-shrink-0 items-center gap-4">
-          {session ? (
-            <NavDropdown userDisplay={userDisplay} isAdmin={isAdmin} />
-          ) : (
-            <Link
-              href="/login"
-              className="rounded bg-blue-500 px-3 py-1 text-sm font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
-              prefetch={false}
-            >
-              Login
-            </Link>
-          )}
+        <div className="flex flex-shrink-0 items-center gap-2 lg:gap-4">
+          <div className="hidden lg:flex items-center gap-2">
+            {session ? (
+              <NavDropdown userDisplay={userDisplay} isAdmin={isAdmin} />
+            ) : (
+              <Link
+                href="/login"
+                className="rounded bg-blue-500 px-4 py-2 text-base font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 whitespace-nowrap"
+                prefetch={false}
+              >
+                Faculty Login
+              </Link>
+            )}
+          </div>
+          <MobileNav session={session} userDisplay={userDisplay} isAdmin={isAdmin} />
         </div>
       </div>
     </nav>

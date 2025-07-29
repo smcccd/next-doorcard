@@ -19,6 +19,8 @@ export async function GET() {
         appointments: {
           select: {
             id: true,
+            dayOfWeek: true,
+            category: true,
           },
         },
       },
@@ -40,6 +42,7 @@ export async function GET() {
         college: doorcard.college,
       },
       appointmentCount: doorcard.appointments.length,
+      availableDays: [...new Set(doorcard.appointments.map(apt => apt.dayOfWeek))],
       createdAt: doorcard.createdAt.toISOString(),
       updatedAt: doorcard.updatedAt.toISOString(),
     }));

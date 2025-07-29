@@ -11,7 +11,7 @@ const meta = {
   tags: ['autodocs'],
   decorators: [
     (Story, context) => {
-      const { session } = context.args;
+      const { session } = (context.args as any) || {};
       return (
         <SessionProvider session={session}>
           <div className="w-[600px]">
@@ -124,7 +124,7 @@ export const InDashboardContext: Story = {
   },
   decorators: [
     (Story, context) => {
-      const { session } = context.args;
+      const { session } = (context.args as any) || {};
       return (
         <SessionProvider session={session}>
           <div className="max-w-4xl mx-auto p-6">
@@ -153,7 +153,7 @@ export const DarkMode: Story = {
   },
   decorators: [
     (Story, context) => {
-      const { session } = context.args;
+      const { session } = (context.args as any) || {};
       return (
         <div className="dark">
           <SessionProvider session={session}>

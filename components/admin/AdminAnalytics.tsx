@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import CollegeLogo from "@/components/CollegeLogo";
+import { College } from "@/types/doorcard";
 import {
   Activity,
   Eye,
@@ -259,7 +261,14 @@ export function AdminAnalytics() {
                         </div>
                       </td>
                       <td className="p-3">
-                        <Badge variant="outline">{doorcard.college}</Badge>
+                        <Badge variant="outline" className="flex items-center gap-1.5 w-fit">
+                          <CollegeLogo 
+                            college={doorcard.college as College} 
+                            height={14}
+                            className="flex-shrink-0"
+                          />
+                          {doorcard.college}
+                        </Badge>
                       </td>
                       <td className="p-3">
                         <div className="flex items-center gap-1">

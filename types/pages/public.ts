@@ -1,4 +1,5 @@
 // Public Page Types
+import { DayOfWeek } from "@prisma/client";
 
 export interface PublicDoorcard {
   id: string;
@@ -15,6 +16,7 @@ export interface PublicDoorcard {
     college?: string;
   };
   appointmentCount: number;
+  availableDays: DayOfWeek[];
   createdAt: string;
   updatedAt: string;
 }

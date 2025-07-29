@@ -87,16 +87,13 @@ export default async function RootLayout({
                 <Navbar />
               </Suspense>
 
-              {/* Site Index - Modern version of legacy subheader */}
-              <SiteIndex />
+              {/* Site Index moved to individual pages that need it */}
 
               <main
                 id="main-content"
-                className="w-full flex-1 bg-gray-50 dark:bg-gray-900"
+                className="w-full flex-1"
               >
-                <section className="min-h-[400px] px-4 sm:px-6 lg:px-8 py-10 max-w-7xl mx-auto">
-                  {children}
-                </section>
+                {children}
               </main>
 
               <Footer />

@@ -1,35 +1,56 @@
 import React from 'react';
-import SMCCDLogo from './SMCCDLogo';
+import Image from 'next/image';
 import { College } from '@/types/doorcard';
 
 interface CollegeLogoProps {
   college: College;
   height?: number;
+  width?: number;
   className?: string;
+  priority?: boolean;
 }
 
-// Campus-specific colors for subtle theming
-const CAMPUS_COLORS: Record<College, string> = {
-  SKYLINE: '#2563eb', // Blue
-  CSM: '#dc2626',     // Red
-  CANADA: '#059669',  // Green
+const COLLEGE_LOGOS: Record<College, { src: string; alt: string; isJpg?: boolean }> = {
+  CANADA: {
+    src: "/canada.svg",
+    alt: "Cañada College Logo"
+  },
+  CSM: {
+    src: "/csm.jpg", 
+    alt: "College of San Mateo Logo",
+    isJpg: true
+  },
+  SKYLINE: {
+    src: "/skyline.svg",
+    alt: "Skyline College Logo"
+  }
 };
 
 const CollegeLogo: React.FC<CollegeLogoProps> = ({ 
   college, 
-  height = 24, 
-  className = '' 
+  height = 24,
+  width,
+  className = '',
+  priority = false
 }) => {
-  const color = CAMPUS_COLORS[college];
+  const logoInfo = COLLEGE_LOGOS[college];
   
-  // For now, we'll use the SMCCD logo for all colleges with campus-specific colors
-  // In the future, individual college logos could be implemented here
+  if (!logoInfo) {
+    return null;
+  }
+
+  // Calculate width based on height if not provided
+  const calculatedWidth = width || height;
+
   return (
     <div className={`flex items-center ${className}`}>
-      <SMCCDLogo 
-        height={height} 
-        color={color}
-        className="transition-all duration-200"
+      <Image
+        src={logoInfo.src}
+        alt={logoInfo.alt}
+        width={calculatedWidth}
+        height={height}
+        className={`transition-all duration-200 ${logoInfo.isJpg ? 'rounded' : ''}`}
+        priority={priority}
       />
     </div>
   );

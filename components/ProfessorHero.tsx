@@ -1,6 +1,5 @@
 import { Search } from "lucide-react";
 
-// A simple SVG dot pattern to use as a background mask
 const DotPattern = () => (
   <svg
     className="absolute inset-0 -z-10 h-full w-full fill-white/10 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"
@@ -30,7 +29,7 @@ export default function ProfessorHero() {
 
       <div className="mx-auto max-w-4xl px-6 py-24 text-center text-white sm:py-32 lg:px-8">
         {/* Main Heading */}
-        <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-6xl">
+        <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-6xl shadow">
           Find Your Professor
         </h1>
 

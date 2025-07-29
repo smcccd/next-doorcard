@@ -57,7 +57,7 @@ export default function SMCCDLogo({
       style={{
         shapeRendering: "geometricPrecision",
         textRendering: "optimizeLegibility",
-        imageRendering: "optimizeQuality",
+        imageRendering: "auto",
       }}
       {...props}
     >

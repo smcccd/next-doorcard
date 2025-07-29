@@ -11,6 +11,8 @@ import { AutoPrintHandler } from "@/components/AutoPrintHandler";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import CollegeLogo from "@/components/CollegeLogo";
+import { College } from "@/types/doorcard";
 import {
   User,
   MapPin,
@@ -256,7 +258,11 @@ export default async function PublicDoorcardView({
                 </div>
                 {doorcard.college && (
                   <div className="flex items-center gap-1">
-                    <Building className="h-4 w-4" />
+                    <CollegeLogo 
+                      college={doorcard.college as College} 
+                      height={16}
+                      className="flex-shrink-0"
+                    />
                     <span>{doorcard.college}</span>
                   </div>
                 )}
