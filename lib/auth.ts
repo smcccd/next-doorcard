@@ -97,7 +97,7 @@ export const authOptions: NextAuthOptions = {
 
           // Try Basic Authentication (common OIDC method)
           const baseUrl = process.env.NEXTAUTH_URL || (process.env.NODE_ENV === 'production' ? 'https://doorcard.vercel.app' : 'http://localhost:3000');
-          const redirectUri = `${baseUrl}/api/auth/callback/onelogin`;
+          const redirectUri = `${baseUrl.replace(/\/$/, '')}/api/auth/callback/onelogin`;
           const tokenParams = new URLSearchParams({
             grant_type: "authorization_code",
             code: params.code || "",
