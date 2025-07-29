@@ -4,7 +4,6 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -82,13 +81,6 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-background">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <Image
-            src="/icons/doorcard-icon.svg"
-            alt="Faculty Doorcard logo"
-            width={48}
-            height={48}
-            className="mx-auto mb-2"
-          />
           <h1 className="text-2xl font-semibold text-foreground">
             Welcome to Faculty Doorcards
           </h1>

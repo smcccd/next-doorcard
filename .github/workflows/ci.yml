@@ -79,12 +79,24 @@ jobs:
 
       - name: Build application
         run: npm run build
+        env:
+          NEXTAUTH_URL: http://localhost:3000
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ONELOGIN_CLIENT_ID: ${{ secrets.ONELOGIN_CLIENT_ID }}
+          ONELOGIN_CLIENT_SECRET: ${{ secrets.ONELOGIN_CLIENT_SECRET }}
+          NODE_ENV: test
 
       - name: Start application
         run: npm run start &
         env:
           PORT: 3000
           NODE_ENV: test
+          NEXTAUTH_URL: http://localhost:3000
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ONELOGIN_CLIENT_ID: ${{ secrets.ONELOGIN_CLIENT_ID }}
+          ONELOGIN_CLIENT_SECRET: ${{ secrets.ONELOGIN_CLIENT_SECRET }}
 
       - name: Wait for server
         run: npx wait-on http://localhost:3000
@@ -104,6 +116,12 @@ jobs:
           config: video=false,screenshotOnRunFailure=true
         env:
           CYPRESS_BASE_URL: http://localhost:3000
+          NEXTAUTH_URL: http://localhost:3000
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ONELOGIN_CLIENT_ID: ${{ secrets.ONELOGIN_CLIENT_ID }}
+          ONELOGIN_CLIENT_SECRET: ${{ secrets.ONELOGIN_CLIENT_SECRET }}
+          NODE_ENV: test
 
       - name: Upload E2E test artifacts
         uses: actions/upload-artifact@v3
@@ -135,6 +153,12 @@ jobs:
 
       - name: Build application
         run: npm run build
+        env:
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL || 'https://next-doorcard.vercel.app' }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ONELOGIN_CLIENT_ID: ${{ secrets.ONELOGIN_CLIENT_ID }}
+          ONELOGIN_CLIENT_SECRET: ${{ secrets.ONELOGIN_CLIENT_SECRET }}
 
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25

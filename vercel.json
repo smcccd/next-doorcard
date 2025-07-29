@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build:production",
+  "buildCommand": "npm run build",
   "framework": "nextjs",
   "installCommand": "npm ci",
   "build": {

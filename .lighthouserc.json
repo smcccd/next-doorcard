@@ -2,11 +2,11 @@
   "ci": {
     "collect": {
       "url": [
-        "http://localhost:3000",
-        "http://localhost:3000/login",
-        "http://localhost:3000/register",
-        "http://localhost:3000/dashboard",
-        "http://localhost:3000/create-doorcard"
+        "${LIGHTHOUSE_BASE_URL:-http://localhost:3000}",
+        "${LIGHTHOUSE_BASE_URL:-http://localhost:3000}/login",
+        "${LIGHTHOUSE_BASE_URL:-http://localhost:3000}/register",
+        "${LIGHTHOUSE_BASE_URL:-http://localhost:3000}/dashboard",
+        "${LIGHTHOUSE_BASE_URL:-http://localhost:3000}/create-doorcard"
       ],
       "numberOfRuns": 3,
       "settings": {
