@@ -1,7 +1,7 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import type { Adapter } from "next-auth/adapters";
+import type { Adapter, AdapterAccount } from "next-auth/adapters";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -31,9 +31,22 @@ function CustomPrismaAdapter(): Adapter {
         where: { provider_providerAccountId: { provider, providerAccountId } },
         select: { User: true },
       });
-      return account?.User ?? null;
+      
+      if (!account?.User) {
+        return null;
+      }
+      
+      // Transform Prisma User to AdapterUser
+      const user = account.User;
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        emailVerified: user.emailVerified,
+      };
     },
-    async linkAccount(account) {
+    async linkAccount(account: AdapterAccount) {
       return await prisma.account.create({
         data: {
           id: crypto.randomUUID(),
@@ -48,7 +61,6 @@ function CustomPrismaAdapter(): Adapter {
           scope: account.scope,
           id_token: account.id_token,
           session_state: account.session_state,
-          updatedAt: new Date(),
         },
       });
     },
