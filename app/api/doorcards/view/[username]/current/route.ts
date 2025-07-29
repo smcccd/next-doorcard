@@ -36,8 +36,8 @@ export async function GET(
     const doorcard = await prisma.doorcard.findFirst({
       where: { userId: user.id, isActive: true },
       include: {
-        user: { select: { name: true, college: true } },
-        appointments: {
+        User: { select: { name: true, college: true } },
+        Appointment: {
           orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
         },
       },

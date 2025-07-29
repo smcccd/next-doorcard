@@ -28,10 +28,10 @@ export async function GET() {
     const doorcards = await prisma.doorcard.findMany({
       where: { userId: user.id },
       include: {
-        metrics: true,
+        DoorcardMetrics: true,
         _count: {
           select: {
-            appointments: true,
+            Appointment: true,
           },
         },
       },
@@ -46,17 +46,17 @@ export async function GET() {
     // Sum up all views and prints from metrics
     const totalViews = doorcards.reduce(
       (sum: number, card: (typeof doorcards)[0]) =>
-        sum + (card.metrics?.totalViews || 0),
+        sum + (card.DoorcardMetrics?.totalViews || 0),
       0,
     );
     const uniqueViews = doorcards.reduce(
       (sum: number, card: (typeof doorcards)[0]) =>
-        sum + (card.metrics?.uniqueViews || 0),
+        sum + (card.DoorcardMetrics?.uniqueViews || 0),
       0,
     );
     const totalShares = doorcards.reduce(
       (sum: number, card: (typeof doorcards)[0]) =>
-        sum + (card.metrics?.totalShares || 0),
+        sum + (card.DoorcardMetrics?.totalShares || 0),
       0,
     );
 
@@ -71,7 +71,7 @@ export async function GET() {
 
     const recentAnalytics = await prisma.doorcardAnalytics.count({
       where: {
-        doorcard: {
+        Doorcard: {
           userId: user.id,
         },
         eventType: "PRINT_DOWNLOAD",

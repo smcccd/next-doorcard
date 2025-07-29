@@ -1,8 +1,10 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import type { Adapter } from "next-auth/adapters";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 // OneLogin profile interface
 interface OneLoginProfile {
@@ -18,8 +20,43 @@ interface OneLoginProfile {
   department?: string;
 }
 
+// Custom PrismaAdapter that handles PascalCase relations
+function CustomPrismaAdapter(): Adapter {
+  const baseAdapter = PrismaAdapter(prisma);
+  
+  return {
+    ...baseAdapter,
+    async getUserByAccount({ providerAccountId, provider }) {
+      const account = await prisma.account.findUnique({
+        where: { provider_providerAccountId: { provider, providerAccountId } },
+        select: { User: true },
+      });
+      return account?.User ?? null;
+    },
+    async linkAccount(account) {
+      return await prisma.account.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: account.userId,
+          type: account.type,
+          provider: account.provider,
+          providerAccountId: account.providerAccountId,
+          refresh_token: account.refresh_token,
+          access_token: account.access_token,
+          expires_at: account.expires_at,
+          token_type: account.token_type,
+          scope: account.scope,
+          id_token: account.id_token,
+          session_state: account.session_state,
+          updatedAt: new Date(),
+        },
+      });
+    },
+  };
+}
+
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: CustomPrismaAdapter(),
   providers: [
     // OneLogin OIDC Provider - Custom OAuth Configuration
     {
@@ -201,12 +238,12 @@ export const authOptions: NextAuthOptions = {
         try {
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email! },
-            include: { accounts: true },
+            include: { Account: true },
           });
 
           if (existingUser) {
             // Check if OneLogin account is already linked
-            const linkedAccount = existingUser.accounts.find(
+            const linkedAccount = existingUser.Account.find(
               (acc) => acc.provider === "onelogin",
             );
 
@@ -214,6 +251,7 @@ export const authOptions: NextAuthOptions = {
               // Link OneLogin account to existing user
               await prisma.account.create({
                 data: {
+                  id: crypto.randomUUID(),
                   userId: existingUser.id,
                   type: account.type,
                   provider: account.provider,

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { randomUUID } from "crypto";
 
 export async function POST(req: Request) {
   try {
@@ -38,10 +39,12 @@ export async function POST(req: Request) {
 
     await prisma.user.create({
       data: {
+        id: randomUUID(),
         name,
         email,
         username: finalUsername,
         password: hashedPassword,
+        updatedAt: new Date(),
       },
     });
 

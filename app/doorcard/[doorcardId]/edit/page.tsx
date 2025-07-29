@@ -60,7 +60,7 @@ export default async function EditDoorcardPage({
     prisma.doorcard.findFirst({
       where: { id: doorcardId, userId: user.id },
       include: {
-        appointments: {
+        Appointment: {
           orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
         },
       },
@@ -84,7 +84,7 @@ export default async function EditDoorcardPage({
   }
 
   // Adapt appointments into “timeBlocks” shape for legacy forms
-  const timeBlocks = doorcard.appointments.map((a) => ({
+  const timeBlocks = doorcard.Appointment.map((a) => ({
     id: a.id,
     day: a.dayOfWeek,
     startTime: a.startTime,
@@ -126,7 +126,7 @@ export default async function EditDoorcardPage({
     timeBlocks,
   };
 
-  const previewAppointments = doorcard.appointments.map((a) => ({
+  const previewAppointments = doorcard.Appointment.map((a) => ({
     id: a.id,
     name: a.name,
     startTime: a.startTime,
@@ -143,7 +143,7 @@ export default async function EditDoorcardPage({
     !doorcard.term ||
     !doorcard.year ||
     !doorcard.college ||
-    doorcard.appointments.length === 0;
+    doorcard.Appointment.length === 0;
 
   /* Progress line width (0%, 33%, 66%, 100%) */
   const progressPct = (step / (STEPS.length - 1)) * 100;

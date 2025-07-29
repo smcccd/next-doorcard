@@ -28,7 +28,7 @@ async function sampleDataCheck() {
   const sampleDoorcards = await prisma.doorcard.findMany({
     take: 5,
     include: {
-      user: {
+      User: {
         select: {
           name: true,
           email: true,
@@ -43,7 +43,7 @@ async function sampleDataCheck() {
     console.log(
       `${index + 1}. ${doorcard.name} (${doorcard.term} ${doorcard.year})`,
     );
-    console.log(`   User Campus: ${doorcard.user.college || "NO CAMPUS"}`);
+    console.log(`   User Campus: ${doorcard.User.college || "NO CAMPUS"}`);
     console.log(`   Doorcard Campus: ${doorcard.college}`);
     console.log("   ---");
   });

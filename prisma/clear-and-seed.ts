@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { DayOfWeek, AppointmentCategory, College } from "@prisma/client";
+import crypto from "crypto";
 
 const prismaForSeed = new PrismaClient();
 
@@ -263,11 +264,13 @@ async function main() {
   if (!user) {
     user = await prismaForSeed.user.create({
       data: {
+        id: crypto.randomUUID(),
         name: "Benjamin Besnyik",
         email: "besnyik@smccd.edu",
         password: "$2b$10$hash", // In real app, properly hash
         role: "FACULTY",
         college: College.SKYLINE,
+        updatedAt: new Date(),
       },
     });
     console.log("✅ Created user besnyik@smccd.edu");
@@ -303,6 +306,7 @@ async function main() {
 
       const doorcard = await prismaForSeed.doorcard.create({
         data: {
+          id: crypto.randomUUID(),
           name: faculty.name,
           doorcardName: `${
             faculty.name.split(" ")[0] === "Dr." ? "Dr." : "Prof."
@@ -315,6 +319,7 @@ async function main() {
           isPublic,
           isActive,
           userId: user.id,
+          updatedAt: new Date(),
         },
       });
 
@@ -367,6 +372,7 @@ async function main() {
         }
 
         appointments.push({
+          id: crypto.randomUUID(),
           name: appointmentName,
           startTime: `${startHour.toString().padStart(2, "0")}:00`,
           endTime: `${endHour.toString().padStart(2, "0")}:${endMinute
@@ -378,6 +384,7 @@ async function main() {
             ? getRandomElement(locations[faculty.college])
             : null,
           doorcardId: doorcard.id,
+          updatedAt: new Date(),
         });
       }
 

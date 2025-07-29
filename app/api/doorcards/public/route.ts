@@ -9,14 +9,14 @@ export async function GET() {
         isPublic: true,
       },
       include: {
-        user: {
+        User: {
           select: {
             id: true,
             name: true,
             username: true,
           },
         },
-        appointments: {
+        Appointment: {
           select: {
             id: true,
             dayOfWeek: true,
@@ -24,7 +24,7 @@ export async function GET() {
           },
         },
       },
-      orderBy: [{ college: "asc" }, { user: { name: "asc" } }],
+      orderBy: [{ college: "asc" }, { User: { name: "asc" } }],
     });
 
     const publicDoorcards = doorcards.map((doorcard) => ({
@@ -37,12 +37,12 @@ export async function GET() {
       college: doorcard.college,
       slug: doorcard.slug,
       user: {
-        name: doorcard.user.name || "",
-        username: doorcard.user.username,
+        name: doorcard.User.name || "",
+        username: doorcard.User.username,
         college: doorcard.college,
       },
-      appointmentCount: doorcard.appointments.length,
-      availableDays: [...new Set(doorcard.appointments.map(apt => apt.dayOfWeek))],
+      appointmentCount: doorcard.Appointment?.length || 0,
+      availableDays: [...new Set(doorcard.Appointment?.map(apt => apt.dayOfWeek) || [])],
       createdAt: doorcard.createdAt.toISOString(),
       updatedAt: doorcard.updatedAt.toISOString(),
     }));

@@ -14,7 +14,7 @@ async function checkMetrics() {
   const sampleMetrics = await prisma.doorcardMetrics.findMany({
     take: 5,
     include: {
-      doorcard: {
+      Doorcard: {
         select: {
           name: true,
           term: true,
@@ -28,7 +28,7 @@ async function checkMetrics() {
   console.log("\nSample metrics:");
   sampleMetrics.forEach((metric, index) => {
     console.log(
-      `${index + 1}. ${metric.doorcard.name} (${metric.doorcard.term} ${metric.doorcard.year}, ${metric.doorcard.college})`,
+      `${index + 1}. ${metric.Doorcard.name} (${metric.Doorcard.term} ${metric.Doorcard.year}, ${metric.Doorcard.college})`,
     );
     console.log(
       `   Views: ${metric.totalViews}, Prints: ${metric.totalPrints}, Shares: ${metric.totalShares}`,
@@ -47,7 +47,7 @@ async function checkMetrics() {
       createdAt: "desc",
     },
     include: {
-      doorcard: {
+      Doorcard: {
         select: {
           name: true,
           term: true,
@@ -61,7 +61,7 @@ async function checkMetrics() {
   console.log("\nRecent analytics events:");
   recentAnalytics.forEach((event, index) => {
     console.log(
-      `${index + 1}. ${event.eventType} - ${event.doorcard.name} (${event.doorcard.college}) - ${event.createdAt.toISOString().split("T")[0]}`,
+      `${index + 1}. ${event.eventType} - ${event.Doorcard.name} (${event.Doorcard.college}) - ${event.createdAt.toISOString().split("T")[0]}`,
     );
   });
 
@@ -75,11 +75,11 @@ async function checkMetrics() {
       ],
     },
     include: {
-      metrics: true,
+      DoorcardMetrics: true,
     },
   });
 
-  const doorcarsWithMetrics = recentDoorcards.filter((d) => d.metrics !== null);
+  const doorcarsWithMetrics = recentDoorcards.filter((d) => d.DoorcardMetrics !== null);
   console.log(`\nRecent doorcards: ${recentDoorcards.length}`);
   console.log(`Recent doorcards with metrics: ${doorcarsWithMetrics.length}`);
 
@@ -88,7 +88,7 @@ async function checkMetrics() {
     doorcarsWithMetrics.slice(0, 5).forEach((doorcard, index) => {
       console.log(`${index + 1}. ${doorcard.name} (${doorcard.college})`);
       console.log(
-        `   Views: ${doorcard.metrics?.totalViews}, Prints: ${doorcard.metrics?.totalPrints}, Shares: ${doorcard.metrics?.totalShares}`,
+        `   Views: ${doorcard.DoorcardMetrics?.totalViews}, Prints: ${doorcard.DoorcardMetrics?.totalPrints}, Shares: ${doorcard.DoorcardMetrics?.totalShares}`,
       );
     });
   }

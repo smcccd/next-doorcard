@@ -61,10 +61,10 @@ export async function GET(
             updatedAt: true,
             _count: {
               select: {
-                appointments: true,
+                Appointment: true,
               },
             },
-            appointments: {
+            Appointment: {
               select: {
                 id: true,
                 name: true,
@@ -107,7 +107,7 @@ export async function GET(
       displayFormat: user.displayFormat,
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
-      doorcards: user.doorcards.map((doorcard) => ({
+      doorcards: user.Doorcard.map((doorcard) => ({
         id: doorcard.id,
         name: doorcard.name,
         doorcardName: doorcard.doorcardName,
@@ -119,13 +119,13 @@ export async function GET(
         officeNumber: doorcard.officeNumber,
         createdAt: doorcard.createdAt.toISOString(),
         updatedAt: doorcard.updatedAt.toISOString(),
-        appointmentCount: doorcard._count.appointments,
-        appointments: doorcard.appointments,
+        appointmentCount: doorcard._count.Appointment,
+        appointments: doorcard.Appointment,
       })),
-      totalDoorcards: user.doorcards.length,
-      activeDoorcards: user.doorcards.filter((d) => d.isActive).length,
-      totalAppointments: user.doorcards.reduce(
-        (total, doorcard) => total + doorcard._count.appointments,
+      totalDoorcards: user.Doorcard.length,
+      activeDoorcards: user.Doorcard.filter((d) => d.isActive).length,
+      totalAppointments: user.Doorcard.reduce(
+        (total, doorcard) => total + doorcard._count.Appointment,
         0,
       ),
     };

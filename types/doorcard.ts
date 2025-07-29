@@ -72,21 +72,21 @@ export type Term = PrismaTerm;
 // Doorcard with *all* relations we commonly need.
 export type DoorcardWithRelations = Prisma.DoorcardGetPayload<{
   include: {
-    appointments: true;
-    user: true;
-    metrics: true;
-    analytics: true;
-    termRelation: true;
+    Appointment: true;
+    User: true;
+    DoorcardMetrics: true;
+    DoorcardAnalytics: true;
+    Term: true;
   };
 }>;
 
 // Light-weight variant for list screens (omit heavy arrays like analytics).
 export type DoorcardListItem = Prisma.DoorcardGetPayload<{
   include: {
-    appointments: true;
-    user: true;
-    metrics: true;
-    termRelation: true;
+    Appointment: true;
+    User: true;
+    DoorcardMetrics: true;
+    Term: true;
   };
 }>;
 

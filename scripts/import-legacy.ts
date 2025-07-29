@@ -8,6 +8,7 @@ import {
 } from "@prisma/client";
 import * as fs from "fs";
 import * as path from "path";
+import crypto from "crypto";
 import { parse } from "fast-csv";
 import { createWriteStream } from "fs";
 import { format } from "fast-csv";
@@ -242,11 +243,13 @@ async function processUsers(
 
               if (!dryRun) {
                 validUsers.push({
+                  id: crypto.randomUUID(),
                   username: row.username,
                   email,
                   password: defaultPassword,
                   role,
                   name: row.username,
+                  updatedAt: new Date(),
                 });
               } else {
                 console.log(
@@ -394,6 +397,7 @@ async function processDoorcards(
               validDoorcards.push({
                 oldId: row.doorcardID,
                 data: {
+                  id: crypto.randomUUID(),
                   name: row.doorcardname,
                   doorcardName: row.doorcardname,
                   officeNumber: "TBD",
@@ -404,6 +408,7 @@ async function processDoorcards(
                   isActive: false,
                   isPublic: false,
                   userId,
+                  updatedAt: new Date(),
                 },
               });
 
@@ -538,6 +543,7 @@ async function processAppointments(
                 // Create placeholder doorcard for missing legacy data
                 const placeholderDoorcard = await prisma.doorcard.create({
                   data: {
+                    id: crypto.randomUUID(),
                     name: `Legacy Doorcard (ID: ${row.doorcardID})`,
                     doorcardName: `Legacy Doorcard (ID: ${row.doorcardID})`,
                     officeNumber: "Unknown",
@@ -548,6 +554,7 @@ async function processAppointments(
                     isActive: false,
                     isPublic: false,
                     userId,
+                    updatedAt: new Date(),
                   },
                 });
                 doorcardIdMap.set(row.doorcardID, placeholderDoorcard.id);
@@ -582,6 +589,7 @@ async function processAppointments(
 
             if (!dryRun) {
               validAppointments.push({
+                id: crypto.randomUUID(),
                 name: row.appointname,
                 startTime,
                 endTime,
@@ -589,6 +597,7 @@ async function processAppointments(
                 category,
                 location,
                 doorcardId,
+                updatedAt: new Date(),
               });
             } else {
               console.log(
@@ -770,11 +779,13 @@ async function createMissingUsers(
     try {
       const email = generateEmail(username);
       validUsers.push({
+        id: crypto.randomUUID(),
         username,
         email,
         password: defaultPassword,
         role: UserRole.FACULTY,
         name: username,
+        updatedAt: new Date(),
       });
     } catch (error) {
       rejects.push({

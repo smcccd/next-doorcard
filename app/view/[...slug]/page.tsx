@@ -81,8 +81,8 @@ async function fetchDoorcard(
         ],
       },
       include: {
-        appointments: true,
-        user: {
+        Appointment: true,
+        User: {
           select: {
             name: true,
             firstName: true,
@@ -106,8 +106,8 @@ async function fetchDoorcard(
       },
       orderBy: { updatedAt: "desc" },
       include: {
-        appointments: true,
-        user: {
+        Appointment: true,
+        User: {
           select: {
             name: true,
             firstName: true,
@@ -174,11 +174,17 @@ export default async function PublicDoorcardView({
   const { doorcard } = result;
   const isSpecificTerm = Boolean(termSlug);
 
-  // Convert doorcard to match DoorcardLite interface
-  const doorcardLite = {
+  // Transform Prisma data and convert to match DoorcardLite interface
+  const transformedDoorcard = {
     ...doorcard,
+    appointments: doorcard.Appointment,
+    user: doorcard.User,
+  };
+  
+  const doorcardLite = {
+    ...transformedDoorcard,
     year: String(doorcard.year), // Convert number to string
-    term: doorcard.term || undefined,
+    term: transformedDoorcard.term || undefined,
   };
 
   return (
@@ -188,7 +194,7 @@ export default async function PublicDoorcardView({
 
       {/* Analytics tracker (client) */}
       <DoorcardViewTracker
-        doorcardId={doorcard.id}
+        doorcardId={transformedDoorcard.id}
         slug={slugArray.join("/")}
         source={useAuth ? "admin_view" : "public_url"}
         isSpecificTerm={isSpecificTerm}
@@ -201,7 +207,7 @@ export default async function PublicDoorcardView({
             <div className="flex-1">
               <div className="mb-3">
                 <h1 className="text-2xl font-bold text-gray-900 print:text-xl mb-2">
-                  {doorcard.doorcardName || "Faculty Doorcard"}
+                  {transformedDoorcard.doorcardName || "Faculty Doorcard"}
                 </h1>
                 {/* Badge row with better spacing */}
                 <div className="flex flex-wrap items-center gap-2">
@@ -212,10 +218,10 @@ export default async function PublicDoorcardView({
                   )}
                   {isSpecificTerm && (
                     <Badge variant="outline" className="text-xs">
-                      {doorcard.term} {doorcard.year}
+                      {transformedDoorcard.term} {transformedDoorcard.year}
                     </Badge>
                   )}
-                  {doorcard.isActive ? (
+                  {transformedDoorcard.isActive ? (
                     <Badge
                       variant="default"
                       className="text-xs bg-green-100 text-green-800"
@@ -227,7 +233,7 @@ export default async function PublicDoorcardView({
                       Draft
                     </Badge>
                   )}
-                  {!doorcard.isPublic && (
+                  {!transformedDoorcard.isPublic && (
                     <Badge
                       variant="outline"
                       className="text-xs border-amber-200 text-amber-700"
@@ -241,39 +247,39 @@ export default async function PublicDoorcardView({
                 <div className="flex items-center gap-1">
                   <User className="h-4 w-4" />
                   <span className="font-medium">
-                    {doorcard.user
-                      ? formatDisplayName(doorcard.user)
-                      : doorcard.name}
+                    {transformedDoorcard.user
+                      ? formatDisplayName(transformedDoorcard.user)
+                      : transformedDoorcard.name}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
-                  <span>Office {doorcard.officeNumber}</span>
+                  <span>Office {transformedDoorcard.officeNumber}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   <span>
-                    {doorcard.term} {doorcard.year}
+                    {transformedDoorcard.term} {transformedDoorcard.year}
                   </span>
                 </div>
-                {doorcard.college && (
+                {transformedDoorcard.college && (
                   <div className="flex items-center gap-1">
                     <CollegeLogo 
-                      college={doorcard.college as College} 
+                      college={transformedDoorcard.college as College} 
                       height={16}
                       className="flex-shrink-0"
                     />
-                    <span>{doorcard.college}</span>
+                    <span>{transformedDoorcard.college}</span>
                   </div>
                 )}
-                {doorcard.user?.website && (
+                {transformedDoorcard.user?.website && (
                   <div className="flex items-center gap-1">
                     <Globe className="h-4 w-4" />
                     <a
                       href={
-                        doorcard.user.website.startsWith("http")
-                          ? doorcard.user.website
-                          : `https://${doorcard.user.website}`
+                        transformedDoorcard.user.website.startsWith("http")
+                          ? transformedDoorcard.user.website
+                          : `https://${transformedDoorcard.user.website}`
                       }
                       target="_blank"
                       rel="noopener noreferrer"
@@ -298,7 +304,7 @@ export default async function PublicDoorcardView({
               )}
               <DoorcardActions
                 doorcard={doorcardLite}
-                doorcardId={doorcard.id}
+                doorcardId={transformedDoorcard.id}
               />
             </div>
           </div>
@@ -307,7 +313,7 @@ export default async function PublicDoorcardView({
 
       {/* Schedule - Screen and Print versions */}
       <div className="w-full">
-        {doorcard.appointments.length > 0 ? (
+        {transformedDoorcard.appointments.length > 0 ? (
           <>
             {/* Screen version - full schedule with all features */}
             <div className="w-full print:hidden">

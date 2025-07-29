@@ -67,15 +67,15 @@ export async function GET(req: NextRequest) {
         createdAt: true,
         _count: {
           select: {
-            doorcards: true,
+            Doorcard: true,
           },
         },
-        doorcards: {
+        Doorcard: {
           select: {
             college: true,
             _count: {
               select: {
-                appointments: true,
+                Appointment: true,
               },
             },
           },
@@ -88,14 +88,14 @@ export async function GET(req: NextRequest) {
 
     // Process the data to include computed fields
     const processedUsers = users.map((user) => {
-      const doorcardCount = user._count.doorcards;
-      const appointmentCount = user.doorcards.reduce(
-        (total, doorcard) => total + doorcard._count.appointments,
+      const doorcardCount = user._count.Doorcard;
+      const appointmentCount = user.Doorcard.reduce(
+        (total, doorcard) => total + doorcard._count.Appointment,
         0,
       );
 
       // Get primary campus from doorcards
-      const campuses = user.doorcards.map((d) => d.college).filter(Boolean);
+      const campuses = user.Doorcard.map((d) => d.college).filter(Boolean);
       const primaryCampus = campuses.length > 0 ? campuses[0] : user.college;
 
       return {

@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { randomUUID } from "crypto";
 
 const prisma = new PrismaClient();
 
@@ -236,6 +237,7 @@ async function seedMockUsers() {
         isUpcoming: false,
       },
       create: {
+        id: randomUUID(),
         name: "Fall 2025",
         year: "2025",
         season: "Fall",
@@ -244,6 +246,7 @@ async function seedMockUsers() {
         isActive: true,
         isArchived: false,
         isUpcoming: false,
+        updatedAt: new Date(),
       },
     });
 
@@ -283,6 +286,7 @@ async function seedMockUsers() {
           role: "FACULTY",
         },
         create: {
+          id: randomUUID(),
           email: faculty.email,
           name: faculty.name,
           firstName: faculty.firstName,
@@ -293,6 +297,7 @@ async function seedMockUsers() {
           password: hashedPassword,
           role: "FACULTY",
           emailVerified: new Date(),
+          updatedAt: new Date(),
         },
       });
 
@@ -306,6 +311,7 @@ async function seedMockUsers() {
 
       const doorcard = await prisma.doorcard.create({
         data: {
+          id: randomUUID(),
           userId: user.id,
           term: "FALL",
           year: 2025,
@@ -317,6 +323,7 @@ async function seedMockUsers() {
           isPublic: true,
           slug,
           termId: fall2025.id,
+          updatedAt: new Date(),
         },
       });
 
@@ -328,6 +335,7 @@ async function seedMockUsers() {
         const hour = template[j];
         await prisma.appointment.create({
           data: {
+            id: randomUUID(),
             doorcardId: doorcard.id,
             name: appointmentTypes[j % appointmentTypes.length],
             dayOfWeek: hour.dayOfWeek as any,
@@ -338,6 +346,7 @@ async function seedMockUsers() {
               hour.appointmentType === "By Appointment"
                 ? "HOURS_BY_ARRANGEMENT"
                 : "OFFICE_HOURS",
+            updatedAt: new Date(),
           },
         });
       }

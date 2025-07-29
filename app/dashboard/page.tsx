@@ -26,15 +26,15 @@ type DashboardDoorcard = Doorcard & {
 export default async function DashboardPage() {
   const user = await requireAuthUser();
 
-  const [doorcards, metrics, activeTerm] = await Promise.all([
+  const [rawDoorcards, metrics, activeTerm] = await Promise.all([
     prisma.doorcard.findMany({
       where: { userId: user.id },
       include: {
-        appointments: true,
-        user: { select: { username: true, name: true } },
+        Appointment: true,
+        User: { select: { username: true, name: true } },
       },
       orderBy: { updatedAt: "desc" },
-    }) as Promise<DashboardDoorcard[]>,
+    }),
     prisma.doorcardMetrics.aggregate({
       _sum: { totalViews: true, totalPrints: true, totalShares: true },
     }),
@@ -43,6 +43,13 @@ export default async function DashboardPage() {
       where: { isActive: true }
     }).then(term => term || null)
   ]);
+
+  // Transform Prisma data to match component expectations
+  const doorcards: DashboardDoorcard[] = rawDoorcards.map(dc => ({
+    ...dc,
+    appointments: dc.Appointment,
+    user: dc.User,
+  }));
 
   // Get current term info (database or computed)
   const currentTermInfo = activeTerm 

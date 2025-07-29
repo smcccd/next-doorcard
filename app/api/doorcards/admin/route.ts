@@ -21,7 +21,7 @@ export async function GET() {
     console.log("🔍 Doorcards Admin API: Querying database...");
     const doorcards = await prisma.doorcard.findMany({
       include: {
-        user: {
+        User: {
           select: {
             name: true,
             email: true,
@@ -31,7 +31,7 @@ export async function GET() {
         },
         _count: {
           select: {
-            appointments: true,
+            Appointment: true,
           },
         },
       },

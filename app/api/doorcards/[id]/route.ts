@@ -5,6 +5,7 @@ import { z } from "zod";
 import { COLLEGES } from "@/types/doorcard";
 import { Prisma, College, TermSeason } from "@prisma/client";
 import { getTermStatus } from "@/lib/doorcard-status";
+import { randomUUID } from "crypto";
 
 /* ----------------------------------------------------------------------------
  * Schemas / Helpers
@@ -54,6 +55,7 @@ async function replaceAppointments(
   if (blocks.length === 0) return;
 
   const data = blocks.map((b) => ({
+    id: randomUUID(),
     doorcardId,
     name: b.activity || b.name || "Office Hours",
     startTime: b.startTime,
@@ -61,6 +63,7 @@ async function replaceAppointments(
     dayOfWeek: (b.dayOfWeek || b.day || "MONDAY") as any,
     category: (b.category as any) || "OFFICE_HOURS",
     location: b.location ?? null,
+    updatedAt: new Date(),
   }));
 
   await prisma.appointment.createMany({ data });
@@ -68,10 +71,10 @@ async function replaceAppointments(
 
 function includeDoorcard(): Prisma.DoorcardInclude {
   return {
-    appointments: {
+    Appointment: {
       orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }], // <- no `as const`
     },
-    user: { select: { name: true, college: true, email: true } },
+    User: { select: { name: true, college: true, email: true } },
   };
 }
 

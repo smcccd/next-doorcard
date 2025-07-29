@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
 import type { TermData, TermTransitionOptions } from "@/types/terms/management";
+import crypto from "crypto";
 
 // Re-export types for backward compatibility
 export type { TermData, TermTransitionOptions } from "@/types/terms/management";
@@ -11,7 +12,7 @@ export class TermManager {
   static async getActiveTerm() {
     return await prisma.term.findFirst({
       where: { isActive: true },
-      include: { doorcards: true },
+      include: { Doorcard: true },
     });
   }
 
@@ -23,7 +24,7 @@ export class TermManager {
       orderBy: [{ year: "desc" }, { season: "asc" }],
       include: {
         _count: {
-          select: { doorcards: true },
+          select: { Doorcard: true },
         },
       },
     });
@@ -43,6 +44,7 @@ export class TermManager {
 
     return await prisma.term.create({
       data: {
+        id: crypto.randomUUID(),
         name: termData.name,
         year: termData.year,
         season: termData.season,
@@ -52,6 +54,7 @@ export class TermManager {
         isArchived: termData.isArchived || false,
         isUpcoming: termData.isUpcoming || false,
         archiveDate: termData.archiveDate,
+        updatedAt: new Date(),
       },
     });
   }
@@ -107,7 +110,7 @@ export class TermManager {
       if (archiveOldDoorcards) {
         await tx.doorcard.updateMany({
           where: {
-            termRelation: {
+            Term: {
               isArchived: true,
             },
           },
@@ -166,20 +169,20 @@ export class TermManager {
 
     return await prisma.doorcard.findMany({
       where: {
-        termRelation: whereClause[status],
+        Term: whereClause[status],
       },
       include: {
-        user: {
+        User: {
           select: { name: true, email: true, college: true },
         },
-        termRelation: true,
+        Term: true,
         _count: {
-          select: { appointments: true },
+          select: { Appointment: true },
         },
       },
       orderBy: [
-        { termRelation: { year: "desc" } },
-        { termRelation: { season: "asc" } },
+        { Term: { year: "desc" } },
+        { Term: { season: "asc" } },
         { name: "asc" },
       ],
     });

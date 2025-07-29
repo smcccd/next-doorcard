@@ -7,6 +7,7 @@ import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 import { timeBlockSchema } from "@/lib/validations/doorcard-edit";
 import type { College, TermSeason } from "@prisma/client";
+import crypto from "crypto";
 
 /* -------------------------------------------------------------------------- */
 /* Schemas / helpers                                                          */
@@ -183,6 +184,7 @@ export async function updateTimeBlocks(
     await prisma.appointment.deleteMany({ where: { doorcardId } });
     await prisma.appointment.createMany({
       data: blocks.map((b) => ({
+        id: crypto.randomUUID(),
         doorcardId,
         name: b.activity,
         startTime: b.startTime,
@@ -190,6 +192,7 @@ export async function updateTimeBlocks(
         dayOfWeek: b.day,
         category: b.category || "OFFICE_HOURS",
         location: b.location,
+        updatedAt: new Date(),
       })),
     });
   } catch (err) {
@@ -279,6 +282,7 @@ export async function createDoorcardWithCampusTerm(
 
     const newDoorcard = await prisma.doorcard.create({
       data: {
+        id: crypto.randomUUID(),
         name: defaultDisplayName,
         doorcardName: defaultDoorcardTitle,
         officeNumber: "",
@@ -288,6 +292,7 @@ export async function createDoorcardWithCampusTerm(
         isActive: false,
         isPublic: false,
         userId: user.id,
+        updatedAt: new Date(),
       },
     });
     newDoorcardId = newDoorcard.id;

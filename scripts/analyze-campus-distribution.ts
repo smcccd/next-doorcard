@@ -42,8 +42,8 @@ async function analyzeCampusDistribution() {
       })),
     },
     include: {
-      user: true,
-      metrics: true,
+      User: true,
+      DoorcardMetrics: true,
     },
   });
 
@@ -140,7 +140,7 @@ async function analyzeCampusDistribution() {
 
   recentDoorcards.forEach((doorcard) => {
     const userId = doorcard.userId;
-    const metrics = doorcard.metrics;
+    const metrics = doorcard.DoorcardMetrics;
 
     if (!userActivityMap.has(userId)) {
       // Find the primary campus for this user (campus with most doorcards)
@@ -155,8 +155,8 @@ async function analyzeCampusDistribution() {
 
       userActivityMap.set(userId, {
         userId,
-        userName: doorcard.user.name,
-        email: doorcard.user.email,
+        userName: doorcard.User.name,
+        email: doorcard.User.email,
         userCampus: primaryCampus, // Use primary campus instead of user.college
         doorcardCampus: doorcard.college,
         totalViews: 0,

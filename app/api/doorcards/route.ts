@@ -3,6 +3,7 @@ import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 import { doorcardSchema } from "@/lib/validations/doorcard";
 import { z } from "zod";
+import crypto from "crypto";
 
 export async function POST(req: Request) {
   try {
@@ -61,6 +62,7 @@ export async function POST(req: Request) {
 
       const doorcard = await prisma.doorcard.create({
         data: {
+          id: crypto.randomUUID(),
           name: validatedData.name,
           doorcardName: validatedData.doorcardName,
           officeNumber: validatedData.officeNumber,
@@ -71,19 +73,22 @@ export async function POST(req: Request) {
           isPublic: validatedData.isPublic,
           slug: cleanSlug,
           userId: user.id,
-          appointments: {
+          Appointment: {
             create: validatedData.appointments.map((apt) => ({
+              id: crypto.randomUUID(),
               name: apt.name,
               startTime: apt.startTime,
               endTime: apt.endTime,
               dayOfWeek: apt.dayOfWeek,
               category: apt.category,
               location: apt.location,
+              updatedAt: new Date(),
             })),
           },
+          updatedAt: new Date(),
         },
         include: {
-          appointments: true,
+          Appointment: true,
         },
       });
 
@@ -122,7 +127,7 @@ export async function GET() {
         userId: user.id,
       },
       include: {
-        user: {
+        User: {
           select: {
             name: true,
             username: true,
@@ -130,7 +135,7 @@ export async function GET() {
             college: true,
           },
         },
-        appointments: {
+        Appointment: {
           orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
         },
       },

@@ -56,10 +56,10 @@ export default async function DoorcardViewById({
   const doorcard = await prisma.doorcard.findUnique({
     where: { id: doorcardId },
     include: {
-      appointments: {
+      Appointment: {
         orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
       },
-      user: {
+      User: {
         select: {
           name: true,
           firstName: true,
@@ -96,7 +96,14 @@ export default async function DoorcardViewById({
     );
   }
 
-  const displayStatus = getDoorcardDisplayStatus(doorcard);
+  // Transform Prisma data to match component expectations
+  const transformedDoorcard = {
+    ...doorcard,
+    appointments: doorcard.Appointment,
+    user: doorcard.User,
+  };
+
+  const displayStatus = getDoorcardDisplayStatus(transformedDoorcard);
 
   return (
     <div className="min-h-screen bg-white">
@@ -105,8 +112,8 @@ export default async function DoorcardViewById({
 
       {/* Analytics tracker (client) */}
       <DoorcardViewTracker
-        doorcardId={doorcard.id}
-        slug={`doorcard/${doorcard.id}`}
+        doorcardId={transformedDoorcard.id}
+        slug={`doorcard/${transformedDoorcard.id}`}
         source={useAuth ? "admin_view" : "direct_link"}
         isSpecificTerm={true}
       />
@@ -118,7 +125,7 @@ export default async function DoorcardViewById({
             <div className="flex-1">
               <div className="mb-3">
                 <h1 className="text-2xl font-bold text-gray-900 print:text-xl mb-2">
-                  {doorcard.doorcardName || "Faculty Doorcard"}
+                  {transformedDoorcard.doorcardName || "Faculty Doorcard"}
                 </h1>
                 {/* Badge row with better spacing */}
                 <div className="flex flex-wrap items-center gap-2">
@@ -128,7 +135,7 @@ export default async function DoorcardViewById({
                     </Badge>
                   )}
                   <Badge variant="outline" className="text-xs">
-                    {doorcard.term} {doorcard.year}
+                    {transformedDoorcard.term} {transformedDoorcard.year}
                   </Badge>
                   <Badge
                     variant={
@@ -146,7 +153,7 @@ export default async function DoorcardViewById({
                   >
                     {displayStatus.label}
                   </Badge>
-                  {!doorcard.isPublic && (
+                  {!transformedDoorcard.isPublic && (
                     <Badge
                       variant="outline"
                       className="text-xs border-amber-200 text-amber-700"
@@ -159,22 +166,22 @@ export default async function DoorcardViewById({
               <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 print:text-xs">
                 <div className="flex items-center gap-1">
                   <User className="h-4 w-4" />
-                  <span className="font-medium">{doorcard.name}</span>
+                  <span className="font-medium">{transformedDoorcard.name}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
-                  <span>Office {doorcard.officeNumber}</span>
+                  <span>Office {transformedDoorcard.officeNumber}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   <span>
-                    {doorcard.term} {doorcard.year}
+                    {transformedDoorcard.term} {transformedDoorcard.year}
                   </span>
                 </div>
-                {doorcard.college && (
+                {transformedDoorcard.college && (
                   <div className="flex items-center gap-1">
                     <Building className="h-4 w-4" />
-                    <span>{doorcard.college}</span>
+                    <span>{transformedDoorcard.college}</span>
                   </div>
                 )}
               </div>
@@ -192,10 +199,10 @@ export default async function DoorcardViewById({
               )}
               <DoorcardActions
                 doorcard={{
-                  ...doorcard,
-                  year: doorcard.year.toString(),
+                  ...transformedDoorcard,
+                  year: transformedDoorcard.year.toString(),
                 }}
-                doorcardId={doorcard.id}
+                doorcardId={transformedDoorcard.id}
               />
             </div>
           </div>
@@ -204,14 +211,14 @@ export default async function DoorcardViewById({
 
       {/* Schedule - Screen and Print versions */}
       <div className="w-full">
-        {doorcard.appointments.length > 0 ? (
+        {transformedDoorcard.appointments.length > 0 ? (
           <>
             {/* Screen version - full schedule with all features */}
             <div className="w-full print:hidden">
               <UnifiedDoorcard
                 doorcard={{
-                  ...doorcard,
-                  year: doorcard.year.toString(),
+                  ...transformedDoorcard,
+                  year: transformedDoorcard.year.toString(),
                 }}
               />
             </div>
@@ -220,8 +227,8 @@ export default async function DoorcardViewById({
             <div className="hidden print:block">
               <PrintOptimizedDoorcard
                 doorcard={{
-                  ...doorcard,
-                  year: doorcard.year.toString(),
+                  ...transformedDoorcard,
+                  year: transformedDoorcard.year.toString(),
                 }}
               />
             </div>

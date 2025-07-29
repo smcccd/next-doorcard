@@ -36,7 +36,7 @@ async function comprehensiveCampusAnalysis() {
       })),
     },
     include: {
-      user: {
+      User: {
         select: {
           id: true,
           name: true,
@@ -179,7 +179,7 @@ async function comprehensiveCampusAnalysis() {
     if (!userDoorcardCount.has(doorcard.userId)) {
       userDoorcardCount.set(doorcard.userId, {
         count: 0,
-        user: doorcard.user,
+        user: doorcard.User,
         primaryCampus: "",
         campuses: new Set(),
       });
@@ -256,7 +256,7 @@ async function comprehensiveCampusAnalysis() {
     const sampleUsers = campusUserIds.slice(0, 3);
     const sampleUserDetails = recentDoorcards
       .filter((d) => sampleUsers.includes(d.userId))
-      .map((d) => d.user.name || d.user.email.split("@")[0]);
+      .map((d) => d.User.name || d.User.email.split("@")[0]);
 
     if (sampleUserDetails.length > 0) {
       console.log(

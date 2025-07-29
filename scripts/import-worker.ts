@@ -13,16 +13,19 @@ const prisma = new PrismaClient();
 
 // Types
 interface UserData {
+  id: string;
   username: string;
   email: string;
   password: string;
   role: UserRole;
   name: string;
+  updatedAt: Date;
 }
 
 interface DoorcardData {
   oldId: string;
   data: {
+    id: string;
     name: string;
     doorcardName: string;
     officeNumber: string;
@@ -33,10 +36,12 @@ interface DoorcardData {
     isActive: boolean;
     isPublic: boolean;
     userId: string;
+    updatedAt: Date;
   };
 }
 
 interface AppointmentData {
+  id: string;
   name: string;
   startTime: string;
   endTime: string;
@@ -44,6 +49,7 @@ interface AppointmentData {
   category: AppointmentCategory;
   location: string | null;
   doorcardId: string;
+  updatedAt: Date;
 }
 
 interface WorkerResult {

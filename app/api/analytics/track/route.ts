@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { randomUUID } from "crypto";
 
 const trackingSchema = z.object({
   doorcardId: z.string().cuid(),
@@ -57,6 +58,7 @@ export async function POST(req: Request) {
     // Record the analytics event
     await prisma.doorcardAnalytics.create({
       data: {
+        id: randomUUID(),
         doorcardId,
         eventType,
         ipAddress: ip,
@@ -112,6 +114,7 @@ async function updateDoorcardMetrics(
       totalShares: eventType === "SHARE" ? 1 : 0,
       lastViewedAt: eventType === "VIEW" ? now : null,
       lastPrintedAt: eventType === "PRINT_DOWNLOAD" ? now : null,
+      updatedAt: now,
     },
     update: {
       totalViews: eventType === "VIEW" ? { increment: 1 } : undefined,
@@ -121,6 +124,7 @@ async function updateDoorcardMetrics(
       totalShares: eventType === "SHARE" ? { increment: 1 } : undefined,
       lastViewedAt: eventType === "VIEW" ? now : undefined,
       lastPrintedAt: eventType === "PRINT_DOWNLOAD" ? now : undefined,
+      updatedAt: now,
     },
   });
 }
