@@ -31,7 +31,7 @@ export async function GET() {
       doorcardName: doorcard.doorcardName,
       officeNumber: doorcard.officeNumber,
       term: doorcard.term,
-      year: doorcard.year.toString(),
+      year: doorcard.year,
       college: doorcard.college,
       slug: doorcard.slug,
       user: {

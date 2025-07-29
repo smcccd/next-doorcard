@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 
 const ALPHABET_LETTERS = [
@@ -34,9 +35,22 @@ const ALPHABET_LETTERS = [
 
 export default function SiteIndex() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const pathname = usePathname();
+  
+  // Don't show site index on authentication pages or other special pages
+  const shouldHide = pathname.includes("/login") || 
+                    pathname.includes("/register") || 
+                    pathname.includes("/reset-password") ||
+                    pathname.includes("/api/") ||
+                    pathname.includes("/404") ||
+                    pathname.includes("/500");
+  
+  if (shouldHide) {
+    return null;
+  }
 
   return (
-    <div className="mb-8 w-full bg-gradient-to-r from-blue-800 to-blue-900 dark:from-blue-900 dark:to-blue-950 shadow-sm">
+    <div className="w-full bg-gradient-to-r from-blue-800 to-blue-900 dark:from-blue-900 dark:to-blue-950 shadow-sm">
       {/* Desktop View */}
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-6">
@@ -52,7 +66,7 @@ export default function SiteIndex() {
                   onClick={() => {
                     // Scroll to section or filter content by letter
                     const element = document.getElementById(
-                      `section-${letter.toLowerCase()}`,
+                      `section-${letter.toLowerCase()}`
                     );
                     if (element) {
                       element.scrollIntoView({ behavior: "smooth" });
@@ -94,7 +108,7 @@ export default function SiteIndex() {
                     onClick={() => {
                       // Scroll to section or filter content by letter
                       const element = document.getElementById(
-                        `section-${letter.toLowerCase()}`,
+                        `section-${letter.toLowerCase()}`
                       );
                       if (element) {
                         element.scrollIntoView({ behavior: "smooth" });

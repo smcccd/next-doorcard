@@ -79,6 +79,10 @@ export const TabletView: Story = {
 };
 
 export const MultipleInstances: Story = {
+  args: {
+    userDisplay: "Faculty Member",
+    isAdmin: false,
+  },
   render: () => (
     <div className="flex gap-4">
       <NavDropdown userDisplay="Faculty Member 1" isAdmin={false} />

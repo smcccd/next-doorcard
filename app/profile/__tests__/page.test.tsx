@@ -208,7 +208,7 @@ describe("ProfilePage", () => {
         const titleSelect = selects.find((s) =>
           s.querySelector('option[value="Dr."]'),
         );
-        expect(titleSelect?.querySelector("select")).toHaveValue("Dr.");
+        expect(titleSelect).toHaveValue("Dr.");
       });
     });
 
@@ -220,9 +220,7 @@ describe("ProfilePage", () => {
         const pronounsSelect = selects.find((s) =>
           s.querySelector('option[value="they/them"]'),
         );
-        expect(pronounsSelect?.querySelector("select")).toHaveValue(
-          "they/them",
-        );
+        expect(pronounsSelect).toHaveValue("they/them");
       });
     });
 
@@ -234,7 +232,7 @@ describe("ProfilePage", () => {
         const campusSelect = selects.find((s) =>
           s.querySelector('option[value="SKYLINE"]'),
         );
-        expect(campusSelect?.querySelector("select")).toHaveValue("SKYLINE");
+        expect(campusSelect).toHaveValue("SKYLINE");
       });
     });
   });

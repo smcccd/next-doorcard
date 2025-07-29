@@ -23,6 +23,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Normal: Story = {
+  args: {
+    children: <ErrorComponent shouldError={false} />,
+  },
   render: () => (
     <ErrorBoundary>
       <ErrorComponent shouldError={false} />
@@ -31,6 +34,9 @@ export const Normal: Story = {
 };
 
 export const WithError: Story = {
+  args: {
+    children: <ErrorComponent shouldError={true} />,
+  },
   render: () => (
     <ErrorBoundary>
       <ErrorComponent shouldError={true} />
@@ -39,6 +45,9 @@ export const WithError: Story = {
 };
 
 export const NestedComponents: Story = {
+  args: {
+    children: <div>Nested content</div>,
+  },
   render: () => (
     <ErrorBoundary>
       <div className="space-y-4">
@@ -58,6 +67,9 @@ export const NestedComponents: Story = {
 };
 
 export const MultipleErrorBoundaries: Story = {
+  args: {
+    children: <div>Multiple boundaries content</div>,
+  },
   render: () => (
     <div className="space-y-6">
       <ErrorBoundary>

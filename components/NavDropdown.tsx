@@ -54,10 +54,10 @@ export function NavDropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-56 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700"
+        className="w-52 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700 py-1"
       >
         {/* User info header (only on mobile) */}
-        <div className="sm:hidden px-2 py-2 border-b border-gray-200 dark:border-gray-700">
+        <div className="sm:hidden px-3 py-2 border-b border-gray-200 dark:border-gray-700">
           <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
             {userDisplay}
           </p>
@@ -69,20 +69,20 @@ export function NavDropdown({
         <DropdownMenuItem asChild>
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-3 cursor-pointer px-3 py-2 group transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
           >
-            <LayoutDashboard className="h-4 w-4" />
-            Dashboard
+            <LayoutDashboard className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+            <span className="transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">Dashboard</span>
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
           <Link
             href="/profile"
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-3 cursor-pointer px-3 py-2 group transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
           >
-            <User className="h-4 w-4" />
-            Profile
+            <User className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+            <span className="transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">Profile</span>
           </Link>
         </DropdownMenuItem>
 
@@ -90,35 +90,40 @@ export function NavDropdown({
           <DropdownMenuItem asChild>
             <Link
               href="/admin"
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex items-center gap-3 cursor-pointer px-3 py-2 group transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
             >
-              <Settings className="h-4 w-4" />
-              Admin Panel
+              <Settings className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+              <span className="transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">Admin Panel</span>
             </Link>
           </DropdownMenuItem>
         )}
 
         <DropdownMenuItem asChild>
-          <Link href="/docs" className="flex items-center gap-2 cursor-pointer">
-            <HelpCircle className="h-4 w-4" />
-            Help
+          <Link 
+            href="/docs" 
+            className="flex items-center gap-3 cursor-pointer px-3 py-2 group transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+          >
+            <HelpCircle className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+            <span className="transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">Help</span>
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="my-1 border-gray-200 dark:border-gray-700" />
 
-        <DropdownMenuItem className="p-0">
-          <DarkModeToggle />
+        <DropdownMenuItem asChild className="p-0 focus:bg-transparent focus:text-inherit">
+          <div className="px-1">
+            <DarkModeToggle />
+          </div>
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="my-1 border-gray-200 dark:border-gray-700" />
 
         <DropdownMenuItem
           onClick={handleSignOut}
-          className="flex items-center gap-2 cursor-pointer text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20 focus:text-red-800 dark:focus:text-red-300"
+          className="flex items-center gap-3 cursor-pointer px-3 py-2 mx-1 rounded-md group transition-all duration-200 text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20 focus:text-red-800 dark:focus:text-red-300"
         >
-          <LogOut className="h-4 w-4" />
-          Sign Out
+          <LogOut className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+          <span className="transition-colors duration-200">Sign Out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

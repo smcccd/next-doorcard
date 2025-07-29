@@ -82,7 +82,7 @@ console.log('code');
 
       const result = parseMarkdown(complexMarkdown);
       // Just verify it calls marked with the content
-      expect(mockMarked).toHaveBeenCalledWith(complexMarkdown);
+      expect(mockParse).toHaveBeenCalledWith(complexMarkdown);
       expect(result).toContain("Header");
     });
   });

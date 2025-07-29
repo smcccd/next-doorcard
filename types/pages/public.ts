@@ -6,7 +6,7 @@ export interface PublicDoorcard {
   doorcardName: string;
   officeNumber: string;
   term: string;
-  year: string;
+  year: number;
   college?: string;
   slug?: string;
   user: {

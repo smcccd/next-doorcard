@@ -87,17 +87,17 @@ export default function LoginPage() {
     <div className="flex flex-grow items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Sign in to Faculty Doorcards
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
             Use your SMCCD credentials to access the system
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-4">
-            <p className="text-red-600 text-sm text-center">{error}</p>
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-4">
+            <p className="text-red-600 dark:text-red-400 text-sm text-center">{error}</p>
           </div>
         )}
 
@@ -117,10 +117,10 @@ export default function LoginPage() {
           {process.env.NODE_ENV === "development" && (
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-gray-300 dark:border-gray-600" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">or</span>
+                <span className="px-2 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">or</span>
               </div>
             </div>
           )}
@@ -129,7 +129,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setShowCredentials(!showCredentials)}
-              className="w-full text-sm text-gray-500 hover:text-gray-700"
+              className="w-full text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
             >
               {showCredentials ? "Hide" : "Show"} development login
             </button>

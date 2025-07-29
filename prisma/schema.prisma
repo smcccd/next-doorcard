@@ -7,108 +7,26 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// *
-///  * ----------------------------- User -------------------------------------
-model User {
-  id            String            @id @default(cuid())
-  name          String?
-  firstName     String?
-  lastName      String?
-  title         String?
-  displayFormat DisplayNameFormat @default(FULL_NAME)
-  email         String            @unique
-  emailVerified DateTime?
-  image         String?
-  username      String?           @unique
-  password      String?
-  role          UserRole          @default(FACULTY)
-  college       College?
-  website       String?
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  pronouns      String?
-  doorcards     Doorcard[]
-  
-  // NextAuth.js required relations
-  accounts      Account[]
-  sessions      Session[]
-
-  @@index([email])
-  @@index([username])
-  @@index([college])
-  @@index([createdAt])
-}
-
-/// *
-///  * -------------------------- NextAuth Models -----------------------------
 model Account {
-  id                String  @id @default(cuid())
+  id                String  @id
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-
-  @@unique([identifier, token])
-}
-
-/// *
-///  * ----------------------------- Doorcard ---------------------------------
-model Doorcard {
-  id           String              @id @default(cuid())
-  name         String
-  doorcardName String
-  officeNumber String
-  term         TermSeason
-  year         Int
-  college      College
-  isActive     Boolean             @default(false)
-  isPublic     Boolean             @default(false)
-  slug         String?             @unique
-  userId       String
-  termId       String?
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
-  appointments Appointment[]
-  termRelation Term?               @relation(fields: [termId], references: [id])
-  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  analytics    DoorcardAnalytics[]
-  metrics      DoorcardMetrics?
-
-  @@unique([userId, college, term, year, isActive])
-  @@index([userId, createdAt])
-  @@index([college])
-  @@index([term, year])
-}
-
-/// *
-///  * --------------------------- Appointment --------------------------------
 model Appointment {
-  id         String              @id @default(cuid())
+  id         String              @id
   name       String
   startTime  String
   endTime    String
@@ -117,19 +35,44 @@ model Appointment {
   location   String?
   doorcardId String
   createdAt  DateTime            @default(now())
-  updatedAt  DateTime            @updatedAt
-  doorcard   Doorcard            @relation(fields: [doorcardId], references: [id], onDelete: Cascade)
+  updatedAt  DateTime
+  Doorcard   Doorcard            @relation(fields: [doorcardId], references: [id], onDelete: Cascade)
 
-  @@index([doorcardId])
-  @@index([dayOfWeek])
   @@index([category])
+  @@index([dayOfWeek])
+  @@index([doorcardId])
   @@index([startTime])
 }
 
-/// *
-///  * ------------------------ Doorcard Analytics ---------------------------
+model Doorcard {
+  id                String              @id
+  name              String
+  doorcardName      String
+  officeNumber      String
+  term              TermSeason
+  year              Int
+  college           College
+  isActive          Boolean             @default(false)
+  isPublic          Boolean             @default(false)
+  slug              String?             @unique
+  userId            String
+  termId            String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime
+  Appointment       Appointment[]
+  Term              Term?               @relation(fields: [termId], references: [id])
+  User              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  DoorcardAnalytics DoorcardAnalytics[]
+  DoorcardMetrics   DoorcardMetrics?
+
+  @@unique([userId, college, term, year, isActive])
+  @@index([college])
+  @@index([term, year])
+  @@index([userId, createdAt])
+}
+
 model DoorcardAnalytics {
-  id         String         @id @default(cuid())
+  id         String         @id
   doorcardId String
   eventType  AnalyticsEvent
   ipAddress  String?
@@ -138,15 +81,13 @@ model DoorcardAnalytics {
   sessionId  String?
   metadata   Json?
   createdAt  DateTime       @default(now())
-  doorcard   Doorcard       @relation(fields: [doorcardId], references: [id], onDelete: Cascade)
+  Doorcard   Doorcard       @relation(fields: [doorcardId], references: [id], onDelete: Cascade)
 
-  @@index([doorcardId, eventType])
   @@index([doorcardId, createdAt])
+  @@index([doorcardId, eventType])
   @@index([sessionId])
 }
 
-/// *
-///  * ----------------------- Aggregated Metrics -----------------------------
 model DoorcardMetrics {
   doorcardId    String    @id
   totalViews    Int       @default(0)
@@ -155,18 +96,24 @@ model DoorcardMetrics {
   totalShares   Int       @default(0)
   lastViewedAt  DateTime?
   lastPrintedAt DateTime?
-  updatedAt     DateTime  @updatedAt
-  doorcard      Doorcard  @relation(fields: [doorcardId], references: [id], onDelete: Cascade)
+  updatedAt     DateTime
+  Doorcard      Doorcard  @relation(fields: [doorcardId], references: [id], onDelete: Cascade)
 
+  @@index([lastViewedAt])
   @@index([totalViews])
   @@index([uniqueViews])
-  @@index([lastViewedAt])
 }
 
-/// *
-///  * ----------------------------- Term (optional) --------------------------
+model Session {
+  id           String   @id
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  User         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model Term {
-  id          String     @id @default(cuid())
+  id          String     @id
   name        String     @unique
   year        String
   season      String
@@ -177,41 +124,75 @@ model Term {
   isUpcoming  Boolean    @default(false)
   archiveDate DateTime?
   createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  doorcards   Doorcard[]
+  updatedAt   DateTime
+  Doorcard    Doorcard[]
 
-  @@index([year])
-  @@index([season])
+  @@index([endDate])
   @@index([isActive])
   @@index([isArchived])
+  @@index([season])
   @@index([startDate])
-  @@index([endDate])
+  @@index([year])
+}
+
+model User {
+  id            String            @id
+  name          String?
+  firstName     String?
+  lastName      String?
+  title         String?
+  displayFormat DisplayNameFormat @default(FULL_NAME)
+  email         String            @unique
+  username      String?           @unique
+  password      String?
+  role          UserRole          @default(FACULTY)
+  college       College?
+  website       String?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime
+  pronouns      String?
+  emailVerified DateTime?
+  image         String?
+  Account       Account[]
+  Doorcard      Doorcard[]
+  Session       Session[]
+
+  @@index([college])
+  @@index([createdAt])
+  @@index([email])
+  @@index([username])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum AnalyticsEvent {
+  VIEW
+  PRINT_PREVIEW
+  PRINT_DOWNLOAD
+  EDIT_STARTED
+  SHARE
+  SEARCH_RESULT
+}
+
+enum AppointmentCategory {
+  OFFICE_HOURS
+  IN_CLASS
+  LECTURE
+  LAB
+  HOURS_BY_ARRANGEMENT
+  REFERENCE
 }
 
 enum College {
   SKYLINE
   CSM
   CANADA
-}
-
-enum DisplayNameFormat {
-  FULL_WITH_TITLE
-  LAST_WITH_TITLE
-  FIRST_INITIAL_LAST_WITH_TITLE
-  FIRST_INITIAL_LAST
-  FULL_NAME
-}
-
-enum UserRole {
-  FACULTY
-  ADMIN
-  STAFF
-}
-
-enum TermSeason {
-  FALL
-  SPRING
-  SUMMER
 }
 
 enum DayOfWeek {
@@ -224,20 +205,22 @@ enum DayOfWeek {
   SUNDAY
 }
 
-enum AppointmentCategory {
-  OFFICE_HOURS
-  IN_CLASS
-  LECTURE
-  LAB
-  HOURS_BY_ARRANGEMENT
-  REFERENCE
+enum DisplayNameFormat {
+  FULL_WITH_TITLE
+  LAST_WITH_TITLE
+  FIRST_INITIAL_LAST_WITH_TITLE
+  FIRST_INITIAL_LAST
+  FULL_NAME
 }
 
-enum AnalyticsEvent {
-  VIEW
-  PRINT_PREVIEW
-  PRINT_DOWNLOAD
-  EDIT_STARTED
-  SHARE
-  SEARCH_RESULT
+enum TermSeason {
+  FALL
+  SPRING
+  SUMMER
+}
+
+enum UserRole {
+  FACULTY
+  ADMIN
+  STAFF
 }

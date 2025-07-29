@@ -36,35 +36,39 @@ export default async function Navbar() {
 
   return (
     <nav
-      className="bg-gray-800 dark:bg-gray-950 text-white px-6 py-4 shadow-sm"
+      className="bg-gray-800 dark:bg-gray-950 text-white px-4 sm:px-6 py-3 sm:py-4 lg:py-2 shadow-lg border-b border-gray-700 dark:border-gray-800"
       aria-label="Primary"
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-center">
         <Link
           href="/"
           prefetch={false}
-          className="flex flex-row sm:flex-col items-center gap-3 sm:gap-2 group"
+          className="flex items-center justify-center gap-2 sm:gap-3 group"
         >
-          <SMCCDLogo
-            height={100}
-            width={225}
-            className="transition mb-[-20px] duration-300 sm:group-hover:brightness-125"
-          />
-          <div className="text-xs sm:text-sm md:text-base font-heading font-semibold tracking-wide text-center text-white/90 group-hover:text-white transition-colors duration-300">
+          <div className="flex-shrink-0">
+            <SMCCDLogo
+              height={42}
+              color="#FFFFFF"
+              animate={true}
+              className="transition duration-300"
+            />
+          </div>
+          <div className="text-sm sm:text-base md:text-lg font-heading font-bold tracking-wide text-white/90 group-hover:text-white transition-colors duration-300">
             Faculty Doorcard
           </div>
         </Link>
 
-        <div className="hidden lg:flex flex-1 items-center justify-center gap-x-6">
+        <div className="hidden lg:flex flex-1 items-center justify-center gap-x-8">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-300 hover:text-white transition-colors text-md font-medium whitespace-nowrap"
+              className="text-gray-300 hover:text-white transition-colors duration-200 text-sm font-medium whitespace-nowrap relative group"
             >
               {link.text}
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-white transition-all duration-200 group-hover:w-full"></span>
             </a>
           ))}
         </div>

@@ -65,25 +65,25 @@ export const Variants: Story = {
       <div className="space-y-4">
         <h3 className="font-semibold">Full Variant</h3>
         <div className="flex gap-4">
-          <CollegeLogo college="CSM" variant="full" />
-          <CollegeLogo college="SKYLINE" variant="full" />
-          <CollegeLogo college="CANADA" variant="full" />
+          <CollegeLogo college="CSM"  />
+          <CollegeLogo college="SKYLINE"  />
+          <CollegeLogo college="CANADA"  />
         </div>
       </div>
       <div className="space-y-4">
         <h3 className="font-semibold">Icon Variant</h3>
         <div className="flex gap-4">
-          <CollegeLogo college="CSM" variant="icon" />
-          <CollegeLogo college="SKYLINE" variant="icon" />
-          <CollegeLogo college="CANADA" variant="icon" />
+          <CollegeLogo college="CSM"  />
+          <CollegeLogo college="SKYLINE"  />
+          <CollegeLogo college="CANADA"  />
         </div>
       </div>
       <div className="space-y-4">
         <h3 className="font-semibold">Inline Variant</h3>
         <div className="space-y-2">
-          <p>Welcome to <CollegeLogo college="CSM" variant="inline" /></p>
-          <p>Welcome to <CollegeLogo college="SKYLINE" variant="inline" /></p>
-          <p>Welcome to <CollegeLogo college="CANADA" variant="inline" /></p>
+          <p>Welcome to <CollegeLogo college="CSM"  /></p>
+          <p>Welcome to <CollegeLogo college="SKYLINE"  /></p>
+          <p>Welcome to <CollegeLogo college="CANADA"  /></p>
         </div>
       </div>
     </div>
@@ -99,25 +99,25 @@ export const Sizes: Story = {
       <div className="space-y-4">
         <h3 className="font-semibold">Small Size</h3>
         <div className="flex gap-4 items-center">
-          <CollegeLogo college="CSM" size="sm" />
-          <CollegeLogo college="SKYLINE" size="sm" />
-          <CollegeLogo college="CANADA" size="sm" />
+          <CollegeLogo college="CSM"  />
+          <CollegeLogo college="SKYLINE"  />
+          <CollegeLogo college="CANADA"  />
         </div>
       </div>
       <div className="space-y-4">
         <h3 className="font-semibold">Medium Size (Default)</h3>
         <div className="flex gap-4 items-center">
-          <CollegeLogo college="CSM" size="md" />
-          <CollegeLogo college="SKYLINE" size="md" />
-          <CollegeLogo college="CANADA" size="md" />
+          <CollegeLogo college="CSM"  />
+          <CollegeLogo college="SKYLINE"  />
+          <CollegeLogo college="CANADA"  />
         </div>
       </div>
       <div className="space-y-4">
         <h3 className="font-semibold">Large Size</h3>
         <div className="flex gap-4 items-center">
-          <CollegeLogo college="CSM" size="lg" />
-          <CollegeLogo college="SKYLINE" size="lg" />
-          <CollegeLogo college="CANADA" size="lg" />
+          <CollegeLogo college="CSM"  />
+          <CollegeLogo college="SKYLINE"  />
+          <CollegeLogo college="CANADA"  />
         </div>
       </div>
     </div>
@@ -125,11 +125,14 @@ export const Sizes: Story = {
 };
 
 export const InContext: Story = {
+  args: {
+    college: 'CSM',
+  },
   render: () => (
     <div className="space-y-6">
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
         <div className="flex items-center justify-between mb-4">
-          <CollegeLogo college="CSM" variant="full" size="md" />
+          <CollegeLogo college="CSM" />
           <span className="text-sm text-gray-500">Faculty Portal</span>
         </div>
         <h2 className="text-xl font-semibold mb-2">Welcome to CSM</h2>
@@ -140,11 +143,11 @@ export const InContext: Story = {
 
       <div className="flex gap-4">
         <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded flex-1">
-          <CollegeLogo college="SKYLINE" variant="icon" size="sm" className="mb-2" />
+          <CollegeLogo college="SKYLINE" className="mb-2" />
           <p className="text-sm">52 Faculty Members</p>
         </div>
         <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded flex-1">
-          <CollegeLogo college="CANADA" variant="icon" size="sm" className="mb-2" />
+          <CollegeLogo college="CANADA" className="mb-2" />
           <p className="text-sm">46 Faculty Members</p>
         </div>
       </div>
@@ -153,6 +156,9 @@ export const InContext: Story = {
 };
 
 export const CustomStyling: Story = {
+  args: {
+    college: 'CSM',
+  },
   render: () => (
     <div className="space-y-4">
       <CollegeLogo 
@@ -172,6 +178,9 @@ export const CustomStyling: Story = {
 };
 
 export const DarkMode: Story = {
+  args: {
+    college: 'SKYLINE',
+  },
   parameters: {
     backgrounds: { default: 'dark' },
   },
