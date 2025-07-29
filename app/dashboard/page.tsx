@@ -12,7 +12,7 @@ import { getCurrentAcademicTerm } from "@/lib/active-term";
 /* -------------------------------------------------------------------------- */
 /* Types (optional)                                                           */
 /* -------------------------------------------------------------------------- */
-import type { Doorcard, Appointment, User } from "@prisma/client";
+import type { Doorcard, Appointment, User, TermSeason } from "@prisma/client";
 
 type DashboardDoorcard = Doorcard & {
   appointments: Appointment[];
@@ -56,8 +56,13 @@ export default async function DashboardPage() {
     ? { displayName: activeTerm.name, isFromDatabase: true }
     : { ...getCurrentAcademicTerm(), isFromDatabase: false };
 
+  // Prepare active term for categorization (convert from database format)
+  const activeTermForCategorization = activeTerm 
+    ? { season: activeTerm.season as TermSeason, year: parseInt(activeTerm.year) }
+    : null;
+
   // Categorize doorcards by temporal status
-  const { current, archived, upcoming } = categorizeDoorcards(doorcards);
+  const { current, archived, upcoming } = categorizeDoorcards(doorcards, activeTermForCategorization);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">

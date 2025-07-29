@@ -61,8 +61,9 @@ export function compareTerms(
  */
 export function getTermStatus(
   doorcard: Pick<Doorcard, "term" | "year">,
+  activeTerm?: { season: TermSeason; year: number } | null
 ): "past" | "current" | "future" {
-  const currentTerm = getCurrentAcademicTerm();
+  const currentTerm = activeTerm || getCurrentAcademicTerm();
   const comparison = compareTerms(
     { season: doorcard.term as TermSeason, year: doorcard.year },
     currentTerm,
@@ -76,13 +77,16 @@ export function getTermStatus(
 /**
  * Categorize doorcards by their temporal status and visibility
  */
-export function categorizeDoorcards<T extends Doorcard>(doorcards: T[]) {
+export function categorizeDoorcards<T extends Doorcard>(
+  doorcards: T[], 
+  activeTerm?: { season: TermSeason; year: number } | null
+) {
   const current: T[] = [];
   const archived: T[] = [];
   const upcoming: T[] = [];
 
   for (const doorcard of doorcards) {
-    const termStatus = getTermStatus(doorcard);
+    const termStatus = getTermStatus(doorcard, activeTerm);
 
     switch (termStatus) {
       case "current":
