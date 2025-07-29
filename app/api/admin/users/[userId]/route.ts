@@ -46,7 +46,7 @@ export async function GET(
         displayFormat: true,
         createdAt: true,
         updatedAt: true,
-        doorcards: {
+        Doorcard: {
           select: {
             id: true,
             name: true,

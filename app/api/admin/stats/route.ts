@@ -37,7 +37,7 @@ export async function GET() {
       prisma.user.count(),
       prisma.user.count({
         where: {
-          doorcards: {
+          Doorcard: {
             some: {},
           },
         },
@@ -77,7 +77,7 @@ export async function GET() {
       // Get user count for this campus
       const campusUsers = await prisma.user.count({
         where: {
-          doorcards: {
+          Doorcard: {
             some: {
               college: campus,
             },
@@ -88,7 +88,7 @@ export async function GET() {
       // Get appointment count for this campus
       const campusAppointments = await prisma.appointment.count({
         where: {
-          doorcard: {
+          Doorcard: {
             college: campus,
           },
         },

@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
         isPublic: true,
         officeNumber: true,
         createdAt: true,
-        user: {
+        User: {
           select: {
             email: true,
             name: true,
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
         },
         _count: {
           select: {
-            appointments: true,
+            Appointment: true,
           },
         },
       },
@@ -109,14 +109,14 @@ export async function GET(req: NextRequest) {
       isActive: doorcard.isActive,
       isPublic: doorcard.isPublic,
       officeNumber: doorcard.officeNumber,
-      appointmentCount: doorcard._count.appointments,
+      appointmentCount: doorcard._count.Appointment,
       createdAt: doorcard.createdAt.toISOString(),
       user: {
-        email: doorcard.user.email,
+        email: doorcard.User.email,
         name:
-          doorcard.user.firstName && doorcard.user.lastName
-            ? `${doorcard.user.firstName} ${doorcard.user.lastName}`
-            : doorcard.user.name,
+          doorcard.User.firstName && doorcard.User.lastName
+            ? `${doorcard.User.firstName} ${doorcard.User.lastName}`
+            : doorcard.User.name,
       },
     }));
 

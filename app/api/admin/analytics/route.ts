@@ -61,8 +61,8 @@ export async function GET() {
     // Get top performing doorcards
     const topDoorcards = await prisma.doorcard.findMany({
       include: {
-        metrics: true,
-        user: {
+        DoorcardMetrics: true,
+        User: {
           select: {
             name: true,
             firstName: true,
@@ -71,14 +71,14 @@ export async function GET() {
         },
       },
       where: {
-        metrics: {
+        DoorcardMetrics: {
           totalViews: {
             gt: 0,
           },
         },
       },
       orderBy: {
-        metrics: {
+        DoorcardMetrics: {
           totalViews: "desc",
         },
       },
@@ -118,13 +118,13 @@ export async function GET() {
       doorcardId: card.id,
       doorcardName: card.doorcardName,
       facultyName:
-        card.user.firstName && card.user.lastName
-          ? `${card.user.firstName} ${card.user.lastName}`
-          : card.user.name || "Unknown",
-      totalViews: card.metrics?.totalViews || 0,
-      totalPrints: card.metrics?.totalPrints || 0,
-      totalShares: card.metrics?.totalShares || 0,
-      lastViewedAt: card.metrics?.lastViewedAt?.toISOString(),
+        card.User.firstName && card.User.lastName
+          ? `${card.User.firstName} ${card.User.lastName}`
+          : card.User.name || "Unknown",
+      totalViews: card.DoorcardMetrics?.totalViews || 0,
+      totalPrints: card.DoorcardMetrics?.totalPrints || 0,
+      totalShares: card.DoorcardMetrics?.totalShares || 0,
+      lastViewedAt: card.DoorcardMetrics?.lastViewedAt?.toISOString(),
       college: card.college,
     }));
 
