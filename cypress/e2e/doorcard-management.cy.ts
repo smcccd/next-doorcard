@@ -28,9 +28,22 @@ describe("Doorcard Management", () => {
 
   it("should navigate to doorcard creation", () => {
     cy.visit("/dashboard");
-    cy.contains("Create Doorcard").click();
-    cy.url().should("include", "/doorcard/new");
-    cy.contains("New Doorcard").should("be.visible");
+
+    // Wait for dashboard to load completely
+    cy.contains("My Doorcards", { timeout: 10000 }).should("be.visible");
+
+    // Find and click the Create Doorcard button
+    cy.contains("Create Doorcard")
+      .should("be.visible")
+      .and("be.enabled")
+      .click();
+
+    // Wait for navigation to complete
+    cy.location("pathname", { timeout: 10000 }).should(
+      "include",
+      "/doorcard/new"
+    );
+    cy.contains("New Doorcard", { timeout: 10000 }).should("be.visible");
   });
 
   it("should display form elements", () => {
