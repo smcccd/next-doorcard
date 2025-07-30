@@ -313,7 +313,8 @@ export default async function PublicDoorcardView({
 
       {/* Schedule - Screen and Print versions */}
       <div className="w-full my-4 max-w-4xl mx-auto">
-        {transformedDoorcard.appointments.length > 0 ? (
+        {transformedDoorcard.appointments &&
+        transformedDoorcard.appointments.length > 0 ? (
           <>
             {/* Screen version - full schedule with all features */}
             <div className="w-full print:hidden">

@@ -282,9 +282,11 @@ describe("NewDoorcardForm", () => {
     it("supports keyboard navigation", async () => {
       render(<NewDoorcardForm />);
 
-      const campusSelect = screen.getByLabelText(/campus/i);
-      const termSelect = screen.getByLabelText(/term/i);
-      const yearSelect = screen.getByLabelText(/year/i);
+      // Get the actual select elements for focus testing
+      const selects = screen.getAllByTestId("select");
+      const campusSelect = selects[0]; // First select is campus
+      const termSelect = selects[1]; // Second select is term
+      const yearSelect = selects[2]; // Third select is year
       const submitButton = screen.getByRole("button", {
         name: /continue to basic info/i,
       });

@@ -11,7 +11,7 @@ import {
   Archive,
   AlertTriangle,
 } from "lucide-react";
-import { type College } from "@/types/doorcard";
+import { type College, COLLEGE_META } from "@/types/doorcard";
 import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
 import type { Doorcard, Appointment, User } from "@prisma/client";
 
@@ -176,6 +176,12 @@ function DoorcardCard({
           <span className="text-gray-600">Term:</span> {doorcard.term}{" "}
           {doorcard.year}
         </div>
+        {doorcard.college && (
+          <div>
+            <span className="text-gray-600">Campus:</span>{" "}
+            {COLLEGE_META[doorcard.college]?.label || doorcard.college}
+          </div>
+        )}
         <div>
           <span className="text-gray-600">Appointments:</span>{" "}
           {doorcard.appointments.length}

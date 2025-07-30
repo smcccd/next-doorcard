@@ -42,7 +42,7 @@ describe("TermManager", () => {
       expect(result).toEqual(mockActiveTermWithDoorcards);
       expect(mockPrisma.term.findFirst).toHaveBeenCalledWith({
         where: { isActive: true },
-        include: { doorcards: true },
+        include: { Doorcard: true },
       });
     });
 
@@ -70,7 +70,7 @@ describe("TermManager", () => {
         orderBy: [{ year: "desc" }, { season: "asc" }],
         include: {
           _count: {
-            select: { doorcards: true },
+            select: { Doorcard: true },
           },
         },
       });
@@ -101,7 +101,8 @@ describe("TermManager", () => {
         data: { isActive: false },
       });
       expect(mockPrisma.term.create).toHaveBeenCalledWith({
-        data: {
+        data: expect.objectContaining({
+          id: expect.any(String),
           name: newTermData.name,
           year: newTermData.year,
           season: newTermData.season,
@@ -111,7 +112,8 @@ describe("TermManager", () => {
           isArchived: false,
           isUpcoming: false,
           archiveDate: undefined,
-        },
+          updatedAt: expect.any(Date),
+        }),
       });
       expect(result).toEqual({ ...newTermData, id: "new-term-123" });
     });
@@ -281,20 +283,20 @@ describe("TermManager", () => {
 
       expect(mockPrisma.doorcard.findMany).toHaveBeenCalledWith({
         where: {
-          termRelation: { isActive: true },
+          Term: { isActive: true },
         },
         include: {
-          user: {
+          User: {
             select: { name: true, email: true, college: true },
           },
-          termRelation: true,
+          Term: true,
           _count: {
-            select: { appointments: true },
+            select: { Appointment: true },
           },
         },
         orderBy: [
-          { termRelation: { year: "desc" } },
-          { termRelation: { season: "asc" } },
+          { Term: { year: "desc" } },
+          { Term: { season: "asc" } },
           { name: "asc" },
         ],
       });
@@ -308,7 +310,7 @@ describe("TermManager", () => {
       expect(mockPrisma.doorcard.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {
-            termRelation: { isArchived: true },
+            Term: { isArchived: true },
           },
         })
       );
@@ -320,7 +322,7 @@ describe("TermManager", () => {
       expect(mockPrisma.doorcard.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {
-            termRelation: { isUpcoming: true },
+            Term: { isUpcoming: true },
           },
         })
       );

@@ -86,7 +86,8 @@ describe("/api/doorcards", () => {
       expect(response.status).toBe(201);
       expect(data).toEqual(mockCreatedDoorcard);
       expect(mockPrisma.doorcard.create).toHaveBeenCalledWith({
-        data: {
+        data: expect.objectContaining({
+          id: expect.any(String),
           name: validDoorcardData.name,
           doorcardName: validDoorcardData.doorcardName,
           officeNumber: validDoorcardData.officeNumber,
@@ -97,19 +98,24 @@ describe("/api/doorcards", () => {
           isPublic: false, // New default
           slug: "dr-test-professor-fall-2024",
           userId: mockUser.id,
-          appointments: {
-            create: validDoorcardData.appointments.map((apt) => ({
-              name: apt.name,
-              startTime: apt.startTime,
-              endTime: apt.endTime,
-              dayOfWeek: apt.dayOfWeek,
-              category: apt.category,
-              location: apt.location,
-            })),
+          updatedAt: expect.any(Date),
+          Appointment: {
+            create: validDoorcardData.appointments.map((apt) =>
+              expect.objectContaining({
+                id: expect.any(String),
+                name: apt.name,
+                startTime: apt.startTime,
+                endTime: apt.endTime,
+                dayOfWeek: apt.dayOfWeek,
+                category: apt.category,
+                location: apt.location,
+                updatedAt: expect.any(Date),
+              })
+            ),
           },
-        },
+        }),
         include: {
-          appointments: true,
+          Appointment: true,
         },
       });
     });
@@ -281,7 +287,7 @@ describe("/api/doorcards", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Failed to create doorcard");
+      expect(data.error).toBe("An unexpected error occurred");
     });
 
     it("handles database errors", async () => {
@@ -299,7 +305,7 @@ describe("/api/doorcards", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Failed to create doorcard");
+      expect(data.error).toBe("An unexpected error occurred");
     });
 
     it("creates doorcard without appointments", async () => {
@@ -320,7 +326,7 @@ describe("/api/doorcards", () => {
       expect(mockPrisma.doorcard.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            appointments: {
+            Appointment: {
               create: [],
             },
           }),
@@ -418,7 +424,7 @@ describe("/api/doorcards", () => {
           userId: mockUser.id,
         },
         include: {
-          user: {
+          User: {
             select: {
               name: true,
               username: true,
@@ -426,7 +432,7 @@ describe("/api/doorcards", () => {
               college: true,
             },
           },
-          appointments: {
+          Appointment: {
             orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
           },
         },
@@ -466,7 +472,7 @@ describe("/api/doorcards", () => {
       const data = await response.json();
 
       expect(response.status).toBe(500);
-      expect(data.error).toBe("Failed to fetch doorcards");
+      expect(data.error).toBe("An unexpected error occurred");
     });
 
     it("orders appointments correctly", async () => {
@@ -475,7 +481,7 @@ describe("/api/doorcards", () => {
       expect(mockPrisma.doorcard.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           include: expect.objectContaining({
-            appointments: {
+            Appointment: {
               orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
             },
           }),
@@ -489,7 +495,7 @@ describe("/api/doorcards", () => {
       expect(mockPrisma.doorcard.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           include: expect.objectContaining({
-            user: {
+            User: {
               select: {
                 name: true,
                 username: true,

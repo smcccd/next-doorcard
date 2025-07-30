@@ -53,7 +53,9 @@ describe("RegisterPage", () => {
   it("renders the registration form", () => {
     render(<RegisterPage />);
 
-    expect(screen.getByText("Register")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Register" })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText("Name")).toBeInTheDocument();
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();

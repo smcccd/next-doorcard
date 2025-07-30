@@ -99,15 +99,15 @@ jest.mock("@/components/ui/select", () => ({
     onValueChange?: (value: string) => void;
     value?: string;
   }) => (
-    <div data-testid="select">
-      <select onChange={(e) => onValueChange?.(e.target.value)} value={value}>
-        {children}
-      </select>
-    </div>
+    <select
+      data-testid="select"
+      onChange={(e) => onValueChange?.(e.target.value)}
+      value={value}
+    >
+      {children}
+    </select>
   ),
-  SelectContent: ({ children }: { children: ReactNode }) => (
-    <div>{children}</div>
-  ),
+  SelectContent: ({ children }: { children: ReactNode }) => <>{children}</>,
   SelectItem: ({
     children,
     value,
@@ -115,11 +115,9 @@ jest.mock("@/components/ui/select", () => ({
     children: ReactNode;
     value?: string;
   }) => <option value={value}>{children}</option>,
-  SelectTrigger: ({ children }: { children: ReactNode }) => (
-    <div>{children}</div>
-  ),
+  SelectTrigger: ({ children }: { children: ReactNode }) => <>{children}</>,
   SelectValue: ({ placeholder }: { placeholder?: string }) => (
-    <span>{placeholder}</span>
+    <option value="">{placeholder}</option>
   ),
 }));
 
@@ -160,6 +158,8 @@ jest.mock("@/components/ui/tabs", () => ({
 jest.mock("lucide-react", () => ({
   AlertCircle: () => <span data-testid="alert-circle-icon">AlertCircle</span>,
   Users: () => <span data-testid="users-icon">Users</span>,
+  User: () => <span data-testid="user-icon">User</span>,
+  Eye: () => <span data-testid="eye-icon">Eye</span>,
   Calendar: () => <span data-testid="calendar-icon">Calendar</span>,
   MapPin: () => <span data-testid="map-pin-icon">MapPin</span>,
   Activity: () => <span data-testid="activity-icon">Activity</span>,
@@ -284,10 +284,19 @@ describe("AdminPage", () => {
     });
 
     it("should hide loading state after data loads", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockStatsResponse,
-      } as Response);
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockStatsResponse,
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockUsersResponse,
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockDoorcardsResponse,
+        } as Response);
 
       render(<AdminPage />);
 

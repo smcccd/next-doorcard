@@ -114,7 +114,11 @@ jest.mock("next/server", () => ({
       try {
         return Promise.resolve(JSON.parse(init.body));
       } catch (e) {
-        return Promise.reject(e);
+        return Promise.reject(
+          new SyntaxError(
+            `Unexpected token ${init.body[0]}, "${init.body}" is not valid JSON`
+          )
+        );
       }
     }),
     text: jest.fn().mockImplementation(() => Promise.resolve(init.body || "")),
@@ -304,8 +308,45 @@ if (typeof Element !== "undefined") {
 global.fetch = jest.fn();
 
 // Mock Prisma enums for tests
+// Mock Prisma error classes
+class MockPrismaClientKnownRequestError extends Error {
+  constructor(message, { code, meta } = {}) {
+    super(message);
+    this.name = "PrismaClientKnownRequestError";
+    this.code = code;
+    this.meta = meta;
+  }
+}
+
+class MockPrismaClientInitializationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "PrismaClientInitializationError";
+  }
+}
+
+class MockPrismaClientValidationError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "PrismaClientValidationError";
+  }
+}
+
+class MockPrismaClientRustPanicError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "PrismaClientRustPanicError";
+  }
+}
+
 jest.doMock("@prisma/client", () => ({
   ...jest.requireActual("@prisma/client"),
+  Prisma: {
+    PrismaClientKnownRequestError: MockPrismaClientKnownRequestError,
+    PrismaClientInitializationError: MockPrismaClientInitializationError,
+    PrismaClientValidationError: MockPrismaClientValidationError,
+    PrismaClientRustPanicError: MockPrismaClientRustPanicError,
+  },
   TermSeason: {
     FALL: "FALL",
     SPRING: "SPRING",

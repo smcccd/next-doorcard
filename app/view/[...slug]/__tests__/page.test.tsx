@@ -102,7 +102,7 @@ describe("PublicDoorcardView", () => {
     isPublic: true,
     slug: "john-smith-fall-2024",
     userId: "user-1",
-    appointments: [
+    Appointment: [
       {
         id: "appt-1",
         dayOfWeek: "Monday",
@@ -111,7 +111,7 @@ describe("PublicDoorcardView", () => {
         appointmentType: "Office Hours",
       },
     ],
-    user: {
+    User: {
       name: "Dr. John Smith",
       firstName: "John",
       lastName: "Smith",
@@ -285,7 +285,7 @@ describe("PublicDoorcardView", () => {
   });
 
   it("shows no appointments message when appointments array is empty", async () => {
-    const doorcardWithoutAppointments = { ...mockDoorcard, appointments: [] };
+    const doorcardWithoutAppointments = { ...mockDoorcard, Appointment: [] };
     mockPrisma.user.findUnique.mockResolvedValue(mockUser);
     mockPrisma.doorcard.findFirst.mockResolvedValue(
       doorcardWithoutAppointments
