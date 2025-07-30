@@ -78,6 +78,9 @@ const nextConfig: NextConfig = {
       "@radix-ui/react-icons",
     ],
   },
+
+  // External packages for serverless functions
+  serverExternalPackages: ["@prisma/client", "prisma"],
 };
 
 export default withSentryConfig(nextConfig, {
