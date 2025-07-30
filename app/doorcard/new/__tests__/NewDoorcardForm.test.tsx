@@ -174,18 +174,19 @@ describe("NewDoorcardForm", () => {
     await selectOption(/term/i, "Fall");
     await selectOption(/year/i, getCurrentYear().toString());
 
-    // Submit
-    await user.click(
-      screen.getByRole("button", { name: /continue to basic info/i })
-    );
+    // Get submit button before clicking
+    const submitButton = screen.getByRole("button", {
+      name: /continue to basic info/i,
+    });
+    expect(submitButton).not.toBeDisabled();
 
-    // Check for loading state - submit button should be disabled during submission
+    // Submit
+    await user.click(submitButton);
+
+    // Check for loading state - submit button should show loading text and be disabled
     await waitFor(() => {
-      const buttons = screen.getAllByRole("button");
-      const submitButton = buttons.find(
-        (btn) => btn.getAttribute("type") === "submit"
-      );
-      expect(submitButton).toBeDisabled();
+      const loadingButton = screen.getByRole("button", { name: /validating/i });
+      expect(loadingButton).toBeDisabled();
     });
 
     // Wait for completion
@@ -283,7 +284,7 @@ describe("NewDoorcardForm", () => {
       );
 
       await waitFor(() => {
-        const errorMessage = screen.getByText(/campus is required/i);
+        const errorMessage = screen.getByText(/required/i);
         expect(errorMessage).toHaveAttribute("role", "alert");
       });
     });

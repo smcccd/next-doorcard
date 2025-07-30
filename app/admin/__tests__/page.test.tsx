@@ -479,24 +479,22 @@ describe("AdminPage", () => {
         ).not.toBeInTheDocument();
       });
 
-      // Look for refresh buttons semantically
-      const refreshButtons = screen
-        .getAllByRole("button")
-        .filter((btn) => btn.textContent?.toLowerCase().includes("refresh"));
+      // Clear previous mock calls to get accurate count
+      jest.clearAllMocks();
 
-      if (refreshButtons.length > 0) {
-        fireEvent.click(refreshButtons[0]);
+      // Look for the specific refresh button
+      const refreshButton = screen.getByRole("button", { name: /refresh/i });
+      expect(refreshButton).toBeInTheDocument();
 
-        // Verify that fetch was called again
-        await waitFor(() => {
-          expect(mockFetch).toHaveBeenCalledTimes(4); // Initial calls + refresh
-        });
-      } else {
-        // If no refresh button found, just verify the component loaded
-        expect(
-          screen.getByRole("heading", { name: /admin dashboard/i })
-        ).toBeInTheDocument();
-      }
+      fireEvent.click(refreshButton);
+
+      // Verify that fetch was called again for all three endpoints
+      await waitFor(() => {
+        expect(mockFetch).toHaveBeenCalledWith("/api/admin/stats");
+        expect(mockFetch).toHaveBeenCalledWith("/api/admin/users");
+        expect(mockFetch).toHaveBeenCalledWith("/api/admin/doorcards");
+        expect(mockFetch).toHaveBeenCalledTimes(3);
+      });
     });
   });
 

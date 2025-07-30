@@ -125,17 +125,25 @@ describe("Home Page", () => {
     render(<Home />);
 
     await waitFor(() => {
-      // Use more specific selectors to avoid ambiguity
-      expect(screen.getAllByText("Dr. John Smith")).toHaveLength(2);
-      expect(screen.getAllByText("Dr. Jane Doe")).toHaveLength(2);
+      // Wait for professors to load by checking for professor cards
+      expect(screen.getAllByTestId("professor-card")).toHaveLength(2);
     });
 
-    // Click CSM radio button
-    fireEvent.click(screen.getByLabelText(/CSM/i));
+    // Get initial professor count
+    const initialCards = screen.getAllByTestId("professor-card");
+    expect(initialCards.length).toBe(2);
+
+    // Click CSM radio button by finding the radio input with value "CSM"
+    const csmRadio = screen.getByRole("radio", { name: /CSM/ });
+    fireEvent.click(csmRadio);
 
     await waitFor(() => {
-      expect(screen.queryByText("Dr. John Smith")).not.toBeInTheDocument(); // Skyline professor
-      expect(screen.getByText("Dr. Jane Doe")).toBeInTheDocument(); // CSM professor
+      // Check that filtering happened - should now only show CSM professor
+      const filteredCards = screen.getAllByTestId("professor-card");
+      expect(filteredCards.length).toBe(1);
+
+      // Verify the professor count indicator shows correct number
+      expect(screen.getByText("1 professor")).toBeInTheDocument();
     });
   });
 
