@@ -532,8 +532,12 @@ describe("AdminPage", () => {
     });
 
     it("should display doorcards stat", () => {
-      const doorcardsSection = screen.getByText("Doorcards");
-      expect(doorcardsSection).toBeInTheDocument();
+      // Use a more specific selector to get the card title, not the tab
+      const doorcardsCards = screen.getAllByText("Doorcards");
+      const doorcardsStatCard = doorcardsCards.find(
+        (element) => element.closest('[data-testid="card"]') !== null
+      );
+      expect(doorcardsStatCard).toBeInTheDocument();
 
       // Check for numbers and patterns
       expect(screen.getByText("75")).toBeInTheDocument();

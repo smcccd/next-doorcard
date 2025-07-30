@@ -22,10 +22,13 @@ describe("Markdown Utils", () => {
 
   describe("marked configuration", () => {
     it("should configure marked with correct options", () => {
-      // Since the module is imported when the test runs, setOptions should be called
-      expect(mockSetOptions).toHaveBeenCalledWith({
-        breaks: true,
-        gfm: true,
+      // Re-import the module to trigger setOptions call
+      jest.isolateModules(() => {
+        require("../markdown");
+        expect(mockSetOptions).toHaveBeenCalledWith({
+          breaks: true,
+          gfm: true,
+        });
       });
     });
   });
