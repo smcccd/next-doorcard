@@ -77,6 +77,7 @@ export default defineConfig({
               token: tokenPayload,
               secret: secret,
               maxAge: 24 * 60 * 60, // Match NextAuth session maxAge
+              encryption: true,
             });
 
             console.log(
@@ -98,6 +99,9 @@ export default defineConfig({
           launchOptions.args.push("--no-sandbox");
           launchOptions.args.push("--disable-web-security");
         }
+
+        // Set custom user agent to help identify Cypress requests
+        launchOptions.args.push("--user-agent=Cypress Test Runner");
         return launchOptions;
       });
 

@@ -1,6 +1,6 @@
 // app/layout.tsx
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Source_Sans_3 } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
@@ -43,6 +43,9 @@ export const metadata: Metadata = {
     process.env.NODE_ENV === "production"
       ? undefined
       : { index: false, follow: false },
+};
+
+export const viewport: Viewport = {
   themeColor: "#1e40af",
 };
 
