@@ -165,12 +165,19 @@ describe("Form Validation", () => {
       cy.get('[role="combobox"]').first().focus();
       cy.focused().should("exist");
 
-      // Tab through elements (if cy.tab() is available)
-      cy.get("body").then(() => {
-        // Simple focus test without cy.tab() dependency
-        cy.get('[role="combobox"]').first().should("be.focusable");
-        cy.contains("Continue to Basic Info").should("be.focusable");
-      });
+      // Test that elements are focusable by focusing them
+      cy.get('[role="combobox"]').first().focus().should("be.focused");
+      cy.contains("Continue to Basic Info").focus().should("be.focused");
+
+      // Verify elements have proper tabindex (or no negative tabindex)
+      cy.get('[role="combobox"]')
+        .first()
+        .should("not.have.attr", "tabindex", "-1");
+      cy.contains("Continue to Basic Info").should(
+        "not.have.attr",
+        "tabindex",
+        "-1"
+      );
     });
   });
 });
