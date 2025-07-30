@@ -1,39 +1,20 @@
-"use client";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 export default function NewDoorcardButton() {
-  const router = useRouter();
-  const [isNavigating, setIsNavigating] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    // Ensure router is ready after hydration
-    setIsReady(true);
-  }, []);
-
-  const handleClick = async () => {
-    if (!isReady || isNavigating) return;
-
-    setIsNavigating(true);
-    try {
-      await router.push("/doorcard/new");
-    } catch (error) {
-      console.error("Navigation error:", error);
-      setIsNavigating(false);
-    }
-  };
-
   return (
-    <Button
-      onClick={handleClick}
-      disabled={!isReady || isNavigating}
+    <Link
+      href="/doorcard/new"
       data-testid="create-doorcard-button"
+      className={cn(
+        "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        "h-11 px-4 py-2", // default size
+        "bg-primary text-primary-foreground shadow hover:bg-primary/90" // default variant
+      )}
     >
       <Plus className="h-5 w-5 mr-1" />
-      {isNavigating ? "Loading..." : "Create Doorcard"}
-    </Button>
+      Create Doorcard
+    </Link>
   );
 }

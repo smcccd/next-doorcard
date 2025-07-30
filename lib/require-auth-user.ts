@@ -32,24 +32,31 @@ type SelectedUser = {
 };
 
 async function fetchSessionUser(): Promise<SelectedUser | null> {
-  // In Cypress/test environment, create a mock user if session token exists
-  if (process.env.CYPRESS || process.env.NODE_ENV === "test") {
-    const { cookies } = await import("next/headers");
-    const sessionToken =
-      cookies().get("next-auth.session-token")?.value ||
-      cookies().get("__Secure-next-auth.session-token")?.value;
+  // In Cypress environment only (not jest tests), create a mock user if session token exists
+  if (process.env.CYPRESS === "true") {
+    try {
+      const { cookies } = await import("next/headers");
+      const sessionToken =
+        cookies().get("next-auth.session-token")?.value ||
+        cookies().get("__Secure-next-auth.session-token")?.value;
 
-    if (sessionToken) {
+      if (sessionToken) {
+        console.log(
+          "[DEBUG] Cypress detected with session token, returning mock user"
+        );
+        return {
+          id: "test-besnyib-smccd-edu",
+          email: "besnyib@smccd.edu",
+          name: "Test User",
+          role: "ADMIN",
+          college: "SKYLINE",
+        };
+      }
+    } catch (error) {
+      // cookies() called outside request scope - ignore in tests
       console.log(
-        "[DEBUG] Cypress detected with session token, returning mock user"
+        "[DEBUG] cookies() not available, continuing with normal auth"
       );
-      return {
-        id: "test-besnyib-smccd-edu",
-        email: "besnyib@smccd.edu",
-        name: "Test User",
-        role: "ADMIN",
-        college: "SKYLINE",
-      };
     }
   }
 
