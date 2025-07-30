@@ -624,6 +624,18 @@ describe("AdminPage", () => {
               json: async () => mockDoorcardsResponse,
             } as Response);
           }
+          if (url.includes("/api/admin/stats")) {
+            return Promise.resolve({
+              ok: true,
+              json: async () => mockStatsResponse,
+            } as Response);
+          }
+          if (url.includes("/api/admin/analytics")) {
+            return Promise.resolve({
+              ok: true,
+              json: async () => mockAnalyticsResponse,
+            } as Response);
+          }
         }
         return Promise.resolve({
           ok: true,
@@ -677,9 +689,38 @@ describe("AdminPage", () => {
 
   describe("Tab Navigation", () => {
     beforeEach(async () => {
-      mockFetch.mockImplementation(() =>
-        Promise.resolve({ ok: true, json: async () => ({}) } as Response)
-      );
+      mockFetch.mockImplementation((url) => {
+        if (typeof url === "string") {
+          if (url.includes("/api/admin/users")) {
+            return Promise.resolve({
+              ok: true,
+              json: async () => mockUsersResponse,
+            } as Response);
+          }
+          if (url.includes("/api/admin/doorcards")) {
+            return Promise.resolve({
+              ok: true,
+              json: async () => mockDoorcardsResponse,
+            } as Response);
+          }
+          if (url.includes("/api/admin/stats")) {
+            return Promise.resolve({
+              ok: true,
+              json: async () => mockStatsResponse,
+            } as Response);
+          }
+          if (url.includes("/api/admin/analytics")) {
+            return Promise.resolve({
+              ok: true,
+              json: async () => mockAnalyticsResponse,
+            } as Response);
+          }
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({}),
+        } as Response);
+      });
 
       render(<AdminPage />);
 
@@ -707,9 +748,38 @@ describe("AdminPage", () => {
 
   describe("Accessibility", () => {
     beforeEach(async () => {
-      mockFetch.mockImplementation(() =>
-        Promise.resolve({ ok: true, json: async () => ({}) } as Response)
-      );
+      mockFetch.mockImplementation((url) => {
+        if (typeof url === "string") {
+          if (url.includes("/api/admin/users")) {
+            return Promise.resolve({
+              ok: true,
+              json: async () => mockUsersResponse,
+            } as Response);
+          }
+          if (url.includes("/api/admin/doorcards")) {
+            return Promise.resolve({
+              ok: true,
+              json: async () => mockDoorcardsResponse,
+            } as Response);
+          }
+          if (url.includes("/api/admin/stats")) {
+            return Promise.resolve({
+              ok: true,
+              json: async () => mockStatsResponse,
+            } as Response);
+          }
+          if (url.includes("/api/admin/analytics")) {
+            return Promise.resolve({
+              ok: true,
+              json: async () => mockAnalyticsResponse,
+            } as Response);
+          }
+        }
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({}),
+        } as Response);
+      });
 
       render(<AdminPage />);
 

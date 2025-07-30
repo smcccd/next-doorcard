@@ -1,6 +1,6 @@
 // Main type exports
 export * from "./doorcard";
-export * from "./next-auth";
+export * from "./next-auth.d";
 
 // Component types
 export * from "./components/ui";
