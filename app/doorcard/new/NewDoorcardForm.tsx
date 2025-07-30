@@ -121,12 +121,14 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
     year: validateField("year", year),
   });
 
-  const handleSubmit = (formData: FormData) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setClientTried(true);
     const errs = validateAll();
     setFieldErrors(errs);
     if (Object.values(errs).some(Boolean)) return;
 
+    const formData = new FormData();
     formData.set("college", college);
     formData.set("term", term);
     formData.set("year", year);
@@ -157,7 +159,7 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
         <Alert>Please fill in all required fields correctly.</Alert>
       )}
 
-      <form action={handleSubmit} className="space-y-8" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-8" noValidate>
         <fieldset className="border border-gray-200 rounded-lg p-6">
           <legend className="text-base font-medium text-gray-900 px-2">
             Campus and Term Selection
