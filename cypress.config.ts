@@ -53,8 +53,15 @@ export default defineConfig({
             const secret =
               process.env.NEXTAUTH_SECRET || "development-secret-key";
 
+            console.log(
+              "Using NEXTAUTH_SECRET:",
+              secret ? "***set***" : "not set"
+            );
+            console.log("NODE_ENV:", process.env.NODE_ENV);
+
             const tokenPayload = {
               sub: id,
+              id: id, // Include both sub and id
               name: name,
               email: email,
               role: role,
@@ -69,6 +76,7 @@ export default defineConfig({
             const token = await encode({
               token: tokenPayload,
               secret: secret,
+              maxAge: 24 * 60 * 60, // Match NextAuth session maxAge
             });
 
             console.log(

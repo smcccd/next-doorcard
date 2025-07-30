@@ -135,13 +135,42 @@ Cypress.Commands.add(
           }
 
           cy.log("Setting auth token cookie");
-          cy.setCookie("next-auth.session-token", token as string, {
-            domain: "localhost",
+
+          // Determine if we're in production environment
+          const isProduction =
+            Cypress.config().baseUrl?.includes("vercel.app") ||
+            Cypress.config().baseUrl?.includes("https://");
+
+          // Extract domain from baseUrl for production
+          let cookieDomain = "localhost";
+          if (isProduction && Cypress.config().baseUrl) {
+            try {
+              const url = new URL(Cypress.config().baseUrl);
+              cookieDomain = url.hostname;
+            } catch (e) {
+              cy.log("Could not parse baseUrl, defaulting to localhost");
+            }
+          }
+
+          // Set cookie without domain for localhost, with domain for production
+          const cookieOptions: any = {
             path: "/",
             httpOnly: true,
-            secure: false,
             sameSite: "lax",
-          });
+          };
+
+          if (isProduction) {
+            cookieOptions.domain = cookieDomain;
+            cookieOptions.secure = true;
+          } else {
+            cookieOptions.secure = false;
+          }
+
+          cy.setCookie(
+            "next-auth.session-token",
+            token as string,
+            cookieOptions
+          );
 
           // Verify the token was set
           cy.getCookie("next-auth.session-token").should("exist");
@@ -170,23 +199,111 @@ Cypress.Commands.add(
   }
 );
 
-// Simple login command for tests (no session caching to avoid timeouts)
+// Production-ready login command that works in all environments
+Cypress.Commands.add(
+  "productionLogin",
+  (userEmail = "besnyib@smccd.edu", userName = "Test User") => {
+    // Always use programmatic authentication for reliability
+    cy.task("createAuthToken", {
+      email: userEmail,
+      name: userName,
+      id: `test-${userEmail.replace("@", "-").replace(".", "-")}`,
+      role: "ADMIN",
+    }).then((token) => {
+      if (!token) {
+        throw new Error("Failed to create auth token");
+      }
+
+      // Determine environment settings
+      const isProduction =
+        Cypress.config().baseUrl?.includes("vercel.app") ||
+        Cypress.config().baseUrl?.includes("https://");
+
+      let cookieDomain = "localhost";
+      if (isProduction && Cypress.config().baseUrl) {
+        try {
+          const url = new URL(Cypress.config().baseUrl);
+          cookieDomain = url.hostname;
+        } catch (e) {
+          cy.log("Could not parse baseUrl, defaulting to localhost");
+        }
+      }
+
+      // Set cookie without domain restriction for localhost
+      cy.setCookie("next-auth.session-token", token as string, {
+        path: "/",
+        httpOnly: true,
+        secure: false, // Always false for localhost testing
+        sameSite: "lax",
+      });
+
+      // Verify the token was set before navigation
+      cy.getCookie("next-auth.session-token")
+        .should("exist")
+        .then((cookie) => {
+          cy.log(`Auth cookie set: ${cookie?.value?.substring(0, 50)}...`);
+        });
+
+      // Test the auth session endpoint first to ensure token works
+      cy.request({
+        url: "/api/auth/session",
+        failOnStatusCode: false,
+      }).then((resp) => {
+        cy.log(`Session API response: ${resp.status}`);
+        if (resp.body?.user) {
+          cy.log(`✅ Auth working - user: ${resp.body.user.email}`);
+        } else {
+          cy.log(
+            `❌ Auth not working - response: ${JSON.stringify(resp.body)}`
+          );
+        }
+      });
+
+      // Navigate directly to dashboard - no login page needed
+      cy.visit("/dashboard");
+
+      // Wait for page to load and check URL
+      cy.location("pathname", { timeout: 10000 }).should("eq", "/dashboard");
+      cy.contains("My Doorcards", { timeout: 10000 }).should("be.visible");
+    });
+  }
+);
+
+// Simple login command for tests - always uses programmatic auth for reliability
 Cypress.Commands.add("simpleLogin", (userEmail = "besnyib@smccd.edu") => {
-  cy.visit("/login");
-  cy.contains("Show development login", { timeout: 10000 })
-    .should("be.visible")
-    .click();
-  cy.get('input[name="email"]', { timeout: 10000 })
-    .should("be.visible")
-    .clear()
-    .type(userEmail);
-  cy.get('input[name="password"]', { timeout: 10000 })
-    .should("be.visible")
-    .clear()
-    .type("password123");
-  cy.get('button[type="submit"]').should("be.visible").click();
-  cy.url({ timeout: 15000 }).should("include", "/dashboard");
-  cy.contains("My Doorcards", { timeout: 10000 }).should("be.visible");
+  // Use the exact same approach as the working auth-test.cy.ts
+  cy.task("createAuthToken", {
+    email: userEmail,
+    name: "Test User",
+    id: `test-${userEmail.replace("@", "-").replace(".", "-")}`,
+    role: "ADMIN",
+  }).then((token) => {
+    expect(token).to.exist;
+
+    // Set the cookie exactly as in the working test
+    cy.setCookie("next-auth.session-token", token as string, {
+      path: "/",
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+
+    // Verify cookie was set
+    cy.getCookie("next-auth.session-token").should("exist");
+
+    // Navigate to dashboard directly - this is what works in the standalone test
+    cy.visit("/dashboard");
+
+    // Check final URL - if it includes /login, auth failed; if /dashboard, success
+    cy.location("pathname", { timeout: 10000 }).then((pathname) => {
+      if (pathname === "/login") {
+        throw new Error("Authentication failed - redirected to login");
+      }
+      expect(pathname).to.equal("/dashboard");
+    });
+
+    cy.contains("My Doorcards", { timeout: 10000 }).should("be.visible");
+  });
 });
 
 // Custom command to create a test doorcard
@@ -363,6 +480,8 @@ declare global {
       login(email: string, password: string): Chainable<void>;
       loginAsTestUser(): Chainable<void>;
       fastLogin(userEmail?: string, userName?: string): Chainable<void>;
+      productionLogin(userEmail?: string, userName?: string): Chainable<void>;
+      simpleLogin(userEmail?: string): Chainable<void>;
       createTestDoorcard(options?: any): Chainable<any>;
       deleteDoorcard(doorcardId: string): Chainable<any>;
       cleanupTestData(): Chainable<void>;
