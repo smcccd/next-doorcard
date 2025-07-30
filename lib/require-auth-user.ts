@@ -36,9 +36,10 @@ async function fetchSessionUser(): Promise<SelectedUser | null> {
   if (process.env.CYPRESS === "true") {
     try {
       const { cookies } = await import("next/headers");
+      const cookieStore = await cookies();
       const sessionToken =
-        cookies().get("next-auth.session-token")?.value ||
-        cookies().get("__Secure-next-auth.session-token")?.value;
+        cookieStore.get("next-auth.session-token")?.value ||
+        cookieStore.get("__Secure-next-auth.session-token")?.value;
 
       if (sessionToken) {
         console.log(
