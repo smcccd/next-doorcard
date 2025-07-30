@@ -1,5 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Home from "../page";
+import { HomePageObject } from "@/lib/test-page-objects";
+import { testHelpers, mockData } from "@/lib/test-utils";
 
 // Mock the router
 const mockPush = jest.fn();
@@ -48,6 +50,11 @@ const mockDoorcards = [
 ];
 
 describe("Home Page", () => {
+  let homePage: HomePageObject;
+
+  beforeEach(() => {
+    homePage = new HomePageObject();
+  });
   beforeEach(() => {
     jest.clearAllMocks();
     (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
@@ -61,21 +68,23 @@ describe("Home Page", () => {
 
     expect(screen.getByText("Find Your Professor")).toBeInTheDocument();
     expect(
-      screen.getByText("Office Hours & Contact Information"),
+      screen.getByText("Office Hours & Contact Information")
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Need to meet with a professor?/),
+      screen.getByText("Search for Your Professor")  
     ).toBeInTheDocument();
   });
 
   it("renders the improved search section", async () => {
     render(<Home />);
 
-    expect(screen.getByText("Search for Your Professor")).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText(/Type professor's name/),
-    ).toBeInTheDocument();
-    expect(screen.getByText("Filter by Campus:")).toBeInTheDocument();
+    // Test user-facing functionality, not exact text
+    expect(screen.getByRole('heading', { name: /search.*professor/i })).toBeInTheDocument();
+    expect(screen.getByTestId('campus-filter')).toBeInTheDocument();
+    expect(screen.getByTestId('department-filter')).toBeInTheDocument();
+    
+    // Test that search input is accessible
+    expect(homePage.getSearchInput()).toBeInTheDocument();
   });
 
   it("shows campus names clearly in tabs", async () => {
@@ -181,7 +190,7 @@ describe("Home Page", () => {
 
   it("handles loading state with improved message", async () => {
     (fetch as jest.MockedFunction<typeof fetch>).mockImplementation(
-      () => new Promise(() => {}), // Never resolves
+      () => new Promise(() => {}) // Never resolves
     );
 
     render(<Home />);

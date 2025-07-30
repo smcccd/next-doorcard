@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
 import { DoorcardLite } from "../UnifiedDoorcard";
 import { formatDisplayName } from "@/lib/display-name";
+import {
+  CATEGORY_COLORS,
+  CATEGORY_LABELS,
+  TIME_SLOTS,
+} from "@/lib/doorcard-constants";
 
 // Appointment interface for PDF generation
 interface AppointmentForPDF {
@@ -22,25 +27,7 @@ interface SimplePDFProps {
   onDownload?: () => void;
 }
 
-// Category colors and labels - matching the database schema
-const CATEGORY_COLORS = {
-  OFFICE_HOURS: "#3b82f6",
-  IN_CLASS: "#10b981",
-  LECTURE: "#8b5cf6",
-  LAB: "#f59e0b",
-  HOURS_BY_ARRANGEMENT: "#06b6d4",
-  REFERENCE: "#6b7280",
-};
-
-const CATEGORY_LABELS = {
-  OFFICE_HOURS: "Office Hours",
-  IN_CLASS: "In Class",
-  LECTURE: "Lecture",
-  LAB: "Lab",
-  HOURS_BY_ARRANGEMENT: "Hours by Arrangement",
-  REFERENCE: "Reference",
-};
-
+// Days for weekday-only view
 const DAYS = [
   { key: "MONDAY", label: "Monday" },
   { key: "TUESDAY", label: "Tuesday" },
@@ -48,20 +35,6 @@ const DAYS = [
   { key: "THURSDAY", label: "Thursday" },
   { key: "FRIDAY", label: "Friday" },
 ];
-
-// Generate time slots from 7 AM to 9 PM
-const TIME_SLOTS = Array.from({ length: 29 }, (_, i) => {
-  const hour = Math.floor(7 + i / 2);
-  const minute = i % 2 === 0 ? "00" : "30";
-  const time24 = `${hour.toString().padStart(2, "0")}:${minute}`;
-  const display =
-    hour > 12
-      ? `${hour - 12}:${minute} PM`
-      : hour === 12
-        ? `12:${minute} PM`
-        : `${hour}:${minute} AM`;
-  return { time24, display };
-});
 
 function generatePrintableHTML(doorcard: DoorcardLite): string {
   const displayName = doorcard.user
@@ -107,9 +80,14 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
     return slotMinutes >= startMinutes && slotMinutes < endMinutes;
   };
 
-  // Get unique categories for legend
+  // Get all categories for legend (show all 6)
   const categories = [
-    ...new Set(doorcard.appointments.map((apt) => apt.category)),
+    "OFFICE_HOURS",
+    "IN_CLASS",
+    "LECTURE",
+    "LAB",
+    "HOURS_BY_ARRANGEMENT",
+    "REFERENCE",
   ];
 
   return `
@@ -128,6 +106,8 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
     
     body {
@@ -253,35 +233,10 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
       margin-top: 1px;
     }
     
-    /* Category-specific colors - matching database schema */
-    .appointment.office-hours {
-      background: #dbeafe !important;
-      color: #1e40af !important;
-    }
-    
-    .appointment.in-class {
-      background: #dcfce7 !important;
-      color: #166534 !important;
-    }
-    
-    .appointment.lecture {
-      background: #f3e8ff !important;
-      color: #7c2d12 !important;
-    }
-    
-    .appointment.lab {
-      background: #fed7aa !important;
-      color: #ea580c !important;
-    }
-    
-    .appointment.hours-by-arrangement {
-      background: #cffafe !important;
-      color: #0e7490 !important;
-    }
-    
-    .appointment.reference {
-      background: #f3f4f6 !important;
-      color: #374151 !important;
+    /* Category-specific colors - matching centralized constants */
+    .appointment {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
     
     .appointment-location {
@@ -317,9 +272,13 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
     }
     
     .legend-color {
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       border-radius: 2px;
+      display: inline-block;
+      vertical-align: middle;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
     
     .legend-text {
@@ -352,7 +311,6 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
   </div>
 
   <div class="faculty-name">${displayName}</div>
-  ${doorcard.user?.title ? `<div class="faculty-title">${doorcard.user.title}</div>` : ""}
 
   <div class="office-info">
     <div class="office-item">
@@ -392,24 +350,40 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
         let html = `<tr>`;
 
         // Time cell
-        html += `<td class="time-cell">${showTime ? slot.display : ""}</td>`;
+        html += `<td class="time-cell">${showTime ? slot.label : ""}</td>`;
 
         // Day columns
         DAYS.forEach((day) => {
           const appointment = byDay[day.key]?.find((apt) =>
-            isSlotCovered(apt, slot.time24),
+            isSlotCovered(apt, slot.value)
           );
 
-          if (appointment && isAppointmentStart(appointment, slot.time24)) {
+          if (appointment && isAppointmentStart(appointment, slot.value)) {
             // This is the start of an appointment - create cell with rowspan
             const rowspan = getRowspan(appointment);
-            const categoryClass = appointment.category
-              .toLowerCase()
-              .replace("_", "-");
+            const bgColor =
+              CATEGORY_COLORS[
+                appointment.category as keyof typeof CATEGORY_COLORS
+              ] || CATEGORY_COLORS.REFERENCE;
+
+            // Extract course code from appointment name
+            const courseName = appointment.name.replace(/^(.*?)\s*-\s*/, "");
+
+            // Format time range
+            const formatTime = (time: string) => {
+              const [hour, min] = time.split(":").map(Number);
+              const period = hour >= 12 ? "PM" : "AM";
+              const displayHour =
+                hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+              return `${displayHour}:${min.toString().padStart(2, "0")} ${period}`;
+            };
+            const timeRange = `${formatTime(appointment.startTime)} - ${formatTime(appointment.endTime)}`;
+
             html += `
-              <td rowspan="${rowspan}" class="appointment ${categoryClass}">
-                ${appointment.name}
-                ${appointment.location ? `<br><span class="appointment-location">${appointment.location}</span>` : ""}
+              <td rowspan="${rowspan}" class="appointment" style="background-color: ${bgColor}; color: #1f2937; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                <div style="font-weight: 600;">${courseName}</div>
+                <div style="font-size: 6px; opacity: 0.8; margin-top: 1px;">${timeRange}</div>
+                ${appointment.location ? `<div style="font-size: 6px; opacity: 0.7;">${appointment.location}</div>` : ""}
               </td>
             `;
           } else if (!appointment) {
@@ -433,30 +407,16 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
     <div class="legend-items">
       ${categories
         .map((category) => {
-          const colorMap = {
-            OFFICE_HOURS: "#dbeafe",
-            IN_CLASS: "#dcfce7",
-            LECTURE: "#f3e8ff",
-            LAB: "#fed7aa",
-            HOURS_BY_ARRANGEMENT: "#cffafe",
-            REFERENCE: "#f3f4f6",
-          };
-          const textColorMap = {
-            OFFICE_HOURS: "#1e40af",
-            IN_CLASS: "#166534",
-            LECTURE: "#7c2d12",
-            LAB: "#ea580c",
-            HOURS_BY_ARRANGEMENT: "#0e7490",
-            REFERENCE: "#374151",
-          };
           const bgColor =
-            colorMap[category as keyof typeof colorMap] || colorMap.REFERENCE;
-          const textColor =
-            textColorMap[category as keyof typeof textColorMap] ||
-            textColorMap.REFERENCE;
+            CATEGORY_COLORS[category as keyof typeof CATEGORY_COLORS] ||
+            CATEGORY_COLORS.REFERENCE;
+          const label =
+            CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS] ||
+            category;
           return `
         <div class="legend-item">
-          <div class="legend-color" style="background-color: ${bgColor}; border: 1px solid #d1d5db; color: ${textColor}; padding: 2px 4px; font-size: 7px; font-weight: 600;">${CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS] || category}</div>
+          <div class="legend-color" style="background-color: ${bgColor}; width: 12px; height: 12px; border: 1px solid #d1d5db; border-radius: 2px; display: inline-block;"></div>
+          <span class="legend-text">${label}</span>
         </div>
       `;
         })

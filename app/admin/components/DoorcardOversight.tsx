@@ -99,7 +99,7 @@ export default function DoorcardOversight({
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedDoorcards = filteredDoorcards.slice(
     startIndex,
-    startIndex + ITEMS_PER_PAGE,
+    startIndex + ITEMS_PER_PAGE
   );
 
   // Reset to page 1 when filters change

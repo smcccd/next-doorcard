@@ -100,7 +100,7 @@ export async function GET() {
       const uniqueRatio = uniqueViews > 0 ? (uniqueViews / totalViews) * 10 : 0;
 
       engagementScore = Math.round(
-        viewScore + printScore + shareScore + uniqueRatio,
+        viewScore + printScore + shareScore + uniqueRatio
       );
     }
 
@@ -132,18 +132,18 @@ export async function GET() {
     const systemStats = {
       totalEvents: totalAnalytics.reduce(
         (sum, event) => sum + event._count.eventType,
-        0,
+        0
       ),
       recentEvents: recentAnalytics.reduce(
         (sum, event) => sum + event._count.eventType,
-        0,
+        0
       ),
       eventBreakdown: totalAnalytics.reduce(
         (acc, event) => {
           acc[event.eventType] = event._count.eventType;
           return acc;
         },
-        {} as Record<string, number>,
+        {} as Record<string, number>
       ),
     };
 
@@ -156,7 +156,7 @@ export async function GET() {
     console.error("Error fetching admin analytics:", error);
     return NextResponse.json(
       { error: "Failed to fetch analytics" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

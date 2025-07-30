@@ -33,7 +33,7 @@ describe("AnalyticsTracker", () => {
 
       expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
         "doorcard-session-id",
-        expect.stringMatching(/^session-\d+-[a-z0-9]{9}$/),
+        expect.stringMatching(/^session-\d+-[a-z0-9]{9}$/)
       );
     });
 
@@ -86,7 +86,7 @@ describe("AnalyticsTracker", () => {
 
       expect(consoleSpy).toHaveBeenCalledWith(
         "Analytics tracking failed:",
-        expect.any(Error),
+        expect.any(Error)
       );
       consoleSpy.mockRestore();
     });

@@ -1,6 +1,7 @@
 # Centralized Type System
 
-This directory contains all TypeScript types for the Next.js Doorcard application, organized by domain and functionality.
+This directory contains all TypeScript types for the Next.js Doorcard
+application, organized by domain and functionality.
 
 ## Structure
 

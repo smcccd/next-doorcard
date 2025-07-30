@@ -34,7 +34,7 @@ describe("TermManager", () => {
         doorcards: [{ id: "doorcard-1" }, { id: "doorcard-2" }],
       };
       mockPrisma.term.findFirst.mockResolvedValueOnce(
-        mockActiveTermWithDoorcards,
+        mockActiveTermWithDoorcards
       );
 
       const result = await TermManager.getActiveTerm();
@@ -137,7 +137,7 @@ describe("TermManager", () => {
     beforeEach(() => {
       // Only set up default mocks, don't pre-configure findUnique
       mockPrisma.$transaction.mockImplementation((callback) =>
-        callback(mockPrisma),
+        callback(mockPrisma)
       );
     });
 
@@ -179,14 +179,14 @@ describe("TermManager", () => {
 
       // Reset the transaction mock to avoid interference
       mockPrisma.$transaction.mockImplementation((callback) =>
-        callback(mockPrisma),
+        callback(mockPrisma)
       );
 
       // Mock findUnique to return null for the new term
       mockPrisma.term.findUnique.mockResolvedValueOnce(null);
 
       await expect(TermManager.transitionToNewTerm(newTermId)).rejects.toThrow(
-        "New term not found",
+        "New term not found"
       );
 
       // Verify that findUnique was called with the correct parameters
@@ -227,7 +227,7 @@ describe("TermManager", () => {
 
     beforeEach(() => {
       mockPrisma.$transaction.mockImplementation((callback) =>
-        callback(mockPrisma),
+        callback(mockPrisma)
       );
     });
 
@@ -310,7 +310,7 @@ describe("TermManager", () => {
           where: {
             termRelation: { isArchived: true },
           },
-        }),
+        })
       );
     });
 
@@ -322,7 +322,7 @@ describe("TermManager", () => {
           where: {
             termRelation: { isUpcoming: true },
           },
-        }),
+        })
       );
     });
   });

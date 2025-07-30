@@ -44,14 +44,26 @@ export function getCurrentAcademicTerm(): { season: TermSeason; year: number } {
  */
 export function compareTerms(
   term1: { season: TermSeason; year: number },
-  term2: { season: TermSeason; year: number },
+  term2: { season: TermSeason; year: number }
 ): number {
   if (term1.year !== term2.year) {
     return term1.year - term2.year;
   }
 
-  const season1Start = TERM_PERIODS[term1.season].startMonth;
-  const season2Start = TERM_PERIODS[term2.season].startMonth;
+  // Validate season values exist in TERM_PERIODS
+  const term1Period = TERM_PERIODS[term1.season];
+  const term2Period = TERM_PERIODS[term2.season];
+
+  if (!term1Period || !term2Period) {
+    console.error("Invalid season values:", {
+      term1: term1.season,
+      term2: term2.season,
+    });
+    return 0; // Treat as equal if invalid
+  }
+
+  const season1Start = term1Period.startMonth;
+  const season2Start = term2Period.startMonth;
 
   return season1Start - season2Start;
 }
@@ -66,7 +78,7 @@ export function getTermStatus(
   const currentTerm = activeTerm || getCurrentAcademicTerm();
   const comparison = compareTerms(
     { season: doorcard.term as TermSeason, year: doorcard.year },
-    currentTerm,
+    currentTerm
   );
 
   if (comparison < 0) return "past";
@@ -78,7 +90,7 @@ export function getTermStatus(
  * Categorize doorcards by their temporal status and visibility
  */
 export function categorizeDoorcards<T extends Doorcard>(
-  doorcards: T[], 
+  doorcards: T[],
   activeTerm?: { season: TermSeason; year: number } | null
 ) {
   const current: T[] = [];
@@ -108,7 +120,7 @@ export function categorizeDoorcards<T extends Doorcard>(
  * Check if a doorcard is complete (has necessary information)
  */
 function isDoorcardComplete(
-  doorcard: Doorcard & { appointments?: any[] },
+  doorcard: Doorcard & { appointments?: any[] }
 ): boolean {
   // Basic info should be present
   if (!doorcard.doorcardName || !doorcard.officeNumber) {
@@ -132,7 +144,7 @@ function isDoorcardComplete(
  * "Upcoming" means it's from a future term
  */
 export function getDoorcardDisplayStatus(
-  doorcard: Doorcard & { appointments?: any[] },
+  doorcard: Doorcard & { appointments?: any[] }
 ): {
   status: "live" | "draft" | "incomplete" | "archived" | "upcoming";
   label: string;

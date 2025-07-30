@@ -1,17 +1,17 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import React from 'react';
-import { Button } from './button';
-import { useToast } from '../../hooks/use-toast';
-import { Toaster } from './toaster';
-import { ToastAction } from './toast';
-import { Check, X, AlertCircle, Info } from 'lucide-react';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import React from "react";
+import { Button } from "./button";
+import { useToast } from "../../hooks/use-toast";
+import { Toaster } from "./toaster";
+import { ToastAction } from "./toast";
+import { Check, X, AlertCircle, Info } from "lucide-react";
 
 const meta = {
-  title: 'UI/Toast',
+  title: "UI/Toast",
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <>
@@ -61,7 +61,7 @@ const ToastVariantsDemo = () => {
       >
         Default Toast
       </Button>
-      
+
       <Button
         variant="destructive"
         onClick={() => {
@@ -184,7 +184,8 @@ const ToastExamplesDemo = () => {
               toast({
                 variant: "destructive",
                 title: "🚫 Access Denied",
-                description: "You don't have permission to perform this action.",
+                description:
+                  "You don't have permission to perform this action.",
               });
             }}
           >
@@ -202,7 +203,8 @@ const ToastExamplesDemo = () => {
             onClick={() => {
               toast({
                 title: "ℹ️ Tip",
-                description: "You can edit your office hours in the settings page.",
+                description:
+                  "You can edit your office hours in the settings page.",
               });
             }}
           >
@@ -310,7 +312,8 @@ const DoorcardToastsDemo = () => {
           onClick={() => {
             toast({
               title: "Student Appointment",
-              description: "John Doe has scheduled an appointment for tomorrow at 2 PM.",
+              description:
+                "John Doe has scheduled an appointment for tomorrow at 2 PM.",
               action: <ToastAction altText="View">View</ToastAction>,
             });
           }}

@@ -57,7 +57,7 @@ function groupByDay(appts: AppointmentLite[]) {
     // Only include weekday appointments in print view
     if (
       ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"].includes(
-        a.dayOfWeek,
+        a.dayOfWeek
       )
     ) {
       (map[a.dayOfWeek] ||= []).push(a);
@@ -69,12 +69,15 @@ function groupByDay(appts: AppointmentLite[]) {
   return map;
 }
 
-function getUsedCategories(
-  appointments: AppointmentLite[],
-): AppointmentCategory[] {
-  const used = new Set<AppointmentCategory>();
-  appointments.forEach((apt) => used.add(apt.category));
-  return Array.from(used);
+function getAllCategories(): AppointmentCategory[] {
+  return [
+    "OFFICE_HOURS",
+    "IN_CLASS",
+    "LECTURE",
+    "LAB",
+    "HOURS_BY_ARRANGEMENT",
+    "REFERENCE",
+  ] as AppointmentCategory[];
 }
 
 export function PrintOptimizedDoorcard({
@@ -82,7 +85,7 @@ export function PrintOptimizedDoorcard({
   containerId = "doorcard-schedule",
 }: PrintOptimizedDoorcardProps) {
   const byDay = groupByDay(doorcard.appointments);
-  const usedCategories = getUsedCategories(doorcard.appointments);
+  const allCategories = getAllCategories();
 
   return (
     <div
@@ -93,22 +96,129 @@ export function PrintOptimizedDoorcard({
         dangerouslySetInnerHTML={{
           __html: `
           @media print {
-            .print-doorcard { font-size: 11px; line-height: 1.2; }
-            .print-header { margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid #dc2626; }
-            .print-header h1 { font-size: 18px; font-weight: bold; color: #dc2626; margin: 0 0 4px 0; }
-            .print-info { font-size: 11px; color: #374151; }
-            .print-table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 10px; }
-            .print-table th { background-color: #f3f4f6; border: 1px solid #d1d5db; padding: 4px 2px; text-align: center; font-weight: 600; font-size: 9px; }
-            .print-table td { border: 1px solid #d1d5db; padding: 2px; text-align: center; font-size: 9px; min-height: 20px; vertical-align: middle; }
-            .print-time-cell { width: 60px; background-color: #f9fafb; font-size: 8px; color: #6b7280; }
-            .print-appointment { font-weight: 600; line-height: 1.1; }
-            .print-time-range { font-size: 8px; opacity: 0.8; }
-            .print-location { font-size: 7px; opacity: 0.7; }
-            .print-legend { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px; font-size: 9px; }
-            .print-legend-item { display: flex; align-items: center; gap: 4px; }
-            .print-color-box { width: 12px; height: 12px; border: 1px solid #9ca3af; border-radius: 2px; }
-            * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            @page { margin: 0.5in; size: letter; }
+            @page { 
+              margin: 0.5in; 
+              size: letter; 
+            }
+            
+            /* Force color printing */
+            * { 
+              -webkit-print-color-adjust: exact !important; 
+              print-color-adjust: exact !important; 
+              color-adjust: exact !important;
+            }
+            
+            .print-doorcard { 
+              font-size: 12px; 
+              line-height: 1.3;
+              max-width: 100%;
+              margin: 0;
+              padding: 0;
+            }
+            
+            .print-header { 
+              margin-bottom: 12px; 
+              padding-bottom: 8px; 
+              border-bottom: 2px solid #dc2626;
+            }
+            
+            .print-header h1 { 
+              font-size: 20px; 
+              font-weight: bold; 
+              color: #dc2626; 
+              margin: 0 0 6px 0; 
+              line-height: 1.2;
+            }
+            
+            .print-info { 
+              font-size: 12px; 
+              color: #374151; 
+              line-height: 1.4;
+            }
+            
+            .print-table { 
+              width: 100%; 
+              border-collapse: collapse; 
+              margin: 12px 0; 
+              font-size: 11px;
+              table-layout: fixed;
+            }
+            
+            .print-table th { 
+              background-color: #f3f4f6 !important; 
+              border: 1px solid #d1d5db; 
+              padding: 6px 4px; 
+              text-align: center; 
+              font-weight: 600; 
+              font-size: 10px;
+              height: 30px;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            
+            .print-table td { 
+              border: 1px solid #d1d5db; 
+              padding: 4px; 
+              text-align: center; 
+              font-size: 10px; 
+              min-height: 25px; 
+              vertical-align: middle;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            
+            .print-time-cell { 
+              width: 80px; 
+              background-color: #f9fafb !important; 
+              font-size: 9px; 
+              color: #6b7280;
+              font-weight: 500;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            
+            .print-appointment { 
+              font-weight: 600; 
+              line-height: 1.2;
+              word-wrap: break-word;
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            
+            .print-time-range { 
+              font-size: 9px; 
+              opacity: 0.8; 
+              margin-top: 2px;
+            }
+            
+            .print-location { 
+              font-size: 8px; 
+              opacity: 0.7; 
+              margin-top: 1px;
+            }
+            
+            .print-legend { 
+              margin-top: 12px; 
+              font-size: 10px;
+            }
+            
+            .print-legend-item { 
+              display: inline-flex !important; 
+              align-items: center; 
+              margin-right: 12px;
+              margin-bottom: 4px;
+            }
+            
+            .print-color-box { 
+              display: inline-block !important;
+              width: 14px !important; 
+              height: 14px !important; 
+              border: 1px solid #9ca3af !important; 
+              border-radius: 2px !important;
+              margin-right: 6px !important;
+              -webkit-print-color-adjust: exact !important; 
+              print-color-adjust: exact !important;
+            }
           }
         `,
         }}
@@ -121,6 +231,13 @@ export function PrintOptimizedDoorcard({
             ? formatDisplayName(doorcard.user)
             : doorcard.name || "Faculty Name"}
         </h1>
+        {doorcard.user?.title && (
+          <div
+            style={{ fontSize: "12px", color: "#6b7280", marginBottom: "4px" }}
+          >
+            {doorcard.user.title}
+          </div>
+        )}
         <div className="print-info">
           <strong>
             {doorcard.term} {doorcard.year}
@@ -175,8 +292,7 @@ export function PrintOptimizedDoorcard({
                 if (
                   list.some(
                     (a) =>
-                      isSlotCovered(a, slot.value) &&
-                      a.startTime !== slot.value,
+                      isSlotCovered(a, slot.value) && a.startTime !== slot.value
                   )
                 ) {
                   return null;
@@ -188,22 +304,72 @@ export function PrintOptimizedDoorcard({
         </tbody>
       </table>
 
-      {/* Compact Legend - Only Used Categories */}
-      {usedCategories.length > 0 && (
-        <div className="print-legend">
-          {usedCategories.map((category) => (
-            <div key={category} className="print-legend-item">
-              <span
-                className="print-color-box"
-                style={{
-                  backgroundColor: CATEGORY_COLORS[category],
-                }}
-              />
-              {CATEGORY_LABELS[category]}
-            </div>
-          ))}
+      {/* Compact Legend - All Categories */}
+      <div className="print-legend" style={{ marginTop: "12px" }}>
+        <div
+          style={{
+            fontSize: "10px",
+            fontWeight: "600",
+            marginBottom: "6px",
+            color: "#1f2937",
+          }}
+        >
+          Activity Types
         </div>
-      )}
+        <table style={{ borderCollapse: "collapse", fontSize: "10px" }}>
+          <tbody>
+            <tr>
+              {allCategories.slice(0, 3).map((category) => (
+                <td
+                  key={category}
+                  style={{ paddingRight: "16px", paddingBottom: "4px" }}
+                >
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <div
+                      style={{
+                        width: "14px",
+                        height: "14px",
+                        backgroundColor: CATEGORY_COLORS[category],
+                        border: "1px solid #9ca3af",
+                        borderRadius: "2px",
+                        marginRight: "6px",
+                        WebkitPrintColorAdjust: "exact",
+                        printColorAdjust: "exact",
+                      }}
+                    />
+                    <span style={{ color: "#4b5563" }}>
+                      {CATEGORY_LABELS[category]}
+                    </span>
+                  </div>
+                </td>
+              ))}
+            </tr>
+            <tr>
+              {allCategories.slice(3, 6).map((category) => (
+                <td key={category} style={{ paddingRight: "16px" }}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <div
+                      style={{
+                        width: "14px",
+                        height: "14px",
+                        backgroundColor: CATEGORY_COLORS[category],
+                        border: "1px solid #9ca3af",
+                        borderRadius: "2px",
+                        marginRight: "6px",
+                        WebkitPrintColorAdjust: "exact",
+                        printColorAdjust: "exact",
+                      }}
+                    />
+                    <span style={{ color: "#4b5563" }}>
+                      {CATEGORY_LABELS[category]}
+                    </span>
+                  </div>
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

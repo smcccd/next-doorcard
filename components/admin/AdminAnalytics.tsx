@@ -261,9 +261,12 @@ export function AdminAnalytics() {
                         </div>
                       </td>
                       <td className="p-3">
-                        <Badge variant="outline" className="flex items-center gap-1.5 w-fit">
-                          <CollegeLogo 
-                            college={doorcard.college as College} 
+                        <Badge
+                          variant="outline"
+                          className="flex items-center gap-1.5 w-fit"
+                        >
+                          <CollegeLogo
+                            college={doorcard.college as College}
                             height={14}
                             className="flex-shrink-0"
                           />
@@ -298,7 +301,7 @@ export function AdminAnalytics() {
                         <div className="text-sm text-gray-500">
                           {doorcard.lastViewedAt
                             ? new Date(
-                                doorcard.lastViewedAt,
+                                doorcard.lastViewedAt
                               ).toLocaleDateString()
                             : "Never"}
                         </div>
@@ -343,7 +346,7 @@ export function AdminAnalytics() {
                     {eventType.toLowerCase().replace("_", " ")}
                   </div>
                 </div>
-              ),
+              )
             )}
           </div>
         </CardContent>

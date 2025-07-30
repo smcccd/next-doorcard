@@ -18,7 +18,7 @@ export function getCurrentAcademicTerm(): ActiveTermInfo {
 
   // Academic year logic:
   // January-May = Spring of current year
-  // June-August = Summer of current year  
+  // June-August = Summer of current year
   // September-December = Fall of current year
   if (currentMonth >= 1 && currentMonth <= 5) {
     season = TermSeason.SPRING;
@@ -37,7 +37,7 @@ export function getCurrentAcademicTerm(): ActiveTermInfo {
     season,
     year,
     displayName,
-    isFromDatabase: false
+    isFromDatabase: false,
   };
 }
 
@@ -52,15 +52,15 @@ export function isCurrentTerm(season: TermSeason, year: number): boolean {
 
 export function isUpcomingTerm(season: TermSeason, year: number): boolean {
   const current = getCurrentAcademicTerm();
-  
+
   if (year > current.year) return true;
   if (year < current.year) return false;
-  
+
   // Same year, check season order
   const seasonOrder = { SPRING: 1, SUMMER: 2, FALL: 3 };
   const currentOrder = seasonOrder[current.season];
   const termOrder = seasonOrder[season];
-  
+
   return termOrder > currentOrder;
 }
 

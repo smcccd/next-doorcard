@@ -276,10 +276,10 @@ describe("AdminPage", () => {
       render(<AdminPage />);
 
       expect(
-        screen.getByText("Loading admin dashboard..."),
+        screen.getByText("Loading admin dashboard...")
       ).toBeInTheDocument();
       expect(
-        screen.getByText("Loading admin dashboard..."),
+        screen.getByText("Loading admin dashboard...")
       ).toBeInTheDocument();
     });
 
@@ -293,7 +293,7 @@ describe("AdminPage", () => {
 
       await waitFor(() => {
         expect(
-          screen.queryByText("Loading admin dashboard..."),
+          screen.queryByText("Loading admin dashboard...")
         ).not.toBeInTheDocument();
       });
     });
@@ -311,7 +311,7 @@ describe("AdminPage", () => {
       await waitFor(() => {
         expect(screen.getByText("Admin Dashboard Error")).toBeInTheDocument();
         expect(
-          screen.getByText("Failed to load admin data"),
+          screen.getByText("Failed to load admin data")
         ).toBeInTheDocument();
       });
     });
@@ -405,7 +405,7 @@ describe("AdminPage", () => {
 
       await waitFor(() => {
         expect(
-          screen.queryByText("Loading admin dashboard..."),
+          screen.queryByText("Loading admin dashboard...")
         ).not.toBeInTheDocument();
       });
 
@@ -434,7 +434,7 @@ describe("AdminPage", () => {
 
       await waitFor(() => {
         expect(
-          screen.queryByText("Loading admin dashboard..."),
+          screen.queryByText("Loading admin dashboard...")
         ).not.toBeInTheDocument();
       });
     });
@@ -479,7 +479,7 @@ describe("AdminPage", () => {
 
       await waitFor(() => {
         expect(
-          screen.queryByText("Loading admin dashboard..."),
+          screen.queryByText("Loading admin dashboard...")
         ).not.toBeInTheDocument();
       });
     });
@@ -527,7 +527,7 @@ describe("AdminPage", () => {
 
       await waitFor(() => {
         expect(
-          screen.queryByText("Loading admin dashboard..."),
+          screen.queryByText("Loading admin dashboard...")
         ).not.toBeInTheDocument();
       });
     });
@@ -547,7 +547,7 @@ describe("AdminPage", () => {
       fireEvent.click(screen.getByTestId("tab-trigger-users"));
 
       const searchInput = screen.getByPlaceholderText(
-        /search by email, name, or username/i,
+        /search by email, name, or username/i
       );
       fireEvent.change(searchInput, { target: { value: "john" } });
 
@@ -559,14 +559,14 @@ describe("AdminPage", () => {
   describe("Tab Navigation", () => {
     beforeEach(async () => {
       mockFetch.mockImplementation(() =>
-        Promise.resolve({ ok: true, json: async () => ({}) } as Response),
+        Promise.resolve({ ok: true, json: async () => ({}) } as Response)
       );
 
       render(<AdminPage />);
 
       await waitFor(() => {
         expect(
-          screen.queryByText("Loading admin dashboard..."),
+          screen.queryByText("Loading admin dashboard...")
         ).not.toBeInTheDocument();
       });
     });
@@ -589,21 +589,21 @@ describe("AdminPage", () => {
   describe("Accessibility", () => {
     beforeEach(async () => {
       mockFetch.mockImplementation(() =>
-        Promise.resolve({ ok: true, json: async () => ({}) } as Response),
+        Promise.resolve({ ok: true, json: async () => ({}) } as Response)
       );
 
       render(<AdminPage />);
 
       await waitFor(() => {
         expect(
-          screen.queryByText("Loading admin dashboard..."),
+          screen.queryByText("Loading admin dashboard...")
         ).not.toBeInTheDocument();
       });
     });
 
     it("should have proper headings structure", () => {
       expect(
-        screen.getByRole("heading", { name: /admin dashboard/i }),
+        screen.getByRole("heading", { name: /admin dashboard/i })
       ).toBeInTheDocument();
     });
 

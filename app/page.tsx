@@ -9,9 +9,7 @@ import {
   useSearchAutocomplete,
   type AutocompleteSuggestion,
 } from "@/hooks/useSearchAutocomplete";
-import {
-  extractDepartmentFromText,
-} from "@/lib/departments";
+import { extractDepartmentFromText } from "@/lib/departments";
 import { useActiveTerm } from "@/hooks/useActiveTerm";
 import { useDebounce } from "@/hooks/useDebounce";
 import { SearchForm } from "@/components/ui/search-form";

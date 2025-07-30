@@ -1,26 +1,26 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import CollegeLogo from './CollegeLogo';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import CollegeLogo from "./CollegeLogo";
 
 const meta = {
-  title: 'Components/CollegeLogo',
+  title: "Components/CollegeLogo",
   component: CollegeLogo,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     college: {
-      control: { type: 'select' },
-      options: ['CSM', 'SKYLINE', 'CANADA'],
-      description: 'The college to display the logo for',
+      control: { type: "select" },
+      options: ["CSM", "SKYLINE", "CANADA"],
+      description: "The college to display the logo for",
     },
     height: {
-      control: { type: 'number' },
-      description: 'The height of the logo in pixels',
+      control: { type: "number" },
+      description: "The height of the logo in pixels",
     },
     className: {
-      control: 'text',
-      description: 'Additional CSS classes',
+      control: "text",
+      description: "Additional CSS classes",
     },
   },
 } satisfies Meta<typeof CollegeLogo>;
@@ -30,13 +30,13 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    college: 'CSM',
+    college: "CSM",
   },
 };
 
 export const AllColleges: Story = {
   args: {
-    college: 'SKYLINE',
+    college: "SKYLINE",
   },
   render: () => (
     <div className="space-y-8">
@@ -58,32 +58,38 @@ export const AllColleges: Story = {
 
 export const Variants: Story = {
   args: {
-    college: 'SKYLINE',
+    college: "SKYLINE",
   },
   render: () => (
     <div className="space-y-8">
       <div className="space-y-4">
         <h3 className="font-semibold">Full Variant</h3>
         <div className="flex gap-4">
-          <CollegeLogo college="CSM"  />
-          <CollegeLogo college="SKYLINE"  />
-          <CollegeLogo college="CANADA"  />
+          <CollegeLogo college="CSM" />
+          <CollegeLogo college="SKYLINE" />
+          <CollegeLogo college="CANADA" />
         </div>
       </div>
       <div className="space-y-4">
         <h3 className="font-semibold">Icon Variant</h3>
         <div className="flex gap-4">
-          <CollegeLogo college="CSM"  />
-          <CollegeLogo college="SKYLINE"  />
-          <CollegeLogo college="CANADA"  />
+          <CollegeLogo college="CSM" />
+          <CollegeLogo college="SKYLINE" />
+          <CollegeLogo college="CANADA" />
         </div>
       </div>
       <div className="space-y-4">
         <h3 className="font-semibold">Inline Variant</h3>
         <div className="space-y-2">
-          <p>Welcome to <CollegeLogo college="CSM"  /></p>
-          <p>Welcome to <CollegeLogo college="SKYLINE"  /></p>
-          <p>Welcome to <CollegeLogo college="CANADA"  /></p>
+          <p>
+            Welcome to <CollegeLogo college="CSM" />
+          </p>
+          <p>
+            Welcome to <CollegeLogo college="SKYLINE" />
+          </p>
+          <p>
+            Welcome to <CollegeLogo college="CANADA" />
+          </p>
         </div>
       </div>
     </div>
@@ -92,32 +98,32 @@ export const Variants: Story = {
 
 export const Sizes: Story = {
   args: {
-    college: 'SKYLINE',
+    college: "SKYLINE",
   },
   render: () => (
     <div className="space-y-8">
       <div className="space-y-4">
         <h3 className="font-semibold">Small Size</h3>
         <div className="flex gap-4 items-center">
-          <CollegeLogo college="CSM"  />
-          <CollegeLogo college="SKYLINE"  />
-          <CollegeLogo college="CANADA"  />
+          <CollegeLogo college="CSM" />
+          <CollegeLogo college="SKYLINE" />
+          <CollegeLogo college="CANADA" />
         </div>
       </div>
       <div className="space-y-4">
         <h3 className="font-semibold">Medium Size (Default)</h3>
         <div className="flex gap-4 items-center">
-          <CollegeLogo college="CSM"  />
-          <CollegeLogo college="SKYLINE"  />
-          <CollegeLogo college="CANADA"  />
+          <CollegeLogo college="CSM" />
+          <CollegeLogo college="SKYLINE" />
+          <CollegeLogo college="CANADA" />
         </div>
       </div>
       <div className="space-y-4">
         <h3 className="font-semibold">Large Size</h3>
         <div className="flex gap-4 items-center">
-          <CollegeLogo college="CSM"  />
-          <CollegeLogo college="SKYLINE"  />
-          <CollegeLogo college="CANADA"  />
+          <CollegeLogo college="CSM" />
+          <CollegeLogo college="SKYLINE" />
+          <CollegeLogo college="CANADA" />
         </div>
       </div>
     </div>
@@ -126,7 +132,7 @@ export const Sizes: Story = {
 
 export const InContext: Story = {
   args: {
-    college: 'CSM',
+    college: "CSM",
   },
   render: () => (
     <div className="space-y-6">
@@ -157,21 +163,18 @@ export const InContext: Story = {
 
 export const CustomStyling: Story = {
   args: {
-    college: 'CSM',
+    college: "CSM",
   },
   render: () => (
     <div className="space-y-4">
-      <CollegeLogo 
-        college="CSM" 
-        className="text-blue-600 dark:text-blue-400" 
+      <CollegeLogo college="CSM" className="text-blue-600 dark:text-blue-400" />
+      <CollegeLogo
+        college="SKYLINE"
+        className="text-green-600 dark:text-green-400"
       />
-      <CollegeLogo 
-        college="SKYLINE" 
-        className="text-green-600 dark:text-green-400" 
-      />
-      <CollegeLogo 
-        college="CANADA" 
-        className="text-purple-600 dark:text-purple-400" 
+      <CollegeLogo
+        college="CANADA"
+        className="text-purple-600 dark:text-purple-400"
       />
     </div>
   ),
@@ -179,10 +182,10 @@ export const CustomStyling: Story = {
 
 export const DarkMode: Story = {
   args: {
-    college: 'SKYLINE',
+    college: "SKYLINE",
   },
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story) => (

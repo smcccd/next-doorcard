@@ -19,20 +19,20 @@ const killProcesses = (pattern, description) => {
 
         const pids = stdout.trim().split("\n").filter(Boolean);
         console.log(
-          `🚫 Found ${pids.length} existing ${description} process(es), killing...`,
+          `🚫 Found ${pids.length} existing ${description} process(es), killing...`
         );
 
         exec(`kill ${pids.join(" ")}`, (killError) => {
           if (killError) {
             console.log(
-              `⚠️  Some ${description} processes may still be running`,
+              `⚠️  Some ${description} processes may still be running`
             );
           } else {
             console.log(`✅ Killed ${pids.length} ${description} process(es)`);
           }
           resolve();
         });
-      },
+      }
     );
   });
 };

@@ -115,7 +115,7 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
 
   const [serverState, serverAction] = useActionState(
     updateTimeBlocks.bind(null, doorcard.id),
-    { success: true } as { success: boolean; message?: string },
+    { success: true } as { success: boolean; message?: string }
   );
 
   /* ---------------------------------------------------------------------- */
@@ -189,8 +189,8 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                 category: draft.category,
                 day: selectedDays[0],
               }
-            : b,
-        ),
+            : b
+        )
       );
     } else {
       const newOnes = selectedDays.map<TimeBlock>((d) => ({
@@ -416,7 +416,7 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                         variant={active ? "default" : "outline"}
                         onClick={() =>
                           setSelectedDays((prev) =>
-                            active ? prev.filter((x) => x !== d) : [...prev, d],
+                            active ? prev.filter((x) => x !== d) : [...prev, d]
                           )
                         }
                       >

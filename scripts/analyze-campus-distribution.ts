@@ -22,7 +22,7 @@ interface UserActivityData {
 
 async function analyzeCampusDistribution() {
   console.log(
-    "🏫 Analyzing Campus Distribution for Doorcard Users (2024-2025)",
+    "🏫 Analyzing Campus Distribution for Doorcard Users (2024-2025)"
   );
   console.log("=".repeat(80));
 
@@ -48,7 +48,7 @@ async function analyzeCampusDistribution() {
   });
 
   console.log(
-    `📊 Found ${recentDoorcards.length} doorcards from recent terms (Fall 2024, Spring 2025, Summer 2025)\n`,
+    `📊 Found ${recentDoorcards.length} doorcards from recent terms (Fall 2024, Spring 2025, Summer 2025)\n`
   );
 
   // 2. Analyze campus distribution of doorcards
@@ -69,7 +69,7 @@ async function analyzeCampusDistribution() {
     const doorcardCampus = doorcard.college;
     campusDistribution.set(
       doorcardCampus,
-      (campusDistribution.get(doorcardCampus) || 0) + 1,
+      (campusDistribution.get(doorcardCampus) || 0) + 1
     );
 
     // Track users by their doorcard campus (since user.college is mostly null)
@@ -88,12 +88,12 @@ async function analyzeCampusDistribution() {
     const percentage = (count / totalDoorcards) * 100;
     doorcardStats.push({ campus, count, percentage });
     console.log(
-      `${campus.padEnd(8)}: ${count.toString().padStart(4)} doorcards (${percentage.toFixed(1)}%)`,
+      `${campus.padEnd(8)}: ${count.toString().padStart(4)} doorcards (${percentage.toFixed(1)}%)`
     );
   });
 
   console.log(
-    `${"TOTAL".padEnd(8)}: ${totalDoorcards.toString().padStart(4)} doorcards (100.0%)\n`,
+    `${"TOTAL".padEnd(8)}: ${totalDoorcards.toString().padStart(4)} doorcards (100.0%)\n`
   );
 
   console.log("👥 USER DISTRIBUTION BY DOORCARD CAMPUS (Unique Users)");
@@ -121,15 +121,15 @@ async function analyzeCampusDistribution() {
     const percentage = (uniqueUserCount / totalUniqueUsers) * 100;
     userStats.push({ campus, count: uniqueUserCount, percentage });
     console.log(
-      `${campus.padEnd(8)}: ${uniqueUserCount.toString().padStart(4)} users (${percentage.toFixed(1)}%)`,
+      `${campus.padEnd(8)}: ${uniqueUserCount.toString().padStart(4)} users (${percentage.toFixed(1)}%)`
     );
   });
 
   console.log(
-    `${"OVERLAP".padEnd(8)}: ${overlappingUsers.toString().padStart(4)} users have doorcards at multiple campuses`,
+    `${"OVERLAP".padEnd(8)}: ${overlappingUsers.toString().padStart(4)} users have doorcards at multiple campuses`
   );
   console.log(
-    `${"TOTAL".padEnd(8)}: ${totalUniqueUsers.toString().padStart(4)} unique users\n`,
+    `${"TOTAL".padEnd(8)}: ${totalUniqueUsers.toString().padStart(4)} unique users\n`
   );
 
   // 3. Get top 10 most active users based on combined metrics
@@ -150,7 +150,7 @@ async function analyzeCampusDistribution() {
         campusCount.set(d.college, (campusCount.get(d.college) || 0) + 1);
       });
       const primaryCampus = Array.from(campusCount.entries()).reduce(
-        (max, current) => (current[1] > max[1] ? current : max),
+        (max, current) => (current[1] > max[1] ? current : max)
       )[0];
 
       userActivityMap.set(userId, {
@@ -189,7 +189,7 @@ async function analyzeCampusDistribution() {
     const campus = user.userCampus;
     const name = user.userName || user.email.split("@")[0];
     console.log(
-      `${rank}. ${name.substring(0, 25).padEnd(25)} | ${(campus || "UNKNOWN").padEnd(9)} | Score: ${user.totalActivity.toString().padStart(4)} (V:${user.totalViews} P:${user.totalPrints} S:${user.totalShares})`,
+      `${rank}. ${name.substring(0, 25).padEnd(25)} | ${(campus || "UNKNOWN").padEnd(9)} | Score: ${user.totalActivity.toString().padStart(4)} (V:${user.totalViews} P:${user.totalPrints} S:${user.totalShares})`
     );
   });
 
@@ -208,7 +208,7 @@ async function analyzeCampusDistribution() {
     const count = topUsersCampusCount.get(campus) || 0;
     const percentage = (count / 10) * 100;
     console.log(
-      `${campus.padEnd(8)}: ${count.toString().padStart(2)}/10 users (${percentage.toFixed(0)}%)`,
+      `${campus.padEnd(8)}: ${count.toString().padStart(2)}/10 users (${percentage.toFixed(0)}%)`
     );
   });
 
@@ -273,13 +273,13 @@ async function analyzeCampusDistribution() {
   campusActivityStats.forEach((stats, campus) => {
     console.log(`\n${campus}:`);
     console.log(
-      `  Users: ${stats.userCount} | Doorcards: ${stats.doorcardCount}`,
+      `  Users: ${stats.userCount} | Doorcards: ${stats.doorcardCount}`
     );
     console.log(
-      `  Total Activity: ${stats.totalViews} views, ${stats.totalPrints} prints, ${stats.totalShares} shares`,
+      `  Total Activity: ${stats.totalViews} views, ${stats.totalPrints} prints, ${stats.totalShares} shares`
     );
     console.log(
-      `  Avg per User: ${stats.avgViewsPerUser.toFixed(1)} views, ${stats.avgPrintsPerUser.toFixed(1)} prints, ${stats.avgSharesPerUser.toFixed(1)} shares`,
+      `  Avg per User: ${stats.avgViewsPerUser.toFixed(1)} views, ${stats.avgPrintsPerUser.toFixed(1)} prints, ${stats.avgSharesPerUser.toFixed(1)} shares`
     );
   });
 
@@ -288,29 +288,29 @@ async function analyzeCampusDistribution() {
   console.log("-".repeat(30));
 
   const mostActiveDoorcardCampus = doorcardStats.reduce((max, current) =>
-    current.count > max.count ? current : max,
+    current.count > max.count ? current : max
   );
 
   const mostActiveUserCampus = userStats.reduce((max, current) =>
-    current.count > max.count ? current : max,
+    current.count > max.count ? current : max
   );
 
   console.log(
-    `• Most doorcards: ${mostActiveDoorcardCampus.campus} (${mostActiveDoorcardCampus.count} doorcards, ${mostActiveDoorcardCampus.percentage.toFixed(1)}%)`,
+    `• Most doorcards: ${mostActiveDoorcardCampus.campus} (${mostActiveDoorcardCampus.count} doorcards, ${mostActiveDoorcardCampus.percentage.toFixed(1)}%)`
   );
   console.log(
-    `• Most users: ${mostActiveUserCampus.campus} (${mostActiveUserCampus.count} users, ${mostActiveUserCampus.percentage.toFixed(1)}%)`,
+    `• Most users: ${mostActiveUserCampus.campus} (${mostActiveUserCampus.count} users, ${mostActiveUserCampus.percentage.toFixed(1)}%)`
   );
   console.log(`• Users with overlapping campuses: ${overlappingUsers}`);
 
   const topUserCampusLeader = Array.from(topUsersCampusCount.entries()).reduce(
     (max, current) => (current[1] > max[1] ? current : max),
-    ["", 0],
+    ["", 0]
   );
 
   if (topUserCampusLeader[0]) {
     console.log(
-      `• Top users dominated by: ${topUserCampusLeader[0]} (${topUserCampusLeader[1]}/10 users)`,
+      `• Top users dominated by: ${topUserCampusLeader[0]} (${topUserCampusLeader[1]}/10 users)`
     );
   }
 
@@ -324,10 +324,10 @@ async function analyzeCampusDistribution() {
   const totalUsers = await prisma.user.count();
 
   console.log(
-    `• User profile campus assignment: ${totalUsers - usersWithNoCampusProfile}/${totalUsers} users have campus in profile (${(((totalUsers - usersWithNoCampusProfile) / totalUsers) * 100).toFixed(1)}%)`,
+    `• User profile campus assignment: ${totalUsers - usersWithNoCampusProfile}/${totalUsers} users have campus in profile (${(((totalUsers - usersWithNoCampusProfile) / totalUsers) * 100).toFixed(1)}%)`
   );
   console.log(
-    `• Note: Campus analysis based on doorcard assignments since most users lack profile campus data`,
+    `• Note: Campus analysis based on doorcard assignments since most users lack profile campus data`
   );
 
   console.log("\n✅ Analysis complete!\n");

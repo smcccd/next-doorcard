@@ -58,7 +58,7 @@ describe("RegisterPage", () => {
     expect(screen.getByLabelText("Email")).toBeInTheDocument();
     expect(screen.getByLabelText("Password")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Register" }),
+      screen.getByRole("button", { name: "Register" })
     ).toBeInTheDocument();
   });
 
@@ -68,7 +68,7 @@ describe("RegisterPage", () => {
     const nameInput = screen.getByTestId("input-name") as HTMLInputElement;
     const emailInput = screen.getByTestId("input-email") as HTMLInputElement;
     const passwordInput = screen.getByTestId(
-      "input-password",
+      "input-password"
     ) as HTMLInputElement;
 
     fireEvent.change(nameInput, { target: { value: "John Doe" } });
@@ -197,7 +197,7 @@ describe("RegisterPage", () => {
     const nameInput = screen.getByTestId("input-name") as HTMLInputElement;
     const emailInput = screen.getByTestId("input-email") as HTMLInputElement;
     const passwordInput = screen.getByTestId(
-      "input-password",
+      "input-password"
     ) as HTMLInputElement;
 
     // Verify required attributes are set
@@ -211,7 +211,7 @@ describe("RegisterPage", () => {
 
     const emailInput = screen.getByTestId("input-email") as HTMLInputElement;
     const passwordInput = screen.getByTestId(
-      "input-password",
+      "input-password"
     ) as HTMLInputElement;
 
     expect(emailInput.type).toBe("email");

@@ -462,7 +462,7 @@ export default function AdminPage() {
                           </div>
                         </div>
                       </div>
-                    ),
+                    )
                   )}
                 </div>
               </CardContent>
@@ -975,13 +975,13 @@ export default function AdminPage() {
                                       <div className="flex items-center gap-2">
                                         <Badge
                                           className={getCategoryColor(
-                                            appointment.category,
+                                            appointment.category
                                           )}
                                           variant="secondary"
                                         >
                                           {appointment.category.replace(
                                             "_",
-                                            " ",
+                                            " "
                                           )}
                                         </Badge>
                                         {appointment.location && (

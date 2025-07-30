@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     if ("error" in session) {
       return NextResponse.json(
         { error: session.error },
-        { status: session.status },
+        { status: session.status }
       );
     }
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     if (!termId) {
       return NextResponse.json(
         { error: "Term ID is required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     console.error("Error archiving term:", error);
     return NextResponse.json(
       { error: "Failed to archive term" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -50,7 +50,7 @@ export async function GET() {
     if ("error" in session) {
       return NextResponse.json(
         { error: session.error },
-        { status: session.status },
+        { status: session.status }
       );
     }
 
@@ -64,7 +64,7 @@ export async function GET() {
     console.error("Error auto-archiving terms:", error);
     return NextResponse.json(
       { error: "Failed to auto-archive terms" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

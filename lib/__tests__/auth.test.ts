@@ -73,7 +73,7 @@ describe("Auth Configuration", () => {
   describe("OneLogin Provider", () => {
     it("should configure OneLogin provider correctly", () => {
       const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin",
+        (p: any) => p.id === "onelogin"
       );
 
       expect(oneLoginProvider).toBeDefined();
@@ -86,45 +86,45 @@ describe("Auth Configuration", () => {
 
     it("should have correct authorization configuration", () => {
       const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin",
+        (p: any) => p.id === "onelogin"
       );
 
       expect(oneLoginProvider?.authorization?.url).toBe(
-        "https://smccd.onelogin.com/oidc/2/auth",
+        "https://smccd.onelogin.com/oidc/2/auth"
       );
       expect(oneLoginProvider?.authorization?.params?.scope).toBe(
-        "openid profile email",
+        "openid profile email"
       );
       expect(oneLoginProvider?.authorization?.params?.response_type).toBe(
-        "code",
+        "code"
       );
     });
 
     it("should have correct token endpoint configuration", () => {
       const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin",
+        (p: any) => p.id === "onelogin"
       );
 
       expect(oneLoginProvider?.token?.url).toBe(
-        "https://smccd.onelogin.com/oidc/2/token",
+        "https://smccd.onelogin.com/oidc/2/token"
       );
       expect(typeof oneLoginProvider?.token?.request).toBe("function");
     });
 
     it("should have correct userinfo endpoint configuration", () => {
       const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin",
+        (p: any) => p.id === "onelogin"
       );
 
       expect(oneLoginProvider?.userinfo?.url).toBe(
-        "https://smccd.onelogin.com/oidc/2/me",
+        "https://smccd.onelogin.com/oidc/2/me"
       );
       expect(typeof oneLoginProvider?.userinfo?.request).toBe("function");
     });
 
     it("should have profile transformation function", () => {
       const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin",
+        (p: any) => p.id === "onelogin"
       );
 
       expect(typeof oneLoginProvider?.profile).toBe("function");
@@ -134,7 +134,7 @@ describe("Auth Configuration", () => {
   describe("Credentials Provider", () => {
     it("should be configured for development only", () => {
       const credentialsProvider = authOptions.providers.find(
-        (p: any) => p.type === "credentials",
+        (p: any) => p.type === "credentials"
       );
 
       if (process.env.NODE_ENV === "development") {
@@ -166,7 +166,7 @@ describe("Auth Configuration", () => {
   describe("Profile Handling", () => {
     it("should transform OneLogin profile correctly", () => {
       const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin",
+        (p: any) => p.id === "onelogin"
       );
       const profileTransform = oneLoginProvider?.profile;
 
@@ -195,7 +195,7 @@ describe("Auth Configuration", () => {
 
     it("should handle missing profile fields gracefully", () => {
       const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin",
+        (p: any) => p.id === "onelogin"
       );
       const profileTransform = oneLoginProvider?.profile;
 
@@ -317,7 +317,7 @@ describe("Auth Configuration", () => {
       const { authOptions } = await import("../auth");
 
       const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin",
+        (p: any) => p.id === "onelogin"
       );
       expect(oneLoginProvider?.clientId).toBeUndefined();
     });
@@ -330,7 +330,7 @@ describe("Auth Configuration", () => {
       const { authOptions } = await import("../auth");
 
       const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin",
+        (p: any) => p.id === "onelogin"
       );
       expect(oneLoginProvider?.clientSecret).toBeUndefined();
     });

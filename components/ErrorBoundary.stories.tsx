@@ -1,22 +1,24 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import React from 'react';
-import ErrorBoundary from './ErrorBoundary';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import React from "react";
+import ErrorBoundary from "./ErrorBoundary";
 
 // Component that will throw an error for testing
 const ErrorComponent = ({ shouldError }: { shouldError: boolean }) => {
   if (shouldError) {
-    throw new Error('This is a test error for the ErrorBoundary');
+    throw new Error("This is a test error for the ErrorBoundary");
   }
-  return <div className="p-4 bg-green-100 rounded">Component working correctly!</div>;
+  return (
+    <div className="p-4 bg-green-100 rounded">Component working correctly!</div>
+  );
 };
 
 const meta = {
-  title: 'Components/ErrorBoundary',
+  title: "Components/ErrorBoundary",
   component: ErrorBoundary,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof ErrorBoundary>;
 
 export default meta;
@@ -78,14 +80,14 @@ export const MultipleErrorBoundaries: Story = {
           <ErrorComponent shouldError={false} />
         </div>
       </ErrorBoundary>
-      
+
       <ErrorBoundary>
         <div className="p-4 bg-red-100 rounded">
           <h3 className="font-semibold">Section 2 - Error</h3>
           <ErrorComponent shouldError={true} />
         </div>
       </ErrorBoundary>
-      
+
       <ErrorBoundary>
         <div className="p-4 bg-green-100 rounded">
           <h3 className="font-semibold">Section 3 - Working</h3>

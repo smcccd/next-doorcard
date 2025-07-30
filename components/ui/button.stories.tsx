@@ -1,32 +1,40 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import { Button } from './button';
-import { Mail, ArrowRight, Loader2 } from 'lucide-react';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import { Button } from "./button";
+import { Mail, ArrowRight, Loader2 } from "lucide-react";
 
 const meta = {
-  title: 'UI/Button',
+  title: "UI/Button",
   component: Button,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     variant: {
-      control: { type: 'select' },
-      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
-      description: 'The visual style of the button',
+      control: { type: "select" },
+      options: [
+        "default",
+        "destructive",
+        "outline",
+        "secondary",
+        "ghost",
+        "link",
+      ],
+      description: "The visual style of the button",
     },
     size: {
-      control: { type: 'select' },
-      options: ['default', 'sm', 'lg', 'icon'],
-      description: 'The size of the button',
+      control: { type: "select" },
+      options: ["default", "sm", "lg", "icon"],
+      description: "The size of the button",
     },
     asChild: {
-      control: { type: 'boolean' },
-      description: 'Change the default rendered element for the one passed as a child',
+      control: { type: "boolean" },
+      description:
+        "Change the default rendered element for the one passed as a child",
     },
     disabled: {
-      control: { type: 'boolean' },
-      description: 'Whether the button is disabled',
+      control: { type: "boolean" },
+      description: "Whether the button is disabled",
     },
   },
 } satisfies Meta<typeof Button>;
@@ -36,7 +44,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    children: 'Button',
+    children: "Button",
   },
 };
 
@@ -100,11 +108,21 @@ export const Disabled: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4">
       <Button disabled>Disabled Default</Button>
-      <Button variant="secondary" disabled>Disabled Secondary</Button>
-      <Button variant="destructive" disabled>Disabled Destructive</Button>
-      <Button variant="outline" disabled>Disabled Outline</Button>
-      <Button variant="ghost" disabled>Disabled Ghost</Button>
-      <Button variant="link" disabled>Disabled Link</Button>
+      <Button variant="secondary" disabled>
+        Disabled Secondary
+      </Button>
+      <Button variant="destructive" disabled>
+        Disabled Destructive
+      </Button>
+      <Button variant="outline" disabled>
+        Disabled Outline
+      </Button>
+      <Button variant="ghost" disabled>
+        Disabled Ghost
+      </Button>
+      <Button variant="link" disabled>
+        Disabled Link
+      </Button>
     </div>
   ),
 };

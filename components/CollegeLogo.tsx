@@ -1,6 +1,6 @@
-import React from 'react';
-import Image from 'next/image';
-import { College } from '@/types/doorcard';
+import React from "react";
+import Image from "next/image";
+import { College } from "@/types/doorcard";
 
 interface CollegeLogoProps {
   college: College;
@@ -10,31 +10,34 @@ interface CollegeLogoProps {
   priority?: boolean;
 }
 
-const COLLEGE_LOGOS: Record<College, { src: string; alt: string; isJpg?: boolean }> = {
+const COLLEGE_LOGOS: Record<
+  College,
+  { src: string; alt: string; isJpg?: boolean }
+> = {
   CANADA: {
     src: "/canada.svg",
-    alt: "Cañada College Logo"
+    alt: "Cañada College Logo",
   },
   CSM: {
-    src: "/csm.jpg", 
+    src: "/csm.jpg",
     alt: "College of San Mateo Logo",
-    isJpg: true
+    isJpg: true,
   },
   SKYLINE: {
     src: "/skyline.svg",
-    alt: "Skyline College Logo"
-  }
+    alt: "Skyline College Logo",
+  },
 };
 
-const CollegeLogo: React.FC<CollegeLogoProps> = ({ 
-  college, 
+const CollegeLogo: React.FC<CollegeLogoProps> = ({
+  college,
   height = 24,
   width,
-  className = '',
-  priority = false
+  className = "",
+  priority = false,
 }) => {
   const logoInfo = COLLEGE_LOGOS[college];
-  
+
   if (!logoInfo) {
     return null;
   }
@@ -49,7 +52,7 @@ const CollegeLogo: React.FC<CollegeLogoProps> = ({
         alt={logoInfo.alt}
         width={calculatedWidth}
         height={height}
-        className={`transition-all duration-200 ${logoInfo.isJpg ? 'rounded' : ''}`}
+        className={`transition-all duration-200 ${logoInfo.isJpg ? "rounded" : ""}`}
         priority={priority}
       />
     </div>

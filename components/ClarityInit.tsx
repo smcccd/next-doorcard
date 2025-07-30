@@ -13,7 +13,7 @@ export default function ClarityInit() {
 
         console.log(
           "✅ Microsoft Clarity initialized successfully with ID:",
-          process.env.NEXT_PUBLIC_CLARITY_ID,
+          process.env.NEXT_PUBLIC_CLARITY_ID
         );
 
         // Add custom events for better tracking
@@ -47,7 +47,7 @@ export default function ClarityInit() {
       }
     } else {
       console.warn(
-        "⚠️ Microsoft Clarity not initialized - missing project ID or not in browser environment",
+        "⚠️ Microsoft Clarity not initialized - missing project ID or not in browser environment"
       );
     }
   }, []);

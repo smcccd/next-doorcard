@@ -1,19 +1,19 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import { Badge } from './badge';
-import { Check, X, AlertCircle, Clock, User } from 'lucide-react';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import { Badge } from "./badge";
+import { Check, X, AlertCircle, Clock, User } from "lucide-react";
 
 const meta = {
-  title: 'UI/Badge',
+  title: "UI/Badge",
   component: Badge,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     variant: {
-      control: { type: 'select' },
-      options: ['default', 'secondary', 'destructive', 'outline'],
-      description: 'The visual style of the badge',
+      control: { type: "select" },
+      options: ["default", "secondary", "destructive", "outline"],
+      description: "The visual style of the badge",
     },
   },
 } satisfies Meta<typeof Badge>;
@@ -23,7 +23,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    children: 'Badge',
+    children: "Badge",
   },
 };
 
@@ -41,10 +41,18 @@ export const Variants: Story = {
 export const CollegeBadges: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4">
-      <Badge variant="outline" className="font-medium">CSM</Badge>
-      <Badge variant="outline" className="font-medium">Skyline</Badge>
-      <Badge variant="outline" className="font-medium">Cañada</Badge>
-      <Badge variant="default" className="bg-blue-600">All Campuses</Badge>
+      <Badge variant="outline" className="font-medium">
+        CSM
+      </Badge>
+      <Badge variant="outline" className="font-medium">
+        Skyline
+      </Badge>
+      <Badge variant="outline" className="font-medium">
+        Cañada
+      </Badge>
+      <Badge variant="default" className="bg-blue-600">
+        All Campuses
+      </Badge>
     </div>
   ),
 };
@@ -117,7 +125,9 @@ export const CustomColors: Story = {
       <div>
         <h3 className="text-sm font-medium mb-2">Department Badges</h3>
         <div className="flex flex-wrap gap-2">
-          <Badge className="bg-indigo-100 text-indigo-800">Computer Science</Badge>
+          <Badge className="bg-indigo-100 text-indigo-800">
+            Computer Science
+          </Badge>
           <Badge className="bg-pink-100 text-pink-800">Mathematics</Badge>
           <Badge className="bg-cyan-100 text-cyan-800">Engineering</Badge>
         </div>
@@ -147,7 +157,7 @@ export const WithIcons: Story = {
 
 export const DarkMode: Story = {
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story) => (
@@ -158,10 +168,24 @@ export const DarkMode: Story = {
   ],
   render: () => (
     <div className="flex flex-wrap gap-4">
-      <Badge className="dark:bg-gray-700 dark:text-gray-200">Default Dark</Badge>
-      <Badge variant="secondary" className="dark:bg-gray-600 dark:text-gray-200">Secondary Dark</Badge>
-      <Badge variant="outline" className="dark:border-gray-600 dark:text-gray-200">Outline Dark</Badge>
-      <Badge className="bg-blue-600 text-white dark:bg-blue-500">Custom Dark</Badge>
+      <Badge className="dark:bg-gray-700 dark:text-gray-200">
+        Default Dark
+      </Badge>
+      <Badge
+        variant="secondary"
+        className="dark:bg-gray-600 dark:text-gray-200"
+      >
+        Secondary Dark
+      </Badge>
+      <Badge
+        variant="outline"
+        className="dark:border-gray-600 dark:text-gray-200"
+      >
+        Outline Dark
+      </Badge>
+      <Badge className="bg-blue-600 text-white dark:bg-blue-500">
+        Custom Dark
+      </Badge>
     </div>
   ),
 };

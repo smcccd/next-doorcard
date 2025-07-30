@@ -1,18 +1,25 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card';
-import { Button } from './button';
-import { Input } from './input';
-import { Label } from './label';
-import { Badge } from './badge';
-import { Clock, MapPin, Calendar } from 'lucide-react';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./card";
+import { Button } from "./button";
+import { Input } from "./input";
+import { Label } from "./label";
+import { Badge } from "./badge";
+import { Clock, MapPin, Calendar } from "lucide-react";
 
 const meta = {
-  title: 'UI/Card',
+  title: "UI/Card",
   component: Card,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof Card>;
 
 export default meta;
@@ -26,7 +33,10 @@ export const Default: Story = {
         <CardDescription>Card description goes here</CardDescription>
       </CardHeader>
       <CardContent>
-        <p>Card content goes here. This is where the main content of the card is displayed.</p>
+        <p>
+          Card content goes here. This is where the main content of the card is
+          displayed.
+        </p>
       </CardContent>
       <CardFooter>
         <p className="text-sm text-muted-foreground">Card footer</p>
@@ -53,7 +63,9 @@ export const LoginForm: Story = {
     <Card className="w-[350px]">
       <CardHeader>
         <CardTitle>Login</CardTitle>
-        <CardDescription>Enter your credentials to access your account</CardDescription>
+        <CardDescription>
+          Enter your credentials to access your account
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form>
@@ -85,7 +97,9 @@ export const ProfessorCard: Story = {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <h3 className="font-bold text-lg">Dr. Jane Smith</h3>
-              <p className="text-sm text-gray-600">Professor of Computer Science</p>
+              <p className="text-sm text-gray-600">
+                Professor of Computer Science
+              </p>
             </div>
             <Badge variant="outline">CSM</Badge>
           </div>
@@ -106,7 +120,9 @@ export const ProfessorCard: Story = {
           </div>
 
           <div className="pt-2 border-t">
-            <p className="text-xs text-gray-600">Click to view schedule and contact info →</p>
+            <p className="text-xs text-gray-600">
+              Click to view schedule and contact info →
+            </p>
           </div>
         </div>
       </CardContent>
@@ -120,13 +136,15 @@ export const Interactive: Story = {
       <Card className="w-[350px] hover:shadow-lg transition-shadow cursor-pointer">
         <CardHeader>
           <CardTitle>Hoverable Card</CardTitle>
-          <CardDescription>Hover over this card to see the shadow effect</CardDescription>
+          <CardDescription>
+            Hover over this card to see the shadow effect
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <p>This card has hover effects applied.</p>
         </CardContent>
       </Card>
-      
+
       <Card className="w-[350px] border-2 border-blue-200">
         <CardHeader>
           <CardTitle>Custom Border</CardTitle>
@@ -142,7 +160,7 @@ export const Interactive: Story = {
 
 export const DarkMode: Story = {
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story) => (
@@ -155,10 +173,14 @@ export const DarkMode: Story = {
     <Card className="w-[350px] dark:bg-gray-800 dark:border-gray-700">
       <CardHeader>
         <CardTitle className="dark:text-white">Dark Mode Card</CardTitle>
-        <CardDescription className="dark:text-gray-400">This card works in dark mode</CardDescription>
+        <CardDescription className="dark:text-gray-400">
+          This card works in dark mode
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="dark:text-gray-300">Card content is properly styled for dark mode.</p>
+        <p className="dark:text-gray-300">
+          Card content is properly styled for dark mode.
+        </p>
       </CardContent>
       <CardFooter>
         <Button>Action</Button>

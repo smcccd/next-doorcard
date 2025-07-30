@@ -1,19 +1,19 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import React from 'react';
-import SiteIndex from './SiteIndex';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import React from "react";
+import SiteIndex from "./SiteIndex";
 
 const meta = {
-  title: 'Navigation/SiteIndex',
+  title: "Navigation/SiteIndex",
   component: SiteIndex,
   parameters: {
-    layout: 'fullscreen',
+    layout: "fullscreen",
     nextjs: {
       navigation: {
-        pathname: '/dashboard',
+        pathname: "/dashboard",
       },
     },
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof SiteIndex>;
 
 export default meta;
@@ -25,7 +25,7 @@ export const OnHomePage: Story = {
   parameters: {
     nextjs: {
       navigation: {
-        pathname: '/',
+        pathname: "/",
       },
     },
   },
@@ -35,7 +35,7 @@ export const OnDashboard: Story = {
   parameters: {
     nextjs: {
       navigation: {
-        pathname: '/dashboard',
+        pathname: "/dashboard",
       },
     },
   },
@@ -45,7 +45,7 @@ export const OnProfile: Story = {
   parameters: {
     nextjs: {
       navigation: {
-        pathname: '/profile',
+        pathname: "/profile",
       },
     },
   },

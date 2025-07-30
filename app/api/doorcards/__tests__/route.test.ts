@@ -178,7 +178,7 @@ describe("/api/doorcards", () => {
 
       expect(response.status).toBe(409);
       expect(data.error).toContain(
-        "You already have a doorcard for Skyline College - FALL 2024",
+        "You already have a doorcard for Skyline College - FALL 2024"
       );
       expect(data.existingDoorcardId).toBe("existing-doorcard-123");
       expect(mockPrisma.doorcard.create).not.toHaveBeenCalled();
@@ -261,7 +261,7 @@ describe("/api/doorcards", () => {
             data: expect.objectContaining({
               slug: expectedSlug,
             }),
-          }),
+          })
         );
 
         jest.clearAllMocks();
@@ -286,7 +286,7 @@ describe("/api/doorcards", () => {
 
     it("handles database errors", async () => {
       mockPrisma.doorcard.create.mockRejectedValue(
-        new Error("Database connection failed"),
+        new Error("Database connection failed")
       );
 
       const request = new NextRequest("http://localhost:3000/api/doorcards", {
@@ -324,7 +324,7 @@ describe("/api/doorcards", () => {
               create: [],
             },
           }),
-        }),
+        })
       );
     });
 
@@ -459,7 +459,7 @@ describe("/api/doorcards", () => {
 
     it("handles database errors", async () => {
       mockPrisma.doorcard.findMany.mockRejectedValue(
-        new Error("Database connection failed"),
+        new Error("Database connection failed")
       );
 
       const response = await GET();
@@ -479,7 +479,7 @@ describe("/api/doorcards", () => {
               orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
             },
           }),
-        }),
+        })
       );
     });
 
@@ -498,7 +498,7 @@ describe("/api/doorcards", () => {
               },
             },
           }),
-        }),
+        })
       );
     });
   });
@@ -516,7 +516,7 @@ describe("/api/doorcards", () => {
       const path = await import("path");
       const routeCode = fs.readFileSync(
         path.join(__dirname, "../[id]/route.ts"),
-        "utf8",
+        "utf8"
       );
 
       expect(routeCode).toContain("getTermStatus");

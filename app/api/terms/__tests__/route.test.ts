@@ -61,7 +61,7 @@ describe("/api/terms", () => {
       const mockUser = { id: "user-123", email: "test@example.com" };
       mockRequireAuthUserAPI.mockResolvedValue(mockUser);
       mockTermManager.getAllTerms.mockRejectedValue(
-        new Error("Database error"),
+        new Error("Database error")
       );
 
       const response = await GET();
@@ -150,7 +150,7 @@ describe("/api/terms", () => {
       const mockUser = { id: "user-123", email: "test@example.com" };
       mockRequireAuthUserAPI.mockResolvedValue(mockUser);
       mockTermManager.createTerm.mockRejectedValue(
-        new Error("Creation failed"),
+        new Error("Creation failed")
       );
 
       const request = new NextRequest("http://localhost:3000/api/terms", {

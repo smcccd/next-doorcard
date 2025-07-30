@@ -12,13 +12,13 @@ describe("Utils", () => {
 
     it("should handle conditional classes", () => {
       expect(cn("base", true && "conditional", false && "hidden")).toBe(
-        "base conditional",
+        "base conditional"
       );
     });
 
     it("should handle arrays and objects", () => {
       expect(cn(["class1", "class2"], { class3: true, class4: false })).toBe(
-        "class1 class2 class3",
+        "class1 class2 class3"
       );
     });
 

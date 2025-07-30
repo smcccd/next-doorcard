@@ -11,6 +11,11 @@ import {
 } from "@react-pdf/renderer";
 import { DoorcardLite } from "../UnifiedDoorcard";
 import { formatDisplayName } from "@/lib/display-name";
+import {
+  CATEGORY_COLORS,
+  CATEGORY_LABELS,
+  TIME_SLOTS,
+} from "@/lib/doorcard-constants";
 
 // Register fonts for better typography
 Font.register({
@@ -34,8 +39,8 @@ Font.register({
 const styles = StyleSheet.create({
   page: {
     fontFamily: "Inter",
-    fontSize: 11,
-    padding: 40,
+    fontSize: 10,
+    padding: 30,
     backgroundColor: "#ffffff",
     color: "#1f2937",
   },
@@ -43,8 +48,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 30,
-    paddingBottom: 15,
+    marginBottom: 20,
+    paddingBottom: 10,
     borderBottomWidth: 2,
     borderBottomColor: "#3b82f6",
   },
@@ -120,7 +125,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   timeSlot: {
-    height: 24,
+    height: 18,
     marginBottom: 1,
     position: "relative",
   },
@@ -134,15 +139,14 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   appointment: {
-    backgroundColor: "#dbeafe",
     borderLeftWidth: 3,
-    padding: 4,
+    padding: 3,
     height: "100%",
     justifyContent: "center",
   },
   appointmentText: {
-    fontSize: 8,
-    color: "#1e40af",
+    fontSize: 7,
+    color: "#1f2937",
     fontWeight: 600,
     textAlign: "center",
   },
@@ -152,51 +156,48 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   legend: {
-    marginTop: 20,
-    padding: 15,
+    marginTop: 15,
+    padding: 10,
     backgroundColor: "#f8fafc",
-    borderRadius: 8,
+    borderRadius: 4,
   },
   legendTitle: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 600,
     color: "#1f2937",
-    marginBottom: 8,
+    marginBottom: 6,
   },
   legendItems: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
+    gap: 8,
   },
   legendItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: 2,
   },
   legendColor: {
-    width: 12,
-    height: 12,
-    marginRight: 6,
-    borderRadius: 2,
+    width: 10,
+    height: 10,
+    marginRight: 4,
+    borderRadius: 1,
   },
   legendText: {
-    fontSize: 9,
+    fontSize: 8,
     color: "#4b5563",
   },
   footer: {
-    position: "absolute",
-    bottom: 20,
-    left: 40,
-    right: 40,
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingTop: 15,
-    borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
   },
   footerText: {
-    fontSize: 8,
+    fontSize: 7,
     color: "#6b7280",
   },
   website: {
@@ -205,35 +206,7 @@ const styles = StyleSheet.create({
   },
 });
 
-// Category colors for legend
-const CATEGORY_COLORS = {
-  OFFICE_HOURS: "#3b82f6",
-  CLASS: "#10b981",
-  MEETING: "#8b5cf6",
-  RESEARCH: "#f59e0b",
-  OTHER: "#6b7280",
-};
-
-const CATEGORY_LABELS = {
-  OFFICE_HOURS: "Office Hours",
-  CLASS: "Class",
-  MEETING: "Meeting",
-  RESEARCH: "Research",
-  OTHER: "Other",
-};
-
-// Time slots for the grid (7 AM to 9 PM)
-const TIME_SLOTS = Array.from({ length: 29 }, (_, i) => {
-  const hour = Math.floor(7 + i / 2);
-  const minute = i % 2 === 0 ? "00" : "30";
-  const display =
-    hour > 12
-      ? `${hour - 12}:${minute} PM`
-      : hour === 12
-        ? `12:${minute} PM`
-        : `${hour}:${minute} AM`;
-  return { time: `${hour.toString().padStart(2, "0")}:${minute}`, display };
-});
+// Days for weekday-only view (more compact for single page)
 
 const DAYS = [
   { key: "MONDAY", label: "Mon" },
@@ -288,8 +261,14 @@ function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
   const displayName = doorcard.user
     ? formatDisplayName(doorcard.user)
     : doorcard.name || "Faculty Member";
+  // Show all categories in legend
   const categories = [
-    ...new Set(doorcard.appointments.map((apt) => apt.category)),
+    "OFFICE_HOURS",
+    "IN_CLASS",
+    "LECTURE",
+    "LAB",
+    "HOURS_BY_ARRANGEMENT",
+    "REFERENCE",
   ];
 
   return (
@@ -341,54 +320,30 @@ function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
               <Text style={styles.dayHeader}>{day.label}</Text>
               {TIME_SLOTS.map((slot, slotIndex) => {
                 const appointment = byDay[day.key]?.find((apt) =>
-                  isSlotCovered(apt, slot.time),
+                  isSlotCovered(apt, slot.value)
                 );
 
                 return (
-                  <View key={slot.time} style={styles.timeSlot}>
+                  <View key={slot.value} style={styles.timeSlot}>
                     {dayIndex === 0 && slotIndex % 2 === 0 && (
-                      <Text style={styles.timeLabel}>{slot.display}</Text>
+                      <Text style={styles.timeLabel}>{slot.label}</Text>
                     )}
                     {appointment ? (
                       <View
                         style={[
                           styles.appointment,
                           {
-                            borderLeftColor:
+                            backgroundColor:
                               CATEGORY_COLORS[
                                 appointment.category as keyof typeof CATEGORY_COLORS
-                              ] || CATEGORY_COLORS.OTHER,
-                            backgroundColor:
-                              appointment.category === "OFFICE_HOURS"
-                                ? "#dbeafe"
-                                : appointment.category === "CLASS"
-                                  ? "#d1fae5"
-                                  : appointment.category === "MEETING"
-                                    ? "#e7d3ff"
-                                    : appointment.category === "RESEARCH"
-                                      ? "#fef3c7"
-                                      : "#f3f4f6",
+                              ] || CATEGORY_COLORS.REFERENCE,
+                            borderLeftWidth: 3,
+                            borderLeftColor: "#1f2937",
                           },
                         ]}
                       >
-                        <Text
-                          style={[
-                            styles.appointmentText,
-                            {
-                              color:
-                                appointment.category === "OFFICE_HOURS"
-                                  ? "#1e40af"
-                                  : appointment.category === "CLASS"
-                                    ? "#047857"
-                                    : appointment.category === "MEETING"
-                                      ? "#7c3aed"
-                                      : appointment.category === "RESEARCH"
-                                        ? "#d97706"
-                                        : "#4b5563",
-                            },
-                          ]}
-                        >
-                          {appointment.name}
+                        <Text style={styles.appointmentText}>
+                          {appointment.name.replace(/^(.*?)\s*-\s*/, "")}
                         </Text>
                         {appointment.location && (
                           <Text style={styles.appointmentLocation}>
@@ -422,7 +377,7 @@ function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
                         backgroundColor:
                           CATEGORY_COLORS[
                             category as keyof typeof CATEGORY_COLORS
-                          ] || CATEGORY_COLORS.OTHER,
+                          ] || CATEGORY_COLORS.REFERENCE,
                       },
                     ]}
                   />

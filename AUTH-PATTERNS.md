@@ -1,6 +1,7 @@
 # Authentication Patterns for Next-Doorcard
 
-This document explains the authentication patterns used in the Next-Doorcard application and why they're more secure than relying solely on middleware.
+This document explains the authentication patterns used in the Next-Doorcard
+application and why they're more secure than relying solely on middleware.
 
 ## Why This Approach?
 
@@ -19,8 +20,8 @@ Relying solely on middleware for auth control can be problematic because:
 #### `requireAuthUser()`
 
 **Use for:** Server components and pages that require authentication
-**Behavior:** Redirects to `/login` if user is not authenticated
-**Returns:** Full user object from database
+**Behavior:** Redirects to `/login` if user is not authenticated **Returns:**
+Full user object from database
 
 ```typescript
 import { requireAuthUser } from "@/lib/require-auth-user";
@@ -35,8 +36,8 @@ export default async function ProtectedPage() {
 #### `requireAuthUserAPI()`
 
 **Use for:** API routes that need to return proper HTTP error responses
-**Behavior:** Returns error object if user is not authenticated
-**Returns:** `{ user }` or `{ error, status }`
+**Behavior:** Returns error object if user is not authenticated **Returns:**
+`{ user }` or `{ error, status }`
 
 ```typescript
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
   if ("error" in authResult) {
     return NextResponse.json(
       { error: authResult.error },
-      { status: authResult.status },
+      { status: authResult.status }
     );
   }
   const { user } = authResult;
@@ -101,8 +102,7 @@ export default async function PublicPage() {
 
 #### `useSession` (from next-auth/react)
 
-**Use for:** Client components
-**Behavior:** Provides session data reactively
+**Use for:** Client components **Behavior:** Provides session data reactively
 **Returns:** Session object with loading states
 
 ```typescript
@@ -120,9 +120,8 @@ export default function ClientComponent() {
 
 #### `clientAuthHelpers`
 
-**Use for:** Utility functions in client components
-**Behavior:** Helper functions for common auth checks
-**Returns:** Various auth-related utilities
+**Use for:** Utility functions in client components **Behavior:** Helper
+functions for common auth checks **Returns:** Various auth-related utilities
 
 ```typescript
 import { clientAuthHelpers } from "@/lib/require-auth-user";
@@ -176,7 +175,7 @@ export async function POST(req: Request) {
   if ("error" in authResult) {
     return NextResponse.json(
       { error: authResult.error },
-      { status: authResult.status },
+      { status: authResult.status }
     );
   }
   const { user } = authResult;
@@ -233,7 +232,8 @@ We've created a migration script to help update your codebase:
 node scripts/migrate-auth-patterns.js
 ```
 
-This script will automatically update most auth patterns in your codebase. After running it:
+This script will automatically update most auth patterns in your codebase. After
+running it:
 
 1. Review the changes made
 2. Test your application thoroughly
@@ -249,7 +249,8 @@ With this new auth pattern, you can simplify your middleware to focus on:
 3. **Rate limiting**
 4. **Logging and monitoring**
 
-You can remove complex auth logic from middleware since each route now handles its own authentication.
+You can remove complex auth logic from middleware since each route now handles
+its own authentication.
 
 ## Best Practices
 

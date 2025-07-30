@@ -76,7 +76,7 @@ describe("Doorcard Server Actions", () => {
       formData.set("year", "2024");
 
       await expect(
-        createDoorcardWithCampusTerm({ success: true }, formData),
+        createDoorcardWithCampusTerm({ success: true }, formData)
       ).rejects.toThrow("REDIRECT");
 
       expect(mockPrisma.doorcard.create).toHaveBeenCalledWith({
@@ -101,7 +101,7 @@ describe("Doorcard Server Actions", () => {
 
       const result = await createDoorcardWithCampusTerm(
         { success: true },
-        formData,
+        formData
       );
 
       expect(result.success).toBe(false);
@@ -117,7 +117,7 @@ describe("Doorcard Server Actions", () => {
 
       const result = await createDoorcardWithCampusTerm(
         { success: true },
-        formData,
+        formData
       );
 
       expect(result.success).toBe(false);
@@ -136,7 +136,7 @@ describe("Doorcard Server Actions", () => {
       formData.set("year", "2024");
 
       await expect(
-        createDoorcardWithCampusTerm({ success: true }, formData),
+        createDoorcardWithCampusTerm({ success: true }, formData)
       ).rejects.toThrow("Unauthorized");
     });
 
@@ -148,7 +148,7 @@ describe("Doorcard Server Actions", () => {
 
       const result = await createDoorcardWithCampusTerm(
         { success: true },
-        formData,
+        formData
       );
 
       expect(result.success).toBe(false);
@@ -167,7 +167,7 @@ describe("Doorcard Server Actions", () => {
       formData.set("year", "2025");
 
       await expect(
-        validateCampusTerm("doorcard-123", { success: true }, formData),
+        validateCampusTerm("doorcard-123", { success: true }, formData)
       ).rejects.toThrow("REDIRECT");
 
       expect(mockPrisma.doorcard.update).toHaveBeenCalledWith({
@@ -191,7 +191,7 @@ describe("Doorcard Server Actions", () => {
       const result = await validateCampusTerm(
         "non-existent",
         { success: true },
-        formData,
+        formData
       );
 
       expect(result.success).toBe(false);
@@ -212,7 +212,7 @@ describe("Doorcard Server Actions", () => {
       const result = await validateCampusTerm(
         "doorcard-123",
         { success: true },
-        formData,
+        formData
       );
 
       expect(result.success).toBe(false);
@@ -234,7 +234,7 @@ describe("Doorcard Server Actions", () => {
       formData.set("officeNumber", "Room 202");
 
       await expect(
-        updateBasicInfo("doorcard-123", { success: true }, formData),
+        updateBasicInfo("doorcard-123", { success: true }, formData)
       ).rejects.toThrow("REDIRECT");
 
       expect(mockPrisma.doorcard.update).toHaveBeenCalledWith({
@@ -256,7 +256,7 @@ describe("Doorcard Server Actions", () => {
       const result = await updateBasicInfo(
         "doorcard-123",
         { success: true },
-        formData,
+        formData
       );
 
       expect(result.success).toBe(false);
@@ -274,7 +274,7 @@ describe("Doorcard Server Actions", () => {
       const result = await updateBasicInfo(
         "non-existent",
         { success: true },
-        formData,
+        formData
       );
 
       expect(result.success).toBe(false);
@@ -304,7 +304,7 @@ describe("Doorcard Server Actions", () => {
       mockPrisma.doorcard.findUnique.mockResolvedValue(null);
 
       await expect(publishDoorcard("non-existent")).rejects.toThrow(
-        "Doorcard not found",
+        "Doorcard not found"
       );
     });
 
@@ -315,7 +315,7 @@ describe("Doorcard Server Actions", () => {
       } as any);
 
       await expect(publishDoorcard("doorcard-123")).rejects.toThrow(
-        "Unauthorized",
+        "Unauthorized"
       );
     });
   });
@@ -349,7 +349,7 @@ describe("Doorcard Server Actions", () => {
     it("should handle database errors gracefully", async () => {
       mockPrisma.doorcard.findUnique.mockResolvedValue(mockDoorcard as any);
       mockPrisma.appointment.deleteMany.mockRejectedValue(
-        new Error("Database error"),
+        new Error("Database error")
       );
 
       const result = await deleteDoorcard("doorcard-123");
@@ -368,7 +368,7 @@ describe("Doorcard Server Actions", () => {
 
       const result = await createDoorcardWithCampusTerm(
         { success: true },
-        formData,
+        formData
       );
 
       expect(result.success).toBe(false);
@@ -383,7 +383,7 @@ describe("Doorcard Server Actions", () => {
 
       const result = await createDoorcardWithCampusTerm(
         { success: true },
-        formData,
+        formData
       );
 
       expect(result.success).toBe(false);
@@ -400,7 +400,7 @@ describe("Doorcard Server Actions", () => {
       formData.set("year", "2024"); // String input
 
       await expect(
-        createDoorcardWithCampusTerm({ success: true }, formData),
+        createDoorcardWithCampusTerm({ success: true }, formData)
       ).rejects.toThrow("REDIRECT");
 
       expect(mockPrisma.doorcard.create).toHaveBeenCalledWith({
@@ -432,7 +432,7 @@ describe("Doorcard Server Actions", () => {
 
         const result = await createDoorcardWithCampusTerm(
           { success: true },
-          formData,
+          formData
         );
 
         expect(result.message).toContain(expected);
@@ -443,7 +443,7 @@ describe("Doorcard Server Actions", () => {
   describe("Error Handling", () => {
     it("should handle database connection errors", async () => {
       mockPrisma.doorcard.findFirst.mockRejectedValue(
-        new Error("Database connection failed"),
+        new Error("Database connection failed")
       );
 
       const formData = new FormData();
@@ -453,7 +453,7 @@ describe("Doorcard Server Actions", () => {
 
       const result = await createDoorcardWithCampusTerm(
         { success: true },
-        formData,
+        formData
       );
 
       expect(result.success).toBe(false);
@@ -466,7 +466,7 @@ describe("Doorcard Server Actions", () => {
 
       const result = await createDoorcardWithCampusTerm(
         { success: true },
-        formData,
+        formData
       );
 
       expect(result.success).toBe(false);

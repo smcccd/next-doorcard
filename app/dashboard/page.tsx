@@ -19,7 +19,6 @@ type DashboardDoorcard = Doorcard & {
   user: Pick<User, "username" | "name">;
 };
 
-
 /* -------------------------------------------------------------------------- */
 /* Page                                                                       */
 /* -------------------------------------------------------------------------- */
@@ -39,143 +38,160 @@ export default async function DashboardPage() {
       _sum: { totalViews: true, totalPrints: true, totalShares: true },
     }),
     // Try to get active term from database, fallback to computed
-    prisma.term.findFirst({
-      where: { isActive: true }
-    }).then(term => term || null)
+    prisma.term
+      .findFirst({
+        where: { isActive: true },
+      })
+      .then((term) => term || null),
   ]);
 
   // Transform Prisma data to match component expectations
-  const doorcards: DashboardDoorcard[] = rawDoorcards.map(dc => ({
+  const doorcards: DashboardDoorcard[] = rawDoorcards.map((dc) => ({
     ...dc,
     appointments: dc.Appointment,
     user: dc.User,
   }));
 
   // Get current term info (database or computed)
-  const currentTermInfo = activeTerm 
+  const currentTermInfo = activeTerm
     ? { displayName: activeTerm.name, isFromDatabase: true }
     : { ...getCurrentAcademicTerm(), isFromDatabase: false };
 
   // Prepare active term for categorization (convert from database format)
-  const activeTermForCategorization = activeTerm 
-    ? { season: activeTerm.season as TermSeason, year: parseInt(activeTerm.year) }
+  const validSeasons: TermSeason[] = ["FALL", "SPRING", "SUMMER"];
+  const activeTermForCategorization = activeTerm
+    ? {
+        season: validSeasons.includes(activeTerm.season as TermSeason)
+          ? (activeTerm.season as TermSeason)
+          : "FALL", // Default to FALL if invalid
+        year: parseInt(activeTerm.year) || new Date().getFullYear(), // Default to current year if invalid
+      }
     : null;
 
   // Categorize doorcards by temporal status
-  const { current, archived, upcoming } = categorizeDoorcards(doorcards, activeTermForCategorization);
+  const { current, archived, upcoming } = categorizeDoorcards(
+    doorcards,
+    activeTermForCategorization
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
         <ProfileBanner />
 
-      <header className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-semibold">My Doorcards</h1>
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <Calendar className="h-4 w-4" />
-              <span>Current Term: {currentTermInfo.displayName}</span>
-              {currentTermInfo.isFromDatabase && (
-                <span className="text-xs text-green-600 dark:text-green-400">(Active)</span>
-              )}
+        <header className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h1 className="text-2xl font-semibold">My Doorcards</h1>
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <Calendar className="h-4 w-4" />
+                <span>Current Term: {currentTermInfo.displayName}</span>
+                {currentTermInfo.isFromDatabase && (
+                  <span className="text-xs text-green-600 dark:text-green-400">
+                    (Active)
+                  </span>
+                )}
+              </div>
             </div>
+            <NewDoorcardButton />
           </div>
-          <NewDoorcardButton />
-        </div>
-      </header>
+        </header>
 
-      <section aria-labelledby="stats-heading">
-        <h2 id="stats-heading" className="sr-only">
-          Dashboard Statistics
-        </h2>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardContent className="p-6 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Current Term
-                </p>
-                <p className="text-3xl font-bold">{current.length}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                  Active doorcards
-                </p>
-              </div>
-              <Calendar className="h-8 w-8 text-blue-600" />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Live Doorcards
-                </p>
-                <p className="text-3xl font-bold">{doorcards.filter((d) => d.isActive && d.isPublic).length}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                  Public & active
-                </p>
-              </div>
-              <Eye className="h-8 w-8 text-green-600" />
-            </CardContent>
-          </Card>
-          {upcoming.length > 0 && (
+        <section aria-labelledby="stats-heading">
+          <h2 id="stats-heading" className="sr-only">
+            Dashboard Statistics
+          </h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardContent className="p-6 flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Upcoming
+                    Current Term
                   </p>
-                  <p className="text-3xl font-bold">{upcoming.length}</p>
+                  <p className="text-3xl font-bold">{current.length}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                    Future terms
+                    Active doorcards
                   </p>
                 </div>
-                <Clock className="h-8 w-8 text-orange-600" />
+                <Calendar className="h-8 w-8 text-blue-600" />
               </CardContent>
             </Card>
-          )}
-          {metrics._sum.totalViews !== null && (
             <Card>
               <CardContent className="p-6 flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Total Views
+                    Live Doorcards
                   </p>
-                  <p className="text-3xl font-bold">{metrics._sum.totalViews}</p>
+                  <p className="text-3xl font-bold">
+                    {doorcards.filter((d) => d.isActive && d.isPublic).length}
+                  </p>
                   <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                    All time
+                    Public & active
                   </p>
                 </div>
-                <Eye className="h-8 w-8 text-purple-600" />
+                <Eye className="h-8 w-8 text-green-600" />
               </CardContent>
             </Card>
-          )}
-        </div>
-      </section>
+            {upcoming.length > 0 && (
+              <Card>
+                <CardContent className="p-6 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Upcoming
+                    </p>
+                    <p className="text-3xl font-bold">{upcoming.length}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      Future terms
+                    </p>
+                  </div>
+                  <Clock className="h-8 w-8 text-orange-600" />
+                </CardContent>
+              </Card>
+            )}
+            {metrics._sum.totalViews !== null && (
+              <Card>
+                <CardContent className="p-6 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Total Views
+                    </p>
+                    <p className="text-3xl font-bold">
+                      {metrics._sum.totalViews}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      All time
+                    </p>
+                  </div>
+                  <Eye className="h-8 w-8 text-purple-600" />
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </section>
 
-      <DoorcardGrid
-        doorcards={current}
-        title={`Current Term (${currentTermInfo.displayName})`}
-        emptyMessage={`No doorcards for ${currentTermInfo.displayName} yet.`}
-      />
-
-      {upcoming.length > 0 && (
         <DoorcardGrid
-          variant="list"
-          doorcards={upcoming}
-          title="Upcoming Terms"
-          emptyMessage="No upcoming doorcards."
+          doorcards={current}
+          title={`Current Term (${currentTermInfo.displayName})`}
+          emptyMessage={`No doorcards for ${currentTermInfo.displayName} yet.`}
         />
-      )}
 
-      {archived.length > 0 && (
-        <DoorcardGrid
-          variant="list"
-          doorcards={archived}
-          title="Past Terms (Archived)"
-          emptyMessage="No archived doorcards."
-        />
-      )}
+        {upcoming.length > 0 && (
+          <DoorcardGrid
+            variant="list"
+            doorcards={upcoming}
+            title="Upcoming Terms"
+            emptyMessage="No upcoming doorcards."
+          />
+        )}
+
+        {archived.length > 0 && (
+          <DoorcardGrid
+            variant="list"
+            doorcards={archived}
+            title="Past Terms (Archived)"
+            emptyMessage="No archived doorcards."
+          />
+        )}
       </div>
     </div>
   );

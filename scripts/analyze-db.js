@@ -95,7 +95,7 @@ async function analyzeDatabase() {
     `;
     const orphanedAppointments = Number(orphanedAppointmentsQuery[0].count);
     console.log(
-      `Appointments without valid doorcards: ${orphanedAppointments}`,
+      `Appointments without valid doorcards: ${orphanedAppointments}`
     );
 
     // Invalid time ranges
@@ -111,7 +111,7 @@ async function analyzeDatabase() {
       take: 5,
     });
     console.log(
-      `Appointments with invalid times: ${invalidTimeAppointments.length}`,
+      `Appointments with invalid times: ${invalidTimeAppointments.length}`
     );
 
     // Sample some data for inspection
@@ -132,7 +132,7 @@ async function analyzeDatabase() {
     console.log("\nSample Users:");
     sampleUsers.forEach((user) => {
       console.log(
-        `  ${user.username || "NO_USERNAME"} (${user.email}) - ${user.role} at ${user.college || "NO_COLLEGE"}`,
+        `  ${user.username || "NO_USERNAME"} (${user.email}) - ${user.role} at ${user.college || "NO_COLLEGE"}`
       );
     });
 
@@ -153,7 +153,7 @@ async function analyzeDatabase() {
     console.log("\nSample Doorcards:");
     sampleDoorcards.forEach((doorcard) => {
       console.log(
-        `  "${doorcard.name}" - ${doorcard.term} ${doorcard.year} at ${doorcard.college} (User: ${doorcard.user?.username || "NO_USER"})`,
+        `  "${doorcard.name}" - ${doorcard.term} ${doorcard.year} at ${doorcard.college} (User: ${doorcard.user?.username || "NO_USER"})`
       );
     });
 

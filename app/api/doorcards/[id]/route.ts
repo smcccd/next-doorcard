@@ -46,7 +46,7 @@ const requestSchemaPATCH = baseUpdateSchema.extend({
 /** Normalize blocks from either shape into appointment create objects */
 async function replaceAppointments(
   doorcardId: string,
-  blocks: z.infer<typeof timeBlockLegacySchema>[] | undefined,
+  blocks: z.infer<typeof timeBlockLegacySchema>[] | undefined
 ) {
   if (!blocks) return;
 
@@ -83,7 +83,7 @@ function includeDoorcard(): Prisma.DoorcardInclude {
  * -------------------------------------------------------------------------- */
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
@@ -109,7 +109,7 @@ export async function GET(
  * -------------------------------------------------------------------------- */
 export async function PUT(
   req: Request,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
@@ -128,7 +128,7 @@ export async function PUT(
     if (!exists) {
       return NextResponse.json(
         { error: "Doorcard not found" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -140,7 +140,7 @@ export async function PUT(
           error:
             "Cannot edit archived doorcards. Archived doorcards are read-only to maintain data integrity.",
         },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -164,13 +164,13 @@ export async function PUT(
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: err.flatten() },
-        { status: 400 },
+        { status: 400 }
       );
     }
     console.error("Error updating doorcard (PUT):", err);
     return NextResponse.json(
       { error: "Failed to update doorcard" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -181,7 +181,7 @@ export async function PUT(
  * -------------------------------------------------------------------------- */
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
@@ -199,7 +199,7 @@ export async function PATCH(
     if (!exists) {
       return NextResponse.json(
         { error: "Doorcard not found" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -211,7 +211,7 @@ export async function PATCH(
           error:
             "Cannot edit archived doorcards. Archived doorcards are read-only to maintain data integrity.",
         },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -237,13 +237,13 @@ export async function PATCH(
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: err.flatten() },
-        { status: 400 },
+        { status: 400 }
       );
     }
     console.error("Error updating doorcard (PATCH):", err);
     return NextResponse.json(
       { error: "Failed to update doorcard" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -253,7 +253,7 @@ export async function PATCH(
  * -------------------------------------------------------------------------- */
 export async function DELETE(
   _req: Request,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
@@ -270,7 +270,7 @@ export async function DELETE(
     console.error("Error deleting doorcard:", err);
     return NextResponse.json(
       { error: "Failed to delete doorcard" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

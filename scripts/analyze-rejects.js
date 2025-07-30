@@ -31,7 +31,7 @@ async function analyzeRejects() {
     .sort((a, b) => b[1] - a[1])
     .forEach(([reason, count]) => {
       console.log(
-        `  ${reason}: ${count} (${((count / doorcardRejects.length) * 100).toFixed(1)}%)`,
+        `  ${reason}: ${count} (${((count / doorcardRejects.length) * 100).toFixed(1)}%)`
       );
     });
 
@@ -41,7 +41,7 @@ async function analyzeRejects() {
 
   await new Promise((resolve, reject) => {
     fs.createReadStream(
-      "/Users/besnyib/next-doorcard/rejects/TBL_APPOINTMENT.csv",
+      "/Users/besnyib/next-doorcard/rejects/TBL_APPOINTMENT.csv"
     )
       .pipe(parse({ headers: true }))
       .on("data", (row) => appointmentRejects.push(row))
@@ -64,7 +64,7 @@ async function analyzeRejects() {
     .sort((a, b) => b[1] - a[1])
     .forEach(([reason, count]) => {
       console.log(
-        `  ${reason}: ${count} (${((count / appointmentRejects.length) * 100).toFixed(1)}%)`,
+        `  ${reason}: ${count} (${((count / appointmentRejects.length) * 100).toFixed(1)}%)`
       );
     });
 
@@ -134,25 +134,25 @@ async function analyzeRejects() {
 
   const appointmentRejectionRate = (appointmentRejects.length / 184936) * 100;
   console.log(
-    `Appointment rejection rate: ${appointmentRejectionRate.toFixed(1)}%`,
+    `Appointment rejection rate: ${appointmentRejectionRate.toFixed(1)}%`
   );
 
   console.log("\n⚠️  Issues requiring immediate attention:");
   console.log(
-    `1. ${appointmentRejects.length} appointments rejected (${appointmentRejectionRate.toFixed(1)}% of total)`,
+    `1. ${appointmentRejects.length} appointments rejected (${appointmentRejectionRate.toFixed(1)}% of total)`
   );
   console.log(
-    `2. ${missingUsers.size} unique usernames not found in user table`,
+    `2. ${missingUsers.size} unique usernames not found in user table`
   );
   console.log(`3. Many appointments have empty usernames`);
   console.log(`4. Legacy data has incomplete user-doorcard relationships`);
 
   // Check for empty usernames in appointments
   const emptyUsernameAppointments = appointmentRejects.filter(
-    (row) => !row.username || row.username.trim() === "",
+    (row) => !row.username || row.username.trim() === ""
   );
   console.log(
-    `5. ${emptyUsernameAppointments.length} appointments with completely empty usernames`,
+    `5. ${emptyUsernameAppointments.length} appointments with completely empty usernames`
   );
 
   // Success rates
@@ -161,27 +161,27 @@ async function analyzeRejects() {
   const successfulAppointments = 184936 - appointmentRejects.length;
 
   console.log(
-    `Successful doorcards: ${successfulDoorcards} (${((successfulDoorcards / 10945) * 100).toFixed(1)}%)`,
+    `Successful doorcards: ${successfulDoorcards} (${((successfulDoorcards / 10945) * 100).toFixed(1)}%)`
   );
   console.log(
-    `Successful appointments: ${successfulAppointments} (${((successfulAppointments / 184936) * 100).toFixed(1)}%)`,
+    `Successful appointments: ${successfulAppointments} (${((successfulAppointments / 184936) * 100).toFixed(1)}%)`
   );
 
   // Recommendations
   console.log("\n💡 RECOMMENDATIONS FOR PRODUCTION:");
   console.log(
-    "1. Fix user creation process - create users from ALL doorcard/appointment data first",
+    "1. Fix user creation process - create users from ALL doorcard/appointment data first"
   );
   console.log(
-    "2. Handle empty usernames in appointments by linking to doorcard owners",
+    "2. Handle empty usernames in appointments by linking to doorcard owners"
   );
   console.log(
-    "3. Implement user matching by alternative identifiers (email patterns, name matching)",
+    "3. Implement user matching by alternative identifiers (email patterns, name matching)"
   );
   console.log("4. Create a reconciliation process for orphaned appointments");
   console.log("5. Add data validation for college names (case sensitivity)");
   console.log(
-    "6. Implement better error handling for malformed dates and terms",
+    "6. Implement better error handling for malformed dates and terms"
   );
 }
 

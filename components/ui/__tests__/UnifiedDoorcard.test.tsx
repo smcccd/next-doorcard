@@ -67,7 +67,7 @@ describe("UnifiedDoorcard", () => {
       render(<UnifiedDoorcard doorcard={mockDoorcard} />);
       // The formatted name is displayed in the header
       expect(
-        screen.getByText("Test Professor (they/them)"),
+        screen.getByText("Test Professor (they/them)")
       ).toBeInTheDocument();
     });
 
@@ -92,7 +92,7 @@ describe("UnifiedDoorcard", () => {
       render(<UnifiedDoorcard doorcard={doorcardWithoutName} />);
       // Should still display the formatted name
       expect(
-        screen.getByText("Test Professor (they/them)"),
+        screen.getByText("Test Professor (they/them)")
       ).toBeInTheDocument();
     });
   });
@@ -110,7 +110,7 @@ describe("UnifiedDoorcard", () => {
 
     it("should display weekend headers when showWeekendDays is true", () => {
       render(
-        <UnifiedDoorcard doorcard={mockDoorcard} showWeekendDays={true} />,
+        <UnifiedDoorcard doorcard={mockDoorcard} showWeekendDays={true} />
       );
 
       expect(screen.getByText("Saturday")).toBeInTheDocument();
@@ -119,7 +119,7 @@ describe("UnifiedDoorcard", () => {
 
     it("should hide weekend headers when showWeekendDays is false", () => {
       render(
-        <UnifiedDoorcard doorcard={mockDoorcard} showWeekendDays={false} />,
+        <UnifiedDoorcard doorcard={mockDoorcard} showWeekendDays={false} />
       );
 
       expect(screen.queryByText("Saturday")).not.toBeInTheDocument();
@@ -256,7 +256,7 @@ describe("UnifiedDoorcard", () => {
       render(<UnifiedDoorcard doorcard={doorcardWithoutWebsite} />);
 
       expect(
-        screen.queryByRole("link", { name: /faculty website/i }),
+        screen.queryByRole("link", { name: /faculty website/i })
       ).not.toBeInTheDocument();
     });
   });

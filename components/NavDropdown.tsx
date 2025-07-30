@@ -72,7 +72,9 @@ export function NavDropdown({
             className="flex items-center gap-3 cursor-pointer px-3 py-2 group transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
           >
             <LayoutDashboard className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-            <span className="transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">Dashboard</span>
+            <span className="transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+              Dashboard
+            </span>
           </Link>
         </DropdownMenuItem>
 
@@ -82,7 +84,9 @@ export function NavDropdown({
             className="flex items-center gap-3 cursor-pointer px-3 py-2 group transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
           >
             <User className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-            <span className="transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">Profile</span>
+            <span className="transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+              Profile
+            </span>
           </Link>
         </DropdownMenuItem>
 
@@ -93,24 +97,31 @@ export function NavDropdown({
               className="flex items-center gap-3 cursor-pointer px-3 py-2 group transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
             >
               <Settings className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-              <span className="transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">Admin Panel</span>
+              <span className="transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                Admin Panel
+              </span>
             </Link>
           </DropdownMenuItem>
         )}
 
         <DropdownMenuItem asChild>
-          <Link 
-            href="/docs" 
+          <Link
+            href="/docs"
             className="flex items-center gap-3 cursor-pointer px-3 py-2 group transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"
           >
             <HelpCircle className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-            <span className="transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">Help</span>
+            <span className="transition-colors duration-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+              Help
+            </span>
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator className="my-1 border-gray-200 dark:border-gray-700" />
 
-        <DropdownMenuItem asChild className="p-0 focus:bg-transparent focus:text-inherit">
+        <DropdownMenuItem
+          asChild
+          className="p-0 focus:bg-transparent focus:text-inherit"
+        >
           <div className="px-1">
             <DarkModeToggle />
           </div>

@@ -23,7 +23,7 @@ interface OneLoginProfile {
 // Custom PrismaAdapter that handles PascalCase relations
 function CustomPrismaAdapter(): Adapter {
   const baseAdapter = PrismaAdapter(prisma);
-  
+
   return {
     ...baseAdapter,
     async getUserByAccount({ providerAccountId, provider }) {
@@ -31,11 +31,11 @@ function CustomPrismaAdapter(): Adapter {
         where: { provider_providerAccountId: { provider, providerAccountId } },
         select: { User: true },
       });
-      
+
       if (!account?.User) {
         return null;
       }
-      
+
       // Transform Prisma User to AdapterUser
       const user = account.User;
       return {
@@ -96,8 +96,12 @@ export const authOptions: NextAuthOptions = {
           const clientSecret = process.env.ONELOGIN_CLIENT_SECRET!;
 
           // Try Basic Authentication (common OIDC method)
-          const baseUrl = process.env.NEXTAUTH_URL || (process.env.NODE_ENV === 'production' ? 'https://doorcard.vercel.app' : 'http://localhost:3000');
-          const redirectUri = `${baseUrl.replace(/\/$/, '')}/api/auth/callback/onelogin`;
+          const baseUrl =
+            process.env.NEXTAUTH_URL ||
+            (process.env.NODE_ENV === "production"
+              ? "https://doorcard.vercel.app"
+              : "http://localhost:3000");
+          const redirectUri = `${baseUrl.replace(/\/$/, "")}/api/auth/callback/onelogin`;
           const tokenParams = new URLSearchParams({
             grant_type: "authorization_code",
             code: params.code || "",
@@ -105,7 +109,7 @@ export const authOptions: NextAuthOptions = {
           });
 
           const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString(
-            "base64",
+            "base64"
           );
 
           console.log("Token request params (Basic Auth):", {
@@ -134,7 +138,7 @@ export const authOptions: NextAuthOptions = {
 
           if (!response.ok) {
             throw new Error(
-              `Token request failed: ${response.status} ${JSON.stringify(tokens)}`,
+              `Token request failed: ${response.status} ${JSON.stringify(tokens)}`
             );
           }
 
@@ -146,7 +150,7 @@ export const authOptions: NextAuthOptions = {
         async request({ tokens, provider }) {
           console.log(
             "UserInfo request with token:",
-            tokens.access_token?.substring(0, 20) + "...",
+            tokens.access_token?.substring(0, 20) + "..."
           );
 
           const userinfoUrl =
@@ -164,7 +168,7 @@ export const authOptions: NextAuthOptions = {
 
           if (!response.ok) {
             throw new Error(
-              `UserInfo request failed: ${response.status} ${JSON.stringify(userInfo)}`,
+              `UserInfo request failed: ${response.status} ${JSON.stringify(userInfo)}`
             );
           }
 
@@ -217,7 +221,7 @@ export const authOptions: NextAuthOptions = {
 
         const isPasswordValid = await bcrypt.compare(
           credentials.password,
-          user.password,
+          user.password
         );
 
         if (!isPasswordValid) {
@@ -270,7 +274,7 @@ export const authOptions: NextAuthOptions = {
           if (existingUser) {
             // Check if OneLogin account is already linked
             const linkedAccount = existingUser.Account.find(
-              (acc) => acc.provider === "onelogin",
+              (acc) => acc.provider === "onelogin"
             );
 
             if (!linkedAccount) {
@@ -359,7 +363,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, isNewUser }) {
       if (isNewUser) {
         console.log(
-          `🎉 New user signed in: ${user.email} via ${account?.provider}`,
+          `🎉 New user signed in: ${user.email} via ${account?.provider}`
         );
       }
     },

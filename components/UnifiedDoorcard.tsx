@@ -94,7 +94,7 @@ export function UnifiedDoorcard({
   containerId = "doorcard-schedule",
 }: UnifiedDoorcardProps) {
   const days = DAY_LABELS.filter((d) =>
-    showWeekendDays ? true : d.key !== "SATURDAY" && d.key !== "SUNDAY",
+    showWeekendDays ? true : d.key !== "SATURDAY" && d.key !== "SUNDAY"
   );
   const byDay = groupByDay(doorcard.appointments);
 
@@ -186,7 +186,7 @@ export function UnifiedDoorcard({
                     list.some(
                       (a) =>
                         isSlotCovered(a, slot.value) &&
-                        a.startTime !== slot.value,
+                        a.startTime !== slot.value
                     )
                   ) {
                     return null;

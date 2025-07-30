@@ -352,7 +352,7 @@ async function seedMockUsers() {
       }
 
       console.log(
-        `✅ Created ${faculty.name} with ${template.length} office hours\n`,
+        `✅ Created ${faculty.name} with ${template.length} office hours\n`
       );
     }
 

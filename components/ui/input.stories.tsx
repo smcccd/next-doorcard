@@ -1,28 +1,38 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import { Input } from './input';
-import { Label } from './label';
-import { Search, Mail, Lock, User, Calendar } from 'lucide-react';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import { Input } from "./input";
+import { Label } from "./label";
+import { Search, Mail, Lock, User, Calendar } from "lucide-react";
 
 const meta = {
-  title: 'UI/Input',
+  title: "UI/Input",
   component: Input,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     type: {
-      control: { type: 'select' },
-      options: ['text', 'email', 'password', 'number', 'tel', 'url', 'search', 'date', 'time'],
-      description: 'The type of input',
+      control: { type: "select" },
+      options: [
+        "text",
+        "email",
+        "password",
+        "number",
+        "tel",
+        "url",
+        "search",
+        "date",
+        "time",
+      ],
+      description: "The type of input",
     },
     disabled: {
-      control: { type: 'boolean' },
-      description: 'Whether the input is disabled',
+      control: { type: "boolean" },
+      description: "Whether the input is disabled",
     },
     placeholder: {
-      control: { type: 'text' },
-      description: 'Placeholder text for the input',
+      control: { type: "text" },
+      description: "Placeholder text for the input",
     },
   },
 } satisfies Meta<typeof Input>;
@@ -32,7 +42,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    placeholder: 'Enter text...',
+    placeholder: "Enter text...",
   },
 };
 
@@ -74,21 +84,35 @@ export const WithIcons: Story = {
         <Label htmlFor="search-icon">Search</Label>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          <Input id="search-icon" className="pl-10" placeholder="Search professors..." />
+          <Input
+            id="search-icon"
+            className="pl-10"
+            placeholder="Search professors..."
+          />
         </div>
       </div>
       <div>
         <Label htmlFor="email-icon">Email</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          <Input id="email-icon" type="email" className="pl-10" placeholder="name@example.com" />
+          <Input
+            id="email-icon"
+            type="email"
+            className="pl-10"
+            placeholder="name@example.com"
+          />
         </div>
       </div>
       <div>
         <Label htmlFor="password-icon">Password</Label>
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          <Input id="password-icon" type="password" className="pl-10" placeholder="Enter password" />
+          <Input
+            id="password-icon"
+            type="password"
+            className="pl-10"
+            placeholder="Enter password"
+          />
         </div>
       </div>
     </div>
@@ -116,9 +140,9 @@ export const States: Story = {
       </div>
       <div>
         <Label htmlFor="error-state">Error State</Label>
-        <Input 
-          id="error-state" 
-          placeholder="Invalid input" 
+        <Input
+          id="error-state"
+          placeholder="Invalid input"
           className="border-red-500 focus:border-red-500 focus:ring-red-500"
         />
         <p className="text-sm text-red-500 mt-1">This field is required</p>
@@ -166,7 +190,7 @@ export const ProfessorSearch: Story = {
 
 export const DarkMode: Story = {
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story) => (
@@ -178,20 +202,24 @@ export const DarkMode: Story = {
   render: () => (
     <div className="space-y-4 w-[350px]">
       <div>
-        <Label htmlFor="dark-input" className="dark:text-gray-200">Dark Mode Input</Label>
-        <Input 
-          id="dark-input" 
-          placeholder="Dark mode input" 
+        <Label htmlFor="dark-input" className="dark:text-gray-200">
+          Dark Mode Input
+        </Label>
+        <Input
+          id="dark-input"
+          placeholder="Dark mode input"
           className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-400"
         />
       </div>
       <div>
-        <Label htmlFor="dark-search" className="dark:text-gray-200">Search in Dark Mode</Label>
+        <Label htmlFor="dark-search" className="dark:text-gray-200">
+          Search in Dark Mode
+        </Label>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input 
-            id="dark-search" 
-            placeholder="Search..." 
+          <Input
+            id="dark-search"
+            placeholder="Search..."
             className="pl-10 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-400"
           />
         </div>

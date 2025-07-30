@@ -1,6 +1,7 @@
 # OneLogin OIDC Configuration
 
-This document explains how to configure OneLogin OIDC authentication for the Faculty Doorcard System.
+This document explains how to configure OneLogin OIDC authentication for the
+Faculty Doorcard System.
 
 ## Prerequisites
 
@@ -132,4 +133,5 @@ NEXTAUTH_DEBUG=true
 | department     | college        | Campus assignment     |
 | title          | role           | User permissions      |
 
-Custom attributes can be added via OneLogin's custom user fields and mapped in the NextAuth provider configuration.
+Custom attributes can be added via OneLogin's custom user fields and mapped in
+the NextAuth provider configuration.

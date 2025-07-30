@@ -1,14 +1,23 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel, SelectSeparator } from './select';
-import { Label } from './label';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup,
+  SelectLabel,
+  SelectSeparator,
+} from "./select";
+import { Label } from "./label";
 
 const meta = {
-  title: 'UI/Select',
+  title: "UI/Select",
   component: Select,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof Select>;
 
 export default meta;
@@ -170,11 +179,21 @@ export const LongOptions: Story = {
           <SelectValue placeholder="Select a course" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="cs101">CS 101 - Introduction to Computer Science</SelectItem>
-          <SelectItem value="cs201">CS 201 - Data Structures and Algorithms</SelectItem>
-          <SelectItem value="cs301">CS 301 - Advanced Software Engineering</SelectItem>
-          <SelectItem value="cs401">CS 401 - Machine Learning and Artificial Intelligence</SelectItem>
-          <SelectItem value="cs501">CS 501 - Distributed Systems and Cloud Computing</SelectItem>
+          <SelectItem value="cs101">
+            CS 101 - Introduction to Computer Science
+          </SelectItem>
+          <SelectItem value="cs201">
+            CS 201 - Data Structures and Algorithms
+          </SelectItem>
+          <SelectItem value="cs301">
+            CS 301 - Advanced Software Engineering
+          </SelectItem>
+          <SelectItem value="cs401">
+            CS 401 - Machine Learning and Artificial Intelligence
+          </SelectItem>
+          <SelectItem value="cs501">
+            CS 501 - Distributed Systems and Cloud Computing
+          </SelectItem>
         </SelectContent>
       </Select>
     </div>
@@ -186,13 +205,13 @@ export const FormIntegration: Story = {
     <form className="space-y-4 w-[400px]">
       <div className="space-y-2">
         <Label htmlFor="name">Name</Label>
-        <input 
-          id="name" 
+        <input
+          id="name"
           className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
           placeholder="Your name"
         />
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="campus-form">Campus</Label>
         <Select>
@@ -206,7 +225,7 @@ export const FormIntegration: Story = {
           </SelectContent>
         </Select>
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="department-form">Department</Label>
         <Select>
@@ -227,7 +246,7 @@ export const FormIntegration: Story = {
 
 export const DarkMode: Story = {
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story) => (
@@ -238,15 +257,35 @@ export const DarkMode: Story = {
   ],
   render: () => (
     <div className="w-[300px] space-y-2">
-      <Label htmlFor="dark-select" className="dark:text-gray-200">Select Option</Label>
+      <Label htmlFor="dark-select" className="dark:text-gray-200">
+        Select Option
+      </Label>
       <Select>
-        <SelectTrigger id="dark-select" className="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100">
+        <SelectTrigger
+          id="dark-select"
+          className="dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100"
+        >
           <SelectValue placeholder="Choose an option" />
         </SelectTrigger>
         <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-          <SelectItem value="option1" className="dark:text-gray-100 dark:hover:bg-gray-700">Option 1</SelectItem>
-          <SelectItem value="option2" className="dark:text-gray-100 dark:hover:bg-gray-700">Option 2</SelectItem>
-          <SelectItem value="option3" className="dark:text-gray-100 dark:hover:bg-gray-700">Option 3</SelectItem>
+          <SelectItem
+            value="option1"
+            className="dark:text-gray-100 dark:hover:bg-gray-700"
+          >
+            Option 1
+          </SelectItem>
+          <SelectItem
+            value="option2"
+            className="dark:text-gray-100 dark:hover:bg-gray-700"
+          >
+            Option 2
+          </SelectItem>
+          <SelectItem
+            value="option3"
+            className="dark:text-gray-100 dark:hover:bg-gray-700"
+          >
+            Option 3
+          </SelectItem>
         </SelectContent>
       </Select>
     </div>

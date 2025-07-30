@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     if (user?.role !== "ADMIN") {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -91,7 +91,7 @@ export async function GET(req: NextRequest) {
       const doorcardCount = user._count.Doorcard;
       const appointmentCount = user.Doorcard.reduce(
         (total, doorcard) => total + doorcard._count.Appointment,
-        0,
+        0
       );
 
       // Get primary campus from doorcards
@@ -119,7 +119,7 @@ export async function GET(req: NextRequest) {
     console.error("Admin users error:", error);
     return NextResponse.json(
       { error: "Failed to fetch users" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

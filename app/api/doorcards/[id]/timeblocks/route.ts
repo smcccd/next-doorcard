@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 // GET /api/doorcards/[id]/timeblocks - Get appointments (timeblocks) for a doorcard
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await requireAuthUserAPI();
   if ("error" in auth) {
@@ -37,7 +37,7 @@ export async function GET(
     console.error("Error fetching appointments:", error);
     return NextResponse.json(
       { error: "Failed to fetch appointments" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

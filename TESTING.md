@@ -1,10 +1,15 @@
 # Testing Strategy & Implementation
 
-This document outlines the comprehensive testing strategy implemented for the Next.js Doorcard application, with a focus on E2E testing, accessibility compliance, and performance monitoring.
+This document outlines the comprehensive testing strategy implemented for the
+Next.js Doorcard application, with a focus on E2E testing, accessibility
+compliance, and performance monitoring.
 
 ## Overview
 
-The testing suite has been set up using **Cypress** as the primary E2E testing framework, with additional tools for accessibility and performance testing. This provides a solid foundation for ensuring code quality, ADA compliance, and optimal user experience.
+The testing suite has been set up using **Cypress** as the primary E2E testing
+framework, with additional tools for accessibility and performance testing. This
+provides a solid foundation for ensuring code quality, ADA compliance, and
+optimal user experience.
 
 ## What's Been Implemented
 
@@ -247,4 +252,7 @@ The test suite is designed for easy integration with:
 - **ADA compliance assurance** for legal and ethical requirements
 - **Performance monitoring** for optimal user experience
 
-This testing infrastructure provides a solid foundation for maintaining high-quality, accessible, and performant web applications. The team can now develop with confidence knowing that quality checks are automated and comprehensive.
+This testing infrastructure provides a solid foundation for maintaining
+high-quality, accessible, and performant web applications. The team can now
+develop with confidence knowing that quality checks are automated and
+comprehensive.

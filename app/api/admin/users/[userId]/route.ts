@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> },
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const resolvedParams = await params;
@@ -24,7 +24,7 @@ export async function GET(
     if (adminUser?.role !== "ADMIN") {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -126,7 +126,7 @@ export async function GET(
       activeDoorcards: user.Doorcard.filter((d) => d.isActive).length,
       totalAppointments: user.Doorcard.reduce(
         (total, doorcard) => total + doorcard._count.Appointment,
-        0,
+        0
       ),
     };
 
@@ -135,7 +135,7 @@ export async function GET(
     console.error("Admin user detail error:", error);
     return NextResponse.json(
       { error: "Failed to fetch user details" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

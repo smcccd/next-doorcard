@@ -88,7 +88,11 @@ export default async function Navbar() {
               </Link>
             )}
           </div>
-          <MobileNav session={session} userDisplay={userDisplay} isAdmin={isAdmin} />
+          <MobileNav
+            session={session}
+            userDisplay={userDisplay}
+            isAdmin={isAdmin}
+          />
         </div>
       </div>
     </nav>

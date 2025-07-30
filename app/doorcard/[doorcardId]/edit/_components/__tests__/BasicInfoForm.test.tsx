@@ -68,7 +68,7 @@ describe("BasicInfoForm", () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
       expect(
-        screen.getByDisplayValue("Dr. Test Professor"),
+        screen.getByDisplayValue("Dr. Test Professor")
       ).toBeInTheDocument();
       expect(screen.getByDisplayValue("Test Doorcard")).toBeInTheDocument();
       expect(screen.getByDisplayValue("Room 101")).toBeInTheDocument();
@@ -86,7 +86,7 @@ describe("BasicInfoForm", () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
       expect(
-        screen.getByRole("button", { name: /continue to schedule/i }),
+        screen.getByRole("button", { name: /continue to schedule/i })
       ).toBeInTheDocument();
     });
 
@@ -127,7 +127,7 @@ describe("BasicInfoForm", () => {
       await user.click(submitButton);
 
       expect(
-        screen.getByText("Full name must be at least 2 characters"),
+        screen.getByText("Full name must be at least 2 characters")
       ).toBeInTheDocument();
     });
 
@@ -144,7 +144,7 @@ describe("BasicInfoForm", () => {
       await user.click(submitButton);
 
       expect(
-        screen.getByText("Full name must be under 100 characters"),
+        screen.getByText("Full name must be under 100 characters")
       ).toBeInTheDocument();
     });
 
@@ -160,7 +160,7 @@ describe("BasicInfoForm", () => {
       await user.click(submitButton);
 
       expect(
-        screen.getByText("Doorcard title is required"),
+        screen.getByText("Doorcard title is required")
       ).toBeInTheDocument();
     });
 
@@ -176,7 +176,7 @@ describe("BasicInfoForm", () => {
       await user.click(submitButton);
 
       expect(
-        screen.getByText("Office location is required"),
+        screen.getByText("Office location is required")
       ).toBeInTheDocument();
     });
 
@@ -214,7 +214,7 @@ describe("BasicInfoForm", () => {
       await user.type(nameInput, "Valid Name");
 
       expect(
-        screen.queryByText("Full name is required"),
+        screen.queryByText("Full name is required")
       ).not.toBeInTheDocument();
     });
   });
@@ -247,7 +247,7 @@ describe("BasicInfoForm", () => {
         expect(mockUpdateBasicInfo).toHaveBeenCalledWith(
           "doorcard-123",
           expect.any(Object),
-          expect.any(FormData),
+          expect.any(FormData)
         );
       });
     });
@@ -300,7 +300,7 @@ describe("BasicInfoForm", () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText("Server validation failed"),
+          screen.getByText("Server validation failed")
         ).toBeInTheDocument();
       });
     });
@@ -340,10 +340,10 @@ describe("BasicInfoForm", () => {
       expect(mockUpdateBasicInfo).not.toHaveBeenCalled();
       expect(screen.getByText("Full name is required")).toBeInTheDocument();
       expect(
-        screen.getByText("Doorcard title is required"),
+        screen.getByText("Doorcard title is required")
       ).toBeInTheDocument();
       expect(
-        screen.getByText("Office location is required"),
+        screen.getByText("Office location is required")
       ).toBeInTheDocument();
     });
   });
@@ -392,7 +392,7 @@ describe("BasicInfoForm", () => {
 
       await user.tab(); // Focus submit button
       expect(
-        screen.getByRole("button", { name: /continue to schedule/i }),
+        screen.getByRole("button", { name: /continue to schedule/i })
       ).toHaveFocus();
     });
   });

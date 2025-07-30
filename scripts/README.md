@@ -2,7 +2,8 @@
 
 ## Overview
 
-The `import-legacy.ts` script imports legacy doorcard data from CSV files into the new Prisma-based database.
+The `import-legacy.ts` script imports legacy doorcard data from CSV files into
+the new Prisma-based database.
 
 ## Usage
 
@@ -12,7 +13,8 @@ The `import-legacy.ts` script imports legacy doorcard data from CSV files into t
 npm run import-legacy:dry
 ```
 
-This will simulate the import without writing to the database and show what would be imported.
+This will simulate the import without writing to the database and show what
+would be imported.
 
 ### Actual Import
 

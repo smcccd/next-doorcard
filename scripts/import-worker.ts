@@ -82,7 +82,7 @@ async function processUserBatch(users: UserData[]): Promise<WorkerResult> {
         }
         return acc;
       },
-      {} as Record<string, string>,
+      {} as Record<string, string>
     );
 
     return {
@@ -101,7 +101,7 @@ async function processUserBatch(users: UserData[]): Promise<WorkerResult> {
 }
 
 async function processDoorcardBatch(
-  doorcards: DoorcardData[],
+  doorcards: DoorcardData[]
 ): Promise<WorkerResult> {
   const errors = [];
   const idMappings: Record<string, string> = {};
@@ -131,7 +131,7 @@ async function processDoorcardBatch(
 }
 
 async function processAppointmentBatch(
-  appointments: AppointmentData[],
+  appointments: AppointmentData[]
 ): Promise<WorkerResult> {
   try {
     const result = await prisma.appointment.createMany({

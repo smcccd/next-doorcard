@@ -11,6 +11,24 @@ const nextConfig: NextConfig = {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   },
 
+  // Webpack configuration
+  webpack: (config, { isServer }) => {
+    // Suppress the serialization warnings
+    config.infrastructureLogging = {
+      level: "error",
+    };
+
+    // Optimize cache settings
+    if (config.cache && !isServer) {
+      config.cache = {
+        type: "filesystem",
+        compression: "gzip",
+      };
+    }
+
+    return config;
+  },
+
   // Security headers
   async headers() {
     return [
@@ -49,6 +67,16 @@ const nextConfig: NextConfig = {
     fetches: {
       fullUrl: process.env.NODE_ENV === "development",
     },
+  },
+
+  // Experimental features for better performance
+  experimental: {
+    // Optimize package imports
+    optimizePackageImports: [
+      "@prisma/client",
+      "lucide-react",
+      "@radix-ui/react-icons",
+    ],
   },
 };
 

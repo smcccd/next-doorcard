@@ -40,7 +40,7 @@ async function finalProductionAnalysis() {
 
     doorcardsByStatus.forEach((group) => {
       console.log(
-        `Doorcards ${group.isActive ? "active" : "inactive"}: ${group._count.isActive}`,
+        `Doorcards ${group.isActive ? "active" : "inactive"}: ${group._count.isActive}`
       );
     });
 
@@ -57,10 +57,10 @@ async function finalProductionAnalysis() {
 
     console.log("\n📅 TEMPORAL DATA RANGE:");
     console.log(
-      `Oldest doorcard: ${oldestDoorcard.term} ${oldestDoorcard.year}`,
+      `Oldest doorcard: ${oldestDoorcard.term} ${oldestDoorcard.year}`
     );
     console.log(
-      `Newest doorcard: ${newestDoorcard.term} ${newestDoorcard.year}`,
+      `Newest doorcard: ${newestDoorcard.term} ${newestDoorcard.year}`
     );
 
     // Check for suspicious data patterns
@@ -77,23 +77,23 @@ async function finalProductionAnalysis() {
 
   console.log("\n🚨 CRITICAL FINDINGS SUMMARY:");
   console.log(
-    "1. APPOINTMENT IMPORT FAILURE: Complete failure despite appearing successful",
+    "1. APPOINTMENT IMPORT FAILURE: Complete failure despite appearing successful"
   );
   console.log(
-    "2. USER DATA INADEQUACY: Source contains only 2 users vs 2000+ needed",
+    "2. USER DATA INADEQUACY: Source contains only 2 users vs 2000+ needed"
   );
   console.log(
-    "3. ORPHANED DATA: 10,000+ placeholder doorcards with no real appointments",
+    "3. ORPHANED DATA: 10,000+ placeholder doorcards with no real appointments"
   );
   console.log("4. INTEGRITY VIOLATIONS: Foreign key relationships are broken");
   console.log(
-    "5. BUSINESS LOGIC ISSUES: No active doorcards, no real user associations",
+    "5. BUSINESS LOGIC ISSUES: No active doorcards, no real user associations"
   );
 
   console.log("\n📊 STATISTICAL SUMMARY:");
   console.log("• Source Files: 185K appointments, 11K doorcards, 2 users");
   console.log(
-    "• Import Success: 10K doorcards, 0 appointments, 1792 auto-generated users",
+    "• Import Success: 10K doorcards, 0 appointments, 1792 auto-generated users"
   );
   console.log("• Rejection Rate: 99.9% doorcards, 4.8% appointments");
   console.log("• Data Completeness: <1% (missing critical relationships)");

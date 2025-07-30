@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     if (!doorcard) {
       return NextResponse.json(
         { error: "Doorcard not found" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     if (eventType !== "EDIT_STARTED" && !doorcard.isPublic) {
       return NextResponse.json(
         { error: "Doorcard is not public" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -77,7 +77,7 @@ export async function POST(req: Request) {
     console.error("Analytics tracking error:", error);
     return NextResponse.json(
       { error: "Failed to track event" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
 async function updateDoorcardMetrics(
   doorcardId: string,
   eventType: string,
-  sessionId: string,
+  sessionId: string
 ) {
   const now = new Date();
 

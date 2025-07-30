@@ -78,7 +78,7 @@ function handleActionError(err: unknown): ActionResult {
 export async function validateCampusTerm(
   doorcardId: string,
   _prevState: ActionResult,
-  formData: FormData,
+  formData: FormData
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -102,7 +102,7 @@ export async function validateCampusTerm(
       return {
         success: false,
         message: `You already have a doorcard for ${campusLabel(
-          data.college,
+          data.college
         )} - ${data.term} ${data.year}. Please edit your existing doorcard "${
           existing.doorcardName
         }" instead.`,
@@ -128,7 +128,7 @@ export async function validateCampusTerm(
 export async function updateBasicInfo(
   doorcardId: string,
   _prevState: ActionResult,
-  formData: FormData,
+  formData: FormData
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -157,7 +157,7 @@ export async function updateBasicInfo(
 export async function updateTimeBlocks(
   doorcardId: string,
   _prevState: ActionResult,
-  formData: FormData,
+  formData: FormData
 ): Promise<ActionResult> {
   try {
     const user = await requireAuth();
@@ -217,7 +217,7 @@ export async function publishDoorcard(doorcardId: string) {
 
 export async function createDoorcardWithCampusTerm(
   _prevState: ActionResult,
-  formData: FormData,
+  formData: FormData
 ): Promise<ActionResult> {
   let newDoorcardId: string | null = null;
   try {
@@ -241,7 +241,7 @@ export async function createDoorcardWithCampusTerm(
       return {
         success: false,
         message: `You already have a doorcard for ${campusLabel(
-          data.college,
+          data.college
         )} - ${data.term} ${data.year}. Please edit "${
           existing.doorcardName
         }" instead.`,

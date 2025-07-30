@@ -1,6 +1,8 @@
 # Cypress E2E Testing Suite
 
-This directory contains a comprehensive End-to-End testing suite for the DoorCard Next.js application using Cypress. The test suite covers functionality, accessibility, performance, and API testing.
+This directory contains a comprehensive End-to-End testing suite for the
+DoorCard Next.js application using Cypress. The test suite covers functionality,
+accessibility, performance, and API testing.
 
 ## Quick Start
 
@@ -40,7 +42,8 @@ npx cypress run --browser chrome
 
 #### 🌐 **Public Features**
 
-- **public-viewing.cy.ts** - Public doorcard viewing, print/export, analytics tracking
+- **public-viewing.cy.ts** - Public doorcard viewing, print/export, analytics
+  tracking
 
 #### 👨‍💼 **Admin Features**
 
@@ -48,7 +51,8 @@ npx cypress run --browser chrome
 
 #### 🔌 **API Testing**
 
-- **api-endpoints.cy.ts** - Complete API endpoint testing (CRUD, validation, error handling)
+- **api-endpoints.cy.ts** - Complete API endpoint testing (CRUD, validation,
+  error handling)
 
 #### ♿ **Accessibility & Performance**
 
@@ -258,10 +262,12 @@ npm run cypress:run --record
 ## Resources
 
 - 📚 [Cypress Documentation](https://docs.cypress.io/)
-- ♿ [cypress-axe Documentation](https://github.com/component-driven/cypress-axe)
+- ♿
+  [cypress-axe Documentation](https://github.com/component-driven/cypress-axe)
 - 📊 [Web Performance Guidelines](https://web.dev/vitals/)
 - 🎯 [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
-- 🛠️ [Cypress Best Practices](https://docs.cypress.io/guides/references/best-practices)
+- 🛠️
+  [Cypress Best Practices](https://docs.cypress.io/guides/references/best-practices)
 
 ## Test Coverage Summary
 

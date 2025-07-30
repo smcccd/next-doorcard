@@ -47,7 +47,7 @@ export default function TermManagement({
   const upcomingTerms = terms.filter((t) => t.isUpcoming);
   const archivedTerms = terms.filter((t) => t.isArchived);
   const otherTerms = terms.filter(
-    (t) => !t.isActive && !t.isUpcoming && !t.isArchived,
+    (t) => !t.isActive && !t.isUpcoming && !t.isArchived
   );
 
   const getTermStatusBadge = (term: Term) => {

@@ -18,7 +18,7 @@ export default withAuth(
       (req.nextUrl.pathname === "/login" || req.nextUrl.pathname === "/")
     ) {
       console.log(
-        "[DEBUG] Middleware: Redirecting authenticated user to /dashboard",
+        "[DEBUG] Middleware: Redirecting authenticated user to /dashboard"
       );
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
@@ -31,7 +31,7 @@ export default withAuth(
     callbacks: {
       authorized: ({ token }) => !!token, // Allow any authenticated user
     },
-  },
+  }
 );
 
 export const config = {

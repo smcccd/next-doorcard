@@ -33,11 +33,11 @@ const getCurrentAcademicYear = () => {
 
 const CURRENT_YEAR = getCurrentAcademicYear();
 const BASE_YEARS = Array.from({ length: 5 }, (_, i) =>
-  (CURRENT_YEAR + i).toString(),
+  (CURRENT_YEAR + i).toString()
 );
 
 type FieldErrors = { college?: string; term?: string; year?: string };
-type ActionState = { success: boolean; message?: string };
+type ActionState = { success: boolean; message?: string } | undefined;
 
 interface Props {
   /** If undefined => new doorcard flow */
@@ -81,7 +81,7 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
       : BASE_YEARS;
 
   const [college, setCollege] = useState<College | "">(
-    (doorcard?.college as College) ?? (userCollege as College) ?? "",
+    (doorcard?.college as College) ?? (userCollege as College) ?? ""
   );
   const [term, setTerm] = useState(doorcard?.term ?? "");
   const [year, setYear] = useState(existingYear ?? "");
@@ -94,17 +94,17 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
       doorcard
         ? validateCampusTerm(doorcard.id, prev, formData) // edit flow
         : createDoorcardWithCampusTerm(prev, formData), // new flow
-    [doorcard],
+    [doorcard]
   );
 
   const [state, serverAction] = useActionState<ActionState, FormData>(
     actionFn,
-    { success: true },
+    { success: true }
   );
 
   const validateField = (
     name: keyof FieldErrors,
-    value: string,
+    value: string
   ): string | undefined => {
     if (!value) return "Required";
     if (name === "college" && !COLLEGE_OPTIONS.includes(value as College))
@@ -152,7 +152,7 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
         </div>
       </div>
 
-      {!state.success && state.message && <Alert>{state.message}</Alert>}
+      {!state?.success && state?.message && <Alert>{state.message}</Alert>}
       {clientTried && anyClientErrors && (
         <Alert>Please fill in all required fields correctly.</Alert>
       )}

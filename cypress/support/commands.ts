@@ -7,7 +7,7 @@ Cypress.Commands.add("checkServer", () => {
       throw new Error(
         "Server is not running at " +
           Cypress.config("baseUrl") +
-          ". Please start your development server before running tests.",
+          ". Please start your development server before running tests."
       );
     }
   });
@@ -56,7 +56,7 @@ Cypress.Commands.add("login", (email, password) => {
       validate: () => {
         cy.getCookie("next-auth.session-token").should("exist");
       },
-    },
+    }
   );
 });
 
@@ -88,7 +88,7 @@ Cypress.Commands.add("loginAsTestUser", () => {
 
       // Critical: Wait for session cookie to be set
       cy.getCookie("next-auth.session-token", { timeout: 10000 }).should(
-        "exist",
+        "exist"
       );
 
       // Additional guard: Ensure the session is fully established
@@ -112,7 +112,7 @@ Cypress.Commands.add("loginAsTestUser", () => {
           expect(resp.body.user).to.have.property("email");
         });
       },
-    },
+    }
   );
 });
 
@@ -165,9 +165,9 @@ Cypress.Commands.add(
             expect(resp.body).to.have.property("user");
           });
         },
-      },
+      }
     );
-  },
+  }
 );
 
 // Simple login command for tests (no session caching to avoid timeouts)
@@ -338,13 +338,13 @@ Cypress.Commands.add(
   (subject, text, options = {}) => {
     const defaultOptions = { delay: 50, ...options };
     return cy.wrap(subject).type(text, defaultOptions);
-  },
+  }
 );
 
 // Custom command to handle form validation more reliably
 Cypress.Commands.add("submitFormAndCheckValidation", (expectedErrors = []) => {
   cy.get(
-    'button[type="submit"], button:contains("Next"), button:contains("Submit")',
+    'button[type="submit"], button:contains("Next"), button:contains("Submit")'
   ).click();
 
   expectedErrors.forEach((error) => {
@@ -368,13 +368,13 @@ declare global {
       cleanupTestData(): Chainable<void>;
       waitForElement(
         selector: string,
-        options?: any,
+        options?: any
       ): Chainable<JQuery<HTMLElement>>;
       fillDoorcardForm(formData: any): Chainable<void>;
       checkAccessibility(context?: any, options?: any): Chainable<void>;
       typeRealistic(text: string, options?: any): Chainable<void>;
       submitFormAndCheckValidation(
-        expectedErrors?: string[],
+        expectedErrors?: string[]
       ): Chainable<boolean>;
     }
   }

@@ -5,7 +5,7 @@ import type { Session } from "next-auth";
 type AuthenticatedHandler<T> = (session: Session) => Promise<T>;
 
 export async function withAuth<T>(
-  handler: AuthenticatedHandler<T>,
+  handler: AuthenticatedHandler<T>
 ): Promise<NextResponse> {
   try {
     const session = await getServerSession();
@@ -22,7 +22,7 @@ export async function withAuth<T>(
       {
         error: error instanceof Error ? error.message : "Internal server error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

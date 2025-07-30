@@ -77,7 +77,7 @@ describe("Doorcard Constants", () => {
 
     it("should handle noon correctly", () => {
       const noonSlot = TIME_SLOTS.find(
-        (slot) => slot.hour === 12 && slot.minute === 0,
+        (slot) => slot.hour === 12 && slot.minute === 0
       );
       expect(noonSlot?.label).toBe("12:00 PM");
     });
@@ -117,7 +117,7 @@ describe("Doorcard Constants", () => {
   describe("extractCourseCode", () => {
     it("should extract course codes with delimiters", () => {
       expect(extractCourseCode("CS 101 - Introduction to Programming")).toBe(
-        "CS 101",
+        "CS 101"
       );
       expect(extractCourseCode("MATH 200A - Calculus")).toBe("MATH 200A");
     });

@@ -49,9 +49,9 @@ jest.mock("@/components/ui/card", () => ({
 
 jest.mock("@/components/ui/select", () => ({
   Select: ({ children, onValueChange, value }: any) => (
-    <select 
+    <select
       data-testid="select"
-      onChange={(e) => onValueChange?.(e.target.value)} 
+      onChange={(e) => onValueChange?.(e.target.value)}
       value={value}
     >
       {children}
@@ -167,7 +167,7 @@ describe("ProfilePage", () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/please log in to view your profile/i),
+          screen.getByText(/please log in to view your profile/i)
         ).toBeInTheDocument();
       });
     });
@@ -182,7 +182,7 @@ describe("ProfilePage", () => {
       render(<ProfilePage />);
 
       expect(
-        screen.getByText(/please log in to view your profile/i),
+        screen.getByText(/please log in to view your profile/i)
       ).toBeInTheDocument();
     });
   });
@@ -195,7 +195,7 @@ describe("ProfilePage", () => {
         expect(screen.getByDisplayValue("Test")).toBeInTheDocument();
         expect(screen.getByDisplayValue("User")).toBeInTheDocument();
         expect(
-          screen.getByDisplayValue("https://example.com"),
+          screen.getByDisplayValue("https://example.com")
         ).toBeInTheDocument();
       });
     });
@@ -206,7 +206,7 @@ describe("ProfilePage", () => {
       await waitFor(() => {
         const selects = screen.getAllByTestId("select");
         const titleSelect = selects.find((s) =>
-          s.querySelector('option[value="Dr."]'),
+          s.querySelector('option[value="Dr."]')
         );
         expect(titleSelect).toHaveValue("Dr.");
       });
@@ -218,7 +218,7 @@ describe("ProfilePage", () => {
       await waitFor(() => {
         const selects = screen.getAllByTestId("select");
         const pronounsSelect = selects.find((s) =>
-          s.querySelector('option[value="they/them"]'),
+          s.querySelector('option[value="they/them"]')
         );
         expect(pronounsSelect).toHaveValue("they/them");
       });
@@ -230,7 +230,7 @@ describe("ProfilePage", () => {
       await waitFor(() => {
         const selects = screen.getAllByTestId("select");
         const campusSelect = selects.find((s) =>
-          s.querySelector('option[value="SKYLINE"]'),
+          s.querySelector('option[value="SKYLINE"]')
         );
         expect(campusSelect).toHaveValue("SKYLINE");
       });
@@ -284,7 +284,7 @@ describe("ProfilePage", () => {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: expect.stringContaining('"firstName":"Updated"'),
-          }),
+          })
         );
         expect(mockToast).toHaveBeenCalledWith({
           title: "Profile updated",
@@ -351,9 +351,9 @@ describe("ProfilePage", () => {
                     status: 200,
                     statusText: "OK",
                   } as Response),
-                100,
-              ),
-            ),
+                100
+              )
+            )
         );
 
       render(<ProfilePage />);
@@ -366,7 +366,7 @@ describe("ProfilePage", () => {
       await user.click(saveButton);
 
       expect(
-        screen.getByRole("button", { name: /saving/i }),
+        screen.getByRole("button", { name: /saving/i })
       ).toBeInTheDocument();
       expect(screen.getByRole("button", { name: /saving/i })).toBeDisabled();
     });
@@ -458,7 +458,7 @@ describe("ProfilePage", () => {
 
       await waitFor(() => {
         expect(
-          screen.getByDisplayValue("https://example.com"),
+          screen.getByDisplayValue("https://example.com")
         ).toBeInTheDocument();
       });
 
@@ -479,7 +479,7 @@ describe("ProfilePage", () => {
 
       await waitFor(() => {
         expect(
-          localStorage.getItem("profile-setup-dismissed-user-123"),
+          localStorage.getItem("profile-setup-dismissed-user-123")
         ).toBeNull();
       });
     });
@@ -529,7 +529,7 @@ describe("ProfilePage", () => {
 
       await waitFor(() => {
         expect(
-          screen.getByRole("heading", { name: /profile settings/i }),
+          screen.getByRole("heading", { name: /profile settings/i })
         ).toBeInTheDocument();
       });
     });

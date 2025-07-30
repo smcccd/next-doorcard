@@ -51,7 +51,7 @@ const mockGetDoorcardDisplayStatus =
   >;
 
 const createMockDoorcard = (
-  overrides: Partial<Doorcard> = {},
+  overrides: Partial<Doorcard> = {}
 ): Doorcard & {
   appointments: Appointment[];
   user?: Pick<User, "username" | "name">;
@@ -89,7 +89,7 @@ describe("DoorcardGrid", () => {
           title="My Doorcards"
           emptyMessage="No doorcards found"
           variant="grid"
-        />,
+        />
       );
 
       expect(screen.getByText("My Doorcards")).toBeInTheDocument();
@@ -114,7 +114,7 @@ describe("DoorcardGrid", () => {
           title="My Doorcards"
           emptyMessage="No doorcards found"
           variant="grid"
-        />,
+        />
       );
 
       expect(screen.getByText("Doorcard 1")).toBeInTheDocument();
@@ -139,7 +139,7 @@ describe("DoorcardGrid", () => {
           title="Draft Doorcards"
           emptyMessage="No drafts"
           variant="list"
-        />,
+        />
       );
 
       expect(screen.getByText("List Doorcard")).toBeInTheDocument();
@@ -157,11 +157,7 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       expect(screen.getByText("Live")).toBeInTheDocument();
@@ -177,11 +173,7 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       expect(screen.getByText("Incomplete")).toBeInTheDocument();
@@ -197,11 +189,7 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       expect(screen.getByText("Archived")).toBeInTheDocument();
@@ -219,11 +207,7 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       const completeLink = screen.getByRole("link", {
@@ -231,7 +215,7 @@ describe("DoorcardGrid", () => {
       });
       expect(completeLink).toHaveAttribute(
         "href",
-        "/doorcard/incomplete-1/edit?step=1",
+        "/doorcard/incomplete-1/edit?step=1"
       );
     });
 
@@ -244,21 +228,17 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       expect(
-        screen.getByRole("link", { name: /view doorcard/i }),
+        screen.getByRole("link", { name: /view doorcard/i })
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("link", { name: /edit doorcard/i }),
+        screen.getByRole("link", { name: /edit doorcard/i })
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("link", { name: /print doorcard/i }),
+        screen.getByRole("link", { name: /print doorcard/i })
       ).toBeInTheDocument();
     });
 
@@ -271,21 +251,17 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       expect(
-        screen.getByRole("link", { name: /view doorcard/i }),
+        screen.getByRole("link", { name: /view doorcard/i })
       ).toBeInTheDocument();
       expect(
-        screen.queryByRole("link", { name: /edit doorcard/i }),
+        screen.queryByRole("link", { name: /edit doorcard/i })
       ).not.toBeInTheDocument();
       expect(
-        screen.getByRole("link", { name: /print doorcard/i }),
+        screen.getByRole("link", { name: /print doorcard/i })
       ).toBeInTheDocument();
     });
   });
@@ -304,11 +280,7 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       const viewLink = screen.getByRole("link", { name: /view doorcard/i });
@@ -324,17 +296,13 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       const viewLink = screen.getByRole("link", { name: /view doorcard/i });
       expect(viewLink).toHaveAttribute(
         "href",
-        "/doorcard/draft-1/view?auth=true",
+        "/doorcard/draft-1/view?auth=true"
       );
     });
   });
@@ -349,11 +317,7 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       expect(screen.getByText("Skyline College")).toBeInTheDocument();
@@ -368,11 +332,7 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       // Should not display campus section when college is null
@@ -397,15 +357,11 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       expect(
-        screen.getByText("Dr. Smith's SPRING 2025 Doorcard"),
+        screen.getByText("Dr. Smith's SPRING 2025 Doorcard")
       ).toBeInTheDocument();
     });
 
@@ -418,11 +374,7 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       expect(screen.getByText(/Faculty Member/)).toBeInTheDocument();
@@ -447,11 +399,7 @@ describe("DoorcardGrid", () => {
       });
 
       render(
-        <DoorcardGrid
-          doorcards={doorcards}
-          title="Test"
-          emptyMessage="Empty"
-        />,
+        <DoorcardGrid doorcards={doorcards} title="Test" emptyMessage="Empty" />
       );
 
       expect(screen.getByText("3")).toBeInTheDocument();

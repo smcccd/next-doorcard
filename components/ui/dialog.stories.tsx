@@ -1,18 +1,27 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import React from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from './dialog';
-import { Button } from './button';
-import { Input } from './input';
-import { Label } from './label';
-import { Textarea } from './textarea';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "./dialog";
+import { Button } from "./button";
+import { Input } from "./input";
+import { Label } from "./label";
+import { Textarea } from "./textarea";
 
 const meta = {
-  title: 'UI/Dialog',
+  title: "UI/Dialog",
   component: Dialog,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof Dialog>;
 
 export default meta;
@@ -28,7 +37,8 @@ export const Default: Story = {
         <DialogHeader>
           <DialogTitle>Dialog Title</DialogTitle>
           <DialogDescription>
-            This is a dialog description that explains what this dialog is about.
+            This is a dialog description that explains what this dialog is
+            about.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
@@ -87,7 +97,8 @@ export const EditProfileDialog: Story = {
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
-            Make changes to your profile information. Click save when you're done.
+            Make changes to your profile information. Click save when you're
+            done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -105,8 +116,8 @@ export const EditProfileDialog: Story = {
           </div>
           <div className="grid gap-2">
             <Label htmlFor="bio">Bio</Label>
-            <Textarea 
-              id="bio" 
+            <Textarea
+              id="bio"
               defaultValue="I teach computer science courses with a focus on software engineering and web development."
               rows={4}
             />
@@ -133,8 +144,8 @@ export const ConfirmationDialog: Story = {
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete your account
-            and remove your data from our servers.
+            This action cannot be undone. This will permanently delete your
+            account and remove your data from our servers.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-start">
@@ -162,21 +173,24 @@ export const InformationDialog: Story = {
           <div>
             <h4 className="font-medium mb-1">Regular Hours</h4>
             <p className="text-sm text-gray-600">
-              Monday & Wednesday: 2:00 PM - 4:00 PM<br />
+              Monday & Wednesday: 2:00 PM - 4:00 PM
+              <br />
               Friday: 10:00 AM - 12:00 PM
             </p>
           </div>
           <div>
             <h4 className="font-medium mb-1">Location</h4>
             <p className="text-sm text-gray-600">
-              Building 36, Room 301<br />
+              Building 36, Room 301
+              <br />
               College of San Mateo
             </p>
           </div>
           <div>
             <h4 className="font-medium mb-1">Note</h4>
             <p className="text-sm text-gray-600">
-              Office hours may change during finals week. Please check the online schedule for updates.
+              Office hours may change during finals week. Please check the
+              online schedule for updates.
             </p>
           </div>
         </div>
@@ -211,9 +225,7 @@ export const NestedDialogs: Story = {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Second Dialog</DialogTitle>
-                <DialogDescription>
-                  This is a nested dialog.
-                </DialogDescription>
+                <DialogDescription>This is a nested dialog.</DialogDescription>
               </DialogHeader>
               <DialogFooter>
                 <DialogClose asChild>
@@ -242,43 +254,44 @@ export const LongContentDialog: Story = {
       <DialogContent className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Terms of Service</DialogTitle>
-          <DialogDescription>
-            Last updated: January 1, 2024
-          </DialogDescription>
+          <DialogDescription>Last updated: January 1, 2024</DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div>
             <h3 className="font-medium mb-2">1. Acceptance of Terms</h3>
             <p className="text-sm text-gray-600">
-              By accessing and using this service, you accept and agree to be bound by the terms 
-              and provision of this agreement. If you do not agree to abide by the above, please 
-              do not use this service.
+              By accessing and using this service, you accept and agree to be
+              bound by the terms and provision of this agreement. If you do not
+              agree to abide by the above, please do not use this service.
             </p>
           </div>
           <div>
             <h3 className="font-medium mb-2">2. Use License</h3>
             <p className="text-sm text-gray-600">
-              Permission is granted to temporarily download one copy of the materials (information 
-              or software) on our website for personal, non-commercial transitory viewing only. 
-              This is the grant of a license, not a transfer of title.
+              Permission is granted to temporarily download one copy of the
+              materials (information or software) on our website for personal,
+              non-commercial transitory viewing only. This is the grant of a
+              license, not a transfer of title.
             </p>
           </div>
           <div>
             <h3 className="font-medium mb-2">3. Disclaimer</h3>
             <p className="text-sm text-gray-600">
-              The materials on our website are provided on an 'as is' basis. We make no warranties, 
-              expressed or implied, and hereby disclaim and negate all other warranties including, 
-              without limitation, implied warranties or conditions of merchantability, fitness for 
-              a particular purpose, or non-infringement of intellectual property or other violation 
-              of rights.
+              The materials on our website are provided on an 'as is' basis. We
+              make no warranties, expressed or implied, and hereby disclaim and
+              negate all other warranties including, without limitation, implied
+              warranties or conditions of merchantability, fitness for a
+              particular purpose, or non-infringement of intellectual property
+              or other violation of rights.
             </p>
           </div>
           <div>
             <h3 className="font-medium mb-2">4. Limitations</h3>
             <p className="text-sm text-gray-600">
-              In no event shall our company or its suppliers be liable for any damages (including, 
-              without limitation, damages for loss of data or profit, or due to business interruption) 
-              arising out of the use or inability to use the materials on our website.
+              In no event shall our company or its suppliers be liable for any
+              damages (including, without limitation, damages for loss of data
+              or profit, or due to business interruption) arising out of the use
+              or inability to use the materials on our website.
             </p>
           </div>
         </div>
@@ -321,7 +334,7 @@ export const CustomStyling: Story = {
 
 export const DarkMode: Story = {
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story) => (
@@ -337,7 +350,9 @@ export const DarkMode: Story = {
       </DialogTrigger>
       <DialogContent className="dark:bg-gray-800 dark:border-gray-700">
         <DialogHeader>
-          <DialogTitle className="dark:text-white">Dark Mode Dialog</DialogTitle>
+          <DialogTitle className="dark:text-white">
+            Dark Mode Dialog
+          </DialogTitle>
           <DialogDescription className="dark:text-gray-400">
             This dialog is styled for dark mode.
           </DialogDescription>
@@ -349,7 +364,10 @@ export const DarkMode: Story = {
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline" className="dark:border-gray-600 dark:text-gray-300">
+            <Button
+              variant="outline"
+              className="dark:border-gray-600 dark:text-gray-300"
+            >
               Cancel
             </Button>
           </DialogClose>

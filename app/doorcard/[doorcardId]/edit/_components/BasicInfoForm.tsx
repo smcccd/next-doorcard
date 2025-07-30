@@ -43,7 +43,7 @@ const rules: Record<
 
 function validateField(
   key: keyof FieldErrors,
-  value: string,
+  value: string
 ): string | undefined {
   const v = value.trim();
   if (!v) return `${rules[key].label} is required`;
@@ -72,7 +72,7 @@ export default function BasicInfoForm({ doorcard }: Props) {
 
   const [state, action] = useActionState(
     updateBasicInfo.bind(null, doorcard.id),
-    { success: true } as { success: boolean; message?: string },
+    { success: true } as { success: boolean; message?: string }
   );
 
   const handleChange = (field: keyof FieldErrors, value: string) => {

@@ -89,7 +89,8 @@
 | tempfontcolor  | →   | -            | ② No template model in new schema |
 | temptablecolor | →   | -            | ② No template model in new schema |
 
-**Note:** Template data has no corresponding model in the new schema. This data will be lost unless a Template model is added.
+**Note:** Template data has no corresponding model in the new schema. This data
+will be lost unless a Template model is added.
 
 ---
 

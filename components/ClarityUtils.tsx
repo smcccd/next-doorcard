@@ -50,7 +50,7 @@ export const ClarityUtils = {
     customId: string,
     sessionId?: string,
     pageId?: string,
-    friendlyName?: string,
+    friendlyName?: string
   ) => {
     if (typeof window !== "undefined") {
       try {

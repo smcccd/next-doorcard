@@ -154,7 +154,7 @@ describe("API Utils", () => {
         mockPrisma.doorcardDraft.findUnique.mockResolvedValue(null);
 
         await expect(draftService.getOne(userId, draftId)).rejects.toThrow(
-          "Draft not found",
+          "Draft not found"
         );
       });
     });
@@ -270,7 +270,7 @@ describe("API Utils", () => {
 
         const result = await draftService.getByOriginalDoorcard(
           userId,
-          originalDoorcardId,
+          originalDoorcardId
         );
 
         expect(mockPrisma.doorcardDraft.findMany).toHaveBeenCalledWith({
@@ -290,7 +290,7 @@ describe("API Utils", () => {
 
         const result = await draftService.deleteByOriginalDoorcard(
           userId,
-          originalDoorcardId,
+          originalDoorcardId
         );
 
         expect(mockPrisma.doorcardDraft.deleteMany).toHaveBeenCalledWith({

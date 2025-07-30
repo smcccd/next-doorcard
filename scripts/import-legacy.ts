@@ -157,7 +157,7 @@ function extractTimeFromDateTime(dateTimeStr: string): string {
     if (timeParts.length >= 2) {
       return `${timeParts[0].padStart(2, "0")}:${timeParts[1].padStart(
         2,
-        "0",
+        "0"
       )}`;
     }
   }
@@ -208,7 +208,7 @@ function extractLocation(appointmentName: string): string | null {
 async function processUsers(
   filePath: string,
   dryRun: boolean,
-  rejects: RejectedRow[],
+  rejects: RejectedRow[]
 ) {
   console.log("\n📤 Processing Users...");
   const defaultPassword = await bcrypt.hash("changeme123", 10);
@@ -230,7 +230,7 @@ async function processUsers(
         for (let i = 0; i < rows.length; i += batchSize) {
           const batch = rows.slice(i, i + batchSize);
           console.log(
-            `📤 Processing users batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(rows.length / batchSize)}`,
+            `📤 Processing users batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(rows.length / batchSize)}`
           );
 
           const validUsers = [];
@@ -253,7 +253,7 @@ async function processUsers(
                 });
               } else {
                 console.log(
-                  `[DRY RUN] Would create/update user: ${row.username} (${email})`,
+                  `[DRY RUN] Would create/update user: ${row.username} (${email})`
                 );
               }
             } catch (error) {
@@ -291,7 +291,7 @@ async function processUsers(
             } catch (error) {
               console.error(
                 `❌ Batch insert failed for users batch ${Math.floor(i / batchSize) + 1}:`,
-                error,
+                error
               );
               // Fall back to individual inserts for this batch
               for (const userData of validUsers) {
@@ -325,7 +325,7 @@ async function processUsers(
         }
 
         console.log(
-          `✅ Users: Processed ${processed}, Created/Updated ${created}`,
+          `✅ Users: Processed ${processed}, Created/Updated ${created}`
         );
         resolve();
       })
@@ -354,7 +354,7 @@ async function processCategories(filePath: string) {
 async function processDoorcards(
   filePath: string,
   dryRun: boolean,
-  rejects: RejectedRow[],
+  rejects: RejectedRow[]
 ) {
   console.log("\n📤 Processing Doorcards...");
   let processed = 0;
@@ -419,7 +419,7 @@ async function processDoorcards(
               // });
             } else {
               console.log(
-                `[DRY RUN] Would create doorcard: ${row.doorcardname} (${season} ${year})`,
+                `[DRY RUN] Would create doorcard: ${row.doorcardname} (${season} ${year})`
               );
             }
           } catch (error) {
@@ -437,13 +437,13 @@ async function processDoorcards(
             let created = 0;
 
             console.log(
-              `📊 Processing ${validDoorcards.length} doorcards in batches of ${batchSize}...`,
+              `📊 Processing ${validDoorcards.length} doorcards in batches of ${batchSize}...`
             );
 
             for (let i = 0; i < validDoorcards.length; i += batchSize) {
               const batch = validDoorcards.slice(i, i + batchSize);
               console.log(
-                `📤 Processing doorcards batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validDoorcards.length / batchSize)} (${batch.length} doorcards)`,
+                `📤 Processing doorcards batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validDoorcards.length / batchSize)} (${batch.length} doorcards)`
               );
 
               // Create doorcards individually to get IDs for mapping
@@ -483,7 +483,7 @@ async function processDoorcards(
             // }
 
             console.log(
-              `✅ Doorcards: Processed ${processed}, Created ${created}`,
+              `✅ Doorcards: Processed ${processed}, Created ${created}`
             );
           } catch (error) {
             console.error(`❌ Batch processing failed for doorcards:`, error);
@@ -501,7 +501,7 @@ async function processDoorcards(
 async function processAppointments(
   filePath: string,
   dryRun: boolean,
-  rejects: RejectedRow[],
+  rejects: RejectedRow[]
 ) {
   console.log("\n📤 Processing Appointments...");
   let processed = 0;
@@ -526,7 +526,7 @@ async function processAppointments(
             // Check if username is valid (not empty)
             if (!row.username || !row.username.trim()) {
               throw new Error(
-                `Empty username for appointment: ${row.appointname}`,
+                `Empty username for appointment: ${row.appointname}`
               );
             }
 
@@ -562,12 +562,12 @@ async function processAppointments(
                 placeholdersCreated++;
               } else {
                 console.log(
-                  `[DRY RUN] Would create placeholder doorcard for ID: ${row.doorcardID}`,
+                  `[DRY RUN] Would create placeholder doorcard for ID: ${row.doorcardID}`
                 );
                 // In dry run, still add to map for further processing
                 doorcardIdMap.set(
                   row.doorcardID,
-                  `dummy-doorcard-${row.doorcardID}`,
+                  `dummy-doorcard-${row.doorcardID}`
                 );
                 doorcardId = `dummy-doorcard-${row.doorcardID}`;
               }
@@ -601,7 +601,7 @@ async function processAppointments(
               });
             } else {
               console.log(
-                `[DRY RUN] Would create appointment: ${row.appointname} on ${row.appointday}`,
+                `[DRY RUN] Would create appointment: ${row.appointname} on ${row.appointday}`
               );
             }
           } catch (error) {
@@ -619,13 +619,13 @@ async function processAppointments(
             let created = 0;
 
             console.log(
-              `📊 Processing ${validAppointments.length} appointments in batches of ${batchSize}...`,
+              `📊 Processing ${validAppointments.length} appointments in batches of ${batchSize}...`
             );
 
             for (let i = 0; i < validAppointments.length; i += batchSize) {
               const batch = validAppointments.slice(i, i + batchSize);
               console.log(
-                `📤 Processing appointments batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validAppointments.length / batchSize)} (${batch.length} appointments)`,
+                `📤 Processing appointments batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validAppointments.length / batchSize)} (${batch.length} appointments)`
               );
 
               try {
@@ -640,17 +640,17 @@ async function processAppointments(
             }
 
             console.log(
-              `✅ Appointments: Processed ${processed}, Created ${created}`,
+              `✅ Appointments: Processed ${processed}, Created ${created}`
             );
             if (placeholdersCreated > 0) {
               console.log(
-                `📝 Created ${placeholdersCreated} placeholder doorcards for missing legacy data`,
+                `📝 Created ${placeholdersCreated} placeholder doorcards for missing legacy data`
               );
             }
           } catch (error) {
             console.error(
               `❌ Batch processing failed for appointments:`,
-              error,
+              error
             );
           }
         } else if (dryRun) {
@@ -679,7 +679,7 @@ async function writeRejects(rejects: RejectedRow[]) {
       acc[reject.file].push(reject);
       return acc;
     },
-    {} as Record<string, RejectedRow[]>,
+    {} as Record<string, RejectedRow[]>
   );
 
   for (const [file, fileRejects] of Object.entries(rejectsByFile)) {
@@ -703,7 +703,7 @@ async function writeRejects(rejects: RejectedRow[]) {
 
 // Extract all unique usernames from doorcard data
 async function extractUsernamesFromDoorcards(
-  filePath: string,
+  filePath: string
 ): Promise<Set<string>> {
   return new Promise((resolve, reject) => {
     const usernames = new Set<string>();
@@ -717,7 +717,7 @@ async function extractUsernamesFromDoorcards(
       })
       .on("end", () => {
         console.log(
-          `📊 Found ${usernames.size} unique usernames in doorcard data`,
+          `📊 Found ${usernames.size} unique usernames in doorcard data`
         );
         resolve(usernames);
       })
@@ -727,7 +727,7 @@ async function extractUsernamesFromDoorcards(
 
 // Extract all unique usernames from appointment data
 async function extractUsernamesFromAppointments(
-  filePath: string,
+  filePath: string
 ): Promise<Set<string>> {
   return new Promise((resolve, reject) => {
     const usernames = new Set<string>();
@@ -741,7 +741,7 @@ async function extractUsernamesFromAppointments(
       })
       .on("end", () => {
         console.log(
-          `📊 Found ${usernames.size} unique usernames in appointment data`,
+          `📊 Found ${usernames.size} unique usernames in appointment data`
         );
         resolve(usernames);
       })
@@ -753,13 +753,13 @@ async function extractUsernamesFromAppointments(
 async function createMissingUsers(
   usernames: Set<string>,
   dryRun: boolean,
-  rejects: RejectedRow[],
+  rejects: RejectedRow[]
 ) {
   console.log("\n📤 Creating missing users from doorcard data...");
   const defaultPassword = await bcrypt.hash("changeme123", 10);
 
   const missingUsernames = Array.from(usernames).filter(
-    (username) => !userIdMap.has(username),
+    (username) => !userIdMap.has(username)
   );
   console.log(`📊 Creating ${missingUsernames.length} missing users...`);
 
@@ -767,7 +767,7 @@ async function createMissingUsers(
     for (const username of missingUsernames) {
       const email = generateEmail(username);
       console.log(
-        `[DRY RUN] Would create missing user: ${username} (${email})`,
+        `[DRY RUN] Would create missing user: ${username} (${email})`
       );
       userIdMap.set(username, `dummy-id-${username}`);
     }
@@ -801,13 +801,13 @@ async function createMissingUsers(
     let created = 0;
 
     console.log(
-      `📊 Processing ${validUsers.length} users in batches of ${batchSize}...`,
+      `📊 Processing ${validUsers.length} users in batches of ${batchSize}...`
     );
 
     for (let i = 0; i < validUsers.length; i += batchSize) {
       const batch = validUsers.slice(i, i + batchSize);
       console.log(
-        `📤 Processing users batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validUsers.length / batchSize)} (${batch.length} users)`,
+        `📤 Processing users batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(validUsers.length / batchSize)} (${batch.length} users)`
       );
 
       try {
@@ -861,7 +861,7 @@ async function importLegacyData(options: { dryRun: boolean }) {
 
     // Skip TBL_USER (AD data) - create users from legacy app data only
     console.log(
-      "⚠️  Skipping TBL_USER.csv (AD data) - creating users from legacy app data",
+      "⚠️  Skipping TBL_USER.csv (AD data) - creating users from legacy app data"
     );
 
     // Extract usernames from doorcard data and appointments
@@ -878,7 +878,7 @@ async function importLegacyData(options: { dryRun: boolean }) {
       ...appointmentUsernames,
     ]);
     console.log(
-      `📊 Found ${allUsernames.size} total unique usernames in legacy app data`,
+      `📊 Found ${allUsernames.size} total unique usernames in legacy app data`
     );
 
     await createMissingUsers(allUsernames, options.dryRun, rejects);

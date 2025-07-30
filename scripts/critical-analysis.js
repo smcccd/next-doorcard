@@ -31,25 +31,25 @@ async function criticalAnalysis() {
 
   console.log("📊 IMPORT SUCCESS RATES:");
   console.log(
-    `Doorcards: ${doorcardSuccessRate}% success (${sourceFiles.doorcards - rejectFiles.doorcards} of ${sourceFiles.doorcards})`,
+    `Doorcards: ${doorcardSuccessRate}% success (${sourceFiles.doorcards - rejectFiles.doorcards} of ${sourceFiles.doorcards})`
   );
   console.log(
-    `Appointments: ${appointmentSuccessRate}% success (${sourceFiles.appointments - rejectFiles.appointments} of ${sourceFiles.appointments})`,
+    `Appointments: ${appointmentSuccessRate}% success (${sourceFiles.appointments - rejectFiles.appointments} of ${sourceFiles.appointments})`
   );
   console.log(`Users: Only 2 users in source file (critical issue)`);
 
   console.log("\n🚨 CRITICAL PROBLEMS IDENTIFIED:");
   console.log(
-    "1. CATASTROPHIC APPOINTMENT FAILURE: 0 appointments imported despite 95.2% success rate",
+    "1. CATASTROPHIC APPOINTMENT FAILURE: 0 appointments imported despite 95.2% success rate"
   );
   console.log(
-    "2. MASSIVE USER DATA MISSING: Only 2 users in source, but 1000+ unique usernames in doorcards",
+    "2. MASSIVE USER DATA MISSING: Only 2 users in source, but 1000+ unique usernames in doorcards"
   );
   console.log(
-    "3. FOREIGN KEY VIOLATIONS: Almost all rejections due to missing users",
+    "3. FOREIGN KEY VIOLATIONS: Almost all rejections due to missing users"
   );
   console.log(
-    "4. DATA INTEGRITY COMPROMISE: Doorcards exist without valid appointments",
+    "4. DATA INTEGRITY COMPROMISE: Doorcards exist without valid appointments"
   );
 
   // Quick analysis of rejection patterns
@@ -65,7 +65,7 @@ async function criticalAnalysis() {
   const appointmentRejects = [];
   await new Promise((resolve, reject) => {
     fs.createReadStream(
-      "/Users/besnyib/next-doorcard/rejects/TBL_APPOINTMENT.csv",
+      "/Users/besnyib/next-doorcard/rejects/TBL_APPOINTMENT.csv"
     )
       .pipe(parse({ headers: true }))
       .on("data", (row) => appointmentRejects.push(row))
@@ -84,7 +84,7 @@ async function criticalAnalysis() {
   console.log(`\n👥 MISSING USER ANALYSIS:`);
   console.log(`Unique missing usernames: ${missingUsers.size}`);
   console.log(
-    `Empty usernames in appointments: ${appointmentRejects.filter((r) => !r.username || r.username.trim() === "").length}`,
+    `Empty usernames in appointments: ${appointmentRejects.filter((r) => !r.username || r.username.trim() === "").length}`
   );
 
   // Check appointment rejection reasons
@@ -101,14 +101,14 @@ async function criticalAnalysis() {
     .slice(0, 5)
     .forEach(([reason, count]) => {
       console.log(
-        `  ${reason}: ${count} (${((count / appointmentRejects.length) * 100).toFixed(1)}%)`,
+        `  ${reason}: ${count} (${((count / appointmentRejects.length) * 100).toFixed(1)}%)`
       );
     });
 
   console.log("\n⚠️  IMMEDIATE ACTIONS REQUIRED FOR PRODUCTION:");
   console.log("1. STOP MIGRATION - appointment import completely failed");
   console.log(
-    "2. Obtain complete user dataset - current user file is incomplete",
+    "2. Obtain complete user dataset - current user file is incomplete"
   );
   console.log("3. Fix appointment-to-user linking logic");
   console.log("4. Implement comprehensive error handling");

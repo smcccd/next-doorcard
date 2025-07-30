@@ -34,7 +34,7 @@ async function checkAvailableData() {
 
     availableTerms.forEach((item) => {
       console.log(
-        `${item.term} ${item.year}: ${item.doorcard_count} total doorcards (${item.active_count} active)`,
+        `${item.term} ${item.year}: ${item.doorcard_count} total doorcards (${item.active_count} active)`
       );
     });
 
@@ -59,7 +59,7 @@ async function checkAvailableData() {
     availableCampuses.forEach((item) => {
       const campus = item.college || "NO_CAMPUS";
       console.log(
-        `${campus}: ${item.doorcard_count} doorcards, ${item.user_count} users`,
+        `${campus}: ${item.doorcard_count} doorcards, ${item.user_count} users`
       );
     });
 
@@ -102,7 +102,7 @@ async function checkAvailableData() {
       const campus = item.college || "NO_CAMPUS";
       const status = item.is_active ? "ACTIVE" : "INACTIVE";
       console.log(
-        `${(index + 1).toString().padStart(2)}. ${item.term} ${item.year} | ${campus} | ${status} | ${item.created_at.toISOString().split("T")[0]}`,
+        `${(index + 1).toString().padStart(2)}. ${item.term} ${item.year} | ${campus} | ${status} | ${item.created_at.toISOString().split("T")[0]}`
       );
     });
   } catch (error) {

@@ -1,23 +1,23 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import React from 'react';
-import { Checkbox } from './checkbox';
-import { Label } from './label';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import React from "react";
+import { Checkbox } from "./checkbox";
+import { Label } from "./label";
 
 const meta = {
-  title: 'UI/Checkbox',
+  title: "UI/Checkbox",
   component: Checkbox,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     checked: {
-      control: { type: 'boolean' },
-      description: 'The controlled checked state of the checkbox',
+      control: { type: "boolean" },
+      description: "The controlled checked state of the checkbox",
     },
     disabled: {
-      control: { type: 'boolean' },
-      description: 'Whether the checkbox is disabled',
+      control: { type: "boolean" },
+      description: "Whether the checkbox is disabled",
     },
   },
 } satisfies Meta<typeof Checkbox>;
@@ -53,11 +53,15 @@ export const States: Story = {
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox id="disabled" disabled />
-        <Label htmlFor="disabled" className="opacity-50">Disabled</Label>
+        <Label htmlFor="disabled" className="opacity-50">
+          Disabled
+        </Label>
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox id="disabled-checked" disabled defaultChecked />
-        <Label htmlFor="disabled-checked" className="opacity-50">Disabled Checked</Label>
+        <Label htmlFor="disabled-checked" className="opacity-50">
+          Disabled Checked
+        </Label>
       </div>
     </div>
   ),
@@ -70,25 +74,37 @@ export const FormExample: Story = {
       <div className="space-y-3">
         <div className="flex items-center space-x-2">
           <Checkbox id="marketing" defaultChecked />
-          <Label htmlFor="marketing" className="text-sm font-normal cursor-pointer">
+          <Label
+            htmlFor="marketing"
+            className="text-sm font-normal cursor-pointer"
+          >
             Send me marketing emails
           </Label>
         </div>
         <div className="flex items-center space-x-2">
           <Checkbox id="updates" defaultChecked />
-          <Label htmlFor="updates" className="text-sm font-normal cursor-pointer">
+          <Label
+            htmlFor="updates"
+            className="text-sm font-normal cursor-pointer"
+          >
             Send me product updates
           </Label>
         </div>
         <div className="flex items-center space-x-2">
           <Checkbox id="newsletter" />
-          <Label htmlFor="newsletter" className="text-sm font-normal cursor-pointer">
+          <Label
+            htmlFor="newsletter"
+            className="text-sm font-normal cursor-pointer"
+          >
             Subscribe to newsletter
           </Label>
         </div>
         <div className="flex items-center space-x-2">
           <Checkbox id="notifications" defaultChecked />
-          <Label htmlFor="notifications" className="text-sm font-normal cursor-pointer">
+          <Label
+            htmlFor="notifications"
+            className="text-sm font-normal cursor-pointer"
+          >
             Enable push notifications
           </Label>
         </div>
@@ -106,28 +122,43 @@ export const ProfileSettings: Story = {
           <div className="flex items-start space-x-2">
             <Checkbox id="public-profile" className="mt-0.5" />
             <div>
-              <Label htmlFor="public-profile" className="text-sm font-medium cursor-pointer">
+              <Label
+                htmlFor="public-profile"
+                className="text-sm font-medium cursor-pointer"
+              >
                 Make my profile public
               </Label>
-              <p className="text-sm text-gray-500">Allow other users to see your profile information</p>
+              <p className="text-sm text-gray-500">
+                Allow other users to see your profile information
+              </p>
             </div>
           </div>
           <div className="flex items-start space-x-2">
             <Checkbox id="show-email" className="mt-0.5" />
             <div>
-              <Label htmlFor="show-email" className="text-sm font-medium cursor-pointer">
+              <Label
+                htmlFor="show-email"
+                className="text-sm font-medium cursor-pointer"
+              >
                 Show email address
               </Label>
-              <p className="text-sm text-gray-500">Display your email on your public profile</p>
+              <p className="text-sm text-gray-500">
+                Display your email on your public profile
+              </p>
             </div>
           </div>
           <div className="flex items-start space-x-2">
             <Checkbox id="show-office" className="mt-0.5" defaultChecked />
             <div>
-              <Label htmlFor="show-office" className="text-sm font-medium cursor-pointer">
+              <Label
+                htmlFor="show-office"
+                className="text-sm font-medium cursor-pointer"
+              >
                 Show office hours
               </Label>
-              <p className="text-sm text-gray-500">Make your office hours visible to students</p>
+              <p className="text-sm text-gray-500">
+                Make your office hours visible to students
+              </p>
             </div>
           </div>
         </div>
@@ -143,7 +174,8 @@ export const Required: Story = {
         <Checkbox id="agree" required />
         <div>
           <Label htmlFor="agree" className="text-sm font-medium cursor-pointer">
-            I agree to the terms and conditions <span className="text-red-500">*</span>
+            I agree to the terms and conditions{" "}
+            <span className="text-red-500">*</span>
           </Label>
           <p className="text-sm text-gray-500">You must agree to continue</p>
         </div>
@@ -157,7 +189,11 @@ export const Required: Story = {
 
 export const IndeterminateState: Story = {
   render: () => {
-    const [checkedItems, setCheckedItems] = React.useState([true, false, false]);
+    const [checkedItems, setCheckedItems] = React.useState([
+      true,
+      false,
+      false,
+    ]);
     const allChecked = checkedItems.every(Boolean);
     const isIndeterminate = checkedItems.some(Boolean) && !allChecked;
 
@@ -166,9 +202,15 @@ export const IndeterminateState: Story = {
         <div className="flex items-center space-x-2 pb-2 border-b">
           <Checkbox
             id="select-all"
-            checked={allChecked ? true : isIndeterminate ? "indeterminate" : false}
+            checked={
+              allChecked ? true : isIndeterminate ? "indeterminate" : false
+            }
             onCheckedChange={(checked) => {
-              setCheckedItems([checked === true, checked === true, checked === true]);
+              setCheckedItems([
+                checked === true,
+                checked === true,
+                checked === true,
+              ]);
             }}
           />
           <Label htmlFor="select-all" className="font-medium cursor-pointer">
@@ -186,7 +228,9 @@ export const IndeterminateState: Story = {
                 setCheckedItems(newItems);
               }}
             />
-            <Label htmlFor="item-1" className="cursor-pointer">Item 1</Label>
+            <Label htmlFor="item-1" className="cursor-pointer">
+              Item 1
+            </Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -198,7 +242,9 @@ export const IndeterminateState: Story = {
                 setCheckedItems(newItems);
               }}
             />
-            <Label htmlFor="item-2" className="cursor-pointer">Item 2</Label>
+            <Label htmlFor="item-2" className="cursor-pointer">
+              Item 2
+            </Label>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -210,7 +256,9 @@ export const IndeterminateState: Story = {
                 setCheckedItems(newItems);
               }}
             />
-            <Label htmlFor="item-3" className="cursor-pointer">Item 3</Label>
+            <Label htmlFor="item-3" className="cursor-pointer">
+              Item 3
+            </Label>
           </div>
         </div>
       </div>
@@ -222,7 +270,10 @@ export const CustomStyling: Story = {
   render: () => (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
-        <Checkbox id="custom-1" className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600" />
+        <Checkbox
+          id="custom-1"
+          className="data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+        />
         <Label htmlFor="custom-1">Green checkbox</Label>
       </div>
       <div className="flex items-center space-x-2">
@@ -239,7 +290,7 @@ export const CustomStyling: Story = {
 
 export const DarkMode: Story = {
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story) => (
@@ -252,15 +303,21 @@ export const DarkMode: Story = {
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
         <Checkbox id="dark-1" />
-        <Label htmlFor="dark-1" className="dark:text-gray-200">Dark mode checkbox</Label>
+        <Label htmlFor="dark-1" className="dark:text-gray-200">
+          Dark mode checkbox
+        </Label>
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox id="dark-2" defaultChecked />
-        <Label htmlFor="dark-2" className="dark:text-gray-200">Checked in dark mode</Label>
+        <Label htmlFor="dark-2" className="dark:text-gray-200">
+          Checked in dark mode
+        </Label>
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox id="dark-3" disabled />
-        <Label htmlFor="dark-3" className="dark:text-gray-400">Disabled in dark mode</Label>
+        <Label htmlFor="dark-3" className="dark:text-gray-400">
+          Disabled in dark mode
+        </Label>
       </div>
     </div>
   ),

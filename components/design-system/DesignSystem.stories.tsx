@@ -10,7 +10,8 @@ const meta: Meta = {
     layout: "padded",
     docs: {
       description: {
-        component: "Complete color palette and typography system for the Next Doorcard application.",
+        component:
+          "Complete color palette and typography system for the Next Doorcard application.",
       },
     },
   },
@@ -24,7 +25,7 @@ export const ColorPalette: Story = {
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-bold mb-6">Color Palette</h2>
-        
+
         {/* Primary Colors */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4">Primary Colors</h3>
@@ -198,7 +199,7 @@ export const Typography: Story = {
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-bold mb-6">Typography System</h2>
-        
+
         {/* Font Families */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4">Font Families</h3>
@@ -206,18 +207,30 @@ export const Typography: Story = {
             <Card>
               <CardContent className="pt-6">
                 <div className="font-sans">
-                  <div className="text-sm text-gray-500 mb-2">Inter (Primary)</div>
-                  <div className="text-lg">The quick brown fox jumps over the lazy dog</div>
-                  <div className="text-sm text-gray-600 mt-2">Used for UI elements, body text, and general content</div>
+                  <div className="text-sm text-gray-500 mb-2">
+                    Inter (Primary)
+                  </div>
+                  <div className="text-lg">
+                    The quick brown fox jumps over the lazy dog
+                  </div>
+                  <div className="text-sm text-gray-600 mt-2">
+                    Used for UI elements, body text, and general content
+                  </div>
                 </div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="pt-6">
-                <div style={{ fontFamily: 'Source Sans 3' }}>
-                  <div className="text-sm text-gray-500 mb-2">Source Sans 3 (Secondary)</div>
-                  <div className="text-lg">The quick brown fox jumps over the lazy dog</div>
-                  <div className="text-sm text-gray-600 mt-2">Used for headings and display text</div>
+                <div style={{ fontFamily: "Source Sans 3" }}>
+                  <div className="text-sm text-gray-500 mb-2">
+                    Source Sans 3 (Secondary)
+                  </div>
+                  <div className="text-lg">
+                    The quick brown fox jumps over the lazy dog
+                  </div>
+                  <div className="text-sm text-gray-600 mt-2">
+                    Used for headings and display text
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -229,24 +242,38 @@ export const Typography: Story = {
           <h3 className="text-lg font-semibold mb-4">Heading Styles</h3>
           <div className="space-y-4">
             <div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold">Heading 1 - Hero</h1>
-              <div className="text-sm text-gray-500 mt-1">text-4xl sm:text-5xl lg:text-6xl font-bold</div>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold">
+                Heading 1 - Hero
+              </h1>
+              <div className="text-sm text-gray-500 mt-1">
+                text-4xl sm:text-5xl lg:text-6xl font-bold
+              </div>
             </div>
             <div>
               <h2 className="text-2xl font-bold">Heading 2 - Section</h2>
-              <div className="text-sm text-gray-500 mt-1">text-2xl font-bold</div>
+              <div className="text-sm text-gray-500 mt-1">
+                text-2xl font-bold
+              </div>
             </div>
             <div>
               <h3 className="text-xl font-semibold">Heading 3 - Subsection</h3>
-              <div className="text-sm text-gray-500 mt-1">text-xl font-semibold</div>
+              <div className="text-sm text-gray-500 mt-1">
+                text-xl font-semibold
+              </div>
             </div>
             <div>
               <h4 className="text-lg font-semibold">Heading 4 - Card Title</h4>
-              <div className="text-sm text-gray-500 mt-1">text-lg font-semibold</div>
+              <div className="text-sm text-gray-500 mt-1">
+                text-lg font-semibold
+              </div>
             </div>
             <div>
-              <h5 className="text-base font-semibold">Heading 5 - Small Title</h5>
-              <div className="text-sm text-gray-500 mt-1">text-base font-semibold</div>
+              <h5 className="text-base font-semibold">
+                Heading 5 - Small Title
+              </h5>
+              <div className="text-sm text-gray-500 mt-1">
+                text-base font-semibold
+              </div>
             </div>
           </div>
         </div>
@@ -256,19 +283,30 @@ export const Typography: Story = {
           <h3 className="text-lg font-semibold mb-4">Body Text</h3>
           <div className="space-y-4">
             <div>
-              <p className="text-xl sm:text-2xl text-blue-100">Large Body Text - Hero Description</p>
-              <div className="text-sm text-gray-500 mt-1">text-xl sm:text-2xl</div>
+              <p className="text-xl sm:text-2xl text-blue-100">
+                Large Body Text - Hero Description
+              </p>
+              <div className="text-sm text-gray-500 mt-1">
+                text-xl sm:text-2xl
+              </div>
             </div>
             <div>
-              <p className="text-base">Regular Body Text - Standard paragraph content for most use cases.</p>
+              <p className="text-base">
+                Regular Body Text - Standard paragraph content for most use
+                cases.
+              </p>
               <div className="text-sm text-gray-500 mt-1">text-base</div>
             </div>
             <div>
-              <p className="text-sm">Small Body Text - Secondary information and metadata.</p>
+              <p className="text-sm">
+                Small Body Text - Secondary information and metadata.
+              </p>
               <div className="text-sm text-gray-500 mt-1">text-sm</div>
             </div>
             <div>
-              <p className="text-xs">Extra Small Text - Fine print and labels.</p>
+              <p className="text-xs">
+                Extra Small Text - Fine print and labels.
+              </p>
               <div className="text-sm text-gray-500 mt-1">text-xs</div>
             </div>
           </div>
@@ -278,13 +316,27 @@ export const Typography: Story = {
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4">Text Colors</h3>
           <div className="space-y-3">
-            <div className="text-gray-900 dark:text-white">Primary text color - Main content</div>
-            <div className="text-gray-700 dark:text-gray-100">Secondary text color - Supporting content</div>
-            <div className="text-gray-600 dark:text-gray-300">Muted text color - Less important information</div>
-            <div className="text-gray-500 dark:text-gray-400">Subtle text color - Metadata and labels</div>
-            <div className="text-blue-600 dark:text-blue-400">Link color - Interactive elements</div>
-            <div className="text-green-600 dark:text-green-400">Success color - Positive states</div>
-            <div className="text-red-600 dark:text-red-400">Error color - Error states</div>
+            <div className="text-gray-900 dark:text-white">
+              Primary text color - Main content
+            </div>
+            <div className="text-gray-700 dark:text-gray-100">
+              Secondary text color - Supporting content
+            </div>
+            <div className="text-gray-600 dark:text-gray-300">
+              Muted text color - Less important information
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">
+              Subtle text color - Metadata and labels
+            </div>
+            <div className="text-blue-600 dark:text-blue-400">
+              Link color - Interactive elements
+            </div>
+            <div className="text-green-600 dark:text-green-400">
+              Success color - Positive states
+            </div>
+            <div className="text-red-600 dark:text-red-400">
+              Error color - Error states
+            </div>
           </div>
         </div>
 
@@ -294,7 +346,9 @@ export const Typography: Story = {
           <div className="space-y-2">
             <div className="font-normal">Normal (400) - Regular body text</div>
             <div className="font-medium">Medium (500) - Emphasized text</div>
-            <div className="font-semibold">Semibold (600) - Section headings</div>
+            <div className="font-semibold">
+              Semibold (600) - Section headings
+            </div>
             <div className="font-bold">Bold (700) - Main headings</div>
           </div>
         </div>
@@ -307,7 +361,7 @@ export const TypographyInContext: Story = {
   render: () => (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold mb-6">Typography in Context</h2>
-      
+
       {/* Faculty Card Example */}
       <Card>
         <CardHeader>
@@ -361,10 +415,14 @@ export const TypographyInContext: Story = {
                 <span className="text-sm font-medium">Dashboard</span>
               </div>
               <div className="flex items-center gap-3 px-3 py-2">
-                <span className="text-sm font-medium text-blue-600 dark:text-blue-400">Profile</span>
+                <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                  Profile
+                </span>
               </div>
               <div className="flex items-center gap-3 px-3 py-2">
-                <span className="text-sm font-medium text-red-700 dark:text-red-400">Sign Out</span>
+                <span className="text-sm font-medium text-red-700 dark:text-red-400">
+                  Sign Out
+                </span>
               </div>
             </div>
           </div>
@@ -377,9 +435,11 @@ export const TypographyInContext: Story = {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">Form Typography</h4>
             <div className="space-y-2">
-              <label className="text-sm font-medium leading-none">First Name</label>
-              <input 
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm" 
+              <label className="text-sm font-medium leading-none">
+                First Name
+              </label>
+              <input
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm"
                 placeholder="Enter your first name"
               />
               <p className="text-xs text-gray-600 dark:text-gray-300">

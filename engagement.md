@@ -6,7 +6,11 @@
 
 ## Executive Summary
 
-The Faculty Doorcard Platform shows strong adoption across all three SMCCD campuses with **432 active faculty members** creating **720 doorcards** and scheduling **5,597 appointments** in recent terms. Skyline College leads in usage with 47.1% of all activity, while CSM and Cañada show balanced engagement at ~27-28% each.
+The Faculty Doorcard Platform shows strong adoption across all three SMCCD
+campuses with **432 active faculty members** creating **720 doorcards** and
+scheduling **5,597 appointments** in recent terms. Skyline College leads in
+usage with 47.1% of all activity, while CSM and Cañada show balanced engagement
+at ~27-28% each.
 
 ## Campus Distribution Analysis
 
@@ -22,43 +26,61 @@ The Faculty Doorcard Platform shows strong adoption across all three SMCCD campu
 ### Key Insights
 
 - **Skyline College** dominates with nearly half of all doorcard activity
-- **Engagement rates** are consistently high across all campuses (1.4-1.7 doorcards per user)
-- **Multi-campus faculty:** 20 users (4.6%) maintain doorcards at multiple campuses
+- **Engagement rates** are consistently high across all campuses (1.4-1.7
+  doorcards per user)
+- **Multi-campus faculty:** 20 users (4.6%) maintain doorcards at multiple
+  campuses
 - **Term participation:** Spring 2025 showed highest activity (340 faculty)
 
 ## Top 20 Beta Test Candidates
 
 ### Tier 1: Power Users (7+ Doorcards)
 
-1. **marquezr@smccd.edu** (Skyline) - 7 doorcards, 40 appointments - _All 3 terms_
+1. **marquezr@smccd.edu** (Skyline) - 7 doorcards, 40 appointments - _All 3
+   terms_
 
 ### Tier 2: Heavy Users (4-6 Doorcards)
 
-2. **mcclungk@smccd.edu** (Skyline) - 4 doorcards, 14 appointments - _All 3 terms_
-3. **jamesb@smccd.edu** (Skyline) - 4 doorcards, 4 appointments - _Fall 2024, Spring 2025_
-4. **zoughbies@smccd.edu** (Skyline) - 4 doorcards, 4 appointments - _All 3 terms_
+2. **mcclungk@smccd.edu** (Skyline) - 4 doorcards, 14 appointments - _All 3
+   terms_
+3. **jamesb@smccd.edu** (Skyline) - 4 doorcards, 4 appointments - _Fall 2024,
+   Spring 2025_
+4. **zoughbies@smccd.edu** (Skyline) - 4 doorcards, 4 appointments - _All 3
+   terms_
 
 ### Tier 3: Consistent Users (3 Doorcards, High Appointments)
 
 5. **liy@smccd.edu** (Skyline) - 3 doorcards, 37 appointments - _All 3 terms_
 6. **llamase@smccd.edu** (Cañada) - 3 doorcards, 36 appointments - _All 3 terms_
 7. **heine@smccd.edu** (Cañada) - 3 doorcards, 36 appointments - _All 3 terms_
-8. **piergrossij@smccd.edu** (Skyline) - 3 doorcards, 36 appointments - _All 3 terms_
+8. **piergrossij@smccd.edu** (Skyline) - 3 doorcards, 36 appointments - _All 3
+   terms_
 9. **travisk@smccd.edu** (CSM) - 3 doorcards, 34 appointments - _All 3 terms_
-10. **beltranh@smccd.edu** (Cañada) - 3 doorcards, 33 appointments - _All 3 terms_
+10. **beltranh@smccd.edu** (Cañada) - 3 doorcards, 33 appointments - _All 3
+    terms_
 
 ### Tier 4: Additional High-Engagement Users
 
-11. **allenr@smccd.edu** (Skyline) - 2 doorcards, 25 appointments - _Spring 2025, Summer 2025_
-12. **brownm@smccd.edu** (CSM) - 2 doorcards, 24 appointments - _Fall 2024, Spring 2025_
-13. **danielson@smccd.edu** (Cañada) - 2 doorcards, 23 appointments - _Fall 2024, Spring 2025_
-14. **fergusonm@smccd.edu** (Skyline) - 2 doorcards, 22 appointments - _All 3 terms_
-15. **gonzalezk@smccd.edu** (CSM) - 2 doorcards, 21 appointments - _Spring 2025, Summer 2025_
-16. **hicksg@smccd.edu** (Cañada) - 2 doorcards, 20 appointments - _Fall 2024, Spring 2025_
-17. **johnsonj@smccd.edu** (Skyline) - 2 doorcards, 19 appointments - _All 3 terms_
-18. **kramm@smccd.edu** (CSM) - 2 doorcards, 18 appointments - _Fall 2024, Spring 2025_
-19. **luckj@smccd.edu** (Skyline) - 2 doorcards, 17 appointments - _Spring 2025, Summer 2025_
-20. **mcdaniels@smccd.edu** (Cañada) - 2 doorcards, 16 appointments - _All 3 terms_
+11. **allenr@smccd.edu** (Skyline) - 2 doorcards, 25 appointments - _Spring
+    2025, Summer 2025_
+12. **brownm@smccd.edu** (CSM) - 2 doorcards, 24 appointments - _Fall 2024,
+    Spring 2025_
+13. **danielson@smccd.edu** (Cañada) - 2 doorcards, 23 appointments - _Fall
+    2024, Spring 2025_
+14. **fergusonm@smccd.edu** (Skyline) - 2 doorcards, 22 appointments - _All 3
+    terms_
+15. **gonzalezk@smccd.edu** (CSM) - 2 doorcards, 21 appointments - _Spring 2025,
+    Summer 2025_
+16. **hicksg@smccd.edu** (Cañada) - 2 doorcards, 20 appointments - _Fall 2024,
+    Spring 2025_
+17. **johnsonj@smccd.edu** (Skyline) - 2 doorcards, 19 appointments - _All 3
+    terms_
+18. **kramm@smccd.edu** (CSM) - 2 doorcards, 18 appointments - _Fall 2024,
+    Spring 2025_
+19. **luckj@smccd.edu** (Skyline) - 2 doorcards, 17 appointments - _Spring 2025,
+    Summer 2025_
+20. **mcdaniels@smccd.edu** (Cañada) - 2 doorcards, 16 appointments - _All 3
+    terms_
 
 ## Beta Testing Recommendations
 
@@ -66,13 +88,16 @@ The Faculty Doorcard Platform shows strong adoption across all three SMCCD campu
 
 - **Skyline:** 12 users (60%) - Reflects actual usage dominance
 - **CSM:** 4 users (20%) - Slightly below actual percentage for focused testing
-- **Cañada:** 4 users (20%) - Slightly below actual percentage for focused testing
+- **Cañada:** 4 users (20%) - Slightly below actual percentage for focused
+  testing
 
 ### User Characteristics
 
-- **Multi-term users preferred:** 85% of recommended users active across multiple terms
+- **Multi-term users preferred:** 85% of recommended users active across
+  multiple terms
 - **High appointment density:** Average 20+ appointments per user
-- **Diverse scheduling patterns:** Mix of office hours, classes, and lab sessions
+- **Diverse scheduling patterns:** Mix of office hours, classes, and lab
+  sessions
 - **Proven platform engagement:** All users demonstrate sustained usage
 
 ### Testing Focus Areas by User Type
@@ -123,7 +148,8 @@ The Faculty Doorcard Platform shows strong adoption across all three SMCCD campu
 
 - **Total system users:** 2,130 faculty accounts
 - **Active doorcard users:** 432 (20.3% adoption rate)
-- **User profile completeness:** 99.95% of users need campus assignment in profiles
+- **User profile completeness:** 99.95% of users need campus assignment in
+  profiles
 - **Campus management:** Handled at doorcard level, not user profile level
 
 ### Authentication & Access
@@ -159,4 +185,6 @@ The Faculty Doorcard Platform shows strong adoption across all three SMCCD campu
 
 ---
 
-**Next Steps:** Contact the recommended 20 faculty members to invite them to participate in the beta testing program, prioritizing Tier 1-2 users for early access and comprehensive testing scenarios.
+**Next Steps:** Contact the recommended 20 faculty members to invite them to
+participate in the beta testing program, prioritizing Tier 1-2 users for early
+access and comprehensive testing scenarios.

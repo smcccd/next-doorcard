@@ -7,7 +7,11 @@ import { PublicDoorcard } from "@/types/pages/public";
 import { College } from "@/types/doorcard";
 import CollegeLogo from "@/components/CollegeLogo";
 import { TermSeason } from "@prisma/client";
-import { isCurrentTerm, isPastTerm, formatTermDisplay } from "@/lib/active-term";
+import {
+  isCurrentTerm,
+  isPastTerm,
+  formatTermDisplay,
+} from "@/lib/active-term";
 import { ActiveTermInfo } from "@/lib/active-term";
 
 // College display names for badges
@@ -29,7 +33,11 @@ interface ProfessorCardProps {
   onClick: (doorcard: PublicDoorcard) => void;
 }
 
-export function ProfessorCard({ doorcard, activeTerm, onClick }: ProfessorCardProps) {
+export function ProfessorCard({
+  doorcard,
+  activeTerm,
+  onClick,
+}: ProfessorCardProps) {
   return (
     <Card
       className="cursor-pointer hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-500 transition-all duration-200 border-2 hover:bg-blue-50/30 dark:hover:bg-blue-900/30 dark:bg-gray-700 dark:border-gray-400"
@@ -53,22 +61,14 @@ export function ProfessorCard({ doorcard, activeTerm, onClick }: ProfessorCardPr
               <Badge
                 variant="outline"
                 className="ml-2 text-xs font-medium flex items-center gap-1.5"
-                title={
-                  COLLEGE_FULL_NAMES[
-                    doorcard.college as College
-                  ]
-                }
+                title={COLLEGE_FULL_NAMES[doorcard.college as College]}
               >
-                <CollegeLogo 
-                  college={doorcard.college as College} 
+                <CollegeLogo
+                  college={doorcard.college as College}
                   height={16}
                   className="flex-shrink-0"
                 />
-                {
-                  COLLEGE_BADGE_NAMES[
-                    doorcard.college as College
-                  ]
-                }
+                {COLLEGE_BADGE_NAMES[doorcard.college as College]}
               </Badge>
             )}
           </div>
@@ -94,18 +94,29 @@ export function ProfessorCard({ doorcard, activeTerm, onClick }: ProfessorCardPr
               <Calendar className="h-4 w-4 text-purple-500 dark:text-purple-400 flex-shrink-0" />
               <div className="flex items-center gap-2">
                 <span className="text-gray-700 dark:text-gray-100">
-                  {formatTermDisplay(doorcard.term as TermSeason, doorcard.year)}
+                  {formatTermDisplay(
+                    doorcard.term as TermSeason,
+                    doorcard.year
+                  )}
                 </span>
-                {activeTerm && isCurrentTerm(doorcard.term as TermSeason, doorcard.year) && (
-                  <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                    Current
-                  </Badge>
-                )}
-                {activeTerm && isPastTerm(doorcard.term as TermSeason, doorcard.year) && (
-                  <Badge variant="outline" className="text-xs px-2 py-0.5 text-gray-500 dark:text-gray-400">
-                    Past
-                  </Badge>
-                )}
+                {activeTerm &&
+                  isCurrentTerm(doorcard.term as TermSeason, doorcard.year) && (
+                    <Badge
+                      variant="secondary"
+                      className="text-xs px-2 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                    >
+                      Current
+                    </Badge>
+                  )}
+                {activeTerm &&
+                  isPastTerm(doorcard.term as TermSeason, doorcard.year) && (
+                    <Badge
+                      variant="outline"
+                      className="text-xs px-2 py-0.5 text-gray-500 dark:text-gray-400"
+                    >
+                      Past
+                    </Badge>
+                  )}
               </div>
             </div>
           </div>
@@ -134,22 +145,14 @@ export function ProfessorCard({ doorcard, activeTerm, onClick }: ProfessorCardPr
               <Badge
                 variant="outline"
                 className="ml-2 text-xs font-medium flex-shrink-0 flex items-center gap-1.5"
-                title={
-                  COLLEGE_FULL_NAMES[
-                    doorcard.college as College
-                  ]
-                }
+                title={COLLEGE_FULL_NAMES[doorcard.college as College]}
               >
-                <CollegeLogo 
-                  college={doorcard.college as College} 
+                <CollegeLogo
+                  college={doorcard.college as College}
                   height={14}
                   className="flex-shrink-0"
                 />
-                {
-                  COLLEGE_BADGE_NAMES[
-                    doorcard.college as College
-                  ]
-                }
+                {COLLEGE_BADGE_NAMES[doorcard.college as College]}
               </Badge>
             )}
           </div>
@@ -178,14 +181,21 @@ export function ProfessorCard({ doorcard, activeTerm, onClick }: ProfessorCardPr
               <div className="flex items-center gap-1">
                 <Calendar className="h-3 w-3 text-purple-500 dark:text-purple-400" />
                 <span className="text-gray-700 dark:text-gray-100">
-                  {formatTermDisplay(doorcard.term as TermSeason, doorcard.year)}
+                  {formatTermDisplay(
+                    doorcard.term as TermSeason,
+                    doorcard.year
+                  )}
                 </span>
               </div>
-              {activeTerm && isCurrentTerm(doorcard.term as TermSeason, doorcard.year) && (
-                <Badge variant="secondary" className="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                  Current
-                </Badge>
-              )}
+              {activeTerm &&
+                isCurrentTerm(doorcard.term as TermSeason, doorcard.year) && (
+                  <Badge
+                    variant="secondary"
+                    className="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                  >
+                    Current
+                  </Badge>
+                )}
             </div>
             <span className="text-gray-500 dark:text-gray-400">
               Click to view →

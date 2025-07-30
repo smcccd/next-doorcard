@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     if (user?.role !== "ADMIN") {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -125,7 +125,7 @@ export async function GET(req: NextRequest) {
     console.error("Admin doorcards error:", error);
     return NextResponse.json(
       { error: "Failed to fetch doorcards" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

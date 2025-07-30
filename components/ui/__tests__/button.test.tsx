@@ -67,13 +67,13 @@ describe("Button", () => {
     render(
       <Button disabled onClick={handleClick}>
         Disabled button
-      </Button>,
+      </Button>
     );
 
     const button = screen.getByRole("button", { name: /disabled button/i });
     expect(button).toBeDisabled();
     expect(button).toHaveClass(
-      "disabled:pointer-events-none disabled:opacity-50",
+      "disabled:pointer-events-none disabled:opacity-50"
     );
   });
 
@@ -82,7 +82,7 @@ describe("Button", () => {
     render(
       <Button disabled onClick={handleClick}>
         Disabled button
-      </Button>,
+      </Button>
     );
 
     const button = screen.getByRole("button", { name: /disabled button/i });
@@ -110,7 +110,7 @@ describe("Button", () => {
     render(
       <Button asChild>
         <a href="/test">Link button</a>
-      </Button>,
+      </Button>
     );
 
     const link = screen.getByRole("link", { name: /link button/i });
@@ -145,7 +145,7 @@ describe("Button", () => {
         data-testid="submit-button"
       >
         Submit
-      </Button>,
+      </Button>
     );
 
     const button = screen.getByRole("button", { name: /submit/i });
@@ -160,7 +160,7 @@ describe("Button", () => {
       render(
         <Button variant="outline" size="lg">
           Large outline
-        </Button>,
+        </Button>
       );
 
       const button = screen.getByRole("button", { name: /large outline/i });
@@ -172,7 +172,7 @@ describe("Button", () => {
       render(
         <Button variant="destructive" size="sm">
           Small destructive
-        </Button>,
+        </Button>
       );
 
       const button = screen.getByRole("button", { name: /small destructive/i });
@@ -184,7 +184,7 @@ describe("Button", () => {
       render(
         <Button variant="ghost" size="icon">
           ×
-        </Button>,
+        </Button>
       );
 
       const button = screen.getByRole("button", { name: /×/i });
@@ -209,7 +209,7 @@ describe("Button", () => {
           aria-describedby="help-text"
         >
           Menu button
-        </Button>,
+        </Button>
       );
 
       const button = screen.getByRole("button", { name: /menu button/i });
@@ -243,7 +243,7 @@ describe("Button", () => {
         <Button>
           <span>Icon</span>
           <span>Text</span>
-        </Button>,
+        </Button>
       );
 
       const button = screen.getByRole("button");
@@ -285,7 +285,7 @@ describe("Button", () => {
       render(
         <Button onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}>
           Mouse events
-        </Button>,
+        </Button>
       );
 
       const button = screen.getByRole("button", { name: /mouse events/i });
@@ -304,7 +304,7 @@ describe("Button", () => {
       render(
         <Button onFocus={handleFocus} onBlur={handleBlur}>
           Focus events
-        </Button>,
+        </Button>
       );
 
       const button = screen.getByRole("button", { name: /focus events/i });

@@ -2,7 +2,10 @@
 
 ## Executive Summary
 
-This analysis examines the campus/college distribution of doorcard users across SKYLINE, CSM, and CANADA campuses for recent terms (Fall 2024, Spring 2025, Summer 2025). The analysis is based on 720 doorcards created by 432 unique users.
+This analysis examines the campus/college distribution of doorcard users across
+SKYLINE, CSM, and CANADA campuses for recent terms (Fall 2024, Spring 2025,
+Summer 2025). The analysis is based on 720 doorcards created by 432 unique
+users.
 
 ## 1. Percentage Breakdown by Campus for Active Doorcard Users
 
@@ -66,7 +69,8 @@ _Note: "+" indicates users with doorcards at multiple campuses_
 
 - **SKYLINE** shows the most consistent activity across all terms
 - **Spring 2025** was the most active term overall (356 doorcards)
-- **Summer 2025** shows significantly lower activity across all campuses (typical for summer terms)
+- **Summer 2025** shows significantly lower activity across all campuses
+  (typical for summer terms)
 - **SKYLINE** has the highest engagement with 1.7 doorcards per user
 - **Cross-campus activity**: 20 users have doorcards at multiple campuses
 
@@ -83,29 +87,41 @@ _Note: "+" indicates users with doorcards at multiple campuses_
 - Campus assignment is managed at the **doorcard level**, not user profile level
 - All 432 active users have campus assignments through their doorcards
 - Only 1 user out of 2,130 has a campus assigned in their user profile
-- This indicates the system relies on doorcard-level campus assignments rather than user profile settings
+- This indicates the system relies on doorcard-level campus assignments rather
+  than user profile settings
 
 ## Key Insights
 
-1. **SKYLINE Dominance**: SKYLINE campus leads in both doorcards (47.1%) and users (47.2%)
-2. **Balanced Distribution**: Despite SKYLINE's lead, all three campuses show healthy activity levels
-3. **Cross-Campus Users**: 4.6% of users have doorcards at multiple campuses, indicating inter-campus collaboration
-4. **Active User Base**: 20.3% of all system users have created doorcards in recent terms
-5. **Seasonal Patterns**: Summer terms show reduced activity, which is typical for academic institutions
+1. **SKYLINE Dominance**: SKYLINE campus leads in both doorcards (47.1%) and
+   users (47.2%)
+2. **Balanced Distribution**: Despite SKYLINE's lead, all three campuses show
+   healthy activity levels
+3. **Cross-Campus Users**: 4.6% of users have doorcards at multiple campuses,
+   indicating inter-campus collaboration
+4. **Active User Base**: 20.3% of all system users have created doorcards in
+   recent terms
+5. **Seasonal Patterns**: Summer terms show reduced activity, which is typical
+   for academic institutions
 
 ## Data Quality Notes
 
-- **Usage Analytics**: Views, prints, and shares data are not yet populated in the database
-- **Campus Assignment**: Analysis is based on doorcard campus assignments rather than user profile data
+- **Usage Analytics**: Views, prints, and shares data are not yet populated in
+  the database
+- **Campus Assignment**: Analysis is based on doorcard campus assignments rather
+  than user profile data
 - **User Roles**: All active doorcard users (100%) have the "FACULTY" role
-- **Data Integrity**: No missing campus assignments found in doorcards from recent terms
+- **Data Integrity**: No missing campus assignments found in doorcards from
+  recent terms
 
 ## Recommendations
 
-1. Consider implementing user profile campus assignment for better user management
+1. Consider implementing user profile campus assignment for better user
+   management
 2. Monitor cross-campus users for potential collaboration opportunities
-3. Investigate the low summer activity to determine if additional engagement is needed
-4. Implement usage analytics tracking to get deeper insights into actual doorcard engagement
+3. Investigate the low summer activity to determine if additional engagement is
+   needed
+4. Implement usage analytics tracking to get deeper insights into actual
+   doorcard engagement
 
 ---
 

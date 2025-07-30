@@ -6,7 +6,7 @@ import { TermSeason } from "@prisma/client";
 // GET /api/doorcards/view/[username]/[termSlug]
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ username: string; termSlug: string }> },
+  { params }: { params: Promise<{ username: string; termSlug: string }> }
 ) {
   try {
     // Require authentication (admin/internal view)
@@ -14,7 +14,7 @@ export async function GET(
     if ("error" in auth) {
       return NextResponse.json(
         { error: auth.error },
-        { status: auth.status || 401 },
+        { status: auth.status || 401 }
       );
     }
 
@@ -42,7 +42,7 @@ export async function GET(
     if (!match) {
       return NextResponse.json(
         { error: "Invalid term format" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -60,7 +60,7 @@ export async function GET(
     if (!doorcard) {
       return NextResponse.json(
         { error: "Doorcard not found for this term" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -69,7 +69,7 @@ export async function GET(
     console.error("Error fetching term doorcard:", error);
     return NextResponse.json(
       { error: "Failed to fetch doorcard" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

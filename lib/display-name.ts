@@ -85,7 +85,7 @@ export function getDisplayFormatOptions(
   firstName: string,
   lastName: string,
   title?: string | null,
-  pronouns?: string | null,
+  pronouns?: string | null
 ) {
   const hasTitle = title && title !== "none";
   const hasPronouns = pronouns && pronouns !== "none";

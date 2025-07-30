@@ -42,7 +42,9 @@ export async function GET() {
         college: doorcard.college,
       },
       appointmentCount: doorcard.Appointment?.length || 0,
-      availableDays: [...new Set(doorcard.Appointment?.map(apt => apt.dayOfWeek) || [])],
+      availableDays: [
+        ...new Set(doorcard.Appointment?.map((apt) => apt.dayOfWeek) || []),
+      ],
       createdAt: doorcard.createdAt.toISOString(),
       updatedAt: doorcard.updatedAt.toISOString(),
     }));
@@ -60,7 +62,7 @@ export async function GET() {
         success: false,
         error: "Failed to fetch doorcards",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

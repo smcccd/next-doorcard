@@ -1,17 +1,17 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import SMCCDLogo from './SMCCDLogo';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import SMCCDLogo from "./SMCCDLogo";
 
 const meta = {
-  title: 'Components/SMCCDLogo',
+  title: "Components/SMCCDLogo",
   component: SMCCDLogo,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     className: {
-      control: 'text',
-      description: 'Additional CSS classes to apply to the logo',
+      control: "text",
+      description: "Additional CSS classes to apply to the logo",
     },
   },
 } satisfies Meta<typeof SMCCDLogo>;
@@ -23,19 +23,19 @@ export const Default: Story = {};
 
 export const CustomSize: Story = {
   args: {
-    className: 'w-32 h-32',
+    className: "w-32 h-32",
   },
 };
 
 export const Small: Story = {
   args: {
-    className: 'w-16 h-16',
+    className: "w-16 h-16",
   },
 };
 
 export const Large: Story = {
   args: {
-    className: 'w-48 h-48',
+    className: "w-48 h-48",
   },
 };
 
@@ -48,20 +48,28 @@ export const InHeader: Story = {
             <Story />
             <div>
               <h1 className="text-xl font-bold">Faculty Portal</h1>
-              <p className="text-blue-200 text-sm">San Mateo County Community College District</p>
+              <p className="text-blue-200 text-sm">
+                San Mateo County Community College District
+              </p>
             </div>
           </div>
           <nav className="flex gap-4">
-            <a href="#" className="hover:text-blue-200">Dashboard</a>
-            <a href="#" className="hover:text-blue-200">Profile</a>
-            <a href="#" className="hover:text-blue-200">Help</a>
+            <a href="#" className="hover:text-blue-200">
+              Dashboard
+            </a>
+            <a href="#" className="hover:text-blue-200">
+              Profile
+            </a>
+            <a href="#" className="hover:text-blue-200">
+              Help
+            </a>
           </nav>
         </div>
       </header>
     ),
   ],
   args: {
-    className: 'w-12 h-12',
+    className: "w-12 h-12",
   },
 };
 
@@ -80,17 +88,41 @@ export const InFooter: Story = {
           <div>
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-gray-400 hover:text-white">About</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white">Contact</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white">Support</a></li>
+              <li>
+                <a href="#" className="text-gray-400 hover:text-white">
+                  About
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-400 hover:text-white">
+                  Contact
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-400 hover:text-white">
+                  Support
+                </a>
+              </li>
             </ul>
           </div>
           <div>
             <h4 className="font-semibold mb-4">Resources</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="text-gray-400 hover:text-white">Help Center</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white">Documentation</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white">Privacy Policy</a></li>
+              <li>
+                <a href="#" className="text-gray-400 hover:text-white">
+                  Help Center
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-400 hover:text-white">
+                  Documentation
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-gray-400 hover:text-white">
+                  Privacy Policy
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -98,7 +130,7 @@ export const InFooter: Story = {
     ),
   ],
   args: {
-    className: 'w-16 h-16',
+    className: "w-16 h-16",
   },
 };
 
@@ -107,8 +139,12 @@ export const WithText: Story = {
     <div className="flex items-center gap-4">
       <SMCCDLogo className="w-20 h-20" />
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Faculty Doorcard System</h2>
-        <p className="text-gray-600">San Mateo County Community College District</p>
+        <h2 className="text-2xl font-bold text-gray-900">
+          Faculty Doorcard System
+        </h2>
+        <p className="text-gray-600">
+          San Mateo County Community College District
+        </p>
         <p className="text-sm text-gray-500 mt-1">
           Connecting students with faculty across our three campuses
         </p>
@@ -119,19 +155,19 @@ export const WithText: Story = {
 
 export const Grayscale: Story = {
   args: {
-    className: 'w-24 h-24 grayscale',
+    className: "w-24 h-24 grayscale",
   },
 };
 
 export const WithHoverEffect: Story = {
   args: {
-    className: 'w-24 h-24 hover:scale-110 transition-transform cursor-pointer',
+    className: "w-24 h-24 hover:scale-110 transition-transform cursor-pointer",
   },
 };
 
 export const DarkMode: Story = {
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story) => (
@@ -141,6 +177,6 @@ export const DarkMode: Story = {
     ),
   ],
   args: {
-    className: 'w-24 h-24',
+    className: "w-24 h-24",
   },
 };

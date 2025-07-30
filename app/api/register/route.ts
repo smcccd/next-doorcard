@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     if (existingUser) {
       return NextResponse.json(
         { message: "User already exists" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -50,13 +50,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       { message: "User created successfully" },
-      { status: 201 },
+      { status: 201 }
     );
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
       { message: "Something went wrong" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

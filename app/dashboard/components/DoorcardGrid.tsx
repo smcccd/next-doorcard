@@ -65,7 +65,6 @@ function publicSlug(user?: { username?: string | null; name?: string | null }) {
   return "user";
 }
 
-
 /* -------------------------------------------------------------------------- */
 /* Card (grid variant)                                                        */
 /* -------------------------------------------------------------------------- */
@@ -132,7 +131,7 @@ function DoorcardCard({
   // Campus-specific card styling
   const getCampusCardStyle = (college?: College) => {
     if (!college) return "hover:shadow-sm";
-    
+
     switch (college) {
       case "SKYLINE":
         return "hover:shadow-sm border-l-4 border-l-blue-500 hover:border-l-blue-600 bg-gradient-to-r from-blue-50/30 to-transparent dark:from-blue-950/30";
@@ -295,7 +294,7 @@ function DoorcardRow({
   // Campus-specific card styling for list view
   const getCampusRowStyle = (college?: College) => {
     if (!college) return "";
-    
+
     switch (college) {
       case "SKYLINE":
         return "border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-50/20 to-transparent dark:from-blue-950/20";

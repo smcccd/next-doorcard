@@ -51,7 +51,7 @@ export function ProfileSetupProvider({
     if (session?.user?.id) {
       localStorage.setItem(
         `profile-setup-dismissed-${session.user.id}`,
-        "true",
+        "true"
       );
     }
   };

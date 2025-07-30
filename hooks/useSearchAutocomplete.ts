@@ -1,11 +1,11 @@
 // hooks/useSearchAutocomplete.ts
-import { useState, useEffect, useMemo } from 'react';
-import type { PublicDoorcard } from '@/types/pages/public';
-import { DEPARTMENTS, extractDepartmentFromText } from '@/lib/departments';
+import { useState, useEffect, useMemo } from "react";
+import type { PublicDoorcard } from "@/types/pages/public";
+import { DEPARTMENTS, extractDepartmentFromText } from "@/lib/departments";
 
 export interface AutocompleteSuggestion {
   id: string;
-  type: 'professor' | 'department' | 'course';
+  type: "professor" | "department" | "course";
   text: string;
   subtitle?: string;
   value: string;
@@ -24,7 +24,7 @@ export function useSearchAutocomplete(
     const departments = new Set<string>();
     const courses = new Set<string>();
 
-    doorcards.forEach(doorcard => {
+    doorcards.forEach((doorcard) => {
       // Add professor names
       professors.add(doorcard.name.toLowerCase());
       if (doorcard.doorcardName !== doorcard.name) {
@@ -45,7 +45,7 @@ export function useSearchAutocomplete(
     return {
       professors: Array.from(professors),
       departments: Array.from(departments),
-      courses: Array.from(courses)
+      courses: Array.from(courses),
     };
   }, [doorcards]);
 
@@ -60,35 +60,36 @@ export function useSearchAutocomplete(
 
     // Professor name suggestions
     searchData.professors
-      .filter(name => name.includes(term))
+      .filter((name) => name.includes(term))
       .slice(0, 5)
-      .forEach(name => {
+      .forEach((name) => {
         newSuggestions.push({
           id: `prof-${name}`,
-          type: 'professor',
-          text: name.split(' ').map(word => 
-            word.charAt(0).toUpperCase() + word.slice(1)
-          ).join(' '),
-          subtitle: 'Professor',
-          value: name
+          type: "professor",
+          text: name
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" "),
+          subtitle: "Professor",
+          value: name,
         });
       });
 
     // Department suggestions
-    DEPARTMENTS
-      .filter(dept => 
-        dept.name.toLowerCase().includes(term) || 
+    DEPARTMENTS.filter(
+      (dept) =>
+        dept.name.toLowerCase().includes(term) ||
         dept.code.toLowerCase().includes(term) ||
-        dept.searchTerms.some(searchTerm => searchTerm.includes(term))
-      )
+        dept.searchTerms.some((searchTerm) => searchTerm.includes(term))
+    )
       .slice(0, 3)
-      .forEach(dept => {
+      .forEach((dept) => {
         newSuggestions.push({
           id: `dept-${dept.code}`,
-          type: 'department',
+          type: "department",
           text: dept.name,
-          subtitle: 'Department',
-          value: dept.code
+          subtitle: "Department",
+          value: dept.code,
         });
       });
 

@@ -68,13 +68,20 @@ export function ProfessorGrid({
             <span>{getHeaderTitle()}</span>
             <div className="flex items-center gap-2">
               {activeLetter && (
-                <Badge variant="default" className="text-xs bg-blue-600 text-white">
+                <Badge
+                  variant="default"
+                  className="text-xs bg-blue-600 text-white"
+                >
                   Last name: {activeLetter}*
                 </Badge>
               )}
               {selectedDay !== "ALL" && (
-                <Badge variant="default" className="text-xs bg-green-600 text-white">
-                  Available: {selectedDay.charAt(0) + selectedDay.slice(1).toLowerCase()}
+                <Badge
+                  variant="default"
+                  className="text-xs bg-green-600 text-white"
+                >
+                  Available:{" "}
+                  {selectedDay.charAt(0) + selectedDay.slice(1).toLowerCase()}
                 </Badge>
               )}
               {selectedDepartment !== "ALL" && (

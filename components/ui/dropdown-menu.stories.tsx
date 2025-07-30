@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import React from 'react';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import React from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator, 
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuGroup,
   DropdownMenuShortcut,
@@ -15,14 +15,14 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuPortal
-} from './dropdown-menu';
-import { Button } from './button';
-import { 
-  User, 
-  Settings, 
-  HelpCircle, 
-  LogOut, 
+  DropdownMenuPortal,
+} from "./dropdown-menu";
+import { Button } from "./button";
+import {
+  User,
+  Settings,
+  HelpCircle,
+  LogOut,
   CreditCard,
   UserPlus,
   Mail,
@@ -35,16 +35,16 @@ import {
   Keyboard,
   Users,
   ChevronDown,
-  MoreHorizontal
-} from 'lucide-react';
+  MoreHorizontal,
+} from "lucide-react";
 
 const meta = {
-  title: 'UI/DropdownMenu',
+  title: "UI/DropdownMenu",
   component: DropdownMenu,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof DropdownMenu>;
 
 export default meta;
@@ -355,7 +355,7 @@ export const AlignmentOptions: Story = {
 
 export const DarkMode: Story = {
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story) => (
@@ -373,7 +373,9 @@ export const DarkMode: Story = {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 dark:bg-gray-800 dark:border-gray-700">
-        <DropdownMenuLabel className="dark:text-gray-200">My Account</DropdownMenuLabel>
+        <DropdownMenuLabel className="dark:text-gray-200">
+          My Account
+        </DropdownMenuLabel>
         <DropdownMenuSeparator className="dark:bg-gray-700" />
         <DropdownMenuItem className="dark:text-gray-300 dark:focus:bg-gray-700">
           <User className="mr-2 h-4 w-4" />

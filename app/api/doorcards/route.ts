@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { doorcardSchema } from "@/lib/validations/doorcard";
 import { z } from "zod";
 import crypto from "crypto";
+import { PrismaErrorHandler, withRetry } from "@/lib/prisma-error-handler";
 
 export async function POST(req: Request) {
   try {
@@ -11,7 +12,7 @@ export async function POST(req: Request) {
     if ("error" in authResult) {
       return NextResponse.json(
         { error: authResult.error },
-        { status: authResult.status },
+        { status: authResult.status }
       );
     }
     const { user } = authResult;
@@ -22,15 +23,17 @@ export async function POST(req: Request) {
       const validatedData = doorcardSchema.parse(json);
 
       // Check for existing doorcard with same college/term/year combination (per user)
-      const existingDoorcard = await prisma.doorcard.findFirst({
-        where: {
-          userId: user.id,
-          college: validatedData.college,
-          term: validatedData.term,
-          year: validatedData.year,
-          // Check ALL doorcards for this user/college/term/year, not just active ones
-        },
-      });
+      const existingDoorcard = await withRetry(() =>
+        prisma.doorcard.findFirst({
+          where: {
+            userId: user.id,
+            college: validatedData.college,
+            term: validatedData.term,
+            year: validatedData.year,
+            // Check ALL doorcards for this user/college/term/year, not just active ones
+          },
+        })
+      );
 
       if (existingDoorcard) {
         const campusName = validatedData.college
@@ -48,7 +51,7 @@ export async function POST(req: Request) {
             error: `You already have a doorcard for ${campusName} - ${validatedData.term} ${validatedData.year}. Please edit your existing doorcard instead.`,
             existingDoorcardId: existingDoorcard.id,
           },
-          { status: 409 },
+          { status: 409 }
         );
       }
 
@@ -60,54 +63,53 @@ export async function POST(req: Request) {
       }`;
       const cleanSlug = baseSlug.replace(/-+/g, "-").replace(/^-|-$/g, "");
 
-      const doorcard = await prisma.doorcard.create({
-        data: {
-          id: crypto.randomUUID(),
-          name: validatedData.name,
-          doorcardName: validatedData.doorcardName,
-          officeNumber: validatedData.officeNumber,
-          term: validatedData.term,
-          year: validatedData.year,
-          college: validatedData.college,
-          isActive: validatedData.isActive,
-          isPublic: validatedData.isPublic,
-          slug: cleanSlug,
-          userId: user.id,
-          Appointment: {
-            create: validatedData.appointments.map((apt) => ({
-              id: crypto.randomUUID(),
-              name: apt.name,
-              startTime: apt.startTime,
-              endTime: apt.endTime,
-              dayOfWeek: apt.dayOfWeek,
-              category: apt.category,
-              location: apt.location,
-              updatedAt: new Date(),
-            })),
+      const doorcard = await withRetry(() =>
+        prisma.doorcard.create({
+          data: {
+            id: crypto.randomUUID(),
+            name: validatedData.name,
+            doorcardName: validatedData.doorcardName,
+            officeNumber: validatedData.officeNumber,
+            term: validatedData.term,
+            year: validatedData.year,
+            college: validatedData.college,
+            isActive: validatedData.isActive,
+            isPublic: validatedData.isPublic,
+            slug: cleanSlug,
+            userId: user.id,
+            Appointment: {
+              create: validatedData.appointments.map((apt) => ({
+                id: crypto.randomUUID(),
+                name: apt.name,
+                startTime: apt.startTime,
+                endTime: apt.endTime,
+                dayOfWeek: apt.dayOfWeek,
+                category: apt.category,
+                location: apt.location,
+                updatedAt: new Date(),
+              })),
+            },
+            updatedAt: new Date(),
           },
-          updatedAt: new Date(),
-        },
-        include: {
-          Appointment: true,
-        },
-      });
+          include: {
+            Appointment: true,
+          },
+        })
+      );
 
       return NextResponse.json(doorcard, { status: 201 });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
           { error: "Validation error", details: error.errors },
-          { status: 400 },
+          { status: 400 }
         );
       }
       throw error;
     }
   } catch (error) {
     console.error("Error creating doorcard:", error);
-    return NextResponse.json(
-      { error: "Failed to create doorcard" },
-      { status: 500 },
-    );
+    return PrismaErrorHandler.handle(error);
   }
 }
 
@@ -117,36 +119,35 @@ export async function GET() {
     if ("error" in authResult) {
       return NextResponse.json(
         { error: authResult.error },
-        { status: authResult.status },
+        { status: authResult.status }
       );
     }
     const { user } = authResult;
 
-    const doorcards = await prisma.doorcard.findMany({
-      where: {
-        userId: user.id,
-      },
-      include: {
-        User: {
-          select: {
-            name: true,
-            username: true,
-            email: true,
-            college: true,
+    const doorcards = await withRetry(() =>
+      prisma.doorcard.findMany({
+        where: {
+          userId: user.id,
+        },
+        include: {
+          User: {
+            select: {
+              name: true,
+              username: true,
+              email: true,
+              college: true,
+            },
+          },
+          Appointment: {
+            orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
           },
         },
-        Appointment: {
-          orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
-        },
-      },
-    });
+      })
+    );
 
     return NextResponse.json(doorcards);
   } catch (error) {
     console.error("Error fetching doorcards:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch doorcards" },
-      { status: 500 },
-    );
+    return PrismaErrorHandler.handle(error);
   }
 }

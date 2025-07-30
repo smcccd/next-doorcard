@@ -206,7 +206,7 @@ describe("require-auth-user utilities", () => {
       it("should return email for valid session", () => {
         const session = { user: { email: "test@example.com", id: "123" } };
         expect(clientAuthHelpers.getUserEmail(session)).toBe(
-          "test@example.com",
+          "test@example.com"
         );
       });
 
@@ -241,7 +241,7 @@ describe("require-auth-user utilities", () => {
     it("should handle database errors gracefully", async () => {
       mockGetServerSession.mockResolvedValueOnce(mockSession);
       mockPrismaUserFindUnique.mockRejectedValueOnce(
-        new Error("Database error"),
+        new Error("Database error")
       );
 
       await expect(requireAuthUser()).rejects.toThrow("Database error");

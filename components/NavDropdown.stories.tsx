@@ -1,16 +1,16 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import { NavDropdown } from './NavDropdown';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import { NavDropdown } from "./NavDropdown";
 
 const meta = {
-  title: 'Navigation/NavDropdown',
+  title: "Navigation/NavDropdown",
   component: NavDropdown,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
     backgrounds: {
-      default: 'dark',
+      default: "dark",
     },
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   decorators: [
     (Story) => (
       <div className="bg-gray-800 p-4 rounded-lg">
@@ -20,12 +20,12 @@ const meta = {
   ],
   argTypes: {
     userDisplay: {
-      control: 'text',
-      description: 'The display name of the user',
+      control: "text",
+      description: "The display name of the user",
     },
     isAdmin: {
-      control: 'boolean',
-      description: 'Whether the user has admin privileges',
+      control: "boolean",
+      description: "Whether the user has admin privileges",
     },
   },
 } satisfies Meta<typeof NavDropdown>;
@@ -35,45 +35,45 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    userDisplay: 'Dr. Jane Smith',
+    userDisplay: "Dr. Jane Smith",
     isAdmin: false,
   },
 };
 
 export const WithAdminAccess: Story = {
   args: {
-    userDisplay: 'Dr. John Doe',
+    userDisplay: "Dr. John Doe",
     isAdmin: true,
   },
 };
 
 export const LongUserName: Story = {
   args: {
-    userDisplay: 'Dr. Christopher Alexander Johnson III',
+    userDisplay: "Dr. Christopher Alexander Johnson III",
     isAdmin: false,
   },
 };
 
 export const MobileView: Story = {
   args: {
-    userDisplay: 'Dr. Sarah Wilson',
+    userDisplay: "Dr. Sarah Wilson",
     isAdmin: true,
   },
   parameters: {
     viewport: {
-      defaultViewport: 'mobile1',
+      defaultViewport: "mobile1",
     },
   },
 };
 
 export const TabletView: Story = {
   args: {
-    userDisplay: 'Prof. Michael Chen',
+    userDisplay: "Prof. Michael Chen",
     isAdmin: false,
   },
   parameters: {
     viewport: {
-      defaultViewport: 'tablet',
+      defaultViewport: "tablet",
     },
   },
 };

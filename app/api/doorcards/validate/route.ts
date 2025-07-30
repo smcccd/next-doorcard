@@ -18,7 +18,7 @@ export async function POST(req: Request) {
     if ("error" in auth) {
       return NextResponse.json(
         { error: auth.error },
-        { status: auth.status || 401 },
+        { status: auth.status || 401 }
       );
     }
     const { user } = auth;
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       if (!owned) {
         return NextResponse.json(
           { error: "Invalid doorcard reference" },
-          { status: 400 },
+          { status: 400 }
         );
       }
     }
@@ -71,13 +71,13 @@ export async function POST(req: Request) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: err.errors },
-        { status: 400 },
+        { status: 400 }
       );
     }
     console.error("Error validating doorcard:", err);
     return NextResponse.json(
       { error: "Failed to validate doorcard" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

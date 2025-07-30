@@ -28,8 +28,13 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 rounded-lg" role="alert">
-        <h3 className="text-red-800 dark:text-red-200 font-semibold">Content Error</h3>
+      <div
+        className="p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 rounded-lg"
+        role="alert"
+      >
+        <h3 className="text-red-800 dark:text-red-200 font-semibold">
+          Content Error
+        </h3>
         <p className="text-red-600 dark:text-red-300 text-sm mt-1">{error}</p>
       </div>
     );

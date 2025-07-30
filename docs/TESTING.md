@@ -1,6 +1,8 @@
 # Testing Guide
 
-This document provides comprehensive guidance on testing the DoorCard application. We use **Jest** with **React Testing Library** for unit testing, and **Cypress** for end-to-end testing.
+This document provides comprehensive guidance on testing the DoorCard
+application. We use **Jest** with **React Testing Library** for unit testing,
+and **Cypress** for end-to-end testing.
 
 ## 🧪 **Testing Stack**
 
@@ -505,4 +507,5 @@ npm test -- --verbose
 - ✅ User interaction simulation
 - ✅ Error boundary and edge case handling
 
-This testing foundation provides excellent coverage of critical application functionality and establishes patterns for continued test development.
+This testing foundation provides excellent coverage of critical application
+functionality and establishes patterns for continued test development.

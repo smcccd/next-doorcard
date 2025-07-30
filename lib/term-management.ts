@@ -64,7 +64,7 @@ export class TermManager {
    */
   static async transitionToNewTerm(
     newTermId: string,
-    options: TermTransitionOptions = {},
+    options: TermTransitionOptions = {}
   ) {
     const {
       archiveOldTerm = true,
@@ -159,7 +159,7 @@ export class TermManager {
    * Get doorcards by term status
    */
   static async getDoorcardsByTermStatus(
-    status: "active" | "archived" | "upcoming",
+    status: "active" | "archived" | "upcoming"
   ) {
     const whereClause = {
       active: { isActive: true },

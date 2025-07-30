@@ -20,7 +20,11 @@ interface MobileNavProps {
   isAdmin?: boolean;
 }
 
-export default function MobileNav({ session, userDisplay, isAdmin }: MobileNavProps) {
+export default function MobileNav({
+  session,
+  userDisplay,
+  isAdmin,
+}: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -29,14 +33,14 @@ export default function MobileNav({ session, userDisplay, isAdmin }: MobileNavPr
   // Close menu on escape key
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === "Escape" && isOpen) {
         closeMenu();
       }
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
     }
   }, [isOpen]);
 
@@ -60,15 +64,15 @@ export default function MobileNav({ session, userDisplay, isAdmin }: MobileNavPr
       {/* Mobile menu overlay */}
       {isOpen && (
         <>
-          <div 
+          <div
             className="fixed inset-0 bg-black bg-opacity-50 z-40"
             onClick={closeMenu}
-            onKeyDown={(e) => e.key === 'Escape' && closeMenu()}
+            onKeyDown={(e) => e.key === "Escape" && closeMenu()}
             aria-hidden="true"
           />
-          
+
           {/* Mobile menu panel */}
-          <div 
+          <div
             id="mobile-menu"
             className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50"
             role="menu"
@@ -87,9 +91,9 @@ export default function MobileNav({ session, userDisplay, isAdmin }: MobileNavPr
                   {link.text}
                 </a>
               ))}
-              
+
               <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-              
+
               <a
                 href="https://site-index.smccd.edu"
                 target="_blank"
@@ -99,7 +103,7 @@ export default function MobileNav({ session, userDisplay, isAdmin }: MobileNavPr
               >
                 Site Index
               </a>
-              
+
               {session ? (
                 <>
                   <Link

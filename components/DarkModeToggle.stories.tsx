@@ -1,13 +1,13 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import { DarkModeToggle } from './DarkModeToggle';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import { DarkModeToggle } from "./DarkModeToggle";
 
 const meta = {
-  title: 'Navigation/DarkModeToggle',
+  title: "Navigation/DarkModeToggle",
   component: DarkModeToggle,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof DarkModeToggle>;
 
 export default meta;
@@ -30,7 +30,7 @@ export const InLightMode: Story = {
 
 export const InDarkMode: Story = {
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story) => (

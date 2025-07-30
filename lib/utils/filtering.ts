@@ -32,18 +32,29 @@ export function filterProfessors(
       const deptFromName = extractDepartmentFromText(dc.name);
       const deptFromDoorcardName = extractDepartmentFromText(dc.doorcardName);
       const deptFromUserName = extractDepartmentFromText(dc.user?.name || "");
-      
-      return deptFromName === options.selectedDepartment || 
-             deptFromDoorcardName === options.selectedDepartment ||
-             deptFromUserName === options.selectedDepartment;
+
+      return (
+        deptFromName === options.selectedDepartment ||
+        deptFromDoorcardName === options.selectedDepartment ||
+        deptFromUserName === options.selectedDepartment
+      );
     });
   }
 
   // Filter by current term only (but only after API has loaded to avoid mismatch)
-  if (options.showCurrentTermOnly && options.activeTerm && !options.termLoading) {
+  if (
+    options.showCurrentTermOnly &&
+    options.activeTerm &&
+    !options.termLoading
+  ) {
     filtered = filtered.filter((dc) => {
-      const termMatches = dc.term.toUpperCase() === options.activeTerm!.season.toUpperCase();
-      const yearMatches = dc.year === (typeof options.activeTerm!.year === 'string' ? parseInt(options.activeTerm!.year) : options.activeTerm!.year);
+      const termMatches =
+        dc.term.toUpperCase() === options.activeTerm!.season.toUpperCase();
+      const yearMatches =
+        dc.year ===
+        (typeof options.activeTerm!.year === "string"
+          ? parseInt(options.activeTerm!.year)
+          : options.activeTerm!.year);
       return termMatches && yearMatches;
     });
   }
@@ -63,7 +74,9 @@ export function filterProfessors(
   if (options.activeLetter) {
     filtered = filtered.filter((dc) => {
       const name = dc.name;
-      const lastNameFirst = name.includes(',') ? name.split(',')[0].trim() : name.split(' ').pop() || '';
+      const lastNameFirst = name.includes(",")
+        ? name.split(",")[0].trim()
+        : name.split(" ").pop() || "";
       return lastNameFirst.toUpperCase().startsWith(options.activeLetter!);
     });
   }
@@ -71,7 +84,10 @@ export function filterProfessors(
   // Filter by availability on specific day
   if (options.selectedDay !== "ALL") {
     filtered = filtered.filter((dc) => {
-      return dc.availableDays && dc.availableDays.includes(options.selectedDay as DayOfWeek);
+      return (
+        dc.availableDays &&
+        dc.availableDays.includes(options.selectedDay as DayOfWeek)
+      );
     });
   }
 
@@ -88,7 +104,9 @@ export function filterProfessors(
   return filtered;
 }
 
-export function hasActiveFilters(options: Omit<FilterOptions, 'activeTerm' | 'termLoading'>): boolean {
+export function hasActiveFilters(
+  options: Omit<FilterOptions, "activeTerm" | "termLoading">
+): boolean {
   return !!(
     options.searchTerm ||
     options.selectedCampus !== "ALL" ||
@@ -98,7 +116,10 @@ export function hasActiveFilters(options: Omit<FilterOptions, 'activeTerm' | 'te
   );
 }
 
-export function getTopResults(filtered: PublicDoorcard[], hasFilters: boolean): PublicDoorcard[] {
+export function getTopResults(
+  filtered: PublicDoorcard[],
+  hasFilters: boolean
+): PublicDoorcard[] {
   // If no active filters applied, show top 24 results for better performance
   if (!hasFilters) {
     return filtered.slice(0, 24);

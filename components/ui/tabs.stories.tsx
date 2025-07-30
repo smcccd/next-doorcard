@@ -1,19 +1,25 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
-import { Label } from './label';
-import { Input } from './input';
-import { Button } from './button';
-import { Badge } from './badge';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import React from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./card";
+import { Label } from "./label";
+import { Input } from "./input";
+import { Button } from "./button";
+import { Badge } from "./badge";
 
 const meta = {
-  title: 'UI/Tabs',
+  title: "UI/Tabs",
   component: Tabs,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof Tabs>;
 
 export default meta;
@@ -54,7 +60,9 @@ export const CampusFilter: Story = {
           <Card>
             <CardHeader>
               <CardTitle>All Campuses</CardTitle>
-              <CardDescription>Showing faculty from all campuses</CardDescription>
+              <CardDescription>
+                Showing faculty from all campuses
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
@@ -135,7 +143,10 @@ export const AccountSettings: Story = {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
-                <Input id="title" defaultValue="Professor of Computer Science" />
+                <Input
+                  id="title"
+                  defaultValue="Professor of Computer Science"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="office">Office</Label>
@@ -182,16 +193,24 @@ export const AccountSettings: Story = {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Email Notifications</p>
-                  <p className="text-sm text-gray-500">Receive email updates about your schedule</p>
+                  <p className="text-sm text-gray-500">
+                    Receive email updates about your schedule
+                  </p>
                 </div>
-                <Button variant="outline" size="sm">Configure</Button>
+                <Button variant="outline" size="sm">
+                  Configure
+                </Button>
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">Public Profile</p>
-                  <p className="text-sm text-gray-500">Make your profile visible to students</p>
+                  <p className="text-sm text-gray-500">
+                    Make your profile visible to students
+                  </p>
                 </div>
-                <Button variant="outline" size="sm">Toggle</Button>
+                <Button variant="outline" size="sm">
+                  Toggle
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -204,12 +223,24 @@ export const AccountSettings: Story = {
 export const VerticalTabs: Story = {
   render: () => (
     <div className="flex gap-8">
-      <Tabs defaultValue="overview" orientation="vertical" className="w-[600px]">
+      <Tabs
+        defaultValue="overview"
+        orientation="vertical"
+        className="w-[600px]"
+      >
         <TabsList className="flex-col h-full w-[200px]">
-          <TabsTrigger value="overview" className="w-full justify-start">Overview</TabsTrigger>
-          <TabsTrigger value="analytics" className="w-full justify-start">Analytics</TabsTrigger>
-          <TabsTrigger value="reports" className="w-full justify-start">Reports</TabsTrigger>
-          <TabsTrigger value="settings" className="w-full justify-start">Settings</TabsTrigger>
+          <TabsTrigger value="overview" className="w-full justify-start">
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="w-full justify-start">
+            Analytics
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="w-full justify-start">
+            Reports
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="w-full justify-start">
+            Settings
+          </TabsTrigger>
         </TabsList>
         <div className="flex-1">
           <TabsContent value="overview">
@@ -263,27 +294,72 @@ export const WithIcons: Story = {
     <Tabs defaultValue="home" className="w-[500px]">
       <TabsList className="grid w-full grid-cols-4">
         <TabsTrigger value="home">
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          <svg
+            className="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            />
           </svg>
           Home
         </TabsTrigger>
         <TabsTrigger value="profile">
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          <svg
+            className="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            />
           </svg>
           Profile
         </TabsTrigger>
         <TabsTrigger value="messages">
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          <svg
+            className="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+            />
           </svg>
           Messages
         </TabsTrigger>
         <TabsTrigger value="settings">
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <svg
+            className="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
           </svg>
           Settings
         </TabsTrigger>
@@ -301,10 +377,16 @@ export const CustomStyling: Story = {
     <div className="space-y-8">
       <Tabs defaultValue="tab1" className="w-[400px]">
         <TabsList className="bg-blue-100 dark:bg-blue-900">
-          <TabsTrigger value="tab1" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+          <TabsTrigger
+            value="tab1"
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+          >
             Blue Tab 1
           </TabsTrigger>
-          <TabsTrigger value="tab2" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+          <TabsTrigger
+            value="tab2"
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
+          >
             Blue Tab 2
           </TabsTrigger>
         </TabsList>
@@ -314,10 +396,16 @@ export const CustomStyling: Story = {
 
       <Tabs defaultValue="tab1" className="w-[400px]">
         <TabsList className="h-12 p-1 bg-gray-100 rounded-lg">
-          <TabsTrigger value="tab1" className="rounded-md data-[state=active]:shadow-sm">
+          <TabsTrigger
+            value="tab1"
+            className="rounded-md data-[state=active]:shadow-sm"
+          >
             Modern Tab 1
           </TabsTrigger>
-          <TabsTrigger value="tab2" className="rounded-md data-[state=active]:shadow-sm">
+          <TabsTrigger
+            value="tab2"
+            className="rounded-md data-[state=active]:shadow-sm"
+          >
             Modern Tab 2
           </TabsTrigger>
         </TabsList>
@@ -330,7 +418,7 @@ export const CustomStyling: Story = {
 
 export const DarkMode: Story = {
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story) => (
@@ -342,13 +430,22 @@ export const DarkMode: Story = {
   render: () => (
     <Tabs defaultValue="tab1" className="w-[400px]">
       <TabsList className="dark:bg-gray-800 dark:border-gray-700">
-        <TabsTrigger value="tab1" className="dark:text-gray-300 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white">
+        <TabsTrigger
+          value="tab1"
+          className="dark:text-gray-300 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white"
+        >
           Dark Tab 1
         </TabsTrigger>
-        <TabsTrigger value="tab2" className="dark:text-gray-300 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white">
+        <TabsTrigger
+          value="tab2"
+          className="dark:text-gray-300 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white"
+        >
           Dark Tab 2
         </TabsTrigger>
-        <TabsTrigger value="tab3" className="dark:text-gray-300 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white">
+        <TabsTrigger
+          value="tab3"
+          className="dark:text-gray-300 dark:data-[state=active]:bg-gray-700 dark:data-[state=active]:text-white"
+        >
           Dark Tab 3
         </TabsTrigger>
       </TabsList>

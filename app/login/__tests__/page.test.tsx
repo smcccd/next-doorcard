@@ -35,10 +35,10 @@ describe("LoginPage", () => {
     render(<LoginPage />);
 
     expect(
-      screen.getByRole("heading", { name: /sign in to faculty doorcards/i }),
+      screen.getByRole("heading", { name: /sign in to faculty doorcards/i })
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /sign in with smccd onelogin/i }),
+      screen.getByRole("button", { name: /sign in with smccd onelogin/i })
     ).toBeInTheDocument();
     expect(screen.getByText(/use your smccd credentials/i)).toBeInTheDocument();
   });
@@ -63,7 +63,7 @@ describe("LoginPage", () => {
     render(<LoginPage />);
 
     expect(
-      screen.getByRole("button", { name: /show development login/i }),
+      screen.getByRole("button", { name: /show development login/i })
     ).toBeInTheDocument();
   });
 
@@ -73,7 +73,7 @@ describe("LoginPage", () => {
     render(<LoginPage />);
 
     expect(
-      screen.queryByRole("button", { name: /show development login/i }),
+      screen.queryByRole("button", { name: /show development login/i })
     ).not.toBeInTheDocument();
   });
 
@@ -94,7 +94,7 @@ describe("LoginPage", () => {
         expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
         expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
         expect(
-          screen.getByRole("button", { name: /^sign in$/i }),
+          screen.getByRole("button", { name: /^sign in$/i })
         ).toBeInTheDocument();
       });
     });
@@ -138,7 +138,7 @@ describe("LoginPage", () => {
 
       await waitFor(() => {
         expect(
-          screen.getByRole("button", { name: /^sign in$/i }),
+          screen.getByRole("button", { name: /^sign in$/i })
         ).toBeInTheDocument();
       });
 
@@ -176,7 +176,7 @@ describe("LoginPage", () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/password must be at least 6 characters/i),
+          screen.getByText(/password must be at least 6 characters/i)
         ).toBeInTheDocument();
       });
 
@@ -260,7 +260,7 @@ describe("LoginPage", () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/invalid email or password/i),
+          screen.getByText(/invalid email or password/i)
         ).toBeInTheDocument();
       });
     });
@@ -302,8 +302,8 @@ describe("LoginPage", () => {
       mockSignIn.mockImplementation(
         () =>
           new Promise((resolve) =>
-            setTimeout(() => resolve({ ok: true, error: null } as any), 1000),
-          ),
+            setTimeout(() => resolve({ ok: true, error: null } as any), 1000)
+          )
       );
 
       render(<LoginPage />);

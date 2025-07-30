@@ -50,7 +50,7 @@ async function comprehensiveCampusAnalysis() {
   });
 
   console.log(
-    `📊 Found ${recentDoorcards.length} doorcards from recent terms (Fall 2024, Spring 2025, Summer 2025)\n`,
+    `📊 Found ${recentDoorcards.length} doorcards from recent terms (Fall 2024, Spring 2025, Summer 2025)\n`
   );
 
   // 2. DOORCARD CAMPUS DISTRIBUTION
@@ -75,11 +75,11 @@ async function comprehensiveCampusAnalysis() {
     const percentage = (count / totalDoorcards) * 100;
     doorcardStats.push({ campus, count, percentage });
     console.log(
-      `${campus.padEnd(8)}: ${count.toString().padStart(4)} doorcards (${percentage.toFixed(1)}%)`,
+      `${campus.padEnd(8)}: ${count.toString().padStart(4)} doorcards (${percentage.toFixed(1)}%)`
     );
   });
   console.log(
-    `${"TOTAL".padEnd(8)}: ${totalDoorcards.toString().padStart(4)} doorcards (100.0%)\n`,
+    `${"TOTAL".padEnd(8)}: ${totalDoorcards.toString().padStart(4)} doorcards (100.0%)\n`
   );
 
   // 3. USER DISTRIBUTION BY CAMPUS (Based on Doorcard Assignments)
@@ -120,15 +120,15 @@ async function comprehensiveCampusAnalysis() {
     const percentage = (uniqueUserCount / totalUniqueUsers) * 100;
     userStats.push({ campus, count: uniqueUserCount, percentage });
     console.log(
-      `${campus.padEnd(8)}: ${uniqueUserCount.toString().padStart(4)} users (${percentage.toFixed(1)}%)`,
+      `${campus.padEnd(8)}: ${uniqueUserCount.toString().padStart(4)} users (${percentage.toFixed(1)}%)`
     );
   });
 
   console.log(
-    `${"OVERLAP".padEnd(8)}: ${overlappingUsers.toString().padStart(4)} users have doorcards at multiple campuses`,
+    `${"OVERLAP".padEnd(8)}: ${overlappingUsers.toString().padStart(4)} users have doorcards at multiple campuses`
   );
   console.log(
-    `${"TOTAL".padEnd(8)}: ${totalUniqueUsers.toString().padStart(4)} unique users\n`,
+    `${"TOTAL".padEnd(8)}: ${totalUniqueUsers.toString().padStart(4)} unique users\n`
   );
 
   // 4. TERM-BY-TERM BREAKDOWN
@@ -162,7 +162,7 @@ async function comprehensiveCampusAnalysis() {
   console.log("-".repeat(60));
   termStats.forEach((stats, campus) => {
     console.log(
-      `${campus.padEnd(10)} | ${stats.fall2024.toString().padStart(9)} | ${stats.spring2025.toString().padStart(11)} | ${stats.summer2025.toString().padStart(11)} | ${stats.total.toString().padStart(5)}`,
+      `${campus.padEnd(10)} | ${stats.fall2024.toString().padStart(9)} | ${stats.spring2025.toString().padStart(11)} | ${stats.summer2025.toString().padStart(11)} | ${stats.total.toString().padStart(5)}`
     );
   });
 
@@ -197,7 +197,7 @@ async function comprehensiveCampusAnalysis() {
       campusCount.set(d.college, (campusCount.get(d.college) || 0) + 1);
     });
     userData.primaryCampus = Array.from(campusCount.entries()).reduce(
-      (max, current) => (current[1] > max[1] ? current : max),
+      (max, current) => (current[1] > max[1] ? current : max)
     )[0];
   });
 
@@ -213,7 +213,7 @@ async function comprehensiveCampusAnalysis() {
         ? `${userData.primaryCampus}+`
         : userData.primaryCampus;
     console.log(
-      `${rank}. ${name.substring(0, 25).padEnd(25)} | ${campusInfo.padEnd(9)} | ${userData.count.toString().padStart(2)} doorcards`,
+      `${rank}. ${name.substring(0, 25).padEnd(25)} | ${campusInfo.padEnd(9)} | ${userData.count.toString().padStart(2)} doorcards`
     );
   });
 
@@ -225,7 +225,7 @@ async function comprehensiveCampusAnalysis() {
   topUsers.forEach(([userId, userData]) => {
     topUsersCampusCount.set(
       userData.primaryCampus,
-      (topUsersCampusCount.get(userData.primaryCampus) || 0) + 1,
+      (topUsersCampusCount.get(userData.primaryCampus) || 0) + 1
     );
   });
 
@@ -233,7 +233,7 @@ async function comprehensiveCampusAnalysis() {
     const count = topUsersCampusCount.get(campus) || 0;
     const percentage = (count / 10) * 100;
     console.log(
-      `${campus.padEnd(8)}: ${count.toString().padStart(2)}/10 users (${percentage.toFixed(0)}%)`,
+      `${campus.padEnd(8)}: ${count.toString().padStart(2)}/10 users (${percentage.toFixed(0)}%)`
     );
   });
 
@@ -260,7 +260,7 @@ async function comprehensiveCampusAnalysis() {
 
     if (sampleUserDetails.length > 0) {
       console.log(
-        `  Sample users: ${[...new Set(sampleUserDetails)].slice(0, 3).join(", ")}`,
+        `  Sample users: ${[...new Set(sampleUserDetails)].slice(0, 3).join(", ")}`
       );
     }
   });
@@ -296,7 +296,7 @@ async function comprehensiveCampusAnalysis() {
 
   console.log(`Total users in system: ${totalUsersInSystem}`);
   console.log(
-    `Users with campus in profile: ${usersWithProfileCampus} (${((usersWithProfileCampus / totalUsersInSystem) * 100).toFixed(1)}%)`,
+    `Users with campus in profile: ${usersWithProfileCampus} (${((usersWithProfileCampus / totalUsersInSystem) * 100).toFixed(1)}%)`
   );
   console.log(`Active doorcard users (2024-2025): ${totalUniqueUsers}`);
 
@@ -311,49 +311,49 @@ async function comprehensiveCampusAnalysis() {
   console.log("-".repeat(30));
 
   const mostActiveDoorcardCampus = doorcardStats.reduce((max, current) =>
-    current.count > max.count ? current : max,
+    current.count > max.count ? current : max
   );
 
   const mostActiveUserCampus = userStats.reduce((max, current) =>
-    current.count > max.count ? current : max,
+    current.count > max.count ? current : max
   );
 
   const topUserCampusLeader = Array.from(topUsersCampusCount.entries()).reduce(
     (max, current) => (current[1] > max[1] ? current : max),
-    ["", 0],
+    ["", 0]
   );
 
   console.log(
-    `• SKYLINE dominates with ${mostActiveDoorcardCampus.count} doorcards (${mostActiveDoorcardCampus.percentage.toFixed(1)}%) and ${mostActiveUserCampus.count} users (${mostActiveUserCampus.percentage.toFixed(1)}%)`,
+    `• SKYLINE dominates with ${mostActiveDoorcardCampus.count} doorcards (${mostActiveDoorcardCampus.percentage.toFixed(1)}%) and ${mostActiveUserCampus.count} users (${mostActiveUserCampus.percentage.toFixed(1)}%)`
   );
   console.log(
-    `• ${overlappingUsers} users (${((overlappingUsers / totalUniqueUsers) * 100).toFixed(1)}%) have doorcards at multiple campuses`,
+    `• ${overlappingUsers} users (${((overlappingUsers / totalUniqueUsers) * 100).toFixed(1)}%) have doorcards at multiple campuses`
   );
   console.log(
-    `• Top 10 most active users are dominated by ${topUserCampusLeader[0]} (${topUserCampusLeader[1]}/10 users)`,
+    `• Top 10 most active users are dominated by ${topUserCampusLeader[0]} (${topUserCampusLeader[1]}/10 users)`
   );
   console.log(
-    `• Only ${((usersWithProfileCampus / totalUsersInSystem) * 100).toFixed(1)}% of users have campus assigned in their profile`,
+    `• Only ${((usersWithProfileCampus / totalUsersInSystem) * 100).toFixed(1)}% of users have campus assigned in their profile`
   );
   console.log(`• Campus assignment is primarily managed at the doorcard level`);
   console.log(
-    `• ${((totalUniqueUsers / totalUsersInSystem) * 100).toFixed(1)}% of all users have created doorcards in recent terms`,
+    `• ${((totalUniqueUsers / totalUsersInSystem) * 100).toFixed(1)}% of all users have created doorcards in recent terms`
   );
 
   // 10. DATA QUALITY NOTES
   console.log("\n📋 DATA QUALITY NOTES");
   console.log("-".repeat(25));
   console.log(
-    "• Usage analytics (views, prints, shares) are not yet populated in the database",
+    "• Usage analytics (views, prints, shares) are not yet populated in the database"
   );
   console.log(
-    "• Campus analysis is based on doorcard assignments rather than user profiles",
+    "• Campus analysis is based on doorcard assignments rather than user profiles"
   );
   console.log(
-    "• 20 users have doorcards across multiple campuses, indicating cross-campus activity",
+    "• 20 users have doorcards across multiple campuses, indicating cross-campus activity"
   );
   console.log(
-    "• Recent terms show consistent activity across all three campuses",
+    "• Recent terms show consistent activity across all three campuses"
   );
 
   console.log("\n✅ Comprehensive analysis complete!\n");

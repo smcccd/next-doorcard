@@ -248,7 +248,7 @@ describe("PublicDoorcardView", () => {
 
     expect(screen.getByText("Doorcard Not Available")).toBeInTheDocument();
     expect(
-      screen.getByText("This doorcard is not publicly accessible"),
+      screen.getByText("This doorcard is not publicly accessible")
     ).toBeInTheDocument();
   });
 
@@ -288,7 +288,7 @@ describe("PublicDoorcardView", () => {
     const doorcardWithoutAppointments = { ...mockDoorcard, appointments: [] };
     mockPrisma.user.findUnique.mockResolvedValue(mockUser);
     mockPrisma.doorcard.findFirst.mockResolvedValue(
-      doorcardWithoutAppointments,
+      doorcardWithoutAppointments
     );
 
     const params = Promise.resolve({ slug: ["john-smith"] });
@@ -298,7 +298,7 @@ describe("PublicDoorcardView", () => {
     render(result);
 
     expect(
-      screen.getByText("No scheduled appointments or office hours."),
+      screen.getByText("No scheduled appointments or office hours.")
     ).toBeInTheDocument();
   });
 
@@ -311,7 +311,7 @@ describe("PublicDoorcardView", () => {
     const searchParams = Promise.resolve({});
 
     await expect(PublicDoorcardView({ params, searchParams })).rejects.toThrow(
-      "notFound called",
+      "notFound called"
     );
     expect(mockNotFound).toHaveBeenCalled();
   });
@@ -352,7 +352,7 @@ describe("PublicDoorcardView", () => {
     expect(websiteLink).toBeInTheDocument();
     expect(websiteLink.closest("a")).toHaveAttribute(
       "href",
-      "https://example.com",
+      "https://example.com"
     );
   });
 

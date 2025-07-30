@@ -41,18 +41,18 @@ export async function GET() {
     console.log(
       "🔍 Doorcards Admin API: Got doorcards:",
       doorcards.length,
-      "items",
+      "items"
     );
     return NextResponse.json(doorcards);
   } catch (error) {
     console.error("❌ Doorcards Admin API Error:", error);
     console.error(
       "❌ Error stack:",
-      error instanceof Error ? error.stack : "No stack",
+      error instanceof Error ? error.stack : "No stack"
     );
     return NextResponse.json(
       { error: "Failed to fetch doorcards" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

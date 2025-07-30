@@ -8,8 +8,8 @@ export async function GET() {
     // First, try to get the active term from database
     const activeTerm = await prisma.term.findFirst({
       where: {
-        isActive: true
-      }
+        isActive: true,
+      },
     });
 
     if (activeTerm) {
@@ -22,14 +22,14 @@ export async function GET() {
           year: activeTerm.year,
           startDate: activeTerm.startDate,
           endDate: activeTerm.endDate,
-          isFromDatabase: true
-        }
+          isFromDatabase: true,
+        },
       });
     }
 
     // Fallback to computed current term
     const computedTerm = getCurrentAcademicTerm();
-    
+
     return NextResponse.json({
       activeTerm: {
         id: null,
@@ -38,16 +38,15 @@ export async function GET() {
         year: computedTerm.year,
         startDate: null,
         endDate: null,
-        isFromDatabase: false
-      }
+        isFromDatabase: false,
+      },
     });
-    
   } catch (error) {
     console.error("Error fetching active term:", error);
-    
+
     // Return computed term as fallback
     const computedTerm = getCurrentAcademicTerm();
-    
+
     return NextResponse.json({
       activeTerm: {
         id: null,
@@ -56,8 +55,8 @@ export async function GET() {
         year: computedTerm.year,
         startDate: null,
         endDate: null,
-        isFromDatabase: false
-      }
+        isFromDatabase: false,
+      },
     });
   }
 }

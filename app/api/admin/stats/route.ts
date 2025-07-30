@@ -20,7 +20,7 @@ export async function GET() {
     if (user?.role !== "ADMIN") {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -120,7 +120,7 @@ export async function GET() {
     console.error("Admin stats error:", error);
     return NextResponse.json(
       { error: "Failed to fetch admin stats" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

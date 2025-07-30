@@ -41,7 +41,7 @@ describe("/api/health", () => {
 
     it("should return unhealthy status when database fails", async () => {
       mockPrisma.$queryRaw.mockRejectedValue(
-        new Error("Database connection failed"),
+        new Error("Database connection failed")
       );
 
       const response = await GET();

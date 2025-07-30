@@ -40,24 +40,24 @@ export async function GET() {
     // Calculate real engagement metrics
     const totalDoorcards = doorcards.length;
     const activeDoors = doorcards.filter(
-      (doorcard: (typeof doorcards)[0]) => doorcard.isActive,
+      (doorcard: (typeof doorcards)[0]) => doorcard.isActive
     ).length;
 
     // Sum up all views and prints from metrics
     const totalViews = doorcards.reduce(
       (sum: number, card: (typeof doorcards)[0]) =>
         sum + (card.DoorcardMetrics?.totalViews || 0),
-      0,
+      0
     );
     const uniqueViews = doorcards.reduce(
       (sum: number, card: (typeof doorcards)[0]) =>
         sum + (card.DoorcardMetrics?.uniqueViews || 0),
-      0,
+      0
     );
     const totalShares = doorcards.reduce(
       (sum: number, card: (typeof doorcards)[0]) =>
         sum + (card.DoorcardMetrics?.totalShares || 0),
-      0,
+      0
     );
 
     // Calculate avg views per card
@@ -92,7 +92,7 @@ export async function GET() {
       // 2. Print usage (25 points) - Prints indicate real-world usage
       const printScore = Math.min(
         (recentAnalytics / (totalDoorcards * 2)) * 25,
-        25,
+        25
       );
       engagementScore += printScore;
 
@@ -103,7 +103,7 @@ export async function GET() {
       // 4. Recent maintenance (15 points)
       const recentlyUpdated = doorcards.filter(
         (doorcard: (typeof doorcards)[0]) =>
-          new Date(doorcard.updatedAt) > thirtyDaysAgo,
+          new Date(doorcard.updatedAt) > thirtyDaysAgo
       ).length;
       const maintenanceScore = (recentlyUpdated / totalDoorcards) * 15;
       engagementScore += maintenanceScore;
@@ -134,7 +134,7 @@ export async function GET() {
     console.error("Error fetching analytics metrics:", error);
     return NextResponse.json(
       { error: "Failed to fetch metrics" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

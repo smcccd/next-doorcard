@@ -58,14 +58,15 @@ export function SearchForm({
 }: SearchFormProps) {
   return (
     <div className="max-w-5xl mx-auto -mt-16 space-y-4">
-      <Card className="border-2 border-blue-200 dark:border-blue-700 bg-white dark:bg-gray-800 shadow-2xl relative backdrop-blur-sm">
+      <Card className="border-2 border-blue-200 dark:border-blue-700 bg-white dark:bg-gray-800 shadow-2xl relative backdrop-blur-sm" data-testid="search-form">
         <CardHeader className="pb-6 pt-8">
           <h2 className="font-bold leading-none tracking-tight flex items-center gap-3 text-xl sm:text-2xl">
             <Search className="h-6 w-6 text-blue-500 dark:text-blue-400" />
             Search for Your Professor
           </h2>
           <p className="text-base text-gray-700 dark:text-gray-100 mt-2">
-            Enter your professor&apos;s name, browse by campus, or filter by department
+            Enter your professor&apos;s name, browse by campus, or filter by
+            department
           </p>
         </CardHeader>
         <CardContent>
@@ -91,7 +92,7 @@ export function SearchForm({
               />
             </div>
             <div>
-              <fieldset>
+              <fieldset data-testid="campus-filter">
                 <legend className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">
                   Campus:
                 </legend>
@@ -100,7 +101,7 @@ export function SearchForm({
                     { value: "ALL", label: "All Campuses" },
                     { value: "SKYLINE", label: "Skyline" },
                     { value: "CSM", label: "CSM" },
-                    { value: "CANADA", label: "Cañada" }
+                    { value: "CANADA", label: "Cañada" },
                   ].map((campus) => (
                     <label
                       key={campus.value}
@@ -111,17 +112,21 @@ export function SearchForm({
                         name="campus"
                         value={campus.value}
                         checked={selectedCampus === campus.value}
-                        onChange={(e) => onCampusChange(e.target.value as College | "ALL")}
+                        onChange={(e) =>
+                          onCampusChange(e.target.value as College | "ALL")
+                        }
                         className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 focus:ring-2"
                       />
                       {campus.value !== "ALL" && (
-                        <CollegeLogo 
-                          college={campus.value as College} 
+                        <CollegeLogo
+                          college={campus.value as College}
                           height={18}
                           className="flex-shrink-0"
                         />
                       )}
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{campus.label}</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        {campus.label}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -132,8 +137,11 @@ export function SearchForm({
                 <Building2 className="h-4 w-4" />
                 Department:
               </p>
-              <Select value={selectedDepartment} onValueChange={onDepartmentChange}>
-                <SelectTrigger className="w-full h-12 text-base bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400">
+              <Select
+                value={selectedDepartment}
+                onValueChange={onDepartmentChange}
+              >
+                <SelectTrigger className="w-full h-12 text-base bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400" data-testid="department-filter">
                   <SelectValue placeholder="Select a department" />
                 </SelectTrigger>
                 <SelectContent className="max-h-64">
@@ -153,7 +161,9 @@ export function SearchForm({
               </p>
               <Select
                 value={selectedDay}
-                onValueChange={(value) => onDayChange(value as DayOfWeek | "ALL")}
+                onValueChange={(value) =>
+                  onDayChange(value as DayOfWeek | "ALL")
+                }
               >
                 <SelectTrigger className="w-full h-12 text-base bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400">
                   <SelectValue placeholder="Select a day" />

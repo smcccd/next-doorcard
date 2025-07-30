@@ -33,7 +33,7 @@ export default defineConfig({
         async ping() {
           try {
             const response = await fetch(
-              config.baseUrl || "http://localhost:3000",
+              config.baseUrl || "http://localhost:3000"
             );
             return response.ok;
           } catch (error) {
@@ -73,7 +73,7 @@ export default defineConfig({
 
             console.log(
               "Token created successfully:",
-              token?.substring(0, 50) + "...",
+              token?.substring(0, 50) + "..."
             );
             return token;
           } catch (error) {

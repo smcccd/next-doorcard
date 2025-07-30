@@ -2,14 +2,20 @@
 
 ## Overview
 
-This document provides specific recommendations and solutions for fixing Cypress session management issues with NextAuth.js applications, particularly addressing timeout problems and session caching issues.
+This document provides specific recommendations and solutions for fixing Cypress
+session management issues with NextAuth.js applications, particularly addressing
+timeout problems and session caching issues.
 
 ## Key Issues Identified
 
-1. **Session Validation Timeouts**: The `validate()` function in `cy.session()` was making HTTP requests that could timeout
-2. **Database Query Delays**: NextAuth callbacks were performing database queries during session validation, causing delays
-3. **Incomplete Session Caching**: Sessions were being cached before authentication was fully complete
-4. **Lack of Fast Authentication**: All tests were going through the full login flow, making them slow and prone to failures
+1. **Session Validation Timeouts**: The `validate()` function in `cy.session()`
+   was making HTTP requests that could timeout
+2. **Database Query Delays**: NextAuth callbacks were performing database
+   queries during session validation, causing delays
+3. **Incomplete Session Caching**: Sessions were being cached before
+   authentication was fully complete
+4. **Lack of Fast Authentication**: All tests were going through the full login
+   flow, making them slow and prone to failures
 
 ## Solutions Implemented
 
@@ -269,7 +275,8 @@ cy.getCookie("next-auth.session-token").then((cookie) => {
 2. **Monitor performance improvements** using the session-test.cy.ts file
 3. **Gradually migrate tests** to use `fastLogin()` where appropriate
 4. **Set up monitoring** to catch session timeout issues early
-5. **Consider implementing** database seeding for tests that need specific user states
+5. **Consider implementing** database seeding for tests that need specific user
+   states
 
 ## Related Resources
 

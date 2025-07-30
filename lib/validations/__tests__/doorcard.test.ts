@@ -85,7 +85,7 @@ describe("Doorcard Validation Schemas", () => {
 
     it("rejects invalid appointment categories", () => {
       expect(() =>
-        appointmentCategorySchema.parse("INVALID_CATEGORY"),
+        appointmentCategorySchema.parse("INVALID_CATEGORY")
       ).toThrow();
       expect(() => appointmentCategorySchema.parse("office_hours")).toThrow();
       expect(() => appointmentCategorySchema.parse("")).toThrow();
@@ -154,7 +154,7 @@ describe("Doorcard Validation Schemas", () => {
         endTime: "12:00", // Before start time
       };
       expect(() => appointmentSchema.parse(invalidAppointment)).toThrow(
-        "End time must be after start time",
+        "End time must be after start time"
       );
     });
 
@@ -165,22 +165,22 @@ describe("Doorcard Validation Schemas", () => {
         endTime: "12:00", // Same as start time
       };
       expect(() => appointmentSchema.parse(invalidAppointment)).toThrow(
-        "End time must be after start time",
+        "End time must be after start time"
       );
     });
 
     it("validates required fields", () => {
       expect(() =>
-        appointmentSchema.parse({ ...validAppointment, name: "" }),
+        appointmentSchema.parse({ ...validAppointment, name: "" })
       ).toThrow("Appointment name is required");
       expect(() =>
-        appointmentSchema.parse({ ...validAppointment, startTime: "" }),
+        appointmentSchema.parse({ ...validAppointment, startTime: "" })
       ).toThrow();
       expect(() =>
-        appointmentSchema.parse({ ...validAppointment, endTime: "" }),
+        appointmentSchema.parse({ ...validAppointment, endTime: "" })
       ).toThrow();
       expect(() =>
-        appointmentSchema.parse({ ...validAppointment, dayOfWeek: "" }),
+        appointmentSchema.parse({ ...validAppointment, dayOfWeek: "" })
       ).toThrow();
     });
 
@@ -189,14 +189,14 @@ describe("Doorcard Validation Schemas", () => {
         appointmentSchema.parse({
           ...validAppointment,
           name: "A".repeat(101),
-        }),
+        })
       ).toThrow();
 
       expect(() =>
         appointmentSchema.parse({
           ...validAppointment,
           location: "A".repeat(51),
-        }),
+        })
       ).toThrow();
     });
   });
@@ -218,19 +218,19 @@ describe("Doorcard Validation Schemas", () => {
 
     it("validates required fields", () => {
       expect(() =>
-        basicInfoSchema.parse({ ...validBasicInfo, name: "" }),
+        basicInfoSchema.parse({ ...validBasicInfo, name: "" })
       ).toThrow("Name is required");
       expect(() =>
-        basicInfoSchema.parse({ ...validBasicInfo, doorcardName: "" }),
+        basicInfoSchema.parse({ ...validBasicInfo, doorcardName: "" })
       ).toThrow("Doorcard name is required");
       expect(() =>
-        basicInfoSchema.parse({ ...validBasicInfo, officeNumber: "" }),
+        basicInfoSchema.parse({ ...validBasicInfo, officeNumber: "" })
       ).toThrow("Office number is required");
       expect(() =>
-        basicInfoSchema.parse({ ...validBasicInfo, term: "" }),
+        basicInfoSchema.parse({ ...validBasicInfo, term: "" })
       ).toThrow("Invalid enum value");
       expect(() =>
-        basicInfoSchema.parse({ ...validBasicInfo, year: 1999 }),
+        basicInfoSchema.parse({ ...validBasicInfo, year: 1999 })
       ).toThrow("Number must be greater than or equal to 2020");
     });
 
@@ -239,37 +239,37 @@ describe("Doorcard Validation Schemas", () => {
         basicInfoSchema.parse({
           ...validBasicInfo,
           name: "A".repeat(101),
-        }),
+        })
       ).toThrow();
 
       expect(() =>
         basicInfoSchema.parse({
           ...validBasicInfo,
           doorcardName: "A".repeat(101),
-        }),
+        })
       ).toThrow();
 
       expect(() =>
         basicInfoSchema.parse({
           ...validBasicInfo,
           officeNumber: "A".repeat(21),
-        }),
+        })
       ).toThrow();
 
       expect(() =>
         basicInfoSchema.parse({
           ...validBasicInfo,
           term: "A".repeat(51),
-        }),
+        })
       ).toThrow();
     });
 
     it("validates year format", () => {
       expect(() =>
-        basicInfoSchema.parse({ ...validBasicInfo, year: 2019 }),
+        basicInfoSchema.parse({ ...validBasicInfo, year: 2019 })
       ).toThrow("Number must be greater than or equal to 2020");
       expect(() =>
-        basicInfoSchema.parse({ ...validBasicInfo, year: 2031 }),
+        basicInfoSchema.parse({ ...validBasicInfo, year: 2031 })
       ).toThrow("Number must be less than or equal to 2030");
     });
 
@@ -297,7 +297,7 @@ describe("Doorcard Validation Schemas", () => {
       };
 
       expect(() => basicInfoSchema.parse(invalidWithDates)).toThrow(
-        "End date must be after start date",
+        "End date must be after start date"
       );
     });
   });
@@ -359,7 +359,7 @@ describe("Doorcard Validation Schemas", () => {
       };
 
       expect(() => doorcardSchema.parse(invalidDoorcard)).toThrow(
-        "Appointment name is required",
+        "Appointment name is required"
       );
     });
   });
@@ -382,10 +382,10 @@ describe("Doorcard Validation Schemas", () => {
 
     it("validates provided fields", () => {
       expect(() => updateDoorcardSchema.parse({ name: "" })).toThrow(
-        "Name is required",
+        "Name is required"
       );
       expect(() => updateDoorcardSchema.parse({ year: 1999 })).toThrow(
-        "Number must be greater than or equal to 2020",
+        "Number must be greater than or equal to 2020"
       );
     });
 
@@ -425,13 +425,13 @@ describe("Doorcard Validation Schemas", () => {
 
     it("validates email format", () => {
       expect(() => userSchema.parse({ email: "invalid-email" })).toThrow(
-        "Invalid email address",
+        "Invalid email address"
       );
       expect(() => userSchema.parse({ email: "test@" })).toThrow(
-        "Invalid email address",
+        "Invalid email address"
       );
       expect(() => userSchema.parse({ email: "@domain.com" })).toThrow(
-        "Invalid email address",
+        "Invalid email address"
       );
     });
 
@@ -440,14 +440,14 @@ describe("Doorcard Validation Schemas", () => {
         userSchema.parse({
           email: "test@smccd.edu",
           name: "A".repeat(101),
-        }),
+        })
       ).toThrow();
 
       expect(() =>
         userSchema.parse({
           email: "test@smccd.edu",
           username: "A".repeat(51),
-        }),
+        })
       ).toThrow();
     });
   });
@@ -470,7 +470,7 @@ describe("Doorcard Validation Schemas", () => {
 
     it("validates required fields", () => {
       expect(() =>
-        timeBlockSchema.parse({ ...validTimeBlock, activity: "" }),
+        timeBlockSchema.parse({ ...validTimeBlock, activity: "" })
       ).toThrow("Activity is required");
     });
 
@@ -585,7 +585,7 @@ describe("Validation Helper Functions", () => {
       const newBlock = { day: "MONDAY", startTime: "09:30", endTime: "10:30" };
       const result = validateTimeBlockOverlap(newBlock, existingBlocks);
       expect(result).toContain(
-        "Time block overlaps with existing MONDAY block",
+        "Time block overlaps with existing MONDAY block"
       );
       expect(result).toContain("09:00 - 10:00");
     });
@@ -719,7 +719,7 @@ describe("Edge Cases and Error Handling", () => {
           term: "FALL", // Valid enum value
           year: 2024, // Number, not string
           college: "SKYLINE",
-        }),
+        })
       ).not.toThrow();
 
       // Over limit
@@ -731,7 +731,7 @@ describe("Edge Cases and Error Handling", () => {
           term: "FALL",
           year: "2024",
           college: "SKYLINE",
-        }),
+        })
       ).toThrow();
     });
 

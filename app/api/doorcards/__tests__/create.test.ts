@@ -92,7 +92,7 @@ describe("/api/doorcards POST", () => {
           year: 2024,
           userId: mockUser.id,
         }),
-      }),
+      })
     );
   });
 

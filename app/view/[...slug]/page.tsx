@@ -30,7 +30,7 @@ import { formatDisplayName } from "@/lib/display-name";
 async function fetchDoorcard(
   username: string,
   termSlug: string | undefined,
-  useAuth: boolean,
+  useAuth: boolean
 ) {
   // If ?auth=true is passed, we allow viewing non-public doorcards (must be signed in)
   const session = await getServerSession(authOptions);
@@ -180,7 +180,7 @@ export default async function PublicDoorcardView({
     appointments: doorcard.Appointment,
     user: doorcard.User,
   };
-  
+
   const doorcardLite = {
     ...transformedDoorcard,
     year: String(doorcard.year), // Convert number to string
@@ -264,8 +264,8 @@ export default async function PublicDoorcardView({
                 </div>
                 {transformedDoorcard.college && (
                   <div className="flex items-center gap-1">
-                    <CollegeLogo 
-                      college={transformedDoorcard.college as College} 
+                    <CollegeLogo
+                      college={transformedDoorcard.college as College}
                       height={16}
                       className="flex-shrink-0"
                     />
@@ -312,7 +312,7 @@ export default async function PublicDoorcardView({
       </div>
 
       {/* Schedule - Screen and Print versions */}
-      <div className="w-full">
+      <div className="w-full my-4 max-w-4xl mx-auto">
         {transformedDoorcard.appointments.length > 0 ? (
           <>
             {/* Screen version - full schedule with all features */}

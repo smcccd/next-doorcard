@@ -20,7 +20,7 @@ async function getImportStatus() {
     console.log(`📅 Appointments: ${appointmentCount.toLocaleString()}`);
     console.log(`${"=".repeat(50)}`);
     console.log(
-      `📊 Total Records: ${(userCount + doorcardCount + appointmentCount).toLocaleString()}`,
+      `📊 Total Records: ${(userCount + doorcardCount + appointmentCount).toLocaleString()}`
     );
     console.log(`\n⏰ Last updated: ${timestamp}`);
     console.log(`⏭️  Next update in 5 seconds...`);

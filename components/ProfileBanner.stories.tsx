@@ -1,14 +1,14 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import { ProfileBanner } from './ProfileBanner';
-import { SessionProvider } from 'next-auth/react';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import { ProfileBanner } from "./ProfileBanner";
+import { SessionProvider } from "next-auth/react";
 
 const meta = {
-  title: 'Components/ProfileBanner',
+  title: "Components/ProfileBanner",
   component: ProfileBanner,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   decorators: [
     (Story, context) => {
       const { session } = (context.args as any) || {};
@@ -30,11 +30,11 @@ export const ShowsBanner: Story = {
   args: {
     session: {
       user: {
-        id: '1',
-        name: 'user123', // Generic username
-        email: 'user123@college.edu',
+        id: "1",
+        name: "user123", // Generic username
+        email: "user123@college.edu",
       },
-      expires: '2024-12-31',
+      expires: "2024-12-31",
     },
   },
 };
@@ -43,11 +43,11 @@ export const GenericEmailName: Story = {
   args: {
     session: {
       user: {
-        id: '1',
-        name: 'jsmith', // Matches email prefix
-        email: 'jsmith@college.edu',
+        id: "1",
+        name: "jsmith", // Matches email prefix
+        email: "jsmith@college.edu",
       },
-      expires: '2024-12-31',
+      expires: "2024-12-31",
     },
   },
 };
@@ -56,11 +56,11 @@ export const NoName: Story = {
   args: {
     session: {
       user: {
-        id: '1',
+        id: "1",
         name: null, // No name set
-        email: 'faculty@college.edu',
+        email: "faculty@college.edu",
       },
-      expires: '2024-12-31',
+      expires: "2024-12-31",
     },
   },
 };
@@ -69,11 +69,11 @@ export const EmptyName: Story = {
   args: {
     session: {
       user: {
-        id: '1',
-        name: '', // Empty name
-        email: 'professor@college.edu',
+        id: "1",
+        name: "", // Empty name
+        email: "professor@college.edu",
       },
-      expires: '2024-12-31',
+      expires: "2024-12-31",
     },
   },
 };
@@ -82,17 +82,18 @@ export const HiddenForCompleteName: Story = {
   args: {
     session: {
       user: {
-        id: '1',
-        name: 'Dr. Jane Smith', // Complete name - banner should not show
-        email: 'jsmith@college.edu',
+        id: "1",
+        name: "Dr. Jane Smith", // Complete name - banner should not show
+        email: "jsmith@college.edu",
       },
-      expires: '2024-12-31',
+      expires: "2024-12-31",
     },
   },
   parameters: {
     docs: {
       description: {
-        story: 'When user has a complete name, the banner is hidden (component returns null).',
+        story:
+          "When user has a complete name, the banner is hidden (component returns null).",
       },
     },
   },
@@ -105,7 +106,8 @@ export const HiddenWhenLoggedOut: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'When user is not logged in, the banner is hidden (component returns null).',
+        story:
+          "When user is not logged in, the banner is hidden (component returns null).",
       },
     },
   },
@@ -115,11 +117,11 @@ export const InDashboardContext: Story = {
   args: {
     session: {
       user: {
-        id: '1',
-        name: 'tempuser',
-        email: 'tempuser@college.edu',
+        id: "1",
+        name: "tempuser",
+        email: "tempuser@college.edu",
       },
-      expires: '2024-12-31',
+      expires: "2024-12-31",
     },
   },
   decorators: [
@@ -149,7 +151,7 @@ export const InDashboardContext: Story = {
 
 export const DarkMode: Story = {
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story, context) => {
@@ -168,11 +170,11 @@ export const DarkMode: Story = {
   args: {
     session: {
       user: {
-        id: '1',
-        name: 'newuser',
-        email: 'newuser@college.edu',
+        id: "1",
+        name: "newuser",
+        email: "newuser@college.edu",
       },
-      expires: '2024-12-31',
+      expires: "2024-12-31",
     },
   },
 };

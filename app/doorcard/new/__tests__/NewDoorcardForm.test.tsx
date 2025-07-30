@@ -58,7 +58,7 @@ describe("NewDoorcardForm", () => {
     expect(screen.getByLabelText(/term/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/year/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /continue to basic info/i }),
+      screen.getByRole("button", { name: /continue to basic info/i })
     ).toBeInTheDocument();
   });
 
@@ -72,7 +72,7 @@ describe("NewDoorcardForm", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/please fill in all required fields correctly/i),
+        screen.getByText(/please fill in all required fields correctly/i)
       ).toBeInTheDocument();
     });
   });
@@ -124,7 +124,7 @@ describe("NewDoorcardForm", () => {
     await waitFor(() => {
       expect(mockCreateDoorcardWithCampusTerm).toHaveBeenCalledWith(
         { success: true }, // previous state
-        expect.any(FormData), // form data
+        expect.any(FormData) // form data
       );
     });
   });
@@ -144,7 +144,7 @@ describe("NewDoorcardForm", () => {
 
     // Submit
     await user.click(
-      screen.getByRole("button", { name: /continue to basic info/i }),
+      screen.getByRole("button", { name: /continue to basic info/i })
     );
 
     await waitFor(() => {
@@ -157,8 +157,8 @@ describe("NewDoorcardForm", () => {
     mockCreateDoorcardWithCampusTerm.mockImplementation(
       () =>
         new Promise((resolve) =>
-          setTimeout(() => resolve({ success: true, doorcardId: "test" }), 100),
-        ),
+          setTimeout(() => resolve({ success: true, doorcardId: "test" }), 100)
+        )
     );
 
     render(<NewDoorcardForm />);
@@ -170,12 +170,12 @@ describe("NewDoorcardForm", () => {
 
     // Submit
     await user.click(
-      screen.getByRole("button", { name: /continue to basic info/i }),
+      screen.getByRole("button", { name: /continue to basic info/i })
     );
 
     // Check for loading state
     expect(
-      screen.getByRole("button", { name: /creating/i }),
+      screen.getByRole("button", { name: /creating/i })
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /creating/i })).toBeDisabled();
 
@@ -199,7 +199,7 @@ describe("NewDoorcardForm", () => {
     await selectOption(/year/i, getCurrentYear().toString());
 
     await user.click(
-      screen.getByRole("button", { name: /continue to basic info/i }),
+      screen.getByRole("button", { name: /continue to basic info/i })
     );
 
     await waitFor(() => {
@@ -238,7 +238,7 @@ describe("NewDoorcardForm", () => {
 
     // Submit with empty fields to show errors
     await user.click(
-      screen.getByRole("button", { name: /continue to basic info/i }),
+      screen.getByRole("button", { name: /continue to basic info/i })
     );
 
     await waitFor(() => {
@@ -270,7 +270,7 @@ describe("NewDoorcardForm", () => {
       render(<NewDoorcardForm />);
 
       await user.click(
-        screen.getByRole("button", { name: /continue to basic info/i }),
+        screen.getByRole("button", { name: /continue to basic info/i })
       );
 
       await waitFor(() => {
@@ -316,20 +316,20 @@ describe("NewDoorcardForm", () => {
       await selectOption(/year/i, getCurrentYear().toString());
 
       await user.click(
-        screen.getByRole("button", { name: /continue to basic info/i }),
+        screen.getByRole("button", { name: /continue to basic info/i })
       );
 
       // Should handle gracefully without crashing
       await waitFor(() => {
         expect(
-          screen.getByRole("button", { name: /continue to basic info/i }),
+          screen.getByRole("button", { name: /continue to basic info/i })
         ).not.toBeDisabled();
       });
     });
 
     it("handles network errors", async () => {
       mockCreateDoorcardWithCampusTerm.mockRejectedValue(
-        new Error("Network error"),
+        new Error("Network error")
       );
 
       render(<NewDoorcardForm />);
@@ -340,7 +340,7 @@ describe("NewDoorcardForm", () => {
       await selectOption(/year/i, getCurrentYear().toString());
 
       await user.click(
-        screen.getByRole("button", { name: /continue to basic info/i }),
+        screen.getByRole("button", { name: /continue to basic info/i })
       );
 
       // Should show error state

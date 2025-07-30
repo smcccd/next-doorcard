@@ -25,7 +25,7 @@ const TERM_OPTIONS = ["Fall", "Spring", "Summer"] as const;
 const COLLEGE_OPTIONS = Object.keys(COLLEGE_META) as College[];
 const CURRENT_YEAR = new Date().getFullYear();
 const YEAR_OPTIONS = Array.from({ length: 5 }, (_, i) =>
-  (CURRENT_YEAR + i).toString(),
+  (CURRENT_YEAR + i).toString()
 );
 
 type FieldErrors = { college?: string; term?: string; year?: string };
@@ -92,14 +92,14 @@ export default function CampusTermForm({ doorcard }: Props) {
 
   const [state, serverAction] = useActionState<ActionState, FormData>(
     validateCampusTerm.bind(null, doorcard.id),
-    { success: true },
+    { success: true }
   );
 
   /* ------------------------------ Validation ------------------------------ */
 
   const validateField = (
     name: keyof FieldErrors,
-    value: string,
+    value: string
   ): string | undefined => {
     if (!value) return "Required";
     switch (name) {

@@ -263,7 +263,7 @@ process.env.NEXTAUTH_URL = "http://localhost:3000";
 process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
 
 // Mock window.matchMedia for responsive/media query tests
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   Object.defineProperty(window, "matchMedia", {
     writable: true,
     value: jest.fn().mockImplementation((query) => ({
@@ -294,12 +294,46 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
 }));
 
 // Mock pointer capture methods for JSDOM compatibility
-Element.prototype.hasPointerCapture = jest.fn(() => false);
-Element.prototype.setPointerCapture = jest.fn();
-Element.prototype.releasePointerCapture = jest.fn();
+if (typeof Element !== 'undefined') {
+  Element.prototype.hasPointerCapture = jest.fn(() => false);
+  Element.prototype.setPointerCapture = jest.fn();
+  Element.prototype.releasePointerCapture = jest.fn();
+}
 
 // Mock fetch if needed
 global.fetch = jest.fn();
+
+// Mock Prisma enums for tests
+jest.doMock('@prisma/client', () => ({
+  ...jest.requireActual('@prisma/client'),
+  TermSeason: {
+    FALL: 'FALL',
+    SPRING: 'SPRING',
+    SUMMER: 'SUMMER'
+  },
+  College: {
+    SKYLINE: 'SKYLINE',
+    CSM: 'CSM',
+    CANADA: 'CANADA'
+  },
+  DayOfWeek: {
+    MONDAY: 'MONDAY',
+    TUESDAY: 'TUESDAY',
+    WEDNESDAY: 'WEDNESDAY',
+    THURSDAY: 'THURSDAY',
+    FRIDAY: 'FRIDAY',
+    SATURDAY: 'SATURDAY',
+    SUNDAY: 'SUNDAY'
+  },
+  AppointmentCategory: {
+    OFFICE_HOURS: 'OFFICE_HOURS',
+    IN_CLASS: 'IN_CLASS',
+    LECTURE: 'LECTURE', 
+    LAB: 'LAB',
+    HOURS_BY_ARRANGEMENT: 'HOURS_BY_ARRANGEMENT',
+    REFERENCE: 'REFERENCE'
+  }
+}));
 
 // Suppress console errors for cleaner test output (optional)
 const originalError = console.error;

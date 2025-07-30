@@ -52,7 +52,7 @@ export default function SiteIndex() {
                   onClick={() => {
                     // Scroll to section or filter content by letter
                     const element = document.getElementById(
-                      `section-${letter.toLowerCase()}`,
+                      `section-${letter.toLowerCase()}`
                     );
                     if (element) {
                       element.scrollIntoView({ behavior: "smooth" });
@@ -94,7 +94,7 @@ export default function SiteIndex() {
                     onClick={() => {
                       // Scroll to section or filter content by letter
                       const element = document.getElementById(
-                        `section-${letter.toLowerCase()}`,
+                        `section-${letter.toLowerCase()}`
                       );
                       if (element) {
                         element.scrollIntoView({ behavior: "smooth" });

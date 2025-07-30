@@ -28,10 +28,10 @@ async function checkMetrics() {
   console.log("\nSample metrics:");
   sampleMetrics.forEach((metric, index) => {
     console.log(
-      `${index + 1}. ${metric.Doorcard.name} (${metric.Doorcard.term} ${metric.Doorcard.year}, ${metric.Doorcard.college})`,
+      `${index + 1}. ${metric.Doorcard.name} (${metric.Doorcard.term} ${metric.Doorcard.year}, ${metric.Doorcard.college})`
     );
     console.log(
-      `   Views: ${metric.totalViews}, Prints: ${metric.totalPrints}, Shares: ${metric.totalShares}`,
+      `   Views: ${metric.totalViews}, Prints: ${metric.totalPrints}, Shares: ${metric.totalShares}`
     );
     console.log(`   Last viewed: ${metric.lastViewedAt || "Never"}`);
   });
@@ -61,7 +61,7 @@ async function checkMetrics() {
   console.log("\nRecent analytics events:");
   recentAnalytics.forEach((event, index) => {
     console.log(
-      `${index + 1}. ${event.eventType} - ${event.Doorcard.name} (${event.Doorcard.college}) - ${event.createdAt.toISOString().split("T")[0]}`,
+      `${index + 1}. ${event.eventType} - ${event.Doorcard.name} (${event.Doorcard.college}) - ${event.createdAt.toISOString().split("T")[0]}`
     );
   });
 
@@ -79,7 +79,9 @@ async function checkMetrics() {
     },
   });
 
-  const doorcarsWithMetrics = recentDoorcards.filter((d) => d.DoorcardMetrics !== null);
+  const doorcarsWithMetrics = recentDoorcards.filter(
+    (d) => d.DoorcardMetrics !== null
+  );
   console.log(`\nRecent doorcards: ${recentDoorcards.length}`);
   console.log(`Recent doorcards with metrics: ${doorcarsWithMetrics.length}`);
 
@@ -88,7 +90,7 @@ async function checkMetrics() {
     doorcarsWithMetrics.slice(0, 5).forEach((doorcard, index) => {
       console.log(`${index + 1}. ${doorcard.name} (${doorcard.college})`);
       console.log(
-        `   Views: ${doorcard.DoorcardMetrics?.totalViews}, Prints: ${doorcard.DoorcardMetrics?.totalPrints}, Shares: ${doorcard.DoorcardMetrics?.totalShares}`,
+        `   Views: ${doorcard.DoorcardMetrics?.totalViews}, Prints: ${doorcard.DoorcardMetrics?.totalPrints}, Shares: ${doorcard.DoorcardMetrics?.totalShares}`
       );
     });
   }

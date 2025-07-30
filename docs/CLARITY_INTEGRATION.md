@@ -1,10 +1,12 @@
 # Microsoft Clarity Integration
 
-This document explains how Microsoft Clarity is integrated into the Next.js application.
+This document explains how Microsoft Clarity is integrated into the Next.js
+application.
 
 ## Overview
 
-Microsoft Clarity is a user behavior analytics tool that provides insights into how users interact with your website through features like:
+Microsoft Clarity is a user behavior analytics tool that provides insights into
+how users interact with your website through features like:
 
 - Session recordings
 - Heatmaps
@@ -30,7 +32,8 @@ Add your Clarity project ID to your `.env.local` file:
 NEXT_PUBLIC_CLARITY_ID=your-clarity-project-id
 ```
 
-**Important**: The environment variable must start with `NEXT_PUBLIC_` to be accessible on the client side.
+**Important**: The environment variable must start with `NEXT_PUBLIC_` to be
+accessible on the client side.
 
 ### Getting Your Project ID
 
@@ -54,7 +57,8 @@ NEXT_PUBLIC_CLARITY_ID=your-clarity-project-id
 
 ### Integration in Layout
 
-The `ClarityInit` component is added to the root layout (`/app/layout.tsx`) to ensure Clarity loads on every page:
+The `ClarityInit` component is added to the root layout (`/app/layout.tsx`) to
+ensure Clarity loads on every page:
 
 ```tsx
 import ClarityInit from "@/components/ClarityInit";
@@ -116,10 +120,13 @@ ClarityUtils.consent(false);
 
 ## Best Practices
 
-1. **Privacy Compliance**: Always respect user privacy and comply with GDPR, CCPA, and other regulations
+1. **Privacy Compliance**: Always respect user privacy and comply with GDPR,
+   CCPA, and other regulations
 2. **Meaningful Events**: Track events that provide business value and insights
-3. **Avoid Over-tracking**: Don't track every single interaction; focus on key user journeys
-4. **Test in Development**: Verify that events are being tracked correctly in your dev environment
+3. **Avoid Over-tracking**: Don't track every single interaction; focus on key
+   user journeys
+4. **Test in Development**: Verify that events are being tracked correctly in
+   your dev environment
 
 ## Verification
 
@@ -145,7 +152,8 @@ To verify that Clarity is working:
 
 3. **Build errors**
    - Make sure the `ClarityInit` component is marked with `"use client"`
-   - Check that the import statement is correct: `import Clarity from "@microsoft/clarity"`
+   - Check that the import statement is correct:
+     `import Clarity from "@microsoft/clarity"`
 
 ### Debug Mode
 
@@ -165,4 +173,5 @@ The Microsoft Clarity npm package supports additional features:
 - **Custom Tags**: Segment your data with custom attributes
 - **Event Tracking**: Monitor specific user actions and conversions
 
-For more advanced usage, refer to the [official Microsoft Clarity documentation](https://learn.microsoft.com/en-us/clarity/).
+For more advanced usage, refer to the
+[official Microsoft Clarity documentation](https://learn.microsoft.com/en-us/clarity/).

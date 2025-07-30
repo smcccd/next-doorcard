@@ -1,17 +1,23 @@
-import type { Meta, StoryObj } from '@storybook/nextjs';
-import { Label } from './label';
-import { Input } from './input';
-import { Checkbox } from './checkbox';
-import { Textarea } from './textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
+import type { Meta, StoryObj } from "@storybook/nextjs";
+import { Label } from "./label";
+import { Input } from "./input";
+import { Checkbox } from "./checkbox";
+import { Textarea } from "./textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./select";
 
 const meta = {
-  title: 'UI/Label',
+  title: "UI/Label",
   component: Label,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
 } satisfies Meta<typeof Label>;
 
 export default meta;
@@ -19,7 +25,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    children: 'Label',
+    children: "Label",
   },
 };
 
@@ -81,7 +87,8 @@ export const Required: Story = {
       </div>
       <div className="space-y-2">
         <Label htmlFor="optional-field">
-          Optional Field <span className="text-gray-500 text-sm">(optional)</span>
+          Optional Field{" "}
+          <span className="text-gray-500 text-sm">(optional)</span>
         </Label>
         <Input id="optional-field" />
       </div>
@@ -116,7 +123,11 @@ export const Disabled: Story = {
       <Label htmlFor="disabled-input" className="opacity-50">
         Disabled Field
       </Label>
-      <Input id="disabled-input" disabled placeholder="This field is disabled" />
+      <Input
+        id="disabled-input"
+        disabled
+        placeholder="This field is disabled"
+      />
     </div>
   ),
 };
@@ -125,29 +136,45 @@ export const FormExample: Story = {
   render: () => (
     <form className="space-y-4 w-[400px]">
       <div className="space-y-2">
-        <Label htmlFor="form-name">Full Name <span className="text-red-500">*</span></Label>
+        <Label htmlFor="form-name">
+          Full Name <span className="text-red-500">*</span>
+        </Label>
         <Input id="form-name" placeholder="John Doe" required />
       </div>
-      
+
       <div className="space-y-2">
-        <Label htmlFor="form-email">Email Address <span className="text-red-500">*</span></Label>
-        <Input id="form-email" type="email" placeholder="john@example.com" required />
+        <Label htmlFor="form-email">
+          Email Address <span className="text-red-500">*</span>
+        </Label>
+        <Input
+          id="form-email"
+          type="email"
+          placeholder="john@example.com"
+          required
+        />
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="form-office">Office Number</Label>
         <Input id="form-office" placeholder="36-301" />
       </div>
-      
+
       <div className="space-y-2">
         <Label htmlFor="form-bio">Bio</Label>
-        <Textarea id="form-bio" placeholder="Tell us about yourself..." rows={4} />
+        <Textarea
+          id="form-bio"
+          placeholder="Tell us about yourself..."
+          rows={4}
+        />
         <p className="text-sm text-gray-500">Maximum 500 characters</p>
       </div>
-      
+
       <div className="flex items-center space-x-2">
         <Checkbox id="form-public" />
-        <Label htmlFor="form-public" className="text-sm font-normal cursor-pointer">
+        <Label
+          htmlFor="form-public"
+          className="text-sm font-normal cursor-pointer"
+        >
           Make my profile public
         </Label>
       </div>
@@ -173,7 +200,7 @@ export const ScreenReaderOnly: Story = {
 
 export const DarkMode: Story = {
   parameters: {
-    backgrounds: { default: 'dark' },
+    backgrounds: { default: "dark" },
   },
   decorators: [
     (Story) => (
@@ -188,15 +215,18 @@ export const DarkMode: Story = {
         <Label htmlFor="dark-input" className="dark:text-gray-200">
           Dark Mode Label
         </Label>
-        <Input 
-          id="dark-input" 
+        <Input
+          id="dark-input"
           placeholder="Dark mode input"
           className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
         />
       </div>
       <div className="flex items-center space-x-2">
         <Checkbox id="dark-checkbox" />
-        <Label htmlFor="dark-checkbox" className="text-sm font-normal cursor-pointer dark:text-gray-200">
+        <Label
+          htmlFor="dark-checkbox"
+          className="text-sm font-normal cursor-pointer dark:text-gray-200"
+        >
           Enable notifications
         </Label>
       </div>

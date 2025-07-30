@@ -156,7 +156,7 @@ describe("Display Name Utils", () => {
       expect(options.map((o) => o.value)).toContain("FULL_WITH_TITLE");
       expect(options.map((o) => o.value)).toContain("LAST_WITH_TITLE");
       expect(options.map((o) => o.value)).toContain(
-        "FIRST_INITIAL_LAST_WITH_TITLE",
+        "FIRST_INITIAL_LAST_WITH_TITLE"
       );
     });
 
@@ -165,7 +165,7 @@ describe("Display Name Utils", () => {
         "Bryan",
         "Besnyi",
         "Dr.",
-        "they/them",
+        "they/them"
       );
 
       expect(options[0]).toMatchObject({

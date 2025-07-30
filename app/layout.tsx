@@ -32,6 +32,7 @@ export const metadata: Metadata = {
   title: "Faculty Doorcard App",
   description: "Create and manage faculty doorcards",
   applicationName: "Faculty Doorcard",
+  manifest: "/manifest.json",
   openGraph: {
     title: "Faculty Doorcard App",
     description: "Create and manage faculty doorcards",
@@ -89,10 +90,7 @@ export default async function RootLayout({
 
               {/* Site Index moved to individual pages that need it */}
 
-              <main
-                id="main-content"
-                className="w-full flex-1"
-              >
+              <main id="main-content" className="w-full flex-1">
                 {children}
               </main>
 

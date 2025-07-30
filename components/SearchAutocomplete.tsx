@@ -1,9 +1,9 @@
 // components/SearchAutocomplete.tsx
 "use client";
 
-import { useEffect, useRef } from 'react';
-import { Search, User, Building2, BookOpen } from 'lucide-react';
-import type { AutocompleteSuggestion } from '@/hooks/useSearchAutocomplete';
+import { useEffect, useRef } from "react";
+import { Search, User, Building2, BookOpen } from "lucide-react";
+import type { AutocompleteSuggestion } from "@/hooks/useSearchAutocomplete";
 
 interface SearchAutocompleteProps {
   suggestions: AutocompleteSuggestion[];
@@ -16,23 +16,26 @@ export function SearchAutocomplete({
   suggestions,
   isVisible,
   onSelect,
-  onClose
+  onClose,
 }: SearchAutocompleteProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         onClose();
       }
     };
 
     if (isVisible) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isVisible, onClose]);
 
@@ -42,11 +45,11 @@ export function SearchAutocomplete({
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'professor':
+      case "professor":
         return <User className="h-4 w-4 text-blue-500" />;
-      case 'department':
+      case "department":
         return <Building2 className="h-4 w-4 text-green-500" />;
-      case 'course':
+      case "course":
         return <BookOpen className="h-4 w-4 text-purple-500" />;
       default:
         return <Search className="h-4 w-4 text-gray-400" />;
@@ -81,7 +84,7 @@ export function SearchAutocomplete({
           </button>
         ))}
       </div>
-      
+
       {suggestions.length > 0 && (
         <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
           <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">

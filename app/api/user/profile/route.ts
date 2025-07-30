@@ -41,7 +41,7 @@ export async function PATCH(req: NextRequest) {
     if (!hasNewNameFields && !hasLegacyName) {
       return NextResponse.json(
         { error: "Either firstName/lastName or name is required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -55,7 +55,7 @@ export async function PATCH(req: NextRequest) {
       } catch {
         return NextResponse.json(
           { error: "Invalid website URL" },
-          { status: 400 },
+          { status: 400 }
         );
       }
     }
@@ -116,7 +116,7 @@ export async function PATCH(req: NextRequest) {
     console.error("Profile update error:", error);
     return NextResponse.json(
       { error: "Failed to update profile" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -126,14 +126,14 @@ export async function GET(req: NextRequest) {
     console.log("[Profile API GET] Starting request...");
     console.log(
       "[Profile API GET] Request headers:",
-      Object.fromEntries(req.headers.entries()),
+      Object.fromEntries(req.headers.entries())
     );
 
     const session = await getServerSession(authOptions);
     console.log("[Profile API GET] Session:", session ? "EXISTS" : "NULL");
     console.log(
       "[Profile API GET] Full session:",
-      JSON.stringify(session, null, 2),
+      JSON.stringify(session, null, 2)
     );
 
     if (!session?.user?.email) {
@@ -169,7 +169,7 @@ export async function GET(req: NextRequest) {
     console.error("Profile fetch error:", error);
     return NextResponse.json(
       { error: "Failed to fetch profile" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

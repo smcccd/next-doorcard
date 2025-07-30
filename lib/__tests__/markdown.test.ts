@@ -16,8 +16,12 @@ import { marked } from "marked";
 import hljs from "highlight.js";
 
 const mockParse = marked.parse as jest.MockedFunction<typeof marked.parse>;
-const mockGetLanguage = hljs.getLanguage as jest.MockedFunction<typeof hljs.getLanguage>;
-const mockHighlight = hljs.highlight as jest.MockedFunction<typeof hljs.highlight>;
+const mockGetLanguage = hljs.getLanguage as jest.MockedFunction<
+  typeof hljs.getLanguage
+>;
+const mockHighlight = hljs.highlight as jest.MockedFunction<
+  typeof hljs.highlight
+>;
 
 describe("Markdown Utils", () => {
   beforeEach(() => {
@@ -63,7 +67,7 @@ describe("Markdown Utils", () => {
       expect(result).toContain("bg-red-50");
       expect(consoleSpy).toHaveBeenCalledWith(
         "Markdown parsing failed:",
-        expect.any(Error),
+        expect.any(Error)
       );
 
       consoleSpy.mockRestore();

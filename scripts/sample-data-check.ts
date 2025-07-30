@@ -20,7 +20,7 @@ async function sampleDataCheck() {
   console.log("\n👥 Sample Users:");
   sampleUsers.forEach((user, index) => {
     console.log(
-      `${index + 1}. ${user.name || user.email} - Campus: ${user.college || "NO CAMPUS"}`,
+      `${index + 1}. ${user.name || user.email} - Campus: ${user.college || "NO CAMPUS"}`
     );
   });
 
@@ -41,7 +41,7 @@ async function sampleDataCheck() {
   console.log("\n🚪 Sample Doorcards:");
   sampleDoorcards.forEach((doorcard, index) => {
     console.log(
-      `${index + 1}. ${doorcard.name} (${doorcard.term} ${doorcard.year})`,
+      `${index + 1}. ${doorcard.name} (${doorcard.term} ${doorcard.year})`
     );
     console.log(`   User Campus: ${doorcard.User.college || "NO CAMPUS"}`);
     console.log(`   Doorcard Campus: ${doorcard.college}`);
