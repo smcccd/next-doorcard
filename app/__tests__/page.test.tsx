@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Home from "../page";
 import { HomePageObject } from "@/lib/test-page-objects";
-import { testHelpers, mockData } from "@/lib/test-utils";
 
 // Mock the router
 const mockPush = jest.fn();

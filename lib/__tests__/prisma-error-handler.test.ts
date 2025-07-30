@@ -29,7 +29,7 @@ describe("PrismaErrorHandler", () => {
         }
       );
 
-      const result = PrismaErrorHandler.handle(error);
+      PrismaErrorHandler.handle(error);
 
       expect(mockNextResponse.json).toHaveBeenCalledWith(
         {
@@ -49,7 +49,7 @@ describe("PrismaErrorHandler", () => {
         }
       );
 
-      const result = PrismaErrorHandler.handle(error);
+      PrismaErrorHandler.handle(error);
 
       expect(mockNextResponse.json).toHaveBeenCalledWith(
         {
@@ -69,7 +69,7 @@ describe("PrismaErrorHandler", () => {
         }
       );
 
-      const result = PrismaErrorHandler.handle(error);
+      PrismaErrorHandler.handle(error);
 
       expect(mockNextResponse.json).toHaveBeenCalledWith(
         {
@@ -82,11 +82,12 @@ describe("PrismaErrorHandler", () => {
 
     it("should handle unknown PrismaClientKnownRequestError codes", () => {
       const error = new Prisma.PrismaClientKnownRequestError("Unknown error", {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         code: "P9999" as any,
         clientVersion: "5.0.0",
       });
 
-      const result = PrismaErrorHandler.handle(error);
+      PrismaErrorHandler.handle(error);
 
       expect(mockNextResponse.json).toHaveBeenCalledWith(
         {
@@ -103,7 +104,7 @@ describe("PrismaErrorHandler", () => {
         "5.0.0"
       );
 
-      const result = PrismaErrorHandler.handle(error);
+      PrismaErrorHandler.handle(error);
 
       expect(mockNextResponse.json).toHaveBeenCalledWith(
         {
@@ -120,7 +121,7 @@ describe("PrismaErrorHandler", () => {
         "5.0.0"
       );
 
-      const result = PrismaErrorHandler.handle(error);
+      PrismaErrorHandler.handle(error);
 
       expect(mockNextResponse.json).toHaveBeenCalledWith(
         {
@@ -139,7 +140,7 @@ describe("PrismaErrorHandler", () => {
         process.env.NODE_ENV = "production";
         const error = new Error("Generic error");
 
-        const result = PrismaErrorHandler.handle(error);
+        PrismaErrorHandler.handle(error);
 
         expect(consoleSpy).toHaveBeenCalledWith(
           "Unexpected database error:",
@@ -166,7 +167,7 @@ describe("PrismaErrorHandler", () => {
         process.env.NODE_ENV = "development";
         const error = new Error("Generic error");
 
-        const result = PrismaErrorHandler.handle(error);
+        PrismaErrorHandler.handle(error);
 
         expect(consoleSpy).not.toHaveBeenCalled();
         expect(mockNextResponse.json).toHaveBeenCalledWith(
