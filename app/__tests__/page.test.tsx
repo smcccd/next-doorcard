@@ -196,9 +196,9 @@ describe("Home Page", () => {
 
     // Test for loading state without relying on exact text
     expect(
-      screen.getByText(/loading/i) || 
-      screen.getByText(/finding/i) ||
-      screen.getByRole('status')
+      screen.getByText(/loading/i) ||
+        screen.getByText(/finding/i) ||
+        screen.getByRole("status")
     ).toBeInTheDocument();
   });
 });
