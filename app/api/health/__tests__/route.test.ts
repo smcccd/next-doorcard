@@ -96,6 +96,30 @@ describe("/api/health", () => {
       expect(typeof data.uptime).toBe("number");
       expect(typeof data.timestamp).toBe("string");
       expect(data.environment).toBe(process.env.NODE_ENV);
+
+      // Validate timestamp is ISO format
+      expect(data.timestamp).toMatch(
+        /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+      );
+    });
+
+    it("should include all required health check fields", async () => {
+      mockPrisma.$queryRaw.mockResolvedValue([{ "?column?": 1 }]);
+
+      const response = await GET();
+      const data = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(data).toHaveProperty("status");
+      expect(data).toHaveProperty("timestamp");
+      expect(data).toHaveProperty("uptime");
+      expect(data).toHaveProperty("environment");
+      expect(data).toHaveProperty("version");
+      expect(data).toHaveProperty("database");
+      expect(data).toHaveProperty("checks");
+      expect(data.checks).toHaveProperty("database");
+      expect(data.checks).toHaveProperty("auth");
+      expect(data.checks).toHaveProperty("onelogin");
     });
 
     it("should handle non-Error exceptions", async () => {

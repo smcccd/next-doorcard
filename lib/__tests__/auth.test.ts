@@ -1,33 +1,73 @@
-// Import will be done dynamically after env setup
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
-// Mock dependencies
-jest.mock("@next-auth/prisma-adapter");
-jest.mock("next-auth/providers/credentials");
-jest.mock("bcryptjs");
+// Mock dependencies first
 jest.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
+    },
+    account: {
+      findUnique: jest.fn(),
+      create: jest.fn(),
+    },
+    session: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    verificationToken: {
+      findUnique: jest.fn(),
+      delete: jest.fn(),
     },
   },
 }));
 
-const mockPrismaAdapter = PrismaAdapter as jest.MockedFunction<
-  typeof PrismaAdapter
->;
+jest.mock("bcryptjs", () => ({
+  compare: jest.fn(),
+  hash: jest.fn(),
+}));
 
-// Mock environment variables
+jest.mock("crypto", () => ({
+  randomUUID: jest.fn(() => "mock-uuid"),
+}));
+
+// Mock the adapter before defining mockAdapter
+jest.mock("@next-auth/prisma-adapter", () => ({
+  PrismaAdapter: jest.fn(() => ({
+    createUser: jest.fn(),
+    getUser: jest.fn(),
+    getUserByEmail: jest.fn(),
+    getUserByAccount: jest.fn(),
+    updateUser: jest.fn(),
+    deleteUser: jest.fn(),
+    linkAccount: jest.fn(),
+    unlinkAccount: jest.fn(),
+    createSession: jest.fn(),
+    getSessionAndUser: jest.fn(),
+    updateSession: jest.fn(),
+    deleteSession: jest.fn(),
+    createVerificationToken: jest.fn(),
+    useVerificationToken: jest.fn(),
+  })),
+}));
+
+// Store original env
 const originalEnv = process.env;
 
-// Set up environment variables before importing
+// Set up test environment before importing auth
+process.env.NEXTAUTH_SECRET = "test-secret";
 process.env.ONELOGIN_CLIENT_ID = "test-client-id";
 process.env.ONELOGIN_CLIENT_SECRET = "test-client-secret";
-process.env.NEXTAUTH_SECRET = "test-secret";
-process.env.NEXTAUTH_URL = "http://localhost:3000";
+process.env.ONELOGIN_ISSUER = "https://smccd.onelogin.com";
+process.env.NODE_ENV = "development";
 
+// Now import after mocks are set up
 import { authOptions } from "../auth";
 
 describe("Auth Configuration", () => {
@@ -39,310 +79,590 @@ describe("Auth Configuration", () => {
     process.env = originalEnv;
   });
 
-  describe("Basic Configuration", () => {
-    it("should have correct adapter configuration", () => {
-      // The adapter might be undefined in test environment due to mocking
-      // Just verify that PrismaAdapter is available as a mock
-      expect(mockPrismaAdapter).toBeDefined();
-    });
-
-    it("should have providers configured", () => {
-      expect(authOptions.providers).toBeDefined();
-      expect(Array.isArray(authOptions.providers)).toBe(true);
-      expect(authOptions.providers.length).toBeGreaterThan(0);
-    });
-
-    it("should have session configuration", () => {
-      expect(authOptions.session).toBeDefined();
+  describe("authOptions", () => {
+    it("should have correct configuration", () => {
+      expect(authOptions.providers).toHaveLength(2);
       expect(authOptions.session?.strategy).toBe("jwt");
-      expect(authOptions.session?.maxAge).toBe(8 * 60 * 60); // 8 hours (matches auth.ts:152)
+      expect(authOptions.session?.maxAge).toBe(8 * 60 * 60); // 8 hours
+      expect(authOptions.pages).toEqual({
+        signIn: "/login",
+        error: "/auth/error",
+      });
     });
 
-    it("should have pages configuration", () => {
-      expect(authOptions.pages).toBeDefined();
-      expect(authOptions.pages?.signIn).toBe("/login");
+    it("should include credentials and onelogin providers", () => {
+      const providerIds = authOptions.providers.map((p) => p.id);
+      expect(providerIds).toContain("credentials");
+      expect(providerIds).toContain("onelogin");
     });
   });
 
-  describe("OneLogin Provider", () => {
-    it("should configure OneLogin provider correctly", () => {
-      const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin"
-      );
+  describe("Custom Prisma Adapter", () => {
+    it("should handle getUserByAccount with user", async () => {
+      const mockAccount = {
+        User: {
+          id: "user-123",
+          email: "test@example.com",
+          name: "Test User",
+          image: "image.jpg",
+          emailVerified: new Date("2024-01-01"),
+        },
+      };
 
-      expect(oneLoginProvider).toBeDefined();
-      expect(oneLoginProvider?.name).toBe("SMCCD OneLogin");
-      expect(oneLoginProvider?.type).toBe("oauth");
-      // clientId and clientSecret are configured from env vars (may be undefined in test)
-      expect(oneLoginProvider).toHaveProperty("clientId");
-      expect(oneLoginProvider).toHaveProperty("clientSecret");
+      (prisma.account.findUnique as jest.Mock).mockResolvedValue(mockAccount);
+
+      const adapter = authOptions.adapter;
+      const result = await adapter?.getUserByAccount?.({
+        provider: "onelogin",
+        providerAccountId: "provider-123",
+      });
+
+      expect(prisma.account.findUnique).toHaveBeenCalledWith({
+        where: {
+          provider_providerAccountId: {
+            provider: "onelogin",
+            providerAccountId: "provider-123",
+          },
+        },
+        select: { User: true },
+      });
+
+      expect(result).toEqual({
+        id: "user-123",
+        email: "test@example.com",
+        name: "Test User",
+        image: "image.jpg",
+        emailVerified: new Date("2024-01-01"),
+      });
     });
 
-    it("should have correct authorization configuration", () => {
-      const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin"
-      );
+    it("should handle getUserByAccount without user", async () => {
+      (prisma.account.findUnique as jest.Mock).mockResolvedValue(null);
 
-      expect(oneLoginProvider?.authorization?.url).toBe(
-        "https://smccd.onelogin.com/oidc/2/auth"
-      );
-      expect(oneLoginProvider?.authorization?.params?.scope).toBe(
-        "openid profile email"
-      );
-      expect(oneLoginProvider?.authorization?.params?.response_type).toBe(
-        "code"
-      );
+      const adapter = authOptions.adapter;
+      const result = await adapter?.getUserByAccount?.({
+        provider: "onelogin",
+        providerAccountId: "provider-123",
+      });
+
+      expect(result).toBeNull();
     });
 
-    it("should have correct token endpoint configuration", () => {
-      const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin"
-      );
+    it("should handle getUserByAccount with account but no user", async () => {
+      const mockAccount = {
+        User: null,
+      };
 
-      expect(oneLoginProvider?.token?.url).toBe(
-        "https://smccd.onelogin.com/oidc/2/token"
-      );
-      expect(typeof oneLoginProvider?.token?.request).toBe("function");
+      (prisma.account.findUnique as jest.Mock).mockResolvedValue(mockAccount);
+
+      const adapter = authOptions.adapter;
+      const result = await adapter?.getUserByAccount?.({
+        provider: "onelogin",
+        providerAccountId: "provider-123",
+      });
+
+      expect(result).toBeNull();
     });
 
-    it("should have correct userinfo endpoint configuration", () => {
-      const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin"
+    it("should handle linkAccount", async () => {
+      const mockAccountData = {
+        userId: "user-123",
+        type: "oauth",
+        provider: "onelogin",
+        providerAccountId: "provider-123",
+        refresh_token: "refresh",
+        access_token: "access",
+        expires_at: 1234567890,
+        token_type: "Bearer",
+        scope: "openid profile email",
+        id_token: "id-token",
+        session_state: "session",
+      };
+
+      const mockCreatedAccount = {
+        ...mockAccountData,
+        id: "account-123",
+        User: { id: "user-123" },
+      };
+
+      (prisma.account.create as jest.Mock).mockResolvedValue(
+        mockCreatedAccount
       );
 
-      expect(oneLoginProvider?.userinfo?.url).toBe(
-        "https://smccd.onelogin.com/oidc/2/me"
-      );
-      expect(typeof oneLoginProvider?.userinfo?.request).toBe("function");
-    });
+      const adapter = authOptions.adapter;
+      const result = await adapter?.linkAccount?.(mockAccountData as any);
 
-    it("should have profile transformation function", () => {
-      const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin"
-      );
+      expect(prisma.account.create).toHaveBeenCalledWith({
+        data: {
+          id: "mock-uuid",
+          userId: mockAccountData.userId,
+          type: mockAccountData.type,
+          provider: mockAccountData.provider,
+          providerAccountId: mockAccountData.providerAccountId,
+          refresh_token: mockAccountData.refresh_token,
+          access_token: mockAccountData.access_token,
+          expires_at: mockAccountData.expires_at,
+          token_type: mockAccountData.token_type,
+          scope: mockAccountData.scope,
+          id_token: mockAccountData.id_token,
+          session_state: mockAccountData.session_state,
+        },
+      });
 
-      expect(typeof oneLoginProvider?.profile).toBe("function");
+      expect(result).toEqual({
+        ...mockAccountData,
+        id: "account-123",
+      });
     });
   });
 
   describe("Credentials Provider", () => {
-    it("should be configured for development only", () => {
-      const credentialsProvider = authOptions.providers.find(
-        (p: any) => p.type === "credentials"
+    const credentialsProvider = authOptions.providers.find(
+      (p) => p.id === "credentials"
+    ) as any;
+
+    it("should authenticate valid credentials", async () => {
+      const mockUser = {
+        id: "user-123",
+        email: "test@example.com",
+        password: "hashed-password",
+        emailVerified: new Date(),
+        name: "Test User",
+        role: "faculty",
+        college: "SKYLINE",
+      };
+
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      const result = await credentialsProvider.authorize({
+        email: "test@example.com",
+        password: "password123",
+      });
+
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { email: "test@example.com" },
+      });
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        "password123",
+        "hashed-password"
+      );
+      expect(result).toEqual({
+        id: "user-123",
+        email: "test@example.com",
+        name: "Test User",
+      });
+    });
+
+    it("should reject invalid email", async () => {
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+
+      const result = await credentialsProvider.authorize({
+        email: "invalid@example.com",
+        password: "password123",
+      });
+
+      expect(result).toBeNull();
+    });
+
+    it("should reject invalid password", async () => {
+      const mockUser = {
+        id: "user-123",
+        email: "test@example.com",
+        password: "hashed-password",
+      };
+
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      const result = await credentialsProvider.authorize({
+        email: "test@example.com",
+        password: "wrong-password",
+      });
+
+      expect(result).toBeNull();
+    });
+
+    it("should reject missing credentials", async () => {
+      const result = await credentialsProvider.authorize({});
+      expect(result).toBeNull();
+    });
+
+    it("should reject when bcrypt throws error", async () => {
+      const mockUser = {
+        id: "user-123",
+        email: "test@example.com",
+        password: "hashed-password",
+      };
+
+      (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
+      (bcrypt.compare as jest.Mock).mockRejectedValue(
+        new Error("Bcrypt error")
       );
 
-      if (process.env.NODE_ENV === "development") {
-        expect(credentialsProvider).toBeDefined();
-      } else {
-        // In production, credentials provider might not be present
-        // This is okay as it's typically for development/testing
-      }
+      const result = await credentialsProvider.authorize({
+        email: "test@example.com",
+        password: "password123",
+      });
+
+      expect(result).toBeNull();
     });
   });
 
-  describe("JWT Configuration", () => {
-    it("should have JWT callback configured", () => {
-      expect(authOptions.callbacks?.jwt).toBeDefined();
-      expect(typeof authOptions.callbacks?.jwt).toBe("function");
-    });
+  describe("Callbacks", () => {
+    describe("jwt callback", () => {
+      const jwtCallback = authOptions.callbacks?.jwt;
 
-    it("should have session callback configured", () => {
-      expect(authOptions.callbacks?.session).toBeDefined();
-      expect(typeof authOptions.callbacks?.session).toBe("function");
-    });
+      it("should add user data to token on sign in", async () => {
+        const token = { email: "test@example.com", sub: "user-123" };
+        const user = {
+          id: "user-123",
+          email: "test@example.com",
+          role: "faculty",
+          college: "SKYLINE",
+        };
 
-    it("should have signIn callback configured", () => {
-      expect(authOptions.callbacks?.signIn).toBeDefined();
-      expect(typeof authOptions.callbacks?.signIn).toBe("function");
-    });
-  });
+        const result = await jwtCallback?.({ token, user, trigger: "signIn" });
 
-  describe("Profile Handling", () => {
-    it("should transform OneLogin profile correctly", () => {
-      const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin"
-      );
-      const profileTransform = oneLoginProvider?.profile;
+        expect(result).toEqual({
+          ...token,
+          id: "user-123",
+          role: "faculty",
+          college: "SKYLINE",
+        });
+      });
 
-      if (profileTransform) {
-        const mockProfile = {
-          sub: "12345",
-          email: "test@smccd.edu",
+      it("should handle OneLogin account creation for new user", async () => {
+        const token = { email: "test@example.com", sub: "user-123" };
+        const account = {
+          provider: "onelogin",
+          providerAccountId: "provider-123",
+        };
+        const profile = {
+          email: "test@example.com",
           name: "Test User",
           given_name: "Test",
           family_name: "User",
-          preferred_username: "testuser",
+          role: "staff",
+          college: "CSM",
+          sub: "provider-123",
         };
 
-        const result = profileTransform(mockProfile);
-
-        expect(result).toEqual({
-          id: "12345",
-          email: "test@smccd.edu",
+        (prisma.user.findFirst as jest.Mock).mockResolvedValue(null);
+        (prisma.user.create as jest.Mock).mockResolvedValue({
+          id: "new-user-123",
+          email: "test@example.com",
           name: "Test User",
-          image: undefined,
-          role: "FACULTY",
-          college: undefined,
+          firstName: "Test",
+          lastName: "User",
+          role: "faculty",
+          college: "CSM",
+          username: "test",
         });
-      }
-    });
 
-    it("should handle missing profile fields gracefully", () => {
-      const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin"
-      );
-      const profileTransform = oneLoginProvider?.profile;
+        const result = await jwtCallback?.({
+          token,
+          account,
+          profile,
+          trigger: "signIn",
+        });
 
-      if (profileTransform) {
-        const incompleteProfile = {
-          sub: "12345",
-          email: "test@smccd.edu",
-          // Missing name, given_name, family_name, preferred_username
+        expect(prisma.user.findFirst).toHaveBeenCalledWith({
+          where: {
+            OR: [{ email: "test@example.com" }, { oneLoginId: "provider-123" }],
+          },
+        });
+
+        expect(prisma.user.create).toHaveBeenCalledWith({
+          data: {
+            email: "test@example.com",
+            oneLoginId: "provider-123",
+            name: "Test User",
+            firstName: "Test",
+            lastName: "User",
+            username: "test",
+            role: "faculty",
+            college: "CSM",
+            emailVerified: expect.any(Date),
+          },
+        });
+
+        expect(result?.id).toBe("new-user-123");
+        expect(result?.role).toBe("faculty");
+        expect(result?.college).toBe("CSM");
+      });
+
+      it("should handle existing OneLogin user", async () => {
+        const token = { email: "test@example.com", sub: "user-123" };
+        const account = {
+          provider: "onelogin",
+          providerAccountId: "provider-123",
+        };
+        const profile = {
+          email: "test@example.com",
+          name: "Test User",
+          given_name: "Test",
+          family_name: "User",
+          sub: "provider-123",
         };
 
-        const result = profileTransform(incompleteProfile);
+        (prisma.user.findFirst as jest.Mock).mockResolvedValue({
+          id: "existing-user-123",
+          email: "test@example.com",
+          role: "admin",
+          college: "SKYLINE",
+          username: "testuser",
+        });
 
-        expect(result.id).toBe("12345");
-        expect(result.email).toBe("test@smccd.edu");
-        expect(result.name).toBe("test@smccd.edu"); // Falls back to email when name is missing
-        expect(result.role).toBe("FACULTY"); // Default role
-        expect(result.college).toBeUndefined();
-        expect(result.image).toBeUndefined();
-      }
-    });
-  });
+        const result = await jwtCallback?.({
+          token,
+          account,
+          profile,
+          trigger: "signIn",
+        });
 
-  describe("Callback Functions", () => {
-    it("should allow OneLogin signins", async () => {
-      const signInCallback = authOptions.callbacks?.signIn;
+        expect(prisma.user.create).not.toHaveBeenCalled();
+        expect(result?.id).toBe("existing-user-123");
+        expect(result?.role).toBe("admin");
+        expect(result?.college).toBe("SKYLINE");
+      });
 
-      if (signInCallback) {
-        const mockParams = {
-          user: { id: "123", email: "test@smccd.edu" },
-          account: { provider: "onelogin", type: "oauth" },
-          profile: { email: "test@smccd.edu" },
+      it("should handle update trigger", async () => {
+        const token = {
+          id: "user-123",
+          email: "test@example.com",
+          role: "faculty",
+          sub: "user-123",
+        };
+        const session = {
+          user: {
+            name: "Updated Name",
+            college: "CSM",
+          },
         };
 
-        const result = await signInCallback(mockParams as any);
-        expect(result).toBe(true);
-      }
-    });
+        (prisma.user.findUnique as jest.Mock).mockResolvedValue({
+          id: "user-123",
+          name: "Updated Name",
+          firstName: "Updated",
+          lastName: "Name",
+          college: "CSM",
+          role: "faculty",
+          username: "updated",
+          displayFormat: "FULL_NAME",
+          title: "Dr.",
+          pronouns: "they/them",
+          website: "https://example.com",
+        });
 
-    it("should handle JWT token creation", async () => {
-      const jwtCallback = authOptions.callbacks?.jwt;
+        const result = await jwtCallback?.({
+          token,
+          session,
+          trigger: "update",
+        });
 
-      if (jwtCallback) {
-        const mockParams = {
-          token: { sub: "123" },
-          user: { id: "123", email: "test@smccd.edu", name: "Test User" },
-          account: { provider: "onelogin" },
-          profile: {},
-          isNewUser: false,
+        expect(result?.name).toBe("Updated Name");
+        expect(result?.firstName).toBe("Updated");
+        expect(result?.lastName).toBe("Name");
+        expect(result?.college).toBe("CSM");
+        expect(result?.username).toBe("updated");
+        expect(result?.displayFormat).toBe("FULL_NAME");
+        expect(result?.title).toBe("Dr.");
+        expect(result?.pronouns).toBe("they/them");
+        expect(result?.website).toBe("https://example.com");
+      });
+
+      it("should handle update trigger when user not found", async () => {
+        const token = {
+          id: "user-123",
+          email: "test@example.com",
+          role: "faculty",
+          sub: "user-123",
+        };
+        const session = {
+          user: {
+            name: "Updated Name",
+          },
         };
 
-        const result = await jwtCallback(mockParams as any);
-        expect(result).toBeDefined();
-        expect(result.sub).toBe("123");
-      }
+        (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
+
+        const result = await jwtCallback?.({
+          token,
+          session,
+          trigger: "update",
+        });
+
+        expect(result).toEqual(token);
+      });
+
+      it("should return token as-is for other triggers", async () => {
+        const token = {
+          id: "user-123",
+          email: "test@example.com",
+          sub: "user-123",
+        };
+
+        const result = await jwtCallback?.({ token });
+
+        expect(result).toEqual(token);
+      });
     });
 
-    it("should create session from JWT", async () => {
+    describe("session callback", () => {
       const sessionCallback = authOptions.callbacks?.session;
 
-      if (sessionCallback) {
-        const mockParams = {
-          session: {
-            expires: "2024-12-31",
-            user: {
-              id: "",
-              email: "test@smccd.edu",
-              name: "Test User",
-            },
-          },
-          token: {
-            sub: "123",
-            email: "test@smccd.edu",
-            name: "Test User",
-            id: "123",
-            role: "FACULTY",
-            college: "SKYLINE",
-          },
-          user: undefined,
+      it("should add token data to session", async () => {
+        const session = {
+          user: { email: "test@example.com" },
+          expires: "2024-12-31",
+        };
+        const token = {
+          id: "user-123",
+          email: "test@example.com",
+          name: "Test User",
+          firstName: "Test",
+          lastName: "User",
+          role: "faculty",
+          college: "SKYLINE",
+          username: "testuser",
+          displayFormat: "FULL_NAME",
+          title: "Dr.",
+          pronouns: "they/them",
+          website: "https://example.com",
+          sub: "user-123",
         };
 
-        const result = await sessionCallback(mockParams as any);
-        expect(result).toBeDefined();
-        expect(result.expires).toBe("2024-12-31");
-        expect(result.user?.id).toBe("123"); // Uses token.id from mockParams
-        expect(result.user?.email).toBe("test@smccd.edu");
-      }
+        const result = await sessionCallback?.({ session, token });
+
+        expect(result?.user).toEqual({
+          id: "user-123",
+          email: "test@example.com",
+          name: "Test User",
+          firstName: "Test",
+          lastName: "User",
+          role: "faculty",
+          college: "SKYLINE",
+          username: "testuser",
+          displayFormat: "FULL_NAME",
+          title: "Dr.",
+          pronouns: "they/them",
+          website: "https://example.com",
+        });
+      });
+    });
+
+    describe("signIn callback", () => {
+      const signInCallback = authOptions.callbacks?.signIn;
+
+      it("should allow sign in with valid account", async () => {
+        const user = { id: "user-123", email: "test@example.com" };
+        const account = { provider: "credentials" };
+
+        const result = await signInCallback?.({ user, account });
+        expect(result).toBe(true);
+      });
+
+      it("should allow sign in without account", async () => {
+        const user = { id: "user-123", email: "test@example.com" };
+
+        const result = await signInCallback?.({ user, account: null });
+        expect(result).toBe(true);
+      });
     });
   });
 
-  describe("Environment Variables", () => {
-    let originalClientId: string | undefined;
-    let originalClientSecret: string | undefined;
+  describe("OneLogin Provider", () => {
+    const oneLoginProvider = authOptions.providers.find(
+      (p) => p.id === "onelogin"
+    ) as any;
 
-    beforeEach(() => {
-      // Store original values
-      originalClientId = process.env.ONELOGIN_CLIENT_ID;
-      originalClientSecret = process.env.ONELOGIN_CLIENT_SECRET;
-    });
-
-    afterEach(() => {
-      // Restore original values
-      if (originalClientId) {
-        process.env.ONELOGIN_CLIENT_ID = originalClientId;
-      } else {
-        delete process.env.ONELOGIN_CLIENT_ID;
-      }
-      if (originalClientSecret) {
-        process.env.ONELOGIN_CLIENT_SECRET = originalClientSecret;
-      } else {
-        delete process.env.ONELOGIN_CLIENT_SECRET;
-      }
-    });
-
-    it("should require OneLogin client ID", async () => {
-      delete process.env.ONELOGIN_CLIENT_ID;
-
-      // Re-import to get fresh configuration
-      jest.resetModules();
-      const { authOptions } = await import("../auth");
-
-      const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin"
+    it("should have correct configuration", () => {
+      expect(oneLoginProvider.type).toBe("oauth");
+      expect(oneLoginProvider.options.clientId).toBe("test-client-id");
+      expect(oneLoginProvider.options.clientSecret).toBe("test-client-secret");
+      expect(oneLoginProvider.options.issuer).toBe(
+        "https://smccd.onelogin.com"
       );
-      expect(oneLoginProvider?.clientId).toBeUndefined();
     });
 
-    it("should require OneLogin client secret", async () => {
-      delete process.env.ONELOGIN_CLIENT_SECRET;
+    it("should handle profile mapping", async () => {
+      const profile = {
+        sub: "onelogin-123",
+        email: "test@example.com",
+        name: "Test User",
+        given_name: "Test",
+        family_name: "User",
+        role: "faculty",
+        college: "SKYLINE",
+      };
 
-      // Re-import to get fresh configuration
-      jest.resetModules();
-      const { authOptions } = await import("../auth");
+      const result = await oneLoginProvider.profile(profile);
 
-      const oneLoginProvider = authOptions.providers.find(
-        (p: any) => p.id === "onelogin"
-      );
-      expect(oneLoginProvider?.clientSecret).toBeUndefined();
+      expect(result).toEqual({
+        id: "onelogin-123",
+        email: "test@example.com",
+        name: "Test User",
+        firstName: "Test",
+        lastName: "User",
+        role: "faculty",
+        college: "SKYLINE",
+      });
+    });
+
+    it("should handle profile without optional fields", async () => {
+      const profile = {
+        sub: "onelogin-123",
+        email: "test@example.com",
+      };
+
+      const result = await oneLoginProvider.profile(profile);
+
+      expect(result).toEqual({
+        id: "onelogin-123",
+        email: "test@example.com",
+        name: "test@example.com",
+        firstName: null,
+        lastName: null,
+        role: null,
+        college: null,
+      });
+    });
+
+    it("should handle profile with id instead of sub", async () => {
+      const profile = {
+        id: "onelogin-123",
+        email: "test@example.com",
+        name: "Test User",
+      };
+
+      const result = await oneLoginProvider.profile(profile);
+
+      expect(result).toEqual({
+        id: "onelogin-123",
+        email: "test@example.com",
+        name: "Test User",
+        firstName: null,
+        lastName: null,
+        role: null,
+        college: null,
+      });
     });
   });
 
-  describe("Security Configuration", () => {
-    it("should have secure session settings", () => {
-      expect(authOptions.session?.strategy).toBe("jwt");
-      expect(authOptions.session?.maxAge).toBeGreaterThan(0);
-      // updateAge is not configured in the auth options
-    });
-
-    it("should use secure cookies in production", () => {
+  describe("Credentials Provider in Production", () => {
+    it("should not include credentials provider in production", async () => {
       process.env.NODE_ENV = "production";
 
-      // The auth configuration uses NextAuth defaults for cookies
-      // Custom cookie configuration is not currently set
-      expect(authOptions.session).toBeDefined();
+      // Re-import to get fresh configuration
+      jest.resetModules();
+      const { authOptions: prodAuthOptions } = await import("../auth");
+
+      const credentialsProvider = prodAuthOptions.providers.find(
+        (p) => p.id === "credentials"
+      );
+
+      expect(credentialsProvider).toBeUndefined();
     });
   });
 });
