@@ -9,8 +9,9 @@ import {
 
 // Mock Date for consistent testing
 const mockDate = (year: number, month: number, day: number = 15) => {
+  const realDate = Date;
   const spy = jest.spyOn(global, "Date").mockImplementation(() => {
-    return new Date(year, month - 1, day) as any; // month is 0-based in constructor
+    return new realDate(year, month - 1, day) as any; // month is 0-based in constructor
   });
   return spy;
 };

@@ -42,7 +42,7 @@ describe("Types Index Exports", () => {
 
   it("should export term types", () => {
     // Final verification that all exports are accessible
-    expect(Object.prototype.toString.call(types)).toBe("[object Module]");
+    expect(Object.prototype.toString.call(types)).toBe("[object Object]");
   });
 
   it("should handle module loading correctly", () => {

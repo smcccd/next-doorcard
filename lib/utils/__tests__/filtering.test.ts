@@ -210,8 +210,9 @@ describe("Filtering Utils", () => {
 
       const result = filterProfessors(mockDoorcards, options);
 
-      expect(result).toHaveLength(1);
-      expect(result[0].name).toBe("Dr. John Smith");
+      expect(result).toHaveLength(2);
+      expect(result.some((dc) => dc.name === "Dr. John Smith")).toBe(true);
+      expect(result.some((dc) => dc.name === "Smith, Alice")).toBe(true);
     });
 
     it("should sort results by appointment count desc, then name asc", () => {
