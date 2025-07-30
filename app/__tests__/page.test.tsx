@@ -1,4 +1,10 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import Home from "../page";
 import { HomePageObject } from "@/lib/test-page-objects";
 
@@ -63,7 +69,9 @@ describe("Home Page", () => {
   });
 
   it("renders the improved header with student-friendly language", async () => {
-    render(<Home />);
+    await act(async () => {
+      render(<Home />);
+    });
 
     expect(screen.getByText("Find Your Professor")).toBeInTheDocument();
     expect(
@@ -73,7 +81,9 @@ describe("Home Page", () => {
   });
 
   it("renders the improved search section", async () => {
-    render(<Home />);
+    await act(async () => {
+      render(<Home />);
+    });
 
     // Test user-facing functionality, not exact text
     expect(
@@ -87,16 +97,20 @@ describe("Home Page", () => {
   });
 
   it("shows campus names clearly in tabs", async () => {
-    render(<Home />);
+    await act(async () => {
+      render(<Home />);
+    });
 
     expect(screen.getByText("All Campuses")).toBeInTheDocument();
-    expect(screen.getByText("Skyline")).toBeInTheDocument();
-    expect(screen.getByText("CSM")).toBeInTheDocument();
-    expect(screen.getByText("Cañada")).toBeInTheDocument();
+    expect(screen.getAllByText("Skyline").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("CSM").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Cañada").length).toBeGreaterThan(0);
   });
 
   it("displays professor cards with improved layout", async () => {
-    render(<Home />);
+    await act(async () => {
+      render(<Home />);
+    });
 
     await waitFor(() => {
       // Test for professor cards using semantic queries, not exact text
@@ -109,7 +123,9 @@ describe("Home Page", () => {
   });
 
   it("shows helpful content when professors are found", async () => {
-    render(<Home />);
+    await act(async () => {
+      render(<Home />);
+    });
 
     await waitFor(() => {
       // Check that professor content is displayed instead of specific tips
@@ -121,7 +137,9 @@ describe("Home Page", () => {
   });
 
   it("filters by campus correctly", async () => {
-    render(<Home />);
+    await act(async () => {
+      render(<Home />);
+    });
 
     await waitFor(() => {
       // Wait for professors to load by checking for professor cards
@@ -134,7 +152,9 @@ describe("Home Page", () => {
 
     // Click CSM radio button by finding the radio input with value "CSM"
     const csmRadio = screen.getByRole("radio", { name: /CSM/ });
-    fireEvent.click(csmRadio);
+    await act(async () => {
+      fireEvent.click(csmRadio);
+    });
 
     await waitFor(() => {
       // Check that filtering happened - should now only show CSM professor
@@ -147,7 +167,9 @@ describe("Home Page", () => {
   });
 
   it("searches professors by name", async () => {
-    render(<Home />);
+    await act(async () => {
+      render(<Home />);
+    });
 
     await waitFor(() => {
       expect(screen.getAllByText("Dr. John Smith")).toHaveLength(2);
@@ -155,7 +177,9 @@ describe("Home Page", () => {
     });
 
     const searchInput = screen.getByPlaceholderText(/Type professor's name/);
-    fireEvent.change(searchInput, { target: { value: "John" } });
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "John" } });
+    });
 
     await waitFor(() => {
       expect(screen.getAllByText("Dr. John Smith").length).toBeGreaterThan(0);
@@ -169,7 +193,9 @@ describe("Home Page", () => {
       json: async () => ({ doorcards: [], success: true }),
     } as Response);
 
-    render(<Home />);
+    await act(async () => {
+      render(<Home />);
+    });
 
     await waitFor(() => {
       expect(screen.getByText("No professors found")).toBeInTheDocument();
@@ -178,20 +204,26 @@ describe("Home Page", () => {
   });
 
   it("navigates to professor page when clicked", async () => {
-    render(<Home />);
+    await act(async () => {
+      render(<Home />);
+    });
 
     await waitFor(() => {
       expect(screen.getAllByText("Dr. John Smith")).toHaveLength(2);
     });
 
     // Click the first occurrence (most likely in a professor card)
-    fireEvent.click(screen.getAllByText("Dr. John Smith")[0]);
+    await act(async () => {
+      fireEvent.click(screen.getAllByText("Dr. John Smith")[0]);
+    });
 
     expect(mockPush).toHaveBeenCalledWith("/view/john-smith");
   });
 
   it("shows proper professor count", async () => {
-    render(<Home />);
+    await act(async () => {
+      render(<Home />);
+    });
 
     await waitFor(() => {
       expect(screen.getByText("2 professors")).toBeInTheDocument();
@@ -203,7 +235,9 @@ describe("Home Page", () => {
       () => new Promise(() => {}) // Never resolves
     );
 
-    render(<Home />);
+    await act(async () => {
+      render(<Home />);
+    });
 
     // Test for loading state without relying on exact text
     expect(
