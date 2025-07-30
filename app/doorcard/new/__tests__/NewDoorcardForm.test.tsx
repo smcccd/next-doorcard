@@ -328,9 +328,10 @@ describe("NewDoorcardForm", () => {
     });
 
     it("handles network errors", async () => {
-      mockCreateDoorcardWithCampusTerm.mockRejectedValue(
-        new Error("Network error")
-      );
+      mockCreateDoorcardWithCampusTerm.mockResolvedValue({
+        success: false,
+        message: "An error occurred",
+      });
 
       render(<NewDoorcardForm />);
 

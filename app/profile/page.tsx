@@ -66,6 +66,7 @@ export default function ProfilePage() {
   const [website, setWebsite] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -110,6 +111,7 @@ export default function ProfilePage() {
           response.status,
           response.statusText
         );
+        setError("Failed to load profile");
         toast({
           title: "Error",
           description: "Failed to load profile information",
@@ -118,6 +120,7 @@ export default function ProfilePage() {
       }
     } catch (error) {
       console.error("Failed to fetch profile:", error);
+      setError("Failed to load profile");
       toast({
         title: "Error",
         description: "Failed to load profile information",
@@ -303,6 +306,16 @@ export default function ProfilePage() {
           <p className="text-red-600 dark:text-red-400">
             Please log in to view your profile.
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400">{error}</p>
         </div>
       </div>
     );
