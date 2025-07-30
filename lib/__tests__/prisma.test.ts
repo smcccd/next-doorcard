@@ -3,6 +3,55 @@ import { jest } from "@jest/globals";
 // Store original environment
 const originalEnv = process.env;
 
+// Mock PrismaClient before importing
+jest.mock("@prisma/client", () => ({
+  PrismaClient: jest.fn().mockImplementation(() => ({
+    $connect: jest.fn(),
+    $disconnect: jest.fn(),
+    user: {
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    doorcard: {
+      findUnique: jest.fn(),
+      findFirst: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      updateMany: jest.fn(),
+      delete: jest.fn(),
+      deleteMany: jest.fn(),
+    },
+    appointment: {
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    analytics: {
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    term: {
+      findFirst: jest.fn(),
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      updateMany: jest.fn(),
+      count: jest.fn(),
+    },
+    $transaction: jest.fn(),
+  })),
+}));
+
 describe("Prisma Client Configuration", () => {
   beforeEach(() => {
     jest.resetModules();
@@ -19,7 +68,7 @@ describe("Prisma Client Configuration", () => {
 
   describe("Prisma Instance", () => {
     it("should export a prisma instance", () => {
-      // Use synchronous require for simpler testing
+      // Use dynamic import to actually exercise the module
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { prisma } = require("@/lib/prisma");
       expect(prisma).toBeDefined();
@@ -101,17 +150,64 @@ describe("Prisma Client Configuration", () => {
   });
 
   describe("Environment Configuration", () => {
-    it("should handle different NODE_ENV values", () => {
-      // Test that the module loads without errors in different environments
-      process.env.NODE_ENV = "production";
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { prisma: prodPrisma } = require("@/lib/prisma");
-      expect(prodPrisma).toBeDefined();
+    it("should configure logging based on NODE_ENV", () => {
+      const { PrismaClient } = require("@prisma/client");
 
+      // Test development environment
       process.env.NODE_ENV = "development";
+      jest.resetModules();
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { prisma: devPrisma } = require("@/lib/prisma");
-      expect(devPrisma).toBeDefined();
+      require("@/lib/prisma");
+
+      expect(PrismaClient).toHaveBeenCalledWith({
+        log: ["query", "error", "warn"],
+        datasources: {
+          db: {
+            url: process.env.DATABASE_URL,
+          },
+        },
+      });
+    });
+
+    it("should configure minimal logging for production", () => {
+      const { PrismaClient } = require("@prisma/client");
+
+      // Test production environment
+      process.env.NODE_ENV = "production";
+      jest.resetModules();
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require("@/lib/prisma");
+
+      expect(PrismaClient).toHaveBeenCalledWith({
+        log: ["error"],
+        datasources: {
+          db: {
+            url: process.env.DATABASE_URL,
+          },
+        },
+      });
+    });
+
+    it("should set global prisma in non-production environments", () => {
+      process.env.NODE_ENV = "development";
+      jest.resetModules();
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { prisma } = require("@/lib/prisma");
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((globalThis as any).prisma).toBe(prisma);
+    });
+
+    it("should reuse global prisma instance when available", () => {
+      const mockPrisma = { mock: "prisma instance" };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (globalThis as any).prisma = mockPrisma;
+
+      jest.resetModules();
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { prisma } = require("@/lib/prisma");
+
+      expect(prisma).toBe(mockPrisma);
     });
   });
 });
