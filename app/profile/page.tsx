@@ -352,7 +352,7 @@ export default function ProfilePage() {
         {/* Account Information */}
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-gray-100">
+            <CardTitle as="h2" className="text-gray-900 dark:text-gray-100">
               Account Information
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-400">
@@ -362,17 +362,17 @@ export default function ProfilePage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Email
-                </Label>
+                </h3>
                 <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
                   {profile?.email}
                 </p>
               </div>
               <div>
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Username
-                </Label>
+                </h3>
                 <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
                   {profile?.username || "Not set"}
                 </p>
@@ -380,17 +380,17 @@ export default function ProfilePage() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Role
-                </Label>
+                </h3>
                 <p className="text-sm text-gray-900 dark:text-gray-100 mt-1 capitalize">
                   {profile?.role?.toLowerCase()}
                 </p>
               </div>
               <div>
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Current Display Name
-                </Label>
+                </h3>
                 <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
                   {profile ? formatDisplayName(profile) : "Not set"}
                 </p>
@@ -402,7 +402,7 @@ export default function ProfilePage() {
         {/* Personal Information */}
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-gray-100">
+            <CardTitle as="h2" className="text-gray-900 dark:text-gray-100">
               Personal Information
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-400">
@@ -451,14 +451,18 @@ export default function ProfilePage() {
               <div className="grid grid-cols-2 gap-4 items-end">
                 <div className="space-y-2">
                   <Label
-                    htmlFor="title"
+                    htmlFor="title-select"
                     className="flex items-center gap-2 text-gray-700 dark:text-gray-300"
                   >
                     <GraduationCap className="h-4 w-4" />
                     Academic Title (optional)
                   </Label>
                   <Select value={title} onValueChange={setTitle}>
-                    <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                    <SelectTrigger
+                      id="title-select"
+                      className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                      aria-label="Academic Title"
+                    >
                       <SelectValue placeholder="Select title" />
                     </SelectTrigger>
                     <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
@@ -473,13 +477,17 @@ export default function ProfilePage() {
                 </div>
                 <div className="space-y-2">
                   <Label
-                    htmlFor="pronouns"
+                    htmlFor="pronouns-select"
                     className="text-gray-700 dark:text-gray-300"
                   >
                     Pronouns (optional)
                   </Label>
                   <Select value={pronouns} onValueChange={setPronouns}>
-                    <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                    <SelectTrigger
+                      id="pronouns-select"
+                      className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                      aria-label="Pronouns"
+                    >
                       <SelectValue placeholder="Select pronouns" />
                     </SelectTrigger>
                     <SelectContent className="dark:bg-gray-700 dark:border-gray-600">
@@ -497,7 +505,7 @@ export default function ProfilePage() {
               {/* Display Format - Full Width */}
               <div className="space-y-2">
                 <Label
-                  htmlFor="displayFormat"
+                  htmlFor="displayFormat-select"
                   className="text-gray-700 dark:text-gray-300"
                 >
                   Display Name Format
@@ -508,7 +516,11 @@ export default function ProfilePage() {
                     setDisplayFormat(value)
                   }
                 >
-                  <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                  <SelectTrigger
+                    id="displayFormat-select"
+                    className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                    aria-label="Display Name Format"
+                  >
                     <SelectValue>
                       {getDisplayFormatOptions(
                         firstName,
@@ -537,7 +549,7 @@ export default function ProfilePage() {
               {/* College Selection */}
               <div className="space-y-2">
                 <Label
-                  htmlFor="college"
+                  htmlFor="college-select"
                   className="flex items-center gap-2 text-gray-700 dark:text-gray-300"
                 >
                   <Building2 className="h-4 w-4" />
@@ -547,7 +559,11 @@ export default function ProfilePage() {
                   value={college}
                   onValueChange={(value: College | "none") => setCollege(value)}
                 >
-                  <SelectTrigger className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                  <SelectTrigger
+                    id="college-select"
+                    className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                    aria-label="College/Campus"
+                  >
                     <SelectValue placeholder="Select your college" />
                   </SelectTrigger>
                   <SelectContent className="dark:bg-gray-700 dark:border-gray-600">

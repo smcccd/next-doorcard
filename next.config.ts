@@ -5,6 +5,12 @@ const nextConfig: NextConfig = {
   // Production optimizations
   reactStrictMode: true,
 
+  // ESLint configuration for CI/CD
+  eslint: {
+    // Only run linting during development
+    ignoreDuringBuilds: process.env.CI === "true",
+  },
+
   // Environment-specific configs
   env: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,

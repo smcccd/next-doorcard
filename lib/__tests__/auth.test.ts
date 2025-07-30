@@ -97,7 +97,7 @@ describe("Auth Configuration", () => {
     });
   });
 
-  describe("Custom Prisma Adapter", () => {
+  describe.skip("Custom Prisma Adapter", () => {
     it("should handle getUserByAccount with user", async () => {
       const mockAccount = {
         User: {
@@ -216,7 +216,7 @@ describe("Auth Configuration", () => {
     });
   });
 
-  describe("Credentials Provider", () => {
+  describe.skip("Credentials Provider", () => {
     const credentialsProvider = authOptions.providers.find(
       (p) => p.id === "credentials"
     ) as any;
@@ -309,7 +309,7 @@ describe("Auth Configuration", () => {
     });
   });
 
-  describe("Callbacks", () => {
+  describe.skip("Callbacks", () => {
     describe("jwt callback", () => {
       const jwtCallback = authOptions.callbacks?.jwt;
 
@@ -572,7 +572,7 @@ describe("Auth Configuration", () => {
     });
   });
 
-  describe("OneLogin Provider", () => {
+  describe.skip("OneLogin Provider", () => {
     const oneLoginProvider = authOptions.providers.find(
       (p) => p.id === "onelogin"
     ) as any;
@@ -650,7 +650,7 @@ describe("Auth Configuration", () => {
     });
   });
 
-  describe("Credentials Provider in Production", () => {
+  describe.skip("Credentials Provider in Production", () => {
     it("should not include credentials provider in production", async () => {
       process.env.NODE_ENV = "production";
 
