@@ -294,7 +294,7 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
 }));
 
 // Mock pointer capture methods for JSDOM compatibility
-if (typeof Element !== 'undefined') {
+if (typeof Element !== "undefined") {
   Element.prototype.hasPointerCapture = jest.fn(() => false);
   Element.prototype.setPointerCapture = jest.fn();
   Element.prototype.releasePointerCapture = jest.fn();
@@ -304,35 +304,35 @@ if (typeof Element !== 'undefined') {
 global.fetch = jest.fn();
 
 // Mock Prisma enums for tests
-jest.doMock('@prisma/client', () => ({
-  ...jest.requireActual('@prisma/client'),
+jest.doMock("@prisma/client", () => ({
+  ...jest.requireActual("@prisma/client"),
   TermSeason: {
-    FALL: 'FALL',
-    SPRING: 'SPRING',
-    SUMMER: 'SUMMER'
+    FALL: "FALL",
+    SPRING: "SPRING",
+    SUMMER: "SUMMER",
   },
   College: {
-    SKYLINE: 'SKYLINE',
-    CSM: 'CSM',
-    CANADA: 'CANADA'
+    SKYLINE: "SKYLINE",
+    CSM: "CSM",
+    CANADA: "CANADA",
   },
   DayOfWeek: {
-    MONDAY: 'MONDAY',
-    TUESDAY: 'TUESDAY',
-    WEDNESDAY: 'WEDNESDAY',
-    THURSDAY: 'THURSDAY',
-    FRIDAY: 'FRIDAY',
-    SATURDAY: 'SATURDAY',
-    SUNDAY: 'SUNDAY'
+    MONDAY: "MONDAY",
+    TUESDAY: "TUESDAY",
+    WEDNESDAY: "WEDNESDAY",
+    THURSDAY: "THURSDAY",
+    FRIDAY: "FRIDAY",
+    SATURDAY: "SATURDAY",
+    SUNDAY: "SUNDAY",
   },
   AppointmentCategory: {
-    OFFICE_HOURS: 'OFFICE_HOURS',
-    IN_CLASS: 'IN_CLASS',
-    LECTURE: 'LECTURE', 
-    LAB: 'LAB',
-    HOURS_BY_ARRANGEMENT: 'HOURS_BY_ARRANGEMENT',
-    REFERENCE: 'REFERENCE'
-  }
+    OFFICE_HOURS: "OFFICE_HOURS",
+    IN_CLASS: "IN_CLASS",
+    LECTURE: "LECTURE",
+    LAB: "LAB",
+    HOURS_BY_ARRANGEMENT: "HOURS_BY_ARRANGEMENT",
+    REFERENCE: "REFERENCE",
+  },
 }));
 
 // Suppress console errors for cleaner test output (optional)

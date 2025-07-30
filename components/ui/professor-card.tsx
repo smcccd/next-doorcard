@@ -42,6 +42,8 @@ export function ProfessorCard({
     <Card
       className="cursor-pointer hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-500 transition-all duration-200 border-2 hover:bg-blue-50/30 dark:hover:bg-blue-900/30 dark:bg-gray-700 dark:border-gray-400"
       onClick={() => onClick(doorcard)}
+      data-testid="professor-card"
+      role="article"
     >
       <CardContent className="p-4">
         {/* Mobile Layout (Full Details) */}

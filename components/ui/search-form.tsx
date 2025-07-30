@@ -58,7 +58,10 @@ export function SearchForm({
 }: SearchFormProps) {
   return (
     <div className="max-w-5xl mx-auto -mt-16 space-y-4">
-      <Card className="border-2 border-blue-200 dark:border-blue-700 bg-white dark:bg-gray-800 shadow-2xl relative backdrop-blur-sm" data-testid="search-form">
+      <Card
+        className="border-2 border-blue-200 dark:border-blue-700 bg-white dark:bg-gray-800 shadow-2xl relative backdrop-blur-sm"
+        data-testid="search-form"
+      >
         <CardHeader className="pb-6 pt-8">
           <h2 className="font-bold leading-none tracking-tight flex items-center gap-3 text-xl sm:text-2xl">
             <Search className="h-6 w-6 text-blue-500 dark:text-blue-400" />
@@ -141,7 +144,10 @@ export function SearchForm({
                 value={selectedDepartment}
                 onValueChange={onDepartmentChange}
               >
-                <SelectTrigger className="w-full h-12 text-base bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400" data-testid="department-filter">
+                <SelectTrigger
+                  className="w-full h-12 text-base bg-white dark:bg-gray-700 border-2 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400"
+                  data-testid="department-filter"
+                >
                   <SelectValue placeholder="Select a department" />
                 </SelectTrigger>
                 <SelectContent className="max-h-64">
