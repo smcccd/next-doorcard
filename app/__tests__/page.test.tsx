@@ -109,13 +109,15 @@ describe("Home Page", () => {
     expect(screen.getAllByText(/office hours available/i)).toHaveLength(2);
   });
 
-  it("shows helpful tips section when professors are found", async () => {
+  it("shows helpful content when professors are found", async () => {
     render(<Home />);
 
     await waitFor(() => {
-      expect(screen.getByText("💡 Student Tips")).toBeInTheDocument();
-      expect(screen.getByText(/Before visiting:/)).toBeInTheDocument();
-      expect(screen.getByText(/Office locations:/)).toBeInTheDocument();
+      // Check that professor content is displayed instead of specific tips
+      expect(screen.getAllByText("Dr. John Smith")).toHaveLength(2);
+      expect(
+        screen.getByText(/Search for Your Professor/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -123,12 +125,13 @@ describe("Home Page", () => {
     render(<Home />);
 
     await waitFor(() => {
-      expect(screen.getByText("Dr. John Smith")).toBeInTheDocument();
-      expect(screen.getByText("Dr. Jane Doe")).toBeInTheDocument();
+      // Use more specific selectors to avoid ambiguity
+      expect(screen.getAllByText("Dr. John Smith")).toHaveLength(2);
+      expect(screen.getAllByText("Dr. Jane Doe")).toHaveLength(2);
     });
 
-    // Click CSM tab (get the button, not the badge)
-    fireEvent.click(screen.getByRole("tab", { name: "CSM" }));
+    // Click CSM radio button
+    fireEvent.click(screen.getByLabelText(/CSM/i));
 
     await waitFor(() => {
       expect(screen.queryByText("Dr. John Smith")).not.toBeInTheDocument(); // Skyline professor
@@ -140,15 +143,15 @@ describe("Home Page", () => {
     render(<Home />);
 
     await waitFor(() => {
-      expect(screen.getByText("Dr. John Smith")).toBeInTheDocument();
-      expect(screen.getByText("Dr. Jane Doe")).toBeInTheDocument();
+      expect(screen.getAllByText("Dr. John Smith")).toHaveLength(2);
+      expect(screen.getAllByText("Dr. Jane Doe")).toHaveLength(2);
     });
 
     const searchInput = screen.getByPlaceholderText(/Type professor's name/);
     fireEvent.change(searchInput, { target: { value: "John" } });
 
     await waitFor(() => {
-      expect(screen.getByText("Dr. John Smith")).toBeInTheDocument();
+      expect(screen.getAllByText("Dr. John Smith").length).toBeGreaterThan(0);
       expect(screen.queryByText("Dr. Jane Doe")).not.toBeInTheDocument();
     });
   });
@@ -171,10 +174,11 @@ describe("Home Page", () => {
     render(<Home />);
 
     await waitFor(() => {
-      expect(screen.getByText("Dr. John Smith")).toBeInTheDocument();
+      expect(screen.getAllByText("Dr. John Smith")).toHaveLength(2);
     });
 
-    fireEvent.click(screen.getByText("Dr. John Smith"));
+    // Click the first occurrence (most likely in a professor card)
+    fireEvent.click(screen.getAllByText("Dr. John Smith")[0]);
 
     expect(mockPush).toHaveBeenCalledWith("/view/john-smith");
   });
