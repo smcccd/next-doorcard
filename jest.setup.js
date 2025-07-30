@@ -485,11 +485,66 @@ jest.mock("@/components/ui/label", () => ({
 }));
 
 jest.mock("@/components/ui/button", () => ({
-  Button: ({ children, disabled, type, ...props }) => (
-    <button disabled={disabled} type={type} {...props}>
-      {children}
-    </button>
-  ),
+  Button: ({
+    children,
+    disabled,
+    type,
+    variant = "default",
+    size = "default",
+    className = "",
+    asChild,
+    ...props
+  }) => {
+    // Map of variant classes (simplified)
+    const variantClasses = {
+      default: "bg-primary text-primary-foreground",
+      destructive: "bg-destructive text-destructive-foreground",
+      outline: "border border-input bg-background",
+      secondary: "bg-secondary text-secondary-foreground",
+      ghost: "hover:bg-accent hover:text-accent-foreground",
+      link: "text-primary underline-offset-4 hover:underline",
+    };
+
+    // Map of size classes (simplified)
+    const sizeClasses = {
+      default: "h-11 px-4 py-2",
+      sm: "h-11 rounded-md px-3",
+      lg: "h-12 rounded-md px-8",
+      icon: "h-11 w-11",
+    };
+
+    // Base classes
+    const baseClasses =
+      "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+
+    const allClasses =
+      `${baseClasses} ${variantClasses[variant] || variantClasses.default} ${sizeClasses[size] || sizeClasses.default} ${className}`.trim();
+
+    // Handle asChild prop
+    if (asChild && React.Children.count(children) === 1) {
+      const child = React.Children.only(children);
+      if (React.isValidElement(child)) {
+        return React.cloneElement(child, {
+          ...props,
+          className: allClasses,
+          disabled,
+          "aria-disabled": disabled ? "true" : undefined,
+        });
+      }
+    }
+
+    return (
+      <button
+        disabled={disabled}
+        type={type}
+        className={allClasses}
+        aria-disabled={disabled ? "true" : undefined}
+        {...props}
+      >
+        {children}
+      </button>
+    );
+  },
 }));
 
 // Mock lucide-react icons

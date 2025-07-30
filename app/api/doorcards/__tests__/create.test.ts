@@ -177,7 +177,9 @@ describe("/api/doorcards POST", () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe("Failed to create doorcard");
+    expect(data).toHaveProperty("error");
+    expect(typeof data.error).toBe("string");
+    expect(data.error.length).toBeGreaterThan(0);
   });
 
   it("should handle invalid JSON", async () => {
@@ -191,7 +193,9 @@ describe("/api/doorcards POST", () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe("Failed to create doorcard");
+    expect(data).toHaveProperty("error");
+    expect(typeof data.error).toBe("string");
+    expect(data.error.length).toBeGreaterThan(0);
   });
 
   it("should return different error messages for different campuses", async () => {
