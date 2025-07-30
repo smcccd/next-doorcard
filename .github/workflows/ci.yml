@@ -87,20 +87,6 @@ jobs:
           ONELOGIN_CLIENT_SECRET: ${{ secrets.ONELOGIN_CLIENT_SECRET }}
           NODE_ENV: test
 
-      - name: Start application
-        run: npm run start &
-        env:
-          PORT: 3000
-          NODE_ENV: test
-          NEXTAUTH_URL: http://localhost:3000
-          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          ONELOGIN_CLIENT_ID: ${{ secrets.ONELOGIN_CLIENT_ID }}
-          ONELOGIN_CLIENT_SECRET: ${{ secrets.ONELOGIN_CLIENT_SECRET }}
-
-      - name: Wait for server
-        run: npx wait-on http://localhost:3000
-
       - name: Run Cypress E2E tests
         uses: cypress-io/github-action@v6
         with:
