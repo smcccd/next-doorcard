@@ -21,7 +21,7 @@ describe("Professor Counts Utils", () => {
   const mockDoorcards: PublicDoorcard[] = [
     {
       id: "1",
-      name: "Dr. Adams, John",
+      name: "Adams, John",
       doorcardName: "John Adams - Mathematics",
       college: "SKYLINE",
       term: "FALL",
@@ -34,7 +34,7 @@ describe("Professor Counts Utils", () => {
     },
     {
       id: "2",
-      name: "Prof. Brown, Jane",
+      name: "Brown, Jane",
       doorcardName: "Jane Brown - Computer Science",
       college: "CSM",
       term: "FALL",
@@ -47,7 +47,7 @@ describe("Professor Counts Utils", () => {
     },
     {
       id: "3",
-      name: "Dr. Carter, Bob",
+      name: "Carter, Bob",
       doorcardName: "Bob Carter - English Literature",
       college: "CANADA",
       term: "SPRING",
@@ -110,7 +110,7 @@ describe("Professor Counts Utils", () => {
     it("should handle comma-separated names correctly", () => {
       const result = calculateProfessorCounts(mockDoorcards, defaultOptions);
 
-      // "Dr. Adams, John" should count as "A" for Adams
+      // "Adams, John" should count as "A" for Adams
       // "Evans, Michael" should count as "E" for Evans
       expect(result["A"]).toBe(1);
       expect(result["E"]).toBe(1);
@@ -149,7 +149,7 @@ describe("Professor Counts Utils", () => {
       const options = { ...defaultOptions, searchTerm: "john" };
       const result = calculateProfessorCounts(mockDoorcards, options);
 
-      expect(result["A"]).toBe(1); // John Adams
+      expect(result["A"]).toBe(1); // Adams, John
       expect(Object.keys(result)).toHaveLength(1);
     });
 
