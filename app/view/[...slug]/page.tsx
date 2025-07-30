@@ -13,14 +13,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import CollegeLogo from "@/components/CollegeLogo";
 import { College } from "@/types/doorcard";
-import {
-  User,
-  MapPin,
-  Calendar,
-  Building,
-  ArrowLeft,
-  Globe,
-} from "lucide-react";
+import { User, MapPin, Calendar, ArrowLeft, Globe } from "lucide-react";
 import { formatDisplayName } from "@/lib/display-name";
 
 /* ----------------------------------------------------------------------------

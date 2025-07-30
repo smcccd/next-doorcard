@@ -68,7 +68,6 @@ export function AnalyticsChart({
   data,
   doorcardAnalytics = [],
   title = "Analytics Overview",
-  showComparison = false,
 }: AnalyticsChartProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const [mounted, setMounted] = useState(false);

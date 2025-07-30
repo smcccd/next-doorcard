@@ -410,10 +410,6 @@ describe("/api/doorcards", () => {
     });
 
     it("returns user's doorcards when authenticated", async () => {
-      const request = new NextRequest("http://localhost:3000/api/doorcards", {
-        method: "GET",
-      });
-
       const response = await GET();
       const data = await response.json();
 
@@ -476,7 +472,7 @@ describe("/api/doorcards", () => {
     });
 
     it("orders appointments correctly", async () => {
-      const response = await GET();
+      await GET();
 
       expect(mockPrisma.doorcard.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -490,7 +486,7 @@ describe("/api/doorcards", () => {
     });
 
     it("includes only specific user fields", async () => {
-      const response = await GET();
+      await GET();
 
       expect(mockPrisma.doorcard.findMany).toHaveBeenCalledWith(
         expect.objectContaining({

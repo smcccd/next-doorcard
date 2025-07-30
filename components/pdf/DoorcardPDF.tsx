@@ -412,11 +412,7 @@ interface DoorcardPDFWrapperProps extends DoorcardPDFProps {
   onDownload?: () => void;
 }
 
-export function DoorcardPDF({
-  doorcard,
-  doorcardId,
-  onDownload,
-}: DoorcardPDFWrapperProps) {
+export function DoorcardPDF({ doorcard, onDownload }: DoorcardPDFWrapperProps) {
   const fileName = `${doorcard.name || "doorcard"}-schedule.pdf`;
 
   const handleDownload = () => {

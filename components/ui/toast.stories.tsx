@@ -4,7 +4,6 @@ import { Button } from "./button";
 import { useToast } from "../../hooks/use-toast";
 import { Toaster } from "./toaster";
 import { ToastAction } from "./toast";
-import { Check, X, AlertCircle, Info } from "lucide-react";
 
 const meta = {
   title: "UI/Toast",

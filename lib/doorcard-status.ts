@@ -2,13 +2,6 @@ import type { Doorcard } from "@prisma/client";
 
 type TermSeason = "SPRING" | "SUMMER" | "FALL";
 
-interface TermPeriod {
-  season: TermSeason;
-  year: number;
-  startMonth: number; // 1-based
-  endMonth: number; // 1-based
-}
-
 /**
  * Define academic term periods
  */

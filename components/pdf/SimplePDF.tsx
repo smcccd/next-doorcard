@@ -436,11 +436,7 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
   `;
 }
 
-export function SimplePDF({
-  doorcard,
-  doorcardId,
-  onDownload,
-}: SimplePDFProps) {
+export function SimplePDF({ doorcard, onDownload }: SimplePDFProps) {
   const handleDownload = () => {
     onDownload?.();
 

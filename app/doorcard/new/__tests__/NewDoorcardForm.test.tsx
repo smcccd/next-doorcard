@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import NewDoorcardForm from "../NewDoorcardForm";
 import { createDoorcardWithCampusTerm } from "@/app/doorcard/actions";
@@ -6,7 +6,6 @@ import React from "react";
 
 // Dynamic year helper
 const getCurrentYear = () => new Date().getFullYear();
-const getNextYear = () => getCurrentYear() + 1;
 
 // Mock Next.js navigation
 const mockPush = jest.fn();

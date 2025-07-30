@@ -28,8 +28,7 @@ describe("AnalyticsTracker", () => {
 
       // Reset module to trigger new initialization
       jest.resetModules();
-      const analyticsModule = await import("../analytics");
-      const newAnalytics = analyticsModule.analytics;
+      await import("../analytics");
 
       expect(mockSessionStorage.setItem).toHaveBeenCalledWith(
         "doorcard-session-id",

@@ -1,6 +1,6 @@
 import { PublicDoorcard } from "@/types/pages/public";
 import { College } from "@/types/doorcard";
-import { DayOfWeek, TermSeason } from "@prisma/client";
+import { DayOfWeek } from "@prisma/client";
 import { extractDepartmentFromText } from "@/lib/departments";
 import { ActiveTermInfo } from "@/lib/active-term";
 

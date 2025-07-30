@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Inter, Source_Sans_3 } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
-import SiteIndex from "@/components/SiteIndex";
+
 import { ProfileSetupProvider } from "@/components/ProfileSetupProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { DarkModeProvider } from "@/components/DarkModeProvider";

@@ -1,7 +1,7 @@
 import { withAuth } from "../api-utils";
 import { getServerSession } from "next-auth/next";
 import { prisma } from "../prisma";
-import { NextResponse } from "next/server";
+
 import type { Session } from "next-auth";
 
 // Mock dependencies

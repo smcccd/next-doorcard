@@ -134,7 +134,6 @@ describe("TermManager", () => {
 
   describe("transitionToNewTerm", () => {
     const newTermId = "new-term-123";
-    const transactionMock = jest.fn();
 
     beforeEach(() => {
       // Only set up default mocks, don't pre-configure findUnique

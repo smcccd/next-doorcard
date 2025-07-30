@@ -37,7 +37,7 @@ const BASE_YEARS = Array.from({ length: 5 }, (_, i) =>
 );
 
 type FieldErrors = { college?: string; term?: string; year?: string };
-type ActionState = { success: boolean; message?: string } | undefined;
+type ActionState = { success: boolean; message?: string };
 
 interface Props {
   /** If undefined => new doorcard flow */

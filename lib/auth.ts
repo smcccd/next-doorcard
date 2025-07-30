@@ -89,7 +89,7 @@ export const authOptions: NextAuthOptions = {
       token: {
         url: "https://smccd.onelogin.com/oidc/2/token",
         async request(context) {
-          const { client, params, checks, provider } = context;
+          const { params, provider } = context;
 
           // Get client credentials from the provider config
           const clientId = process.env.ONELOGIN_CLIENT_ID!;
@@ -317,7 +317,7 @@ export const authOptions: NextAuthOptions = {
 
       return true;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;

@@ -1,6 +1,5 @@
 import { GET } from "../route";
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
 
 // Mock dependencies
 jest.mock("@/lib/prisma", () => ({

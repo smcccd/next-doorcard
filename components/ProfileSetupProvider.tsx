@@ -56,13 +56,6 @@ export function ProfileSetupProvider({
     }
   };
 
-  // Function to reset the modal (can be called when user visits profile page)
-  const resetProfileSetup = () => {
-    if (session?.user?.id) {
-      localStorage.removeItem(`profile-setup-dismissed-${session.user.id}`);
-    }
-  };
-
   return (
     <>
       {children}

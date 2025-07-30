@@ -1,6 +1,5 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import * as ReactDOM from "react-dom";
 import BasicInfoForm from "../BasicInfoForm";
 import { updateBasicInfo } from "@/app/doorcard/actions";
 
@@ -221,7 +220,7 @@ describe("BasicInfoForm", () => {
 
   describe("Form Submission", () => {
     it("should submit form with valid data", async () => {
-      mockUpdateBasicInfo.mockImplementation((id, state, formData) => {
+      mockUpdateBasicInfo.mockImplementation(() => {
         return Promise.resolve({ success: true });
       });
 

@@ -20,11 +20,7 @@ interface MobileNavProps {
   isAdmin?: boolean;
 }
 
-export default function MobileNav({
-  session,
-  userDisplay,
-  isAdmin,
-}: MobileNavProps) {
+export default function MobileNav({ session, isAdmin }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);

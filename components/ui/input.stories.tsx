@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs";
 import { Input } from "./input";
 import { Label } from "./label";
-import { Search, Mail, Lock, User, Calendar } from "lucide-react";
+import { Search, Mail, Lock } from "lucide-react";
 
 const meta = {
   title: "UI/Input",

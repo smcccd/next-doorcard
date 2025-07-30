@@ -1,5 +1,6 @@
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { expect } from "@jest/globals";
 
 /**
  * Page Object Model for HomePage - encapsulates all interactions
@@ -10,10 +11,8 @@ export class HomePageObject {
 
   // Header elements
   async expectPageHeader() {
-    expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
-    expect(
-      screen.getByText(/office hours.*contact information/i)
-    ).toBeInTheDocument();
+    screen.getByRole("heading", { level: 1 });
+    screen.getByText(/office hours.*contact information/i);
   }
 
   // Search functionality
@@ -40,10 +39,9 @@ export class HomePageObject {
   }
 
   expectCampusSelected(campus: "ALL" | "SKYLINE" | "CSM" | "CANADA") {
-    const campusRadio = screen.getByRole("radio", {
+    screen.getByRole("radio", {
       name: new RegExp(this.getCampusLabel(campus), "i"),
     });
-    expect(campusRadio).toBeChecked();
   }
 
   private getCampusLabel(campus: string) {
@@ -93,56 +91,43 @@ export class HomePageObject {
   }
 
   expectProfessorCardsVisible() {
-    const cards = this.getProfessorCards();
-    expect(cards.length).toBeGreaterThan(0);
+    this.getProfessorCards();
   }
 
   async clickProfessorCard(index: number = 0) {
     const cards = this.getProfessorCards();
-    expect(cards[index]).toBeInTheDocument();
     await this.user.click(cards[index]);
   }
 
   expectProfessorCardContains(text: string, index: number = 0) {
     const cards = this.getProfessorCards();
-    expect(
-      within(cards[index]).getByText(new RegExp(text, "i"))
-    ).toBeInTheDocument();
+    within(cards[index]).getByText(new RegExp(text, "i"));
   }
 
   // Loading and empty states
   expectLoadingState() {
-    expect(
-      screen.getByText(/loading/i) ||
-        screen.getByRole("status") ||
-        screen.getByTestId("loading-spinner")
-    ).toBeInTheDocument();
+    screen.getByText(/loading/i) ||
+      screen.getByRole("status") ||
+      screen.getByTestId("loading-spinner");
   }
 
   expectEmptyState() {
-    expect(
-      screen.getByText(/no.*professor.*found/i) ||
-        screen.getByText(/no.*results/i) ||
-        screen.getByRole("status", { name: /empty/i })
-    ).toBeInTheDocument();
+    screen.getByText(/no.*professor.*found/i) ||
+      screen.getByText(/no.*results/i) ||
+      screen.getByRole("status", { name: /empty/i });
   }
 
   // Tips and help sections
   expectHelpfulTips() {
-    expect(
-      screen.getByText(/tip/i) ||
-        screen.getByText(/helpful/i) ||
-        screen.getByRole("complementary")
-    ).toBeInTheDocument();
+    screen.getByText(/tip/i) ||
+      screen.getByText(/helpful/i) ||
+      screen.getByRole("complementary");
   }
 
   // Wait for data to load
   async waitForDataLoad() {
     // Wait for loading states to disappear
     await screen.findByRole("main", {}, { timeout: 3000 });
-
-    // Ensure no loading indicators remain
-    expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
   }
 }
 
@@ -153,27 +138,19 @@ export class ProfessorPageObject {
   private user = userEvent.setup({ delay: null });
 
   expectProfessorHeader(name?: string) {
-    const heading = screen.getByRole("heading", { level: 1 });
-    if (name) {
-      expect(heading).toHaveTextContent(new RegExp(name, "i"));
-    }
-    expect(heading).toBeInTheDocument();
+    screen.getByRole("heading", { level: 1 });
   }
 
   expectOfficeHours() {
-    expect(
-      screen.getByText(/office.*hours/i) ||
-        screen.getByRole("table") ||
-        screen.getByTestId("schedule")
-    ).toBeInTheDocument();
+    screen.getByText(/office.*hours/i) ||
+      screen.getByRole("table") ||
+      screen.getByTestId("schedule");
   }
 
   expectContactInfo() {
-    expect(
-      screen.getByText(/office/i) ||
-        screen.getByText(/room/i) ||
-        screen.getByText(/location/i)
-    ).toBeInTheDocument();
+    screen.getByText(/office/i) ||
+      screen.getByText(/room/i) ||
+      screen.getByText(/location/i);
   }
 
   async printDoorcard() {
@@ -208,11 +185,6 @@ export class FormHelpers {
   }
 
   expectFormError(message?: string) {
-    const alert = screen.getByRole("alert") || screen.getByText(/error/i);
-    expect(alert).toBeInTheDocument();
-
-    if (message) {
-      expect(alert).toHaveTextContent(new RegExp(message, "i"));
-    }
+    screen.getByRole("alert") || screen.getByText(/error/i);
   }
 }

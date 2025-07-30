@@ -1,7 +1,5 @@
 // Import will be done dynamically after env setup
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 
 // Mock dependencies
 jest.mock("@next-auth/prisma-adapter");
@@ -20,10 +18,6 @@ jest.mock("@/lib/prisma", () => ({
 const mockPrismaAdapter = PrismaAdapter as jest.MockedFunction<
   typeof PrismaAdapter
 >;
-const mockCredentialsProvider = CredentialsProvider as jest.MockedFunction<
-  typeof CredentialsProvider
->;
-const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
 
 // Mock environment variables
 const originalEnv = process.env;
