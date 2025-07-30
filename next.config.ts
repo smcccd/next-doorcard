@@ -71,12 +71,8 @@ const nextConfig: NextConfig = {
 
   // Experimental features for better performance
   experimental: {
-    // Optimize package imports
-    optimizePackageImports: [
-      "@prisma/client",
-      "lucide-react",
-      "@radix-ui/react-icons",
-    ],
+    // Optimize package imports (removed @prisma/client to avoid conflict)
+    optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
   },
 
   // External packages for serverless functions
