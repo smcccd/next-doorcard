@@ -162,6 +162,7 @@ parameters: {
         { id: 'keyboard', enabled: true },
       ],
     },
+    context: '#storybook-root',
   },
 }
 ```

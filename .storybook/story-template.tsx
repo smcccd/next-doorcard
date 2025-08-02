@@ -189,6 +189,7 @@ export const AccessibilityTest: Story = {
           },
         ],
       },
+      context: "#storybook-root",
     },
   },
 };

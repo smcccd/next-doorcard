@@ -77,7 +77,7 @@ const withProviders = (Story: any) => (
     <SessionProvider session={null}>
       <DarkModeProvider>
         <StorybookErrorBoundary>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
+          <div className="p-4">
             <Story />
             <Toaster />
           </div>
@@ -170,8 +170,8 @@ const preview: Preview = {
           },
         ],
       },
-      // Show violations in the accessibility panel
-      element: "#storybook-root",
+      // Show violations in the accessibility panel (updated parameter)
+      context: "#storybook-root",
       manual: false,
     },
 

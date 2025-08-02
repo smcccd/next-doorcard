@@ -3,38 +3,54 @@ import { prisma } from "@/lib/prisma";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
 
 // Mock dependencies
-jest.mock("@/lib/prisma", () => ({
-  prisma: {
-    user: {
-      findUnique: jest.fn(),
-    },
-    doorcardAnalytics: {
-      groupBy: jest.fn(),
-    },
-    doorcardMetrics: {
-      aggregate: jest.fn(),
-    },
-    doorcard: {
-      findMany: jest.fn(),
-    },
-  },
-}));
+jest.mock("@/lib/prisma");
 
 jest.mock("@/lib/require-auth-user", () => ({
   requireAuthUserAPI: jest.fn(),
 }));
 
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+// Create properly typed mocks
+const mockUser = {
+  findUnique: jest.fn(),
+};
+const mockDoorcardAnalytics = {
+  groupBy: jest.fn(),
+};
+const mockDoorcardMetrics = {
+  aggregate: jest.fn(),
+};
+const mockDoorcard = {
+  findMany: jest.fn(),
+};
+
+// Apply mocks to prisma
+(prisma.user as any) = mockUser;
+(prisma.doorcardAnalytics as any) = mockDoorcardAnalytics;
+(prisma.doorcardMetrics as any) = mockDoorcardMetrics;
+(prisma.doorcard as any) = mockDoorcard;
 const mockRequireAuthUserAPI = requireAuthUserAPI as jest.MockedFunction<
   typeof requireAuthUserAPI
 >;
 
 describe("Admin Analytics API Route", () => {
-  const mockUser = {
+  const mockAdminUser = {
     id: "admin-123",
     email: "admin@example.com",
     name: "Admin User",
-    role: "admin",
+    role: "ADMIN" as const,
+    college: "SKYLINE" as const,
+    firstName: "Admin",
+    lastName: "User",
+    title: null,
+    displayFormat: "FULL_NAME" as const,
+    username: "adminuser",
+    password: null,
+    website: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    pronouns: null,
+    emailVerified: null,
+    image: null,
   };
 
   beforeEach(() => {
@@ -54,7 +70,7 @@ describe("Admin Analytics API Route", () => {
       mockRequireAuthUserAPI.mockResolvedValue({
         user: { email: "admin@example.com" },
       });
-      mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+      mockUser.findUnique.mockResolvedValue({ role: "ADMIN" });
 
       // Mock analytics data
       const mockAnalyticsGroupBy = [
@@ -81,7 +97,7 @@ describe("Admin Analytics API Route", () => {
         {
           id: "doorcard-1",
           doorcardName: "Dr. Smith Office Hours",
-          college: "SKYLINE",
+          college: "SKYLINE" as const,
           User: {
             name: "Dr. John Smith",
             firstName: "John",
@@ -97,7 +113,7 @@ describe("Admin Analytics API Route", () => {
         {
           id: "doorcard-2",
           doorcardName: "Prof. Johnson Schedule",
-          college: "CSM",
+          college: "CSM" as const,
           User: {
             name: "Prof. Mary Johnson",
             firstName: null,
@@ -112,14 +128,14 @@ describe("Admin Analytics API Route", () => {
         },
       ];
 
-      mockPrisma.doorcardAnalytics.groupBy
-        .mockResolvedValueOnce(mockAnalyticsGroupBy) // First call: total analytics
-        .mockResolvedValueOnce(mockRecentAnalytics); // Second call: recent analytics
+      mockDoorcardAnalytics.groupBy
+        .mockResolvedValueOnce(mockAnalyticsGroupBy as any) // First call: total analytics
+        .mockResolvedValueOnce(mockRecentAnalytics as any); // Second call: recent analytics
 
-      mockPrisma.doorcardMetrics.aggregate.mockResolvedValue(
-        mockMetricsAggregate
+      mockDoorcardMetrics.aggregate.mockResolvedValue(
+        mockMetricsAggregate as any
       );
-      mockPrisma.doorcard.findMany.mockResolvedValue(mockTopDoorcards);
+      mockDoorcard.findMany.mockResolvedValue(mockTopDoorcards as any);
 
       const response = await GET();
       const data = await response.json();
@@ -168,7 +184,7 @@ describe("Admin Analytics API Route", () => {
       mockRequireAuthUserAPI.mockResolvedValue({
         user: { email: "admin@example.com" },
       });
-      mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+      mockUser.findUnique.mockResolvedValue({ role: "ADMIN" });
 
       // Test different engagement scenarios
       const testCases = [
@@ -212,13 +228,13 @@ describe("Admin Analytics API Route", () => {
         mockRequireAuthUserAPI.mockResolvedValue({
           user: { email: "admin@example.com" },
         });
-        mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+        mockUser.findUnique.mockResolvedValue({ role: "ADMIN" });
 
-        mockPrisma.doorcardAnalytics.groupBy.mockResolvedValue([]);
-        mockPrisma.doorcardMetrics.aggregate.mockResolvedValue(
-          testCase.metrics
+        mockDoorcardAnalytics.groupBy.mockResolvedValue([]);
+        mockDoorcardMetrics.aggregate.mockResolvedValue(
+          testCase.metrics as any
         );
-        mockPrisma.doorcard.findMany.mockResolvedValue([]);
+        mockDoorcard.findMany.mockResolvedValue([]);
 
         const response = await GET();
         const data = await response.json();
@@ -231,17 +247,17 @@ describe("Admin Analytics API Route", () => {
       mockRequireAuthUserAPI.mockResolvedValue({
         user: { email: "admin@example.com" },
       });
-      mockPrisma.user.findUnique.mockResolvedValue(mockUser);
-      mockPrisma.doorcardAnalytics.groupBy.mockResolvedValue([]);
-      mockPrisma.doorcardMetrics.aggregate.mockResolvedValue({
+      mockUser.findUnique.mockResolvedValue({ role: "ADMIN" });
+      mockDoorcardAnalytics.groupBy.mockResolvedValue([]);
+      mockDoorcardMetrics.aggregate.mockResolvedValue({
         _sum: { totalViews: 0, uniqueViews: 0, totalPrints: 0, totalShares: 0 },
-      });
+      } as any);
 
       const testDoorcards = [
         {
           id: "card-1",
           doorcardName: "Test Card 1",
-          college: "SKYLINE",
+          college: "SKYLINE" as const,
           User: {
             name: "Dr. John Smith",
             firstName: "John",
@@ -252,7 +268,7 @@ describe("Admin Analytics API Route", () => {
         {
           id: "card-2",
           doorcardName: "Test Card 2",
-          college: "CSM",
+          college: "CSM" as const,
           User: {
             name: "Prof. Legacy Name",
             firstName: null,
@@ -263,7 +279,7 @@ describe("Admin Analytics API Route", () => {
         {
           id: "card-3",
           doorcardName: "Test Card 3",
-          college: "CANADA",
+          college: "CANADA" as const,
           User: {
             name: null,
             firstName: null,
@@ -273,7 +289,7 @@ describe("Admin Analytics API Route", () => {
         },
       ];
 
-      mockPrisma.doorcard.findMany.mockResolvedValue(testDoorcards);
+      mockDoorcard.findMany.mockResolvedValue(testDoorcards as any);
 
       const response = await GET();
       const data = await response.json();
@@ -287,17 +303,17 @@ describe("Admin Analytics API Route", () => {
       mockRequireAuthUserAPI.mockResolvedValue({
         user: { email: "admin@example.com" },
       });
-      mockPrisma.user.findUnique.mockResolvedValue(mockUser);
-      mockPrisma.doorcardAnalytics.groupBy.mockResolvedValue([]);
-      mockPrisma.doorcardMetrics.aggregate.mockResolvedValue({
+      mockUser.findUnique.mockResolvedValue({ role: "ADMIN" });
+      mockDoorcardAnalytics.groupBy.mockResolvedValue([]);
+      mockDoorcardMetrics.aggregate.mockResolvedValue({
         _sum: {
           totalViews: null,
           uniqueViews: null,
           totalPrints: null,
           totalShares: null,
         },
-      });
-      mockPrisma.doorcard.findMany.mockResolvedValue([]);
+      } as any);
+      mockDoorcard.findMany.mockResolvedValue([]);
 
       const response = await GET();
       const data = await response.json();
@@ -317,17 +333,17 @@ describe("Admin Analytics API Route", () => {
       mockRequireAuthUserAPI.mockResolvedValue({
         user: { email: "admin@example.com" },
       });
-      mockPrisma.user.findUnique.mockResolvedValue(mockUser);
-      mockPrisma.doorcardAnalytics.groupBy.mockResolvedValue([]);
-      mockPrisma.doorcardMetrics.aggregate.mockResolvedValue({
+      mockUser.findUnique.mockResolvedValue({ role: "ADMIN" });
+      mockDoorcardAnalytics.groupBy.mockResolvedValue([]);
+      mockDoorcardMetrics.aggregate.mockResolvedValue({
         _sum: { totalViews: 0, uniqueViews: 0, totalPrints: 0, totalShares: 0 },
-      });
+      } as any);
 
       const doorcardWithoutMetrics = [
         {
           id: "card-1",
           doorcardName: "No Metrics Card",
-          college: "SKYLINE",
+          college: "SKYLINE" as const,
           User: {
             name: "Test User",
             firstName: "Test",
@@ -337,7 +353,7 @@ describe("Admin Analytics API Route", () => {
         },
       ];
 
-      mockPrisma.doorcard.findMany.mockResolvedValue(doorcardWithoutMetrics);
+      mockDoorcard.findMany.mockResolvedValue(doorcardWithoutMetrics as any);
 
       const response = await GET();
       const data = await response.json();
@@ -366,7 +382,7 @@ describe("Admin Analytics API Route", () => {
 
       expect(response.status).toBe(401);
       expect(data).toEqual({ error: "Unauthorized" });
-      expect(mockPrisma.user.findUnique).not.toHaveBeenCalled();
+      expect(mockUser.findUnique).not.toHaveBeenCalled();
     });
 
     it("should return 401 when user session has no email", async () => {
@@ -379,11 +395,24 @@ describe("Admin Analytics API Route", () => {
       expect(data).toEqual({ error: "Unauthorized" });
     });
 
+    it("should return 403 when user is not admin", async () => {
+      mockRequireAuthUserAPI.mockResolvedValue({
+        user: { email: "faculty@example.com" },
+      });
+      mockUser.findUnique.mockResolvedValue({ role: "FACULTY" });
+
+      const response = await GET();
+      const data = await response.json();
+
+      expect(response.status).toBe(403);
+      expect(data).toEqual({ error: "Unauthorized: Admin access required" });
+    });
+
     it("should return 404 when user is not found", async () => {
       mockRequireAuthUserAPI.mockResolvedValue({
         user: { email: "nonexistent@example.com" },
       });
-      mockPrisma.user.findUnique.mockResolvedValue(null);
+      mockUser.findUnique.mockResolvedValue(null);
 
       const response = await GET();
       const data = await response.json();
@@ -396,8 +425,8 @@ describe("Admin Analytics API Route", () => {
       mockRequireAuthUserAPI.mockResolvedValue({
         user: { email: "admin@example.com" },
       });
-      mockPrisma.user.findUnique.mockResolvedValue(mockUser);
-      mockPrisma.doorcardAnalytics.groupBy.mockRejectedValue(
+      mockUser.findUnique.mockResolvedValue({ role: "ADMIN" });
+      mockDoorcardAnalytics.groupBy.mockRejectedValue(
         new Error("Database error")
       );
 
@@ -412,25 +441,26 @@ describe("Admin Analytics API Route", () => {
       mockRequireAuthUserAPI.mockResolvedValue({
         user: { email: "admin@example.com" },
       });
-      mockPrisma.user.findUnique.mockResolvedValue(mockUser);
-      mockPrisma.doorcardAnalytics.groupBy.mockResolvedValue([]);
-      mockPrisma.doorcardMetrics.aggregate.mockResolvedValue({
+      mockUser.findUnique.mockResolvedValue({ role: "ADMIN" });
+      mockDoorcardAnalytics.groupBy.mockResolvedValue([]);
+      mockDoorcardMetrics.aggregate.mockResolvedValue({
         _sum: { totalViews: 0, uniqueViews: 0, totalPrints: 0, totalShares: 0 },
-      });
-      mockPrisma.doorcard.findMany.mockResolvedValue([]);
+      } as any);
+      mockDoorcard.findMany.mockResolvedValue([]);
 
       await GET();
 
       // Verify user lookup
-      expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
+      expect(mockUser.findUnique).toHaveBeenCalledWith({
         where: { email: "admin@example.com" },
+        select: { role: true },
       });
 
       // Verify analytics groupBy calls
-      expect(mockPrisma.doorcardAnalytics.groupBy).toHaveBeenCalledTimes(2);
+      expect(mockDoorcardAnalytics.groupBy).toHaveBeenCalledTimes(2);
 
       // First call: total analytics
-      expect(mockPrisma.doorcardAnalytics.groupBy).toHaveBeenNthCalledWith(1, {
+      expect(mockDoorcardAnalytics.groupBy).toHaveBeenNthCalledWith(1, {
         by: ["eventType"],
         _count: {
           eventType: true,
@@ -438,7 +468,7 @@ describe("Admin Analytics API Route", () => {
       });
 
       // Second call: recent analytics (last 30 days)
-      expect(mockPrisma.doorcardAnalytics.groupBy).toHaveBeenNthCalledWith(2, {
+      expect(mockDoorcardAnalytics.groupBy).toHaveBeenNthCalledWith(2, {
         by: ["eventType"],
         where: {
           createdAt: {
@@ -451,7 +481,7 @@ describe("Admin Analytics API Route", () => {
       });
 
       // Verify metrics aggregate
-      expect(mockPrisma.doorcardMetrics.aggregate).toHaveBeenCalledWith({
+      expect(mockDoorcardMetrics.aggregate).toHaveBeenCalledWith({
         _sum: {
           totalViews: true,
           uniqueViews: true,
@@ -461,7 +491,7 @@ describe("Admin Analytics API Route", () => {
       });
 
       // Verify top doorcards query
-      expect(mockPrisma.doorcard.findMany).toHaveBeenCalledWith({
+      expect(mockDoorcard.findMany).toHaveBeenCalledWith({
         include: {
           DoorcardMetrics: true,
           User: {
