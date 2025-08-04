@@ -1,13 +1,14 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline (Legacy - Use ci-enhanced.yml)
 
-# Temporarily disabled while testing optimized workflow
-# on:
-#   push:
-#     branches: [main, develop]
-#   pull_request:
-#     branches: [main]
+# This workflow is deprecated in favor of ci-enhanced.yml
+# Please use the enhanced workflow for all CI/CD needs
 on:
   workflow_dispatch: # Only allow manual triggers
+    inputs:
+      reason:
+        description: "Reason for running legacy pipeline"
+        required: true
+        default: "Testing legacy workflow"
 
 env:
   NODE_VERSION: "22"

@@ -136,14 +136,12 @@ describe("Doorcard Validation Schemas", () => {
     });
 
     it("accepts appointment without location", () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { location, ...appointmentWithoutLocation } = validAppointment;
       const result = appointmentSchema.parse(appointmentWithoutLocation);
       expect(result.location).toBeUndefined();
     });
 
     it("uses default category when not provided", () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { category, ...appointmentWithoutCategory } = validAppointment;
       const result = appointmentSchema.parse(appointmentWithoutCategory);
       expect(result.category).toBe("OFFICE_HOURS");
@@ -334,7 +332,6 @@ describe("Doorcard Validation Schemas", () => {
     });
 
     it("accepts doorcard without appointments", () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { appointments, ...doorcardWithoutAppointments } = validDoorcard;
       const result = doorcardSchema.parse(doorcardWithoutAppointments);
       expect(result.appointments).toEqual([]); // Default value
@@ -478,7 +475,6 @@ describe("Doorcard Validation Schemas", () => {
     });
 
     it("accepts optional fields", () => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { location, category, ...requiredFields } = validTimeBlock;
       const result = timeBlockSchema.parse(requiredFields);
       expect(result.location).toBeUndefined();

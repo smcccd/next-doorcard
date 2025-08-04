@@ -95,7 +95,6 @@ console.log('code');
 
     it("should handle non-string return from marked.parse", () => {
       // Test the typeof check in the parseMarkdown function
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       mockParse.mockReturnValue({} as any); // Return non-string
 
       const result = parseMarkdown("test");
@@ -106,7 +105,6 @@ console.log('code');
 
     it("should handle Promise return from marked.parse", () => {
       // Test edge case where marked.parse might return a Promise
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       mockParse.mockReturnValue(Promise.resolve("<p>async</p>") as any);
 
       const result = parseMarkdown("test");
@@ -116,7 +114,6 @@ console.log('code');
     });
 
     it("should handle null markdown input", () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = parseMarkdown(null as any);
 
       expect(mockParse).toHaveBeenCalledWith(null);
@@ -124,7 +121,6 @@ console.log('code');
     });
 
     it("should handle undefined markdown input", () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = parseMarkdown(undefined as any);
 
       expect(mockParse).toHaveBeenCalledWith(undefined);

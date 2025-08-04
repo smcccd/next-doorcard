@@ -97,7 +97,7 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
         return createDoorcardWithCampusTerm(prev, formData); // new flow
       }
     },
-    [doorcard?.id] // Only depend on the ID, not the entire doorcard object
+    [doorcard] // Include the entire doorcard object as required by the dependency
   );
 
   const [state, serverAction] = useActionState<ActionState, FormData>(

@@ -106,22 +106,40 @@ export class HomePageObject {
 
   // Loading and empty states
   expectLoadingState() {
-    screen.getByText(/loading/i) ||
-      screen.getByRole("status") ||
-      screen.getByTestId("loading-spinner");
+    try {
+      screen.getByText(/loading/i);
+    } catch {
+      try {
+        screen.getByRole("status");
+      } catch {
+        screen.getByTestId("loading-spinner");
+      }
+    }
   }
 
   expectEmptyState() {
-    screen.getByText(/no.*professor.*found/i) ||
-      screen.getByText(/no.*results/i) ||
-      screen.getByRole("status", { name: /empty/i });
+    try {
+      screen.getByText(/no.*professor.*found/i);
+    } catch {
+      try {
+        screen.getByText(/no.*results/i);
+      } catch {
+        screen.getByRole("status", { name: /empty/i });
+      }
+    }
   }
 
   // Tips and help sections
   expectHelpfulTips() {
-    screen.getByText(/tip/i) ||
-      screen.getByText(/helpful/i) ||
-      screen.getByRole("complementary");
+    try {
+      screen.getByText(/tip/i);
+    } catch {
+      try {
+        screen.getByText(/helpful/i);
+      } catch {
+        screen.getByRole("complementary");
+      }
+    }
   }
 
   // Wait for data to load
@@ -142,15 +160,27 @@ export class ProfessorPageObject {
   }
 
   expectOfficeHours() {
-    screen.getByText(/office.*hours/i) ||
-      screen.getByRole("table") ||
-      screen.getByTestId("schedule");
+    try {
+      screen.getByText(/office.*hours/i);
+    } catch {
+      try {
+        screen.getByRole("table");
+      } catch {
+        screen.getByTestId("schedule");
+      }
+    }
   }
 
   expectContactInfo() {
-    screen.getByText(/office/i) ||
-      screen.getByText(/room/i) ||
-      screen.getByText(/location/i);
+    try {
+      screen.getByText(/office/i);
+    } catch {
+      try {
+        screen.getByText(/room/i);
+      } catch {
+        screen.getByText(/location/i);
+      }
+    }
   }
 
   async printDoorcard() {
@@ -185,6 +215,10 @@ export class FormHelpers {
   }
 
   expectFormError(message?: string) {
-    screen.getByRole("alert") || screen.getByText(/error/i);
+    try {
+      screen.getByRole("alert");
+    } catch {
+      screen.getByText(/error/i);
+    }
   }
 }

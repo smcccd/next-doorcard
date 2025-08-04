@@ -82,7 +82,6 @@ describe("PrismaErrorHandler", () => {
 
     it("should handle unknown PrismaClientKnownRequestError codes", () => {
       const error = new Prisma.PrismaClientKnownRequestError("Unknown error", {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         code: "P9999" as any,
         clientVersion: "5.0.0",
       });
