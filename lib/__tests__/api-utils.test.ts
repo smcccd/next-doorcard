@@ -1,31 +1,43 @@
 import { withAuth } from "../api-utils";
 import { getServerSession } from "next-auth/next";
 import { prisma } from "../prisma";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
 
 import type { Session } from "next-auth";
 
 // Mock dependencies
-jest.mock("next-auth/next");
-jest.mock("../prisma", () => ({
+vi.mock("next-auth/next");
+vi.mock("../prisma", () => ({
   prisma: {
     doorcardDraft: {
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      upsert: jest.fn(),
-      delete: jest.fn(),
-      deleteMany: jest.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      upsert: vi.fn(),
+      delete: vi.fn(),
+      deleteMany: vi.fn(),
     },
   },
 }));
 
-const mockGetServerSession = getServerSession as jest.MockedFunction<
+const mockGetServerSession = getServerSession as MockedFunction<
   typeof getServerSession
 >;
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockPrisma = prisma as MockedObject<typeof prisma>;
 
 describe("API Utils", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("withAuth", () => {
@@ -37,7 +49,7 @@ describe("API Utils", () => {
 
       mockGetServerSession.mockResolvedValue(mockSession);
 
-      const mockHandler = jest.fn().mockResolvedValue({ success: true });
+      const mockHandler = vi.fn().mockResolvedValue({ success: true });
       const result = await withAuth(mockHandler);
 
       expect(mockHandler).toHaveBeenCalledWith(mockSession);
@@ -47,7 +59,7 @@ describe("API Utils", () => {
     it("should return 401 for missing session", async () => {
       mockGetServerSession.mockResolvedValue(null);
 
-      const mockHandler = jest.fn();
+      const mockHandler = vi.fn();
       const result = await withAuth(mockHandler);
 
       expect(mockHandler).not.toHaveBeenCalled();
@@ -62,7 +74,7 @@ describe("API Utils", () => {
 
       mockGetServerSession.mockResolvedValue(invalidSession);
 
-      const mockHandler = jest.fn();
+      const mockHandler = vi.fn();
       const result = await withAuth(mockHandler);
 
       expect(mockHandler).not.toHaveBeenCalled();
@@ -78,9 +90,9 @@ describe("API Utils", () => {
       mockGetServerSession.mockResolvedValue(mockSession);
 
       const error = new Error("Handler failed");
-      const mockHandler = jest.fn().mockRejectedValue(error);
+      const mockHandler = vi.fn().mockRejectedValue(error);
 
-      const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation();
 
       const result = await withAuth(mockHandler);
 
@@ -98,9 +110,9 @@ describe("API Utils", () => {
 
       mockGetServerSession.mockResolvedValue(mockSession);
 
-      const mockHandler = jest.fn().mockRejectedValue("String error");
+      const mockHandler = vi.fn().mockRejectedValue("String error");
 
-      const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation();
 
       const result = await withAuth(mockHandler);
 

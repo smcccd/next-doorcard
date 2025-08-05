@@ -4,26 +4,39 @@ import { getServerSession } from "next-auth/next";
 import { prisma } from "@/lib/prisma";
 
 // Mock dependencies
-jest.mock("next-auth/next", () => ({
-  getServerSession: jest.fn(),
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
+
+vi.mock("next-auth/next", () => ({
+  getServerSession: vi.fn(),
 }));
 
-jest.mock("@/lib/prisma", () => ({
+vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
-      findUnique: jest.fn(),
+      findUnique: vi.fn(),
     },
   },
 }));
 
-jest.mock("@/lib/auth", () => ({
+vi.mock("@/lib/auth", () => ({
   authOptions: {},
 }));
 
-const mockGetServerSession = getServerSession as jest.MockedFunction<
+const mockGetServerSession = getServerSession as MockedFunction<
   typeof getServerSession
 >;
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockPrisma = prisma as MockedObject<typeof prisma>;
 
 describe("Admin Users [userId] API Route", () => {
   const adminSession = {
@@ -126,7 +139,7 @@ describe("Admin Users [userId] API Route", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("GET /api/admin/users/[userId]", () => {

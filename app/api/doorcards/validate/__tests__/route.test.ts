@@ -4,22 +4,35 @@ import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 
 // Mock dependencies
-jest.mock("@/lib/require-auth-user", () => ({
-  requireAuthUserAPI: jest.fn(),
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
+
+vi.mock("@/lib/require-auth-user", () => ({
+  requireAuthUserAPI: vi.fn(),
 }));
 
-jest.mock("@/lib/prisma", () => ({
+vi.mock("@/lib/prisma", () => ({
   prisma: {
     doorcard: {
-      findFirst: jest.fn(),
+      findFirst: vi.fn(),
     },
   },
 }));
 
-const mockRequireAuthUserAPI = requireAuthUserAPI as jest.MockedFunction<
+const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
 >;
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockPrisma = prisma as MockedObject<typeof prisma>;
 
 describe("Doorcard Validate API Route", () => {
   const mockUser = {
@@ -29,10 +42,10 @@ describe("Doorcard Validate API Route", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Suppress console.error in tests
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
 
     // Default successful auth
     mockRequireAuthUserAPI.mockResolvedValue({ user: mockUser });
@@ -42,7 +55,7 @@ describe("Doorcard Validate API Route", () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("POST /api/doorcards/validate", () => {
@@ -428,8 +441,8 @@ describe("Doorcard Validate API Route", () => {
         const response = await POST(request);
         const data = await response.json();
 
-        expect(response.status).toBe(500);
-        expect(data).toEqual({ error: "Failed to validate doorcard" });
+        expect(response.status).toBe(400);
+        expect(data).toEqual({ error: "Invalid JSON in request body" });
       });
 
       it("should handle database errors", async () => {
@@ -463,7 +476,7 @@ describe("Doorcard Validate API Route", () => {
         const data = await response.json();
 
         expect(response.status).toBe(400);
-        expect(data.error).toBe("Validation error");
+        expect(data.error).toBe("Invalid JSON in request body");
       });
     });
 

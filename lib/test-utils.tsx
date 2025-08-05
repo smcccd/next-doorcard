@@ -1,6 +1,7 @@
 import React from "react";
 import { render, RenderOptions } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { vi } from "vitest";
 
 // Custom render function that includes common providers
 const customRender = (
@@ -99,6 +100,114 @@ export const setupUserEvent = () =>
     // Add consistent timing for all tests
     delay: null, // Disable delays in tests for speed
   });
+
+// Vitest-specific test utilities
+export const vitestHelpers = {
+  // Mock Next.js router with custom state
+  mockRouter: (routerState = {}) => {
+    const mockPush = vi.fn();
+    const mockReplace = vi.fn();
+    const mockRefresh = vi.fn();
+
+    vi.mocked(
+      vi.doMock("next/navigation", () => ({
+        useRouter: () => ({
+          push: mockPush,
+          replace: mockReplace,
+          refresh: mockRefresh,
+          back: vi.fn(),
+          forward: vi.fn(),
+          prefetch: vi.fn(),
+          ...routerState,
+        }),
+        usePathname: () => "/",
+        useSearchParams: () => new URLSearchParams(),
+      }))
+    );
+
+    return { mockPush, mockReplace, mockRefresh };
+  },
+
+  // Mock NextAuth session with custom user
+  mockSession: (sessionData: any = {}) => {
+    const mockSession = {
+      user: {
+        id: "test-user-id",
+        name: "Test User",
+        email: "test@example.com",
+        ...(sessionData.user || {}),
+      },
+      expires: "2024-12-31",
+      ...sessionData,
+    };
+
+    vi.mocked(
+      vi.doMock("next-auth/react", () => ({
+        useSession: () => ({
+          data: mockSession,
+          status: "authenticated",
+        }),
+        signIn: vi.fn(),
+        signOut: vi.fn(),
+      }))
+    );
+
+    return mockSession;
+  },
+
+  // Mock Prisma with custom responses
+  mockPrisma: (mockResponses = {}) => {
+    const defaultMocks = {
+      user: {
+        findUnique: vi.fn(),
+        findMany: vi.fn(),
+        create: vi.fn(),
+        update: vi.fn(),
+      },
+      doorcard: {
+        findMany: vi.fn(),
+        findUnique: vi.fn(),
+        create: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn(),
+      },
+      ...mockResponses,
+    };
+
+    vi.mocked(
+      vi.doMock("@/lib/prisma", () => ({
+        prisma: defaultMocks,
+      }))
+    );
+
+    return defaultMocks;
+  },
+};
+
+// React 19 specific test helpers
+export const react19Helpers = {
+  // Helper for testing Server Components (mock data fetching)
+  mockServerComponentData: (data: any) => {
+    return Promise.resolve(data);
+  },
+
+  // Helper for testing React 19 Actions
+  mockAction: (implementation?: (...args: any[]) => any) => {
+    return vi.fn(implementation || (() => Promise.resolve()));
+  },
+
+  // Helper for testing optimistic updates
+  mockOptimisticState: (initialState: any) => {
+    let currentState = initialState;
+    const updateOptimistic = vi.fn((updater) => {
+      currentState =
+        typeof updater === "function" ? updater(currentState) : updater;
+      return currentState;
+    });
+
+    return [currentState, updateOptimistic];
+  },
+};
 
 // Re-export everything from testing-library
 export * from "@testing-library/react";

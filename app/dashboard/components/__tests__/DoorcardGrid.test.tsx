@@ -1,13 +1,23 @@
 import { render, screen } from "@testing-library/react";
 import DoorcardGrid from "../DoorcardGrid";
 import type { Doorcard, Appointment, User } from "@prisma/client";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  vi,
+} from "vitest";
 
 // Mock the external dependencies
-jest.mock("@/lib/doorcard-status", () => ({
-  getDoorcardDisplayStatus: jest.fn(),
+vi.mock("@/lib/doorcard-status", () => ({
+  getDoorcardDisplayStatus: vi.fn(),
 }));
 
-jest.mock("@/types/doorcard", () => ({
+vi.mock("@/types/doorcard", () => ({
   COLLEGE_META: {
     SKYLINE: { label: "Skyline College" },
     CSM: { label: "College of San Mateo" },
@@ -16,7 +26,7 @@ jest.mock("@/types/doorcard", () => ({
 }));
 
 // Mock Next.js Link component
-jest.mock("next/link", () => {
+vi.mock("next/link", () => {
   const MockLink = ({ children, href, ...props }: any) => (
     <a href={href} {...props}>
       {children}
@@ -27,7 +37,7 @@ jest.mock("next/link", () => {
 });
 
 // Mock lucide-react icons
-jest.mock("lucide-react", () => ({
+vi.mock("lucide-react", () => ({
   Printer: () => <span data-testid="printer-icon">Printer</span>,
   Edit: () => <span data-testid="edit-icon">Edit</span>,
   ExternalLink: () => (
@@ -45,10 +55,9 @@ jest.mock("lucide-react", () => ({
 
 import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
 
-const mockGetDoorcardDisplayStatus =
-  getDoorcardDisplayStatus as jest.MockedFunction<
-    typeof getDoorcardDisplayStatus
-  >;
+const mockGetDoorcardDisplayStatus = getDoorcardDisplayStatus as MockedFunction<
+  typeof getDoorcardDisplayStatus
+>;
 
 const createMockDoorcard = (
   overrides: Partial<Doorcard> = {}
@@ -78,7 +87,7 @@ const createMockDoorcard = (
 
 describe("DoorcardGrid", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("Grid Layout", () => {

@@ -1,0 +1,60 @@
+# Ignore files during Vercel deployment
+*.test.ts
+*.test.tsx
+*.test.js
+*.test.jsx
+**/__tests__/**
+**/tests/**
+cypress/**
+.cypress/**
+coverage/**
+.jest-cache/**
+*.spec.ts
+*.spec.tsx
+*.spec.js
+*.spec.jsx
+
+# Storybook files
+.storybook/**
+storybook-static/**
+**/*.stories.ts
+**/*.stories.tsx
+**/*.stories.js
+**/*.stories.jsx
+
+# Development files
+.env.local
+.env.development
+.env.test
+
+# Cache directories
+.next/cache/**
+node_modules/.cache/**
+
+# Documentation
+docs/**
+README.md
+CHANGELOG.md
+
+# Git
+.git/**
+.gitignore
+
+# IDE
+.vscode/**
+.idea/**
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock

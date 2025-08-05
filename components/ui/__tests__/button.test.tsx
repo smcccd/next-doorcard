@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Button } from "../button";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("Button", () => {
   const user = userEvent.setup();
@@ -53,7 +54,7 @@ describe("Button", () => {
   });
 
   it("handles click events", async () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(<Button onClick={handleClick}>Click me</Button>);
 
     const button = screen.getByRole("button", { name: /click me/i });
@@ -63,7 +64,7 @@ describe("Button", () => {
   });
 
   it("can be disabled", () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(
       <Button disabled onClick={handleClick}>
         Disabled button
@@ -78,7 +79,7 @@ describe("Button", () => {
   });
 
   it("does not trigger click when disabled", async () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(
       <Button disabled onClick={handleClick}>
         Disabled button
@@ -92,7 +93,7 @@ describe("Button", () => {
   });
 
   it("forwards ref correctly", () => {
-    const ref = jest.fn();
+    const ref = vi.fn();
     render(<Button ref={ref}>Button with ref</Button>);
 
     expect(ref).toHaveBeenCalledWith(expect.any(HTMLButtonElement));
@@ -120,7 +121,7 @@ describe("Button", () => {
   });
 
   it("supports keyboard navigation", async () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(<Button onClick={handleClick}>Keyboard button</Button>);
 
     const button = screen.getByRole("button", { name: /keyboard button/i });
@@ -253,7 +254,7 @@ describe("Button", () => {
     });
 
     it("handles rapid successive clicks", async () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(<Button onClick={handleClick}>Rapid click</Button>);
 
       const button = screen.getByRole("button", { name: /rapid click/i });
@@ -279,8 +280,8 @@ describe("Button", () => {
 
   describe("event handling", () => {
     it("handles mousedown and mouseup events", async () => {
-      const handleMouseDown = jest.fn();
-      const handleMouseUp = jest.fn();
+      const handleMouseDown = vi.fn();
+      const handleMouseUp = vi.fn();
 
       render(
         <Button onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}>
@@ -298,8 +299,8 @@ describe("Button", () => {
     });
 
     it("handles focus and blur events", () => {
-      const handleFocus = jest.fn();
-      const handleBlur = jest.fn();
+      const handleFocus = vi.fn();
+      const handleBlur = vi.fn();
 
       render(
         <Button onFocus={handleFocus} onBlur={handleBlur}>

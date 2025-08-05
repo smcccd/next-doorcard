@@ -65,7 +65,7 @@ export function calculateProfessorCounts(
       (dc) =>
         dc.name.toLowerCase().includes(term) ||
         dc.doorcardName.toLowerCase().includes(term) ||
-        dc.user.name?.toLowerCase().includes(term)
+        dc.user?.name?.toLowerCase().includes(term)
     );
   }
 

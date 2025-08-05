@@ -1,12 +1,22 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AdminPage from "../page";
 import type { ReactNode } from "react";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  vi,
+} from "vitest";
 
 // Mock fetch globally
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 // Mock UI components
-jest.mock("@/components/ui/card", () => ({
+vi.mock("@/components/ui/card", () => ({
   Card: ({
     children,
     ...props
@@ -32,7 +42,7 @@ jest.mock("@/components/ui/card", () => ({
   ),
 }));
 
-jest.mock("@/components/ui/button", () => ({
+vi.mock("@/components/ui/button", () => ({
   Button: ({
     children,
     onClick,
@@ -57,7 +67,7 @@ jest.mock("@/components/ui/button", () => ({
   ),
 }));
 
-jest.mock("@/components/ui/badge", () => ({
+vi.mock("@/components/ui/badge", () => ({
   Badge: ({
     children,
     variant,
@@ -73,13 +83,13 @@ jest.mock("@/components/ui/badge", () => ({
   ),
 }));
 
-jest.mock("@/components/ui/input", () => ({
+vi.mock("@/components/ui/input", () => ({
   Input: ({ ...props }: { [key: string]: unknown }) => (
     <input data-testid="input" {...props} />
   ),
 }));
 
-jest.mock("@/components/ui/label", () => ({
+vi.mock("@/components/ui/label", () => ({
   Label: ({
     children,
     ...props
@@ -89,7 +99,7 @@ jest.mock("@/components/ui/label", () => ({
   }) => <label {...props}>{children}</label>,
 }));
 
-jest.mock("@/components/ui/select", () => ({
+vi.mock("@/components/ui/select", () => ({
   Select: ({
     children,
     onValueChange,
@@ -121,7 +131,7 @@ jest.mock("@/components/ui/select", () => ({
   ),
 }));
 
-jest.mock("@/components/ui/tabs", () => ({
+vi.mock("@/components/ui/tabs", () => ({
   Tabs: ({
     children,
     value,
@@ -155,30 +165,30 @@ jest.mock("@/components/ui/tabs", () => ({
 }));
 
 // Mock the entire AdminAnalytics component to avoid complex dependencies
-jest.mock("@/components/admin/AdminAnalytics", () => ({
+vi.mock("@/components/admin/AdminAnalytics", () => ({
   AdminAnalytics: () => (
     <div data-testid="admin-analytics">Admin Analytics</div>
   ),
 }));
 
 // Mock analytics components
-jest.mock("@/components/analytics/AnalyticsChart", () => ({
+vi.mock("@/components/analytics/AnalyticsChart", () => ({
   AnalyticsChart: () => (
     <div data-testid="analytics-chart">Analytics Chart</div>
   ),
 }));
 
-jest.mock("@/components/analytics/TestChart", () => ({
+vi.mock("@/components/analytics/TestChart", () => ({
   TestChart: () => <div data-testid="test-chart">Test Chart</div>,
 }));
 
-jest.mock("@/components/CollegeLogo", () => ({
+vi.mock("@/components/CollegeLogo", () => ({
   __esModule: true,
   default: () => <div data-testid="college-logo">College Logo</div>,
 }));
 
 // Mock lucide-react icons
-jest.mock("lucide-react", () => ({
+vi.mock("lucide-react", () => ({
   AlertCircle: () => <span data-testid="alert-circle-icon">AlertCircle</span>,
   Users: () => <span data-testid="users-icon">Users</span>,
   User: () => <span data-testid="user-icon">User</span>,
@@ -194,7 +204,7 @@ jest.mock("lucide-react", () => ({
   XCircle: () => <span data-testid="x-circle-icon">XCircle</span>,
 }));
 
-const mockFetch = fetch as jest.MockedFunction<typeof fetch>;
+const mockFetch = fetch as MockedFunction<typeof fetch>;
 
 const mockStatsResponse = {
   totalUsers: 150,
@@ -304,7 +314,7 @@ const mockDoorcardsResponse = [
 
 describe.skip("AdminPage", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockFetch.mockImplementation((url) => {
       if (typeof url === "string") {
         if (url.includes("/api/admin/stats")) {
@@ -480,7 +490,7 @@ describe.skip("AdminPage", () => {
       });
 
       // Clear previous mock calls to get accurate count
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Look for the specific refresh button
       const refreshButton = screen.getByRole("button", { name: /refresh/i });

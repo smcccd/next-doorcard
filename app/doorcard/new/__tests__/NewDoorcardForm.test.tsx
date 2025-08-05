@@ -3,41 +3,51 @@ import userEvent from "@testing-library/user-event";
 import NewDoorcardForm from "../NewDoorcardForm";
 import { createDoorcardWithCampusTerm } from "@/app/doorcard/actions";
 import React, { startTransition } from "react";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  vi,
+} from "vitest";
 
 // Dynamic year helper
 const getCurrentYear = () => new Date().getFullYear();
 
 // Mock Next.js navigation
-const mockPush = jest.fn();
-jest.mock("next/navigation", () => ({
+const mockPush = vi.fn();
+vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
   }),
 }));
 
 // Mock server action
-jest.mock("@/app/doorcard/actions", () => ({
-  createDoorcardWithCampusTerm: jest.fn(),
-  validateCampusTerm: jest.fn(),
+vi.mock("@/app/doorcard/actions", () => ({
+  createDoorcardWithCampusTerm: vi.fn(),
+  validateCampusTerm: vi.fn(),
 }));
 
 // Mock useActionState to avoid dispatch context issues
-const mockDispatch = jest.fn();
+const mockDispatch = vi.fn();
 
-jest.mock("react", () => ({
-  ...jest.requireActual("react"),
-  useActionState: jest.fn(),
+vi.mock("react", () => ({
+  ...vi.importActual("react"),
+  useActionState: vi.fn(),
 }));
 
 // Get typed mocks
 const mockCreateDoorcardWithCampusTerm =
-  createDoorcardWithCampusTerm as jest.MockedFunction<
+  createDoorcardWithCampusTerm as MockedFunction<
     typeof createDoorcardWithCampusTerm
   >;
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { useActionState } = require("react");
-const mockUseActionState = useActionState as jest.MockedFunction<
+const mockUseActionState = useActionState as MockedFunction<
   typeof useActionState
 >;
 
@@ -57,7 +67,7 @@ describe("NewDoorcardForm", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockCreateDoorcardWithCampusTerm.mockResolvedValue({
       success: true,
       doorcardId: "test-id",

@@ -1,4 +1,12 @@
 import {
+  vi,
+  beforeEach,
+  describe,
+  it,
+  expect,
+  type MockedFunction,
+} from "vitest";
+import {
   render,
   screen,
   fireEvent,
@@ -9,15 +17,15 @@ import Home from "../page";
 import { HomePageObject } from "@/lib/test-page-objects";
 
 // Mock the router
-const mockPush = jest.fn();
-jest.mock("next/navigation", () => ({
+const mockPush = vi.fn();
+vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
   }),
 }));
 
 // Mock fetch
-global.fetch = jest.fn() as jest.MockedFunction<typeof fetch>;
+global.fetch = vi.fn() as MockedFunction<typeof fetch>;
 
 const mockDoorcards = [
   {
@@ -61,8 +69,8 @@ describe("Home Page", () => {
     homePage = new HomePageObject();
   });
   beforeEach(() => {
-    jest.clearAllMocks();
-    (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+    vi.clearAllMocks();
+    (fetch as MockedFunction<typeof fetch>).mockResolvedValue({
       ok: true,
       json: async () => ({ doorcards: mockDoorcards, success: true }),
     } as Response);
@@ -188,7 +196,7 @@ describe("Home Page", () => {
   });
 
   it("shows improved empty state when no professors found", async () => {
-    (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+    (fetch as MockedFunction<typeof fetch>).mockResolvedValue({
       ok: true,
       json: async () => ({ doorcards: [], success: true }),
     } as Response);
@@ -231,7 +239,7 @@ describe("Home Page", () => {
   });
 
   it("handles loading state with improved message", async () => {
-    (fetch as jest.MockedFunction<typeof fetch>).mockImplementation(
+    (fetch as MockedFunction<typeof fetch>).mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
 

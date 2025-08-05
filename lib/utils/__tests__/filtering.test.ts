@@ -1,3 +1,4 @@
+import { vi, beforeEach, describe, expect, it } from "vitest";
 import { DayOfWeek, TermSeason } from "@prisma/client";
 import { PublicDoorcard } from "@/types/pages/public";
 import { College } from "@/types/doorcard";
@@ -9,8 +10,8 @@ import {
 } from "../filtering";
 
 // Mock the departments module
-jest.mock("@/lib/departments", () => ({
-  extractDepartmentFromText: jest.fn((text: string) => {
+vi.mock("@/lib/departments", () => ({
+  extractDepartmentFromText: vi.fn((text: string) => {
     if (text.toLowerCase().includes("math")) return "MATH";
     if (
       text.toLowerCase().includes("computer") ||

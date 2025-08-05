@@ -1,3 +1,4 @@
+import { vi, beforeEach, describe, expect, it } from "vitest";
 import {
   getCurrentAcademicTerm,
   compareTerms,
@@ -9,9 +10,9 @@ import type { Doorcard } from "@prisma/client";
 
 // Mock Date for consistent testing
 const mockDate = (date: string) => {
-  jest.useFakeTimers();
+  vi.useFakeTimers();
   const mockDateObj = new Date(date);
-  jest.setSystemTime(mockDateObj);
+  vi.setSystemTime(mockDateObj);
 };
 
 const createMockDoorcard = (overrides: Partial<Doorcard> = {}): Doorcard => ({
@@ -34,7 +35,7 @@ const createMockDoorcard = (overrides: Partial<Doorcard> = {}): Doorcard => ({
 
 describe("Doorcard Status", () => {
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe("getCurrentAcademicTerm", () => {

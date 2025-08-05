@@ -33,6 +33,7 @@ export async function GET() {
       totalAppointments,
       campusStats,
       recentUsers,
+      recentDoorcards,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.user.count({
@@ -47,7 +48,7 @@ export async function GET() {
         where: { isActive: true },
       }),
       prisma.appointment.count(),
-      // Campus breakdown
+      // Campus breakdown with aggregated data
       prisma.doorcard.groupBy({
         by: ["college"],
         _count: {
@@ -62,7 +63,72 @@ export async function GET() {
           },
         },
       }),
+      // Recent doorcards (last 7 days)
+      prisma.doorcard.count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+          },
+        },
+      }),
     ]);
+
+    // Get campus data with single aggregated query
+    const campusList = campusStats
+      .map((stat) => stat.college)
+      .filter((college) => college !== null);
+
+    const [campusUserData, campusAppointmentData] = await Promise.all([
+      // Get user counts per campus
+      prisma.user.findMany({
+        where: {
+          Doorcard: {
+            some: {
+              college: {
+                in: campusList,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+          Doorcard: {
+            select: {
+              college: true,
+            },
+            distinct: ["college"],
+          },
+        },
+      }),
+      // Get appointment counts per campus
+      prisma.appointment.groupBy({
+        by: ["doorcardId"],
+        where: {
+          Doorcard: {
+            college: {
+              in: campusList,
+            },
+          },
+        },
+        _count: {
+          id: true,
+        },
+      }),
+    ]);
+
+    // Get doorcard to campus mapping for appointments
+    const doorcardIds = campusAppointmentData.map((item) => item.doorcardId);
+    const doorcardCampusMap = await prisma.doorcard.findMany({
+      where: {
+        id: {
+          in: doorcardIds,
+        },
+      },
+      select: {
+        id: true,
+        college: true,
+      },
+    });
 
     // Process campus breakdown
     const campusBreakdown: Record<
@@ -70,34 +136,39 @@ export async function GET() {
       { users: number; doorcards: number; appointments: number }
     > = {};
 
+    // Count unique users per campus
+    const campusUserCount: Record<string, Set<string>> = {};
+    campusUserData.forEach((user) => {
+      user.Doorcard.forEach((doorcard) => {
+        if (doorcard.college) {
+          if (!campusUserCount[doorcard.college]) {
+            campusUserCount[doorcard.college] = new Set();
+          }
+          campusUserCount[doorcard.college].add(user.id);
+        }
+      });
+    });
+
+    // Count appointments per campus
+    const campusAppointmentCount: Record<string, number> = {};
+    const campusMap = new Map(doorcardCampusMap.map((d) => [d.id, d.college]));
+    campusAppointmentData.forEach((appointment) => {
+      const campus = campusMap.get(appointment.doorcardId);
+      if (campus) {
+        campusAppointmentCount[campus] =
+          (campusAppointmentCount[campus] || 0) + appointment._count.id;
+      }
+    });
+
+    // Build final campus breakdown
     for (const stat of campusStats) {
       const campus = stat.college;
       if (!campus) continue;
 
-      // Get user count for this campus
-      const campusUsers = await prisma.user.count({
-        where: {
-          Doorcard: {
-            some: {
-              college: campus,
-            },
-          },
-        },
-      });
-
-      // Get appointment count for this campus
-      const campusAppointments = await prisma.appointment.count({
-        where: {
-          Doorcard: {
-            college: campus,
-          },
-        },
-      });
-
       campusBreakdown[campus] = {
-        users: campusUsers,
+        users: campusUserCount[campus]?.size || 0,
         doorcards: stat._count.id,
-        appointments: campusAppointments,
+        appointments: campusAppointmentCount[campus] || 0,
       };
     }
 
@@ -110,7 +181,7 @@ export async function GET() {
       campusBreakdown,
       recentActivity: {
         newUsers: recentUsers,
-        newDoorcards: 0, // TODO: Add doorcard creation tracking
+        newDoorcards: recentDoorcards,
         newAppointments: 0, // TODO: Add appointment creation tracking
       },
     };
