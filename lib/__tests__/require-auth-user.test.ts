@@ -1,6 +1,18 @@
+import {
+  vi,
+  beforeEach,
+  describe,
+  it,
+  expect,
+  type MockedFunction,
+} from "vitest";
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+
+// Unmock the module we're testing so we can test the real implementation
+vi.unmock("@/lib/require-auth-user");
+
 import {
   requireAuthUser,
   getOptionalAuthUser,
@@ -10,12 +22,12 @@ import {
 } from "../require-auth-user";
 
 // Mock dependencies
-jest.mock("next-auth/next");
-jest.mock("next/navigation");
-jest.mock("@/lib/prisma", () => ({
+vi.mock("next-auth/next");
+vi.mock("next/navigation");
+vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
-      findUnique: jest.fn(),
+      findUnique: vi.fn(),
     },
   },
 }));
@@ -45,7 +57,7 @@ describe("require-auth-user utilities", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("requireAuthUser", () => {

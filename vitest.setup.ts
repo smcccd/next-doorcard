@@ -98,6 +98,12 @@ vi.mock("next-auth/next", () => ({
 vi.mock("@/lib/require-auth-user", () => ({
   requireAuthUserAPI: vi.fn(),
   requireAuthUser: vi.fn(),
+  getOptionalAuthUser: vi.fn(),
+  getAuthUser: vi.fn(),
+  clientAuthHelpers: {
+    getUserEmail: vi.fn((session) => session?.user?.email),
+    getUserId: vi.fn((session) => session?.user?.id),
+  },
 }));
 
 // Mock Prisma client
