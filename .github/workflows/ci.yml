@@ -70,8 +70,14 @@ jobs:
           path: |
             node_modules
             ~/.npm
+            ~/.cache
           key: ${{ needs.setup.outputs.cache-key }}
-          fail-on-cache-miss: true
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies if cache miss
+        run: npm ci --prefer-offline --no-audit
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -115,8 +121,14 @@ jobs:
           path: |
             node_modules
             ~/.npm
+            ~/.cache
           key: ${{ needs.setup.outputs.cache-key }}
-          fail-on-cache-miss: true
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies if cache miss
+        run: npm ci --prefer-offline --no-audit
 
       - name: Setup test database
         run: |
@@ -152,8 +164,14 @@ jobs:
           path: |
             node_modules
             ~/.npm
+            ~/.cache
           key: ${{ needs.setup.outputs.cache-key }}
-          fail-on-cache-miss: true
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies if cache miss
+        run: npm ci --prefer-offline --no-audit
 
       - name: Restore Next.js cache
         uses: actions/cache@v4
@@ -192,8 +210,9 @@ jobs:
             public
             package.json
             package-lock.json
-            next.config.js
+            next.config.ts
             prisma
+            node_modules/.prisma
           retention-days: 1
 
   # E2E tests (simplified for now)
@@ -236,7 +255,12 @@ jobs:
             ~/.npm
             ~/.cache
           key: ${{ needs.setup.outputs.cache-key }}
-          fail-on-cache-miss: true
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies if cache miss
+        run: npm ci --prefer-offline --no-audit
 
       - name: Setup E2E environment
         run: |
