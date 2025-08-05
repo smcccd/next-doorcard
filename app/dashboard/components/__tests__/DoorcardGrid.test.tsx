@@ -45,10 +45,9 @@ jest.mock("lucide-react", () => ({
 
 import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
 
-const mockGetDoorcardDisplayStatus =
-  getDoorcardDisplayStatus as jest.MockedFunction<
-    typeof getDoorcardDisplayStatus
-  >;
+const mockGetDoorcardDisplayStatus = getDoorcardDisplayStatus as MockedFunction<
+  typeof getDoorcardDisplayStatus
+>;
 
 const createMockDoorcard = (
   overrides: Partial<Doorcard> = {}

@@ -31,13 +31,13 @@ jest.mock("react", () => ({
 
 // Get typed mocks
 const mockCreateDoorcardWithCampusTerm =
-  createDoorcardWithCampusTerm as jest.MockedFunction<
+  createDoorcardWithCampusTerm as MockedFunction<
     typeof createDoorcardWithCampusTerm
   >;
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { useActionState } = require("react");
-const mockUseActionState = useActionState as jest.MockedFunction<
+const mockUseActionState = useActionState as MockedFunction<
   typeof useActionState
 >;
 

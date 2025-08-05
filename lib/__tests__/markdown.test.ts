@@ -9,8 +9,8 @@ jest.mock("marked", () => ({
 import { parseMarkdown } from "../markdown";
 import { marked } from "marked";
 
-const mockParse = marked.parse as jest.MockedFunction<typeof marked.parse>;
-const mockSetOptions = marked.setOptions as jest.MockedFunction<
+const mockParse = marked.parse as MockedFunction<typeof marked.parse>;
+const mockSetOptions = marked.setOptions as MockedFunction<
   typeof marked.setOptions
 >;
 

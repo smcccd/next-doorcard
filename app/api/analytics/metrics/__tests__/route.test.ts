@@ -23,7 +23,7 @@ jest.mock("@/lib/require-auth-user", () => ({
 }));
 
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
-const mockRequireAuthUserAPI = requireAuthUserAPI as jest.MockedFunction<
+const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
 >;
 

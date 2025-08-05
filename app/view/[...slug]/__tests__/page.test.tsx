@@ -83,10 +83,10 @@ jest.mock("lucide-react", () => ({
   Globe: () => <div data-testid="globe-icon" />,
 }));
 
-const mockGetServerSession = getServerSession as jest.MockedFunction<
+const mockGetServerSession = getServerSession as MockedFunction<
   typeof getServerSession
 >;
-const mockNotFound = notFound as jest.MockedFunction<typeof notFound>;
+const mockNotFound = notFound as MockedFunction<typeof notFound>;
 const mockPrisma = prisma as any;
 
 describe("PublicDoorcardView", () => {

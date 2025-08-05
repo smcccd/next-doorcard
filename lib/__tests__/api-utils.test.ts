@@ -18,7 +18,7 @@ jest.mock("../prisma", () => ({
   },
 }));
 
-const mockGetServerSession = getServerSession as jest.MockedFunction<
+const mockGetServerSession = getServerSession as MockedFunction<
   typeof getServerSession
 >;
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;

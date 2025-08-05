@@ -194,7 +194,7 @@ jest.mock("lucide-react", () => ({
   XCircle: () => <span data-testid="x-circle-icon">XCircle</span>,
 }));
 
-const mockFetch = fetch as jest.MockedFunction<typeof fetch>;
+const mockFetch = fetch as MockedFunction<typeof fetch>;
 
 const mockStatsResponse = {
   totalUsers: 150,

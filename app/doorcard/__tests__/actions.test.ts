@@ -19,12 +19,12 @@ jest.mock("@/lib/prisma");
 jest.mock("next/navigation");
 jest.mock("next/cache");
 
-const mockRequireAuthUserAPI = requireAuthUserAPI as jest.MockedFunction<
+const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
 >;
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
-const mockRedirect = redirect as jest.MockedFunction<typeof redirect>;
-const mockRevalidatePath = revalidatePath as jest.MockedFunction<
+const mockRedirect = redirect as MockedFunction<typeof redirect>;
+const mockRevalidatePath = revalidatePath as MockedFunction<
   typeof revalidatePath
 >;
 

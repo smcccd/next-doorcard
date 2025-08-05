@@ -7,7 +7,7 @@ import { NextRequest } from "next/server";
 jest.mock("@/lib/require-auth-user");
 jest.mock("@/lib/term-management");
 
-const mockRequireAuthUserAPI = requireAuthUserAPI as jest.MockedFunction<
+const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
 >;
 const mockTermManager = TermManager as jest.Mocked<typeof TermManager>;

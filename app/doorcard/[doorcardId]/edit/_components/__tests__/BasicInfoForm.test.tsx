@@ -40,7 +40,7 @@ jest.mock("lucide-react", () => ({
   Building2: () => <span data-testid="building-icon">Building</span>,
 }));
 
-const mockUpdateBasicInfo = updateBasicInfo as jest.MockedFunction<
+const mockUpdateBasicInfo = updateBasicInfo as MockedFunction<
   typeof updateBasicInfo
 >;
 

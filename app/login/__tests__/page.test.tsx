@@ -5,7 +5,7 @@ import LoginPage from "../page";
 
 // Mock NextAuth
 jest.mock("next-auth/react");
-const mockSignIn = signIn as jest.MockedFunction<typeof signIn>;
+const mockSignIn = signIn as MockedFunction<typeof signIn>;
 
 // Mock Next.js navigation
 const mockPush = jest.fn();

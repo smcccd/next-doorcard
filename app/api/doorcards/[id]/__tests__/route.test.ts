@@ -33,12 +33,10 @@ jest.mock("crypto", () => ({
 }));
 
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
-const mockRequireAuthUserAPI = requireAuthUserAPI as jest.MockedFunction<
+const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
 >;
-const mockGetTermStatus = getTermStatus as jest.MockedFunction<
-  typeof getTermStatus
->;
+const mockGetTermStatus = getTermStatus as MockedFunction<typeof getTermStatus>;
 
 describe("Doorcard API Route [id]", () => {
   const mockUser = {

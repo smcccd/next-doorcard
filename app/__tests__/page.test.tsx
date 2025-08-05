@@ -17,7 +17,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 // Mock fetch
-global.fetch = jest.fn() as jest.MockedFunction<typeof fetch>;
+global.fetch = jest.fn() as MockedFunction<typeof fetch>;
 
 const mockDoorcards = [
   {
@@ -62,7 +62,7 @@ describe("Home Page", () => {
   });
   beforeEach(() => {
     jest.clearAllMocks();
-    (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+    (fetch as MockedFunction<typeof fetch>).mockResolvedValue({
       ok: true,
       json: async () => ({ doorcards: mockDoorcards, success: true }),
     } as Response);
@@ -188,7 +188,7 @@ describe("Home Page", () => {
   });
 
   it("shows improved empty state when no professors found", async () => {
-    (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValue({
+    (fetch as MockedFunction<typeof fetch>).mockResolvedValue({
       ok: true,
       json: async () => ({ doorcards: [], success: true }),
     } as Response);
@@ -231,7 +231,7 @@ describe("Home Page", () => {
   });
 
   it("handles loading state with improved message", async () => {
-    (fetch as jest.MockedFunction<typeof fetch>).mockImplementation(
+    (fetch as MockedFunction<typeof fetch>).mockImplementation(
       () => new Promise(() => {}) // Never resolves
     );
 

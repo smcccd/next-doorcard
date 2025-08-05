@@ -20,11 +20,11 @@ jest.mock("@/lib/prisma", () => ({
   },
 }));
 
-const mockGetServerSession = getServerSession as jest.MockedFunction<
+const mockGetServerSession = getServerSession as MockedFunction<
   typeof getServerSession
 >;
-const mockRedirect = redirect as jest.MockedFunction<typeof redirect>;
-const mockPrismaUserFindUnique = prisma.user.findUnique as jest.MockedFunction<
+const mockRedirect = redirect as MockedFunction<typeof redirect>;
+const mockPrismaUserFindUnique = prisma.user.findUnique as MockedFunction<
   typeof prisma.user.findUnique
 >;
 

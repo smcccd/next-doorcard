@@ -50,7 +50,7 @@ export default defineConfig({
         minThreads: 1,
       },
     },
-    reporter: ["verbose", "junit"],
+    reporters: ["verbose", "junit"],
     outputFile: {
       junit: "coverage/junit.xml",
     },

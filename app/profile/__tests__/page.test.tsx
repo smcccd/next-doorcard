@@ -81,9 +81,9 @@ jest.mock("lucide-react", () => ({
 
 // Mock fetch
 global.fetch = jest.fn();
-const mockFetch = fetch as jest.MockedFunction<typeof fetch>;
+const mockFetch = fetch as MockedFunction<typeof fetch>;
 
-const mockUseSession = useSession as jest.MockedFunction<typeof useSession>;
+const mockUseSession = useSession as MockedFunction<typeof useSession>;
 
 const mockSessionData = {
   user: {

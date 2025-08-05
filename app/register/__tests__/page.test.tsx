@@ -42,12 +42,12 @@ jest.mock("@/components/ui/input", () => ({
 }));
 
 // Mock fetch
-global.fetch = jest.fn() as jest.MockedFunction<typeof fetch>;
+global.fetch = jest.fn() as MockedFunction<typeof fetch>;
 
 describe("RegisterPage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (fetch as jest.MockedFunction<typeof fetch>).mockClear();
+    (fetch as MockedFunction<typeof fetch>).mockClear();
   });
 
   it("renders the registration form", () => {
@@ -83,7 +83,7 @@ describe("RegisterPage", () => {
   });
 
   it("submits form with correct data on successful registration", async () => {
-    (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({
+    (fetch as MockedFunction<typeof fetch>).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ success: true }),
     } as Response);
@@ -127,7 +127,7 @@ describe("RegisterPage", () => {
 
   it("shows error toast on registration failure", async () => {
     const errorMessage = "Email already exists";
-    (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({
+    (fetch as MockedFunction<typeof fetch>).mockResolvedValueOnce({
       ok: false,
       json: async () => ({ message: errorMessage }),
     } as Response);
@@ -162,7 +162,7 @@ describe("RegisterPage", () => {
   });
 
   it("shows generic error message when no specific message provided", async () => {
-    (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce({
+    (fetch as MockedFunction<typeof fetch>).mockResolvedValueOnce({
       ok: false,
       json: async () => ({}),
     } as Response);

@@ -22,7 +22,7 @@ declare global {
 }
 
 // Make Jest available globally for existing tests with enhanced compatibility
-globalThis.jest = Object.assign(vi, {
+(globalThis as any).jest = Object.assign(vi, {
   fn: vi.fn,
   mock: vi.mock,
   clearAllMocks: vi.clearAllMocks,
