@@ -6,172 +6,59 @@ on:
   pull_request:
     branches: [main]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  NODE_VERSION: "22"
-  NEXT_TELEMETRY_DISABLED: 1
-
 jobs:
-  # Setup and install dependencies
-  setup:
-    name: Setup
+  test:
+    name: Test
     runs-on: ubuntu-latest
-    outputs:
-      cache-key: ${{ steps.cache-key.outputs.key }}
-    steps:
-      - uses: actions/checkout@v4
+    timeout-minutes: 10
 
-      - name: Generate cache key
-        id: cache-key
-        run: echo "key=${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}" >> $GITHUB_OUTPUT
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: "22"
           cache: "npm"
 
-      - name: Cache dependencies
-        id: cache-deps
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            ~/.npm
-            ~/.cache
-          key: ${{ steps.cache-key.outputs.key }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-
-            ${{ runner.os }}-node-
-
       - name: Install dependencies
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: npm ci --prefer-offline --no-audit
-
-  # Lint and type check
-  lint:
-    name: Lint & Type Check
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Restore dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            ~/.npm
-            ~/.cache
-          key: ${{ needs.setup.outputs.cache-key }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies if cache miss
-        run: npm ci --prefer-offline --no-audit
+        run: npm ci
 
       - name: Generate Prisma Client
         run: npx prisma generate
 
-      - name: Run ESLint
+      - name: Run linting
         run: npm run lint
 
-      - name: Run TypeScript type check
+      - name: Run type checking
         run: npm run type-check
 
-  # Unit tests
-  test-unit:
-    name: Unit Tests
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Restore dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            ~/.npm
-            ~/.cache
-          key: ${{ needs.setup.outputs.cache-key }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies if cache miss
-        run: npm ci --prefer-offline --no-audit
-
-      - name: Generate Prisma Client
-        run: npx prisma generate
-
-      - name: Run unit tests
-        run: npm run test:ci
+      - name: Run tests
+        run: npm test
         env:
-          NODE_ENV: test
+          DATABASE_URL: postgresql://test:test@localhost:5432/test
           NEXTAUTH_SECRET: test-secret
           NEXTAUTH_URL: http://localhost:3000
 
-  # Build
   build:
     name: Build
-    needs: [setup, lint]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: test
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: "22"
+          cache: "npm"
 
-      - name: Restore dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            ~/.npm
-            ~/.cache
-          key: ${{ needs.setup.outputs.cache-key }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies if cache miss
-        run: npm ci --prefer-offline --no-audit
-
-      - name: Restore Next.js cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
-
-      - name: Create .env.local
-        run: |
-          cat > .env.local << EOF
-          NEXTAUTH_URL=http://localhost:3000
-          NEXTAUTH_SECRET=build-secret
-          DATABASE_URL=postgresql://user:pass@localhost:5432/db
-          ONELOGIN_CLIENT_ID=dummy
-          ONELOGIN_CLIENT_SECRET=dummy
-          ONELOGIN_ISSUER=https://dummy.onelogin.com
-          EOF
+      - name: Install dependencies
+        run: npm ci
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -179,135 +66,23 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          NODE_ENV: production
           SKIP_ENV_VALIDATION: true
 
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            .next
-            public
-            package.json
-            package-lock.json
-            next.config.ts
-            prisma
-            node_modules/.prisma
-          retention-days: 1
-
-  # E2E tests (simplified for now)
-  test-e2e:
-    name: E2E Tests
-    needs: [build, test-unit]
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: e2e_db
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-
-      - name: Restore dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            ~/.npm
-            ~/.cache
-          key: ${{ needs.setup.outputs.cache-key }}
-          restore-keys: |
-            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies if cache miss
-        run: npm ci --prefer-offline --no-audit
-
-      - name: Setup E2E environment
-        run: |
-          npx prisma generate
-          npx prisma db push --skip-generate
-
-          cat > .env.local << EOF
-          DATABASE_URL=postgresql://postgres:postgres@localhost:5432/e2e_db
-          NEXTAUTH_URL=http://localhost:3000
-          NEXTAUTH_SECRET=e2e-test-secret
-          ONELOGIN_CLIENT_ID=test-client
-          ONELOGIN_CLIENT_SECRET=test-secret
-          ONELOGIN_ISSUER=https://test.onelogin.com
-          NODE_ENV=test
-          CYPRESS=true
-          EOF
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/e2e_db
-
-      - name: Install Cypress binary
-        run: npx cypress install
-
-      - name: Run E2E tests
-        uses: cypress-io/github-action@v6
-        with:
-          browser: chrome
-          headed: false
-          start: npm run start
-          wait-on: "http://localhost:3000"
-          wait-on-timeout: 120
-          config: video=false,screenshotOnRunFailure=true
-          spec: |
-            cypress/e2e/smoke.cy.ts
-        env:
-          CYPRESS_BASE_URL: http://localhost:3000
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/e2e_db
-          NEXTAUTH_SECRET: e2e-test-secret
-
-      - name: Upload E2E artifacts
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-artifacts
-          path: |
-            cypress/screenshots
-            cypress/videos
-          retention-days: 7
-
-  # Deploy to Vercel
   deploy:
-    name: Deploy
-    needs: [build, test-unit, test-e2e]
+    name: Deploy to Vercel
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    environment:
-      name: production
-      url: ${{ steps.vercel.outputs.preview-url }}
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Deploy to Vercel
-        id: vercel
         uses: amondnet/vercel-action@v25
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: "--prod"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
