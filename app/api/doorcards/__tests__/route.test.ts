@@ -18,7 +18,7 @@ jest.mock("@/lib/prisma", () => ({
 const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
 >;
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockPrisma = prisma as MockedObject<typeof prisma>;
 
 describe("/api/doorcards", () => {
   const mockUser = {

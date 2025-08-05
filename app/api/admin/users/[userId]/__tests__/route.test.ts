@@ -23,7 +23,7 @@ jest.mock("@/lib/auth", () => ({
 const mockGetServerSession = getServerSession as MockedFunction<
   typeof getServerSession
 >;
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockPrisma = prisma as MockedObject<typeof prisma>;
 
 describe("Admin Users [userId] API Route", () => {
   const adminSession = {

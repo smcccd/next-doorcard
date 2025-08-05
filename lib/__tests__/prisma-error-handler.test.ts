@@ -12,7 +12,7 @@ jest.mock("next/server", () => ({
   },
 }));
 
-const mockNextResponse = NextResponse as jest.Mocked<typeof NextResponse>;
+const mockNextResponse = NextResponse as MockedObject<typeof NextResponse>;
 
 describe("PrismaErrorHandler", () => {
   beforeEach(() => {

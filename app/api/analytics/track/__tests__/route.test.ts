@@ -23,7 +23,7 @@ jest.mock("crypto", () => ({
   randomUUID: jest.fn(() => "mock-uuid-123"),
 }));
 
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockPrisma = prisma as MockedObject<typeof prisma>;
 const mockRandomUUID = randomUUID as MockedFunction<typeof randomUUID>;
 
 describe("Analytics Tracking API Route", () => {

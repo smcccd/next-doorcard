@@ -89,6 +89,11 @@ vi.mock("next-auth", () => ({
   getServerSession: vi.fn(),
 }));
 
+// Mock NextAuth next functions
+vi.mock("next-auth/next", () => ({
+  getServerSession: vi.fn(),
+}));
+
 // Mock Prisma client
 const mockPrisma = {
   user: {

@@ -32,7 +32,7 @@ jest.mock("crypto", () => ({
   randomUUID: jest.fn(() => "mock-uuid-123"),
 }));
 
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockPrisma = prisma as MockedObject<typeof prisma>;
 const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
 >;

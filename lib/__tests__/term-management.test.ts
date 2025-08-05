@@ -7,7 +7,7 @@ import {
 } from "../term-management";
 
 // Use the global Prisma mock from jest.setup.js
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockPrisma = prisma as MockedObject<typeof prisma>;
 
 describe("TermManager", () => {
   beforeEach(() => {

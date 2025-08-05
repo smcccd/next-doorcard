@@ -12,7 +12,7 @@ jest.mock("@testing-library/user-event", () => ({
   })),
 }));
 
-const mockUserEvent = userEvent as jest.Mocked<typeof userEvent>;
+const mockUserEvent = userEvent as MockedObject<typeof userEvent>;
 
 describe("Test Utils", () => {
   beforeEach(() => {

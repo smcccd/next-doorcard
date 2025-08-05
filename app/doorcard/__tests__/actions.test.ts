@@ -22,7 +22,7 @@ jest.mock("next/cache");
 const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
 >;
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockPrisma = prisma as MockedObject<typeof prisma>;
 const mockRedirect = redirect as MockedFunction<typeof redirect>;
 const mockRevalidatePath = revalidatePath as MockedFunction<
   typeof revalidatePath

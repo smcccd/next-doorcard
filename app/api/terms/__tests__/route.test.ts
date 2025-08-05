@@ -10,7 +10,7 @@ jest.mock("@/lib/term-management");
 const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
 >;
-const mockTermManager = TermManager as jest.Mocked<typeof TermManager>;
+const mockTermManager = TermManager as MockedObject<typeof TermManager>;
 
 describe("/api/terms", () => {
   beforeEach(() => {
