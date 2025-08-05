@@ -27,6 +27,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   AlertCircle,
   Users,
   Calendar,
@@ -336,10 +342,37 @@ export default function AdminPage() {
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
             </Button>
-            <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
-              Export Data
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Data
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() =>
+                    window.open("/api/admin/export?type=users", "_blank")
+                  }
+                >
+                  Export Users
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    window.open("/api/admin/export?type=doorcards", "_blank")
+                  }
+                >
+                  Export Doorcards
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() =>
+                    window.open("/api/admin/export?type=analytics", "_blank")
+                  }
+                >
+                  Export Analytics
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
@@ -715,7 +748,16 @@ export default function AdminPage() {
                             </div>
                           </td>
                           <td className="p-3">
-                            <Button variant="outline" size="sm">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                window.open(
+                                  `/doorcards/${doorcard.user.email.split("@")[0]}/${doorcard.doorcardName}`,
+                                  "_blank"
+                                )
+                              }
+                            >
                               View
                             </Button>
                           </td>

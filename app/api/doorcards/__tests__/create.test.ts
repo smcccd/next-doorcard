@@ -4,23 +4,36 @@ import { prisma } from "@/lib/prisma";
 import { NextRequest } from "next/server";
 
 // Mock dependencies
-jest.mock("@/lib/require-auth-user");
-jest.mock("@/lib/prisma", () => ({
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
+
+vi.mock("@/lib/require-auth-user");
+vi.mock("@/lib/prisma", () => ({
   prisma: {
     doorcard: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
+      findFirst: vi.fn(),
+      create: vi.fn(),
     },
     appointment: {
-      createMany: jest.fn(),
+      createMany: vi.fn(),
     },
   },
 }));
 
-const mockRequireAuthUserAPI = requireAuthUserAPI as jest.MockedFunction<
+const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
 >;
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockPrisma = prisma as MockedObject<typeof prisma>;
 
 describe("/api/doorcards POST", () => {
   const mockUser = {
@@ -53,7 +66,7 @@ describe("/api/doorcards POST", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockRequireAuthUserAPI.mockResolvedValue({ user: mockUser });
   });
 
@@ -231,7 +244,7 @@ describe("/api/doorcards POST", () => {
       expect(response.status).toBe(409);
       expect(data.error).toContain(testCase.expected);
 
-      jest.clearAllMocks();
+      vi.clearAllMocks();
       mockRequireAuthUserAPI.mockResolvedValue({ user: mockUser });
     }
   });

@@ -2,7 +2,9 @@ import { render, screen } from "@testing-library/react";
 import NewDoorcardButton from "../NewDoorcardButton";
 
 // Mock lucide-react icons
-jest.mock("lucide-react", () => ({
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("lucide-react", () => ({
   Plus: () => <span data-testid="plus-icon">Plus</span>,
 }));
 

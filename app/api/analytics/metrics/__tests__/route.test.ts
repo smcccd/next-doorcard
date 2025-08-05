@@ -1,29 +1,41 @@
 import { GET } from "../route";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
 
 // Mock dependencies
-jest.mock("@/lib/prisma", () => ({
+vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
-      findUnique: jest.fn(),
+      findUnique: vi.fn(),
     },
     doorcard: {
-      findMany: jest.fn(),
-      count: jest.fn(),
+      findMany: vi.fn(),
+      count: vi.fn(),
     },
     doorcardAnalytics: {
-      count: jest.fn(),
+      count: vi.fn(),
     },
   },
 }));
 
-jest.mock("@/lib/require-auth-user", () => ({
-  requireAuthUserAPI: jest.fn(),
+vi.mock("@/lib/require-auth-user", () => ({
+  requireAuthUserAPI: vi.fn(),
 }));
 
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
-const mockRequireAuthUserAPI = requireAuthUserAPI as jest.MockedFunction<
+const mockPrisma = prisma as MockedObject<typeof prisma>;
+const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
 >;
 
@@ -70,10 +82,10 @@ describe("Analytics Metrics API Route", () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Suppress console.error in tests
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
 
     // Default successful mocks
     mockRequireAuthUserAPI.mockResolvedValue({
@@ -86,7 +98,7 @@ describe("Analytics Metrics API Route", () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("GET /api/analytics/metrics", () => {

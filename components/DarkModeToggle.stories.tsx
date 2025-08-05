@@ -6,8 +6,21 @@ const meta = {
   component: DarkModeToggle,
   parameters: {
     layout: "centered",
+    docs: {
+      description: {
+        component:
+          "A toggle component that switches between light and dark themes. Integrates with the DarkModeProvider context and persists theme preference.",
+      },
+    },
   },
   tags: ["autodocs"],
+  argTypes: {
+    // No direct props, but component responds to theme context
+    className: {
+      control: { type: "text" },
+      description: "Additional CSS classes to apply to the toggle button",
+    },
+  },
 } satisfies Meta<typeof DarkModeToggle>;
 
 export default meta;
@@ -75,4 +88,74 @@ export const MultipleToggles: Story = {
       </p>
     </div>
   ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Multiple toggle instances are synchronized through the shared context. Clicking any toggle affects all instances.",
+      },
+    },
+  },
+};
+
+// Accessibility focused story
+export const AccessibilityTest: Story = {
+  render: () => <DarkModeToggle />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Toggle configured for accessibility testing. Should have proper ARIA labels, keyboard navigation, and screen reader support.",
+      },
+    },
+    a11y: {
+      config: {
+        rules: [
+          {
+            id: "color-contrast",
+            enabled: true,
+          },
+          {
+            id: "keyboard",
+            enabled: true,
+          },
+          {
+            id: "aria-required-attr",
+            enabled: true,
+          },
+        ],
+      },
+      context: "#storybook-root",
+    },
+  },
+};
+
+// Interactive example for testing
+export const InteractiveDemo: Story = {
+  render: () => (
+    <div className="p-6 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-lg font-semibold dark:text-white">
+            Theme Settings
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Switch between light and dark modes
+          </p>
+        </div>
+        <DarkModeToggle />
+      </div>
+      <div className="text-sm text-gray-500 dark:text-gray-400">
+        Background and text colors will change when you toggle the theme.
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Interactive demo showing the toggle in a realistic UI context with proper styling that responds to theme changes.",
+      },
+    },
+  },
 };

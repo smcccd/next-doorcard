@@ -1,22 +1,32 @@
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { PrismaErrorHandler, withRetry } from "../prisma-error-handler";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
 
 // Mock NextResponse
-jest.mock("next/server", () => ({
+vi.mock("next/server", () => ({
   NextResponse: {
-    json: jest.fn((body, init) => ({
+    json: vi.fn((body, init) => ({
       body,
       status: init?.status || 200,
     })),
   },
 }));
 
-const mockNextResponse = NextResponse as jest.Mocked<typeof NextResponse>;
+const mockNextResponse = NextResponse as MockedObject<typeof NextResponse>;
 
 describe("PrismaErrorHandler", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("handle", () => {
@@ -82,7 +92,6 @@ describe("PrismaErrorHandler", () => {
 
     it("should handle unknown PrismaClientKnownRequestError codes", () => {
       const error = new Prisma.PrismaClientKnownRequestError("Unknown error", {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         code: "P9999" as any,
         clientVersion: "5.0.0",
       });
@@ -134,7 +143,7 @@ describe("PrismaErrorHandler", () => {
 
     it("should handle generic errors and log in production", () => {
       const originalEnv = process.env.NODE_ENV;
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation();
 
       try {
         process.env.NODE_ENV = "production";
@@ -161,7 +170,7 @@ describe("PrismaErrorHandler", () => {
 
     it("should handle generic errors without logging in development", () => {
       const originalEnv = process.env.NODE_ENV;
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation();
 
       try {
         process.env.NODE_ENV = "development";
@@ -187,11 +196,11 @@ describe("PrismaErrorHandler", () => {
 
 describe("withRetry", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should return result on successful operation", async () => {
-    const operation = jest.fn().mockResolvedValue("success");
+    const operation = vi.fn().mockResolvedValue("success");
 
     const result = await withRetry(operation);
 
@@ -234,7 +243,7 @@ describe("withRetry", () => {
   });
 
   it("should not retry on non-retryable errors", async () => {
-    const operation = jest.fn().mockRejectedValue(
+    const operation = vi.fn().mockRejectedValue(
       new Prisma.PrismaClientKnownRequestError("Unique constraint", {
         code: "P2002",
         clientVersion: "5.0.0",
@@ -246,14 +255,14 @@ describe("withRetry", () => {
   });
 
   it("should not retry on generic errors", async () => {
-    const operation = jest.fn().mockRejectedValue(new Error("Generic error"));
+    const operation = vi.fn().mockRejectedValue(new Error("Generic error"));
 
     await expect(withRetry(operation)).rejects.toThrow("Generic error");
     expect(operation).toHaveBeenCalledTimes(1);
   });
 
   it("should throw after max retries exceeded", async () => {
-    const operation = jest.fn().mockRejectedValue(
+    const operation = vi.fn().mockRejectedValue(
       new Prisma.PrismaClientKnownRequestError("Timeout", {
         code: "P2024",
         clientVersion: "5.0.0",
@@ -292,7 +301,7 @@ describe("withRetry", () => {
   });
 
   it("should use default retry parameters", async () => {
-    const operation = jest.fn().mockResolvedValue("success");
+    const operation = vi.fn().mockResolvedValue("success");
 
     const result = await withRetry(operation);
 

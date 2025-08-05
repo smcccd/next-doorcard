@@ -2,26 +2,37 @@ import { GET } from "../route";
 import { prisma } from "@/lib/prisma";
 
 // Mock dependencies
-jest.mock("@/lib/prisma", () => ({
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
+
+vi.mock("@/lib/prisma", () => ({
   prisma: {
     doorcard: {
-      findMany: jest.fn(),
+      findMany: vi.fn(),
     },
   },
 }));
 
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockPrisma = prisma as MockedObject<typeof prisma>;
 
 describe("Public Doorcards API Route", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Suppress console.error in tests
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("GET /api/doorcards/public", () => {

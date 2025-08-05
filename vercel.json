@@ -4,11 +4,11 @@
   },
   "buildCommand": "npm run build",
   "framework": "nextjs",
-  "installCommand": "npm ci",
+  "installCommand": "npm ci --force",
   "build": {
     "env": {
       "NEXT_TELEMETRY_DISABLED": "1",
-      "PRISMA_GENERATE_SKIP_AUTOINSTALL": "true"
+      "NODE_ENV": "production"
     }
   },
   "functions": {

@@ -1,35 +1,40 @@
+import {
+  vi,
+  beforeEach,
+  describe,
+  it,
+  expect,
+  type MockedFunction,
+} from "vitest";
+
 // Mock dependencies first
-jest.mock("marked", () => ({
+vi.mock("marked", () => ({
   marked: {
-    setOptions: jest.fn(),
-    parse: jest.fn(),
+    setOptions: vi.fn(),
+    parse: vi.fn(),
   },
 }));
 
 import { parseMarkdown } from "../markdown";
 import { marked } from "marked";
 
-const mockParse = marked.parse as jest.MockedFunction<typeof marked.parse>;
-const mockSetOptions = marked.setOptions as jest.MockedFunction<
+const mockParse = marked.parse as MockedFunction<typeof marked.parse>;
+const mockSetOptions = marked.setOptions as MockedFunction<
   typeof marked.setOptions
 >;
 
 describe("Markdown Utils", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockParse.mockImplementation((text: string) => `<p>${text}</p>`);
   });
 
   describe("marked configuration", () => {
     it("should configure marked with correct options", () => {
-      // Re-import the module to trigger setOptions call
-      jest.isolateModules(() => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        require("../markdown");
-        expect(mockSetOptions).toHaveBeenCalledWith({
-          breaks: true,
-          gfm: true,
-        });
+      // The module should have been initialized and setOptions called during import
+      expect(mockSetOptions).toHaveBeenCalledWith({
+        breaks: true,
+        gfm: true,
       });
     });
   });
@@ -62,7 +67,7 @@ describe("Markdown Utils", () => {
         throw new Error("Parsing error");
       });
 
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation();
 
       const result = parseMarkdown("# Test");
 
@@ -95,7 +100,6 @@ console.log('code');
 
     it("should handle non-string return from marked.parse", () => {
       // Test the typeof check in the parseMarkdown function
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       mockParse.mockReturnValue({} as any); // Return non-string
 
       const result = parseMarkdown("test");
@@ -106,7 +110,6 @@ console.log('code');
 
     it("should handle Promise return from marked.parse", () => {
       // Test edge case where marked.parse might return a Promise
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       mockParse.mockReturnValue(Promise.resolve("<p>async</p>") as any);
 
       const result = parseMarkdown("test");
@@ -116,7 +119,6 @@ console.log('code');
     });
 
     it("should handle null markdown input", () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = parseMarkdown(null as any);
 
       expect(mockParse).toHaveBeenCalledWith(null);
@@ -124,7 +126,6 @@ console.log('code');
     });
 
     it("should handle undefined markdown input", () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = parseMarkdown(undefined as any);
 
       expect(mockParse).toHaveBeenCalledWith(undefined);
@@ -145,7 +146,7 @@ console.log('code');
         throw new Error("Test error");
       });
 
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation();
 
       const result = parseMarkdown("# Test");
 
@@ -158,7 +159,7 @@ console.log('code');
     });
 
     it("should handle different types of parsing errors", () => {
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation();
 
       // Test with TypeError
       mockParse.mockImplementation(() => {

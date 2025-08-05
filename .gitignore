@@ -54,3 +54,6 @@ prisma/dev.db-journal
 
 *storybook.log
 storybook-static
+
+# Claude configuration
+CLAUDE.md

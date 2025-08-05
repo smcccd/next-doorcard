@@ -15,13 +15,21 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check if user is admin (you might want to add an admin role check here)
+    // Check if user is admin
     const user = await prisma.user.findUnique({
       where: { email: session.email },
+      select: { role: true },
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    if (user.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Unauthorized: Admin access required" },
+        { status: 403 }
+      );
     }
 
     // Get overall platform metrics
