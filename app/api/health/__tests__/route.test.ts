@@ -8,7 +8,7 @@ jest.mock("@/lib/prisma", () => ({
   },
 }));
 
-const mockPrisma = prisma as jest.Mocked<typeof prisma>;
+const mockPrisma = prisma as MockedObject<typeof prisma>;
 
 describe("/api/health", () => {
   beforeEach(() => {

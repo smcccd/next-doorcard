@@ -109,7 +109,9 @@ describe("Auth Configuration", () => {
         },
       };
 
-      (prisma.account.findUnique as jest.Mock).mockResolvedValue(mockAccount);
+      (prisma.account.findUnique as MockedFunction<any>).mockResolvedValue(
+        mockAccount
+      );
 
       const adapter = authOptions.adapter;
       const result = await adapter?.getUserByAccount?.({
@@ -153,7 +155,9 @@ describe("Auth Configuration", () => {
         User: null,
       };
 
-      (prisma.account.findUnique as jest.Mock).mockResolvedValue(mockAccount);
+      (prisma.account.findUnique as MockedFunction<any>).mockResolvedValue(
+        mockAccount
+      );
 
       const adapter = authOptions.adapter;
       const result = await adapter?.getUserByAccount?.({

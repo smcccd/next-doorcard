@@ -47,7 +47,7 @@ describe("AnalyticsTracker", () => {
 
   describe("Event Tracking", () => {
     it("should track events via API call", async () => {
-      const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+      const mockFetch = global.fetch as MockedFunction<typeof fetch>;
       mockFetch.mockResolvedValueOnce({
         ok: true,
       } as Response);
@@ -71,7 +71,7 @@ describe("AnalyticsTracker", () => {
     });
 
     it("should handle tracking failures gracefully", async () => {
-      const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+      const mockFetch = global.fetch as MockedFunction<typeof fetch>;
       mockFetch.mockRejectedValueOnce(new Error("Network error"));
 
       const consoleSpy = jest.spyOn(console, "error").mockImplementation();
@@ -93,7 +93,7 @@ describe("AnalyticsTracker", () => {
 
   describe("Convenience Methods", () => {
     beforeEach(() => {
-      const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
+      const mockFetch = global.fetch as MockedFunction<typeof fetch>;
       mockFetch.mockResolvedValue({
         ok: true,
       } as Response);

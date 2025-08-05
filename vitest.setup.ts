@@ -1,7 +1,8 @@
-import "@testing-library/jest-dom";
-import { vi, beforeEach } from "vitest";
+import "@testing-library/jest-dom/vitest";
+import { vi, beforeEach, afterEach, type MockedFunction } from "vitest";
+import { cleanup } from "@testing-library/react";
 
-// Create Jest compatibility layer for existing tests
+// Enhanced Jest compatibility layer for existing tests
 declare global {
   const jest: typeof vi & {
     fn: typeof vi.fn;
@@ -11,21 +12,34 @@ declare global {
     restoreAllMocks: typeof vi.restoreAllMocks;
     MockedFunction: any;
     Mocked: any;
+    spyOn: typeof vi.spyOn;
   };
+
+  // Export Vitest types globally for easier migration
+  type MockedFunction<T extends (...args: any[]) => any> =
+    import("vitest").MockedFunction<T>;
+  type MockedObject<T> = import("vitest").MockedObject<T>;
 }
 
-// Make Jest available globally for existing tests
+// Make Jest available globally for existing tests with enhanced compatibility
 globalThis.jest = Object.assign(vi, {
   fn: vi.fn,
   mock: vi.mock,
   clearAllMocks: vi.clearAllMocks,
   resetAllMocks: vi.resetAllMocks,
   restoreAllMocks: vi.restoreAllMocks,
+  spyOn: vi.spyOn,
   MockedFunction: {} as any,
   Mocked: {} as any,
 });
 
-// Mock Next.js router
+// Automatic cleanup after each test (React 19 best practice)
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+});
+
+// Mock Next.js navigation (App Router - Next.js 15)
 vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: vi.fn(),
@@ -39,7 +53,23 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "",
   redirect: vi.fn(),
   notFound: vi.fn(),
+  permanentRedirect: vi.fn(),
 }));
+
+// Mock Next.js server components and actions (React 19 support)
+vi.mock("react", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react")>();
+  return {
+    ...actual,
+    cache: vi.fn((fn) => fn),
+    use: vi.fn(),
+    startTransition: vi.fn((fn) => fn()),
+    experimental_useOptimistic: vi.fn(() => [null, vi.fn()]),
+  };
+});
+
+// Mock server actions
+vi.mock("server-only", () => ({}));
 
 // Mock NextAuth
 vi.mock("next-auth/react", () => ({
