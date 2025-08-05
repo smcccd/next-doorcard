@@ -31,5 +31,14 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "cypress", "**/*.stories.tsx", "**/*.stories.ts"]
+  "exclude": [
+    "node_modules",
+    "cypress",
+    "**/*.stories.tsx",
+    "**/*.stories.ts",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ]
 }
