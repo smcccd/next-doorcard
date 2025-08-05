@@ -11,14 +11,11 @@ const customJestConfig = {
   // Use single environment for now to simplify configuration
   testEnvironment: "jsdom",
   testMatch: [
-    // Only run working tests to unblock CI
-    "**/components/**/__tests__/**/*.{js,jsx,tsx}",
-    "**/lib/__tests__/utils.test.tsx",
-    "**/lib/__tests__/test-utils.test.tsx",
-    "**/lib/__tests__/**/*.integration.test.{js,ts}",
-    "**/types/__tests__/**/*.{js,jsx,tsx}",
-    // Add simple integration tests that don't require complex setup
-    "**/app/api/health/__tests__/**/*.integration.test.{js,ts}",
+    // Include all working test patterns
+    "**/components/**/__tests__/**/*.{js,jsx,ts,tsx}",
+    "**/lib/__tests__/**/*.{js,jsx,ts,tsx}",
+    "**/app/**/__tests__/**/*.{js,jsx,ts,tsx}",
+    "**/types/**/__tests__/**/*.{js,jsx,ts,tsx}",
   ],
   testTimeout: process.env.CI ? 30000 : 10000,
   testPathIgnorePatterns: [
