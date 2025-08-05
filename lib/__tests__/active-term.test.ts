@@ -1,3 +1,4 @@
+import { vi, beforeEach, describe, expect, it } from "vitest";
 import { TermSeason } from "@prisma/client";
 import {
   getCurrentAcademicTerm,
@@ -9,14 +10,14 @@ import {
 
 // Mock Date for consistent testing
 const mockDate = (year: number, month: number, day: number = 15) => {
-  jest.useFakeTimers();
-  jest.setSystemTime(new Date(year, month - 1, day));
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date(year, month - 1, day));
 };
 
 describe("Active Term Utils", () => {
   afterEach(() => {
-    jest.useRealTimers();
-    jest.restoreAllMocks();
+    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   describe("getCurrentAcademicTerm", () => {

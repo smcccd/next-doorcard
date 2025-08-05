@@ -3,21 +3,31 @@ import { getServerSession } from "next-auth/next";
 import { notFound } from "next/navigation";
 import PublicDoorcardView from "../page";
 import { prisma } from "@/lib/prisma";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  vi,
+} from "vitest";
 
 // Mock dependencies
-jest.mock("next-auth/next");
-jest.mock("next/navigation");
-jest.mock("@/lib/prisma");
-jest.mock("@/lib/auth");
+vi.mock("next-auth/next");
+vi.mock("next/navigation");
+vi.mock("@/lib/prisma");
+vi.mock("@/lib/auth");
 
 // Mock components
-jest.mock("@/components/UnifiedDoorcard", () => ({
+vi.mock("@/components/UnifiedDoorcard", () => ({
   UnifiedDoorcard: ({ doorcard }: any) => (
     <div data-testid="unified-doorcard">Doorcard for {doorcard.name}</div>
   ),
 }));
 
-jest.mock("@/components/PrintOptimizedDoorcard", () => ({
+vi.mock("@/components/PrintOptimizedDoorcard", () => ({
   PrintOptimizedDoorcard: ({ doorcard }: any) => (
     <div data-testid="print-optimized-doorcard">
       Print version for {doorcard.name}
@@ -25,36 +35,36 @@ jest.mock("@/components/PrintOptimizedDoorcard", () => ({
   ),
 }));
 
-jest.mock("@/components/UnifiedDoorcardActions", () => ({
+vi.mock("@/components/UnifiedDoorcardActions", () => ({
   DoorcardActions: ({ doorcard }: any) => (
     <div data-testid="doorcard-actions">Actions for {doorcard.name}</div>
   ),
 }));
 
-jest.mock("@/components/doorcard/DoorcardViewTracker", () => ({
+vi.mock("@/components/doorcard/DoorcardViewTracker", () => ({
   DoorcardViewTracker: (props: any) => (
     <div data-testid="view-tracker" data-doorcard-id={props.doorcardId} />
   ),
 }));
 
-jest.mock("@/components/AutoPrintHandler", () => ({
+vi.mock("@/components/AutoPrintHandler", () => ({
   AutoPrintHandler: ({ autoPrint }: any) => (
     <div data-testid="auto-print-handler" data-auto-print={autoPrint} />
   ),
 }));
 
-jest.mock("@/lib/display-name", () => ({
+vi.mock("@/lib/display-name", () => ({
   formatDisplayName: (user: any) => `${user.firstName} ${user.lastName}`,
 }));
 
 // Mock UI components
-jest.mock("@/components/ui/badge", () => ({
+vi.mock("@/components/ui/badge", () => ({
   Badge: ({ children, variant, className }: any) => (
     <span className={`badge ${variant} ${className}`}>{children}</span>
   ),
 }));
 
-jest.mock("@/components/ui/button", () => ({
+vi.mock("@/components/ui/button", () => ({
   Button: ({ children, asChild, ...props }: any) => {
     if (asChild) {
       return <div {...props}>{children}</div>;
@@ -63,7 +73,7 @@ jest.mock("@/components/ui/button", () => ({
   },
 }));
 
-jest.mock("next/link", () => {
+vi.mock("next/link", () => {
   const MockLink = ({ children, href, ...props }: any) => (
     <a href={href} {...props}>
       {children}
@@ -74,7 +84,7 @@ jest.mock("next/link", () => {
 });
 
 // Mock icons
-jest.mock("lucide-react", () => ({
+vi.mock("lucide-react", () => ({
   User: () => <div data-testid="user-icon" />,
   MapPin: () => <div data-testid="map-pin-icon" />,
   Calendar: () => <div data-testid="calendar-icon" />,
@@ -131,14 +141,14 @@ describe("PublicDoorcardView", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockGetServerSession.mockResolvedValue(null);
     mockPrisma.user = {
-      findUnique: jest.fn(),
-      findFirst: jest.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
     };
     mockPrisma.doorcard = {
-      findFirst: jest.fn(),
+      findFirst: vi.fn(),
     };
   });
 

@@ -1,20 +1,29 @@
+import {
+  vi,
+  beforeEach,
+  describe,
+  it,
+  expect,
+  type MockedFunction,
+} from "vitest";
+import type { MockedObject } from "vitest";
 import { NextRequest } from "next/server";
 import { GET } from "../route";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 
 // Mock dependencies
-jest.mock("@/lib/require-auth-user", () => ({
-  requireAuthUserAPI: jest.fn(),
+vi.mock("@/lib/require-auth-user", () => ({
+  requireAuthUserAPI: vi.fn(),
 }));
 
-jest.mock("@/lib/prisma", () => ({
+vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
-      findFirst: jest.fn(),
+      findFirst: vi.fn(),
     },
     doorcard: {
-      findFirst: jest.fn(),
+      findFirst: vi.fn(),
     },
   },
 }));
@@ -25,6 +34,9 @@ const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
 const mockPrisma = prisma as MockedObject<typeof prisma>;
 
 describe("Current Doorcard View API Route", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
   const mockUser = {
     id: "user-123",
     name: "Test User",
@@ -68,17 +80,17 @@ describe("Current Doorcard View API Route", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Suppress console.error in tests
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
 
     // Default successful auth
     mockRequireAuthUserAPI.mockResolvedValue({ user: mockUser });
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("GET /api/doorcards/view/[username]/current", () => {

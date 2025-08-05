@@ -4,20 +4,33 @@ import { getServerSession } from "next-auth/next";
 import { prisma } from "@/lib/prisma";
 
 // Mock dependencies
-jest.mock("next-auth/next", () => ({
-  getServerSession: jest.fn(),
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
+
+vi.mock("next-auth/next", () => ({
+  getServerSession: vi.fn(),
 }));
 
-jest.mock("@/lib/prisma", () => ({
+vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
-      findUnique: jest.fn(),
-      update: jest.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
     },
   },
 }));
 
-jest.mock("@/lib/auth", () => ({
+vi.mock("@/lib/auth", () => ({
   authOptions: {},
 }));
 
@@ -43,15 +56,15 @@ describe("User Profile API Route", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Suppress console.log output in tests
-    jest.spyOn(console, "log").mockImplementation(() => {});
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("GET /api/user/profile", () => {
@@ -248,7 +261,7 @@ describe("User Profile API Route", () => {
       ];
 
       for (const website of testCases) {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         mockGetServerSession.mockResolvedValue(mockSession);
         mockPrisma.user.update.mockResolvedValue({ ...mockUser, website });
 
@@ -337,7 +350,7 @@ describe("User Profile API Route", () => {
       ];
 
       for (const website of validWebsites) {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         mockGetServerSession.mockResolvedValue(mockSession);
         mockPrisma.user.update.mockResolvedValue({ ...mockUser, website });
 
@@ -487,7 +500,7 @@ describe("User Profile API Route", () => {
       const validColleges = ["SKYLINE", "CSM", "CANADA"];
 
       for (const college of validColleges) {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         mockGetServerSession.mockResolvedValue(mockSession);
         mockPrisma.user.update.mockResolvedValue({ ...mockUser, college });
 

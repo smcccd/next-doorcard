@@ -1,59 +1,69 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  vi,
+} from "vitest";
 
 // Mock dependencies first
-jest.mock("@/lib/prisma", () => ({
+vi.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
-      findUnique: jest.fn(),
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
+      findUnique: vi.fn(),
+      findFirst: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
     },
     account: {
-      findUnique: jest.fn(),
-      create: jest.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
     },
     session: {
-      create: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
+      create: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
     },
     verificationToken: {
-      findUnique: jest.fn(),
-      delete: jest.fn(),
+      findUnique: vi.fn(),
+      delete: vi.fn(),
     },
   },
 }));
 
-jest.mock("bcryptjs", () => ({
-  compare: jest.fn(),
-  hash: jest.fn(),
+vi.mock("bcryptjs", () => ({
+  compare: vi.fn(),
+  hash: vi.fn(),
 }));
 
-jest.mock("crypto", () => ({
-  randomUUID: jest.fn(() => "mock-uuid"),
+vi.mock("crypto", () => ({
+  randomUUID: vi.fn(() => "mock-uuid"),
 }));
 
 // Mock the adapter before defining mockAdapter
-jest.mock("@next-auth/prisma-adapter", () => ({
-  PrismaAdapter: jest.fn(() => ({
-    createUser: jest.fn(),
-    getUser: jest.fn(),
-    getUserByEmail: jest.fn(),
-    getUserByAccount: jest.fn(),
-    updateUser: jest.fn(),
-    deleteUser: jest.fn(),
-    linkAccount: jest.fn(),
-    unlinkAccount: jest.fn(),
-    createSession: jest.fn(),
-    getSessionAndUser: jest.fn(),
-    updateSession: jest.fn(),
-    deleteSession: jest.fn(),
-    createVerificationToken: jest.fn(),
-    useVerificationToken: jest.fn(),
+vi.mock("@next-auth/prisma-adapter", () => ({
+  PrismaAdapter: vi.fn(() => ({
+    createUser: vi.fn(),
+    getUser: vi.fn(),
+    getUserByEmail: vi.fn(),
+    getUserByAccount: vi.fn(),
+    updateUser: vi.fn(),
+    deleteUser: vi.fn(),
+    linkAccount: vi.fn(),
+    unlinkAccount: vi.fn(),
+    createSession: vi.fn(),
+    getSessionAndUser: vi.fn(),
+    updateSession: vi.fn(),
+    deleteSession: vi.fn(),
+    createVerificationToken: vi.fn(),
+    useVerificationToken: vi.fn(),
   })),
 }));
 
@@ -72,7 +82,7 @@ import { authOptions } from "../auth";
 
 describe("Auth Configuration", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {

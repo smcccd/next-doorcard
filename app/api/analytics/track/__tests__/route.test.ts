@@ -4,23 +4,36 @@ import { prisma } from "@/lib/prisma";
 import { randomUUID } from "crypto";
 
 // Mock dependencies
-jest.mock("@/lib/prisma", () => ({
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
+
+vi.mock("@/lib/prisma", () => ({
   prisma: {
     doorcard: {
-      findUnique: jest.fn(),
+      findUnique: vi.fn(),
     },
     doorcardAnalytics: {
-      create: jest.fn(),
-      findFirst: jest.fn(),
+      create: vi.fn(),
+      findFirst: vi.fn(),
     },
     doorcardMetrics: {
-      upsert: jest.fn(),
+      upsert: vi.fn(),
     },
   },
 }));
 
-jest.mock("crypto", () => ({
-  randomUUID: jest.fn(() => "mock-uuid-123"),
+vi.mock("crypto", () => ({
+  randomUUID: vi.fn(() => "mock-uuid-123"),
 }));
 
 const mockPrisma = prisma as MockedObject<typeof prisma>;
@@ -40,10 +53,10 @@ describe("Analytics Tracking API Route", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Suppress console.error in tests
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
 
     // Default successful mocks
     mockPrisma.doorcard.findUnique.mockResolvedValue(mockDoorcard);
@@ -72,7 +85,7 @@ describe("Analytics Tracking API Route", () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("POST /api/analytics/track", () => {
@@ -133,7 +146,7 @@ describe("Analytics Tracking API Route", () => {
       ];
 
       for (const eventType of eventTypes) {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         mockPrisma.doorcard.findUnique.mockResolvedValue(mockDoorcard);
         mockPrisma.doorcardAnalytics.create.mockResolvedValue({} as any);
         mockPrisma.doorcardAnalytics.findFirst.mockResolvedValue(null);
@@ -181,7 +194,7 @@ describe("Analytics Tracking API Route", () => {
       ];
 
       for (const testCase of testCases) {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         mockPrisma.doorcard.findUnique.mockResolvedValue(mockDoorcard);
         mockPrisma.doorcardAnalytics.create.mockResolvedValue({} as any);
         mockPrisma.doorcardAnalytics.findFirst.mockResolvedValue(null);

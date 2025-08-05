@@ -4,8 +4,10 @@ import { College } from "@/types/doorcard";
 import { calculateProfessorCounts, CountOptions } from "../professor-counts";
 
 // Mock the departments module
-jest.mock("@/lib/departments", () => ({
-  extractDepartmentFromText: jest.fn((text: string) => {
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/departments", () => ({
+  extractDepartmentFromText: vi.fn((text: string) => {
     if (text.toLowerCase().includes("math")) return "MATH";
     if (
       text.toLowerCase().includes("computer") ||

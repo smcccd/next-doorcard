@@ -4,26 +4,37 @@ import BasicInfoForm from "../BasicInfoForm";
 import { updateBasicInfo } from "@/app/doorcard/actions";
 
 // Mock the server action
-jest.mock("@/app/doorcard/actions", () => ({
-  updateBasicInfo: jest.fn(),
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  vi,
+} from "vitest";
+
+vi.mock("@/app/doorcard/actions", () => ({
+  updateBasicInfo: vi.fn(),
 }));
 
 // Mock useFormStatus
-jest.mock("react-dom", () => ({
-  ...jest.requireActual("react-dom"),
+vi.mock("react-dom", () => ({
+  ...vi.importActual("react-dom"),
   useFormStatus: () => ({ pending: false }),
 }));
 
 // Mock UI components
-jest.mock("@/components/ui/input", () => ({
+vi.mock("@/components/ui/input", () => ({
   Input: ({ ...props }: any) => <input data-testid="input" {...props} />,
 }));
 
-jest.mock("@/components/ui/label", () => ({
+vi.mock("@/components/ui/label", () => ({
   Label: ({ children, ...props }: any) => <label {...props}>{children}</label>,
 }));
 
-jest.mock("@/components/ui/button", () => ({
+vi.mock("@/components/ui/button", () => ({
   Button: ({ children, onClick, disabled, ...props }: any) => (
     <button onClick={onClick} disabled={disabled} {...props}>
       {children}
@@ -32,7 +43,7 @@ jest.mock("@/components/ui/button", () => ({
 }));
 
 // Mock lucide-react icons
-jest.mock("lucide-react", () => ({
+vi.mock("lucide-react", () => ({
   AlertCircle: () => <span data-testid="alert-circle">Alert</span>,
   CheckCircle2: () => <span data-testid="check-circle">Check</span>,
   User: () => <span data-testid="user-icon">User</span>,
@@ -58,7 +69,7 @@ describe("BasicInfoForm", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUpdateBasicInfo.mockReturnValue({ success: true } as any);
   });
 

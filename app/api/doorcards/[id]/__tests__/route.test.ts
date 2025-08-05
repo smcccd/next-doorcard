@@ -6,30 +6,43 @@ import { getTermStatus } from "@/lib/doorcard-status";
 import { randomUUID } from "crypto";
 
 // Mock dependencies
-jest.mock("@/lib/prisma", () => ({
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
+
+vi.mock("@/lib/prisma", () => ({
   prisma: {
     doorcard: {
-      findFirst: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
+      findFirst: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
     },
     appointment: {
-      deleteMany: jest.fn(),
-      createMany: jest.fn(),
+      deleteMany: vi.fn(),
+      createMany: vi.fn(),
     },
   },
 }));
 
-jest.mock("@/lib/require-auth-user", () => ({
-  requireAuthUserAPI: jest.fn(),
+vi.mock("@/lib/require-auth-user", () => ({
+  requireAuthUserAPI: vi.fn(),
 }));
 
-jest.mock("@/lib/doorcard-status", () => ({
-  getTermStatus: jest.fn(),
+vi.mock("@/lib/doorcard-status", () => ({
+  getTermStatus: vi.fn(),
 }));
 
-jest.mock("crypto", () => ({
-  randomUUID: jest.fn(() => "mock-uuid-123"),
+vi.mock("crypto", () => ({
+  randomUUID: vi.fn(() => "mock-uuid-123"),
 }));
 
 const mockPrisma = prisma as MockedObject<typeof prisma>;
@@ -71,7 +84,7 @@ describe("Doorcard API Route [id]", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockRequireAuthUserAPI.mockResolvedValue({ user: mockUser });
   });
 

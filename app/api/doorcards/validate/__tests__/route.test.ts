@@ -4,14 +4,27 @@ import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 
 // Mock dependencies
-jest.mock("@/lib/require-auth-user", () => ({
-  requireAuthUserAPI: jest.fn(),
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
+
+vi.mock("@/lib/require-auth-user", () => ({
+  requireAuthUserAPI: vi.fn(),
 }));
 
-jest.mock("@/lib/prisma", () => ({
+vi.mock("@/lib/prisma", () => ({
   prisma: {
     doorcard: {
-      findFirst: jest.fn(),
+      findFirst: vi.fn(),
     },
   },
 }));
@@ -29,10 +42,10 @@ describe("Doorcard Validate API Route", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Suppress console.error in tests
-    jest.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
 
     // Default successful auth
     mockRequireAuthUserAPI.mockResolvedValue({ user: mockUser });
@@ -42,7 +55,7 @@ describe("Doorcard Validate API Route", () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("POST /api/doorcards/validate", () => {

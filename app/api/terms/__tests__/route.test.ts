@@ -4,8 +4,21 @@ import { TermManager } from "@/lib/term-management";
 import { NextRequest } from "next/server";
 
 // Mock dependencies
-jest.mock("@/lib/require-auth-user");
-jest.mock("@/lib/term-management");
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
+
+vi.mock("@/lib/require-auth-user");
+vi.mock("@/lib/term-management");
 
 const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
@@ -14,14 +27,14 @@ const mockTermManager = TermManager as MockedObject<typeof TermManager>;
 
 describe("/api/terms", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Mock console methods to reduce test noise
-    jest.spyOn(console, "log").mockImplementation();
-    jest.spyOn(console, "error").mockImplementation();
+    vi.spyOn(console, "log").mockImplementation();
+    vi.spyOn(console, "error").mockImplementation();
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("GET", () => {

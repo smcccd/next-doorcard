@@ -3,12 +3,21 @@ import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render, testHelpers, mockData, setupUserEvent } from "../test-utils";
 
-// Mock userEvent setup to control timing
-jest.mock("@testing-library/user-event", () => ({
-  setup: jest.fn(() => ({
-    click: jest.fn(),
-    type: jest.fn(),
-    clear: jest.fn(),
+import {
+  vi,
+  beforeEach,
+  afterEach,
+  describe,
+  it,
+  expect,
+  type MockedObject,
+} from "vitest";
+
+vi.mock("@testing-library/user-event", () => ({
+  setup: vi.fn(() => ({
+    click: vi.fn(),
+    type: vi.fn(),
+    clear: vi.fn(),
   })),
 }));
 
@@ -16,7 +25,7 @@ const mockUserEvent = userEvent as MockedObject<typeof userEvent>;
 
 describe("Test Utils", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe("Custom Render Function", () => {
@@ -231,11 +240,11 @@ describe("Test Utils", () => {
 
     describe("waitForDataToLoad", () => {
       beforeEach(() => {
-        jest.useFakeTimers();
+        vi.useFakeTimers();
       });
 
       afterEach(() => {
-        jest.useRealTimers();
+        vi.useRealTimers();
       });
 
       it("should wait when loading indicators are present", async () => {
@@ -244,11 +253,11 @@ describe("Test Utils", () => {
         const waitPromise = testHelpers.waitForDataToLoad(container);
 
         // Fast-forward time
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
 
         await waitPromise;
 
-        expect(jest.getTimerCount()).toBe(0);
+        expect(vi.getTimerCount()).toBe(0);
       });
 
       it("should wait for aria-label loading indicators", async () => {
@@ -257,11 +266,11 @@ describe("Test Utils", () => {
 
         const waitPromise = testHelpers.waitForDataToLoad(container);
 
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
 
         await waitPromise;
 
-        expect(jest.getTimerCount()).toBe(0);
+        expect(vi.getTimerCount()).toBe(0);
       });
 
       it("should wait for class-based loading indicators", async () => {
@@ -269,11 +278,11 @@ describe("Test Utils", () => {
 
         const waitPromise = testHelpers.waitForDataToLoad(container);
 
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
 
         await waitPromise;
 
-        expect(jest.getTimerCount()).toBe(0);
+        expect(vi.getTimerCount()).toBe(0);
       });
 
       it("should resolve immediately when no loading indicators", async () => {
@@ -284,7 +293,7 @@ describe("Test Utils", () => {
         await waitPromise;
 
         // Should resolve without waiting
-        expect(jest.getTimerCount()).toBe(0);
+        expect(vi.getTimerCount()).toBe(0);
       });
 
       it("should handle multiple loading indicators", async () => {
@@ -295,11 +304,11 @@ describe("Test Utils", () => {
 
         const waitPromise = testHelpers.waitForDataToLoad(container);
 
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
 
         await waitPromise;
 
-        expect(jest.getTimerCount()).toBe(0);
+        expect(vi.getTimerCount()).toBe(0);
       });
     });
   });

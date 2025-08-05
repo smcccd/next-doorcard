@@ -16,6 +16,8 @@ export default defineConfig({
       "**/dist/**",
       "**/.next/**",
       "**/cypress/**",
+      "**/backup*/**",
+      "**/*backup*/**",
     ],
     coverage: {
       provider: "v8",

@@ -4,13 +4,24 @@ import { signIn } from "next-auth/react";
 import LoginPage from "../page";
 
 // Mock NextAuth
-jest.mock("next-auth/react");
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  vi,
+} from "vitest";
+
+vi.mock("next-auth/react");
 const mockSignIn = signIn as MockedFunction<typeof signIn>;
 
 // Mock Next.js navigation
-const mockPush = jest.fn();
+const mockPush = vi.fn();
 const mockSearchParams = new URLSearchParams();
-jest.mock("next/navigation", () => ({
+vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
   }),
@@ -22,7 +33,7 @@ describe("LoginPage", () => {
   const originalEnv = process.env.NODE_ENV;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockSignIn.mockResolvedValue({ ok: true, error: null } as any);
     mockSearchParams.delete("error");
   });

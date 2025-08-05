@@ -1,14 +1,24 @@
 import { analytics } from "../analytics";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  vi,
+} from "vitest";
 
 // Mock fetch globally
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 // Mock window and sessionStorage for SSR environments
 const mockSessionStorage = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
 };
 
 Object.defineProperty(window, "sessionStorage", {
@@ -18,7 +28,7 @@ Object.defineProperty(window, "sessionStorage", {
 
 describe("AnalyticsTracker", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockSessionStorage.getItem.mockReturnValue(null);
   });
 
@@ -74,7 +84,7 @@ describe("AnalyticsTracker", () => {
       const mockFetch = global.fetch as MockedFunction<typeof fetch>;
       mockFetch.mockRejectedValueOnce(new Error("Network error"));
 
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation();
 
       const testEvent = {
         doorcardId: "doorcard-123",
@@ -100,7 +110,7 @@ describe("AnalyticsTracker", () => {
     });
 
     it("should track view events", async () => {
-      const trackSpy = jest.spyOn(analytics, "track");
+      const trackSpy = vi.spyOn(analytics, "track");
 
       await analytics.trackView("doorcard-123", { page: "public" });
 
@@ -112,7 +122,7 @@ describe("AnalyticsTracker", () => {
     });
 
     it("should track print preview events", async () => {
-      const trackSpy = jest.spyOn(analytics, "track");
+      const trackSpy = vi.spyOn(analytics, "track");
 
       await analytics.trackPrint("doorcard-123", "preview");
 
@@ -123,7 +133,7 @@ describe("AnalyticsTracker", () => {
     });
 
     it("should track print download events", async () => {
-      const trackSpy = jest.spyOn(analytics, "track");
+      const trackSpy = vi.spyOn(analytics, "track");
 
       await analytics.trackPrint("doorcard-123", "download");
 
@@ -134,7 +144,7 @@ describe("AnalyticsTracker", () => {
     });
 
     it("should track edit events", async () => {
-      const trackSpy = jest.spyOn(analytics, "track");
+      const trackSpy = vi.spyOn(analytics, "track");
 
       await analytics.trackEdit("doorcard-123");
 
@@ -145,7 +155,7 @@ describe("AnalyticsTracker", () => {
     });
 
     it("should track share events", async () => {
-      const trackSpy = jest.spyOn(analytics, "track");
+      const trackSpy = vi.spyOn(analytics, "track");
 
       await analytics.trackShare("doorcard-123", "email");
 
@@ -157,7 +167,7 @@ describe("AnalyticsTracker", () => {
     });
 
     it("should track search result events", async () => {
-      const trackSpy = jest.spyOn(analytics, "track");
+      const trackSpy = vi.spyOn(analytics, "track");
 
       await analytics.trackSearchResult("doorcard-123", "professor smith", 2);
 

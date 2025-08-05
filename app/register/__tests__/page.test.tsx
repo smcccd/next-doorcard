@@ -1,25 +1,35 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  vi,
+} from "vitest";
 
 import RegisterPage from "../page";
 
 // Mock the router
-const mockPush = jest.fn();
-jest.mock("next/navigation", () => ({
+const mockPush = vi.fn();
+vi.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
   }),
 }));
 
 // Mock the toast hook
-const mockToast = jest.fn();
-jest.mock("@/hooks/use-toast", () => ({
+const mockToast = vi.fn();
+vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({
     toast: mockToast,
   }),
 }));
 
 // Mock UI components
-jest.mock("@/components/ui/card", () => ({
+vi.mock("@/components/ui/card", () => ({
   Card: ({ children, className }: any) => (
     <div className={className}>{children}</div>
   ),
@@ -30,7 +40,7 @@ jest.mock("@/components/ui/card", () => ({
   ),
 }));
 
-jest.mock("@/components/ui/input", () => ({
+vi.mock("@/components/ui/input", () => ({
   Input: ({ onChange, value, ...props }: any) => (
     <input
       {...props}
@@ -42,11 +52,11 @@ jest.mock("@/components/ui/input", () => ({
 }));
 
 // Mock fetch
-global.fetch = jest.fn() as MockedFunction<typeof fetch>;
+global.fetch = vi.fn() as MockedFunction<typeof fetch>;
 
 describe("RegisterPage", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     (fetch as MockedFunction<typeof fetch>).mockClear();
   });
 

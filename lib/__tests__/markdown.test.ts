@@ -1,8 +1,17 @@
+import {
+  vi,
+  beforeEach,
+  describe,
+  it,
+  expect,
+  type MockedFunction,
+} from "vitest";
+
 // Mock dependencies first
-jest.mock("marked", () => ({
+vi.mock("marked", () => ({
   marked: {
-    setOptions: jest.fn(),
-    parse: jest.fn(),
+    setOptions: vi.fn(),
+    parse: vi.fn(),
   },
 }));
 
@@ -16,20 +25,16 @@ const mockSetOptions = marked.setOptions as MockedFunction<
 
 describe("Markdown Utils", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockParse.mockImplementation((text: string) => `<p>${text}</p>`);
   });
 
   describe("marked configuration", () => {
     it("should configure marked with correct options", () => {
-      // Re-import the module to trigger setOptions call
-      jest.isolateModules(() => {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        require("../markdown");
-        expect(mockSetOptions).toHaveBeenCalledWith({
-          breaks: true,
-          gfm: true,
-        });
+      // The module should have been initialized and setOptions called during import
+      expect(mockSetOptions).toHaveBeenCalledWith({
+        breaks: true,
+        gfm: true,
       });
     });
   });
@@ -62,7 +67,7 @@ describe("Markdown Utils", () => {
         throw new Error("Parsing error");
       });
 
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation();
 
       const result = parseMarkdown("# Test");
 
@@ -141,7 +146,7 @@ console.log('code');
         throw new Error("Test error");
       });
 
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation();
 
       const result = parseMarkdown("# Test");
 
@@ -154,7 +159,7 @@ console.log('code');
     });
 
     it("should handle different types of parsing errors", () => {
-      const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+      const consoleSpy = vi.spyOn(console, "error").mockImplementation();
 
       // Test with TypeError
       mockParse.mockImplementation(() => {

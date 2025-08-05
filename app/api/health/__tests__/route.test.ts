@@ -2,9 +2,20 @@ import { GET } from "../route";
 import { prisma } from "@/lib/prisma";
 
 // Mock dependencies
-jest.mock("@/lib/prisma", () => ({
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedObject,
+  vi,
+} from "vitest";
+
+vi.mock("@/lib/prisma", () => ({
   prisma: {
-    $queryRaw: jest.fn(),
+    $queryRaw: vi.fn(),
   },
 }));
 
@@ -12,7 +23,7 @@ const mockPrisma = prisma as MockedObject<typeof prisma>;
 
 describe("/api/health", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset environment variables
     delete process.env.NEXTAUTH_SECRET;
     delete process.env.ONELOGIN_CLIENT_ID;

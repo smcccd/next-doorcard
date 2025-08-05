@@ -1,3 +1,11 @@
+import {
+  vi,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type MockedObject,
+} from "vitest";
 import { prisma } from "@/lib/prisma";
 import {
   TermManager,
@@ -11,7 +19,7 @@ const mockPrisma = prisma as MockedObject<typeof prisma>;
 
 describe("TermManager", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const mockTerm = {
@@ -176,7 +184,7 @@ describe("TermManager", () => {
 
     it("should throw error if new term not found", async () => {
       // Clear all previous mocks to start fresh
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       // Reset the transaction mock to avoid interference
       mockPrisma.$transaction.mockImplementation((callback) =>
@@ -198,7 +206,7 @@ describe("TermManager", () => {
 
     it("should respect custom options", async () => {
       // Clear all mocks to avoid interference from previous tests
-      jest.clearAllMocks();
+      vi.clearAllMocks();
 
       const options = {
         archiveOldTerm: false,
@@ -474,16 +482,16 @@ describe("generateTermName", () => {
 describe("getCurrentAcademicYear", () => {
   beforeEach(() => {
     // Reset Date mock
-    jest.useFakeTimers();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it("should return current year for fall semester (August-December)", () => {
     // Set date to October 15, 2024
-    jest.setSystemTime(new Date("2024-10-15"));
+    vi.setSystemTime(new Date("2024-10-15"));
 
     const result = getCurrentAcademicYear();
 
@@ -492,7 +500,7 @@ describe("getCurrentAcademicYear", () => {
 
   it("should return previous year for spring semester (January-July)", () => {
     // Set date to March 15, 2024
-    jest.setSystemTime(new Date("2024-03-15"));
+    vi.setSystemTime(new Date("2024-03-15"));
 
     const result = getCurrentAcademicYear();
 
@@ -500,22 +508,22 @@ describe("getCurrentAcademicYear", () => {
   });
 
   it("should handle January edge case", () => {
-    jest.setSystemTime(new Date("2024-01-01"));
+    vi.setSystemTime(new Date("2024-01-01"));
     expect(getCurrentAcademicYear()).toBe("2023");
   });
 
   it("should handle July edge case", () => {
-    jest.setSystemTime(new Date("2024-07-31"));
+    vi.setSystemTime(new Date("2024-07-31"));
     expect(getCurrentAcademicYear()).toBe("2023");
   });
 
   it("should handle August edge case", () => {
-    jest.setSystemTime(new Date("2024-08-01T12:00:00Z"));
+    vi.setSystemTime(new Date("2024-08-01T12:00:00Z"));
     expect(getCurrentAcademicYear()).toBe("2024");
   });
 
   it("should handle December edge case", () => {
-    jest.setSystemTime(new Date("2024-12-31"));
+    vi.setSystemTime(new Date("2024-12-31"));
     expect(getCurrentAcademicYear()).toBe("2024");
   });
 });

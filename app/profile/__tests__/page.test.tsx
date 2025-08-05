@@ -4,18 +4,29 @@ import { useSession } from "next-auth/react";
 import ProfilePage from "../page";
 
 // Mock next-auth
-jest.mock("next-auth/react", () => ({
-  useSession: jest.fn(),
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type,
+  MockedFunction,
+  vi,
+} from "vitest";
+
+vi.mock("next-auth/react", () => ({
+  useSession: vi.fn(),
 }));
 
 // Mock toast hook
-const mockToast = jest.fn();
-jest.mock("@/hooks/use-toast", () => ({
+const mockToast = vi.fn();
+vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast: mockToast }),
 }));
 
 // Mock UI components
-jest.mock("@/components/ui/button", () => ({
+vi.mock("@/components/ui/button", () => ({
   Button: ({ children, onClick, disabled, ...props }: any) => (
     <button onClick={onClick} disabled={disabled} {...props}>
       {children}
@@ -23,15 +34,15 @@ jest.mock("@/components/ui/button", () => ({
   ),
 }));
 
-jest.mock("@/components/ui/input", () => ({
+vi.mock("@/components/ui/input", () => ({
   Input: ({ ...props }: any) => <input data-testid="input" {...props} />,
 }));
 
-jest.mock("@/components/ui/label", () => ({
+vi.mock("@/components/ui/label", () => ({
   Label: ({ children, ...props }: any) => <label {...props}>{children}</label>,
 }));
 
-jest.mock("@/components/ui/card", () => ({
+vi.mock("@/components/ui/card", () => ({
   Card: ({ children }: any) => <div data-testid="card">{children}</div>,
   CardContent: ({ children }: any) => (
     <div data-testid="card-content">{children}</div>
@@ -47,7 +58,7 @@ jest.mock("@/components/ui/card", () => ({
   ),
 }));
 
-jest.mock("@/components/ui/select", () => ({
+vi.mock("@/components/ui/select", () => ({
   Select: ({ children, onValueChange, value }: any) => (
     <select
       data-testid="select"
@@ -68,7 +79,7 @@ jest.mock("@/components/ui/select", () => ({
 // Remove separator mock as it's not used in the component
 
 // Mock lucide-react icons
-jest.mock("lucide-react", () => ({
+vi.mock("lucide-react", () => ({
   AlertCircle: () => <span data-testid="alert-circle">Alert</span>,
   CheckCircle2: () => <span data-testid="check-circle">Check</span>,
   User: () => <span data-testid="user-icon">User</span>,
@@ -80,7 +91,7 @@ jest.mock("lucide-react", () => ({
 }));
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 const mockFetch = fetch as MockedFunction<typeof fetch>;
 
 const mockUseSession = useSession as MockedFunction<typeof useSession>;
@@ -113,14 +124,14 @@ describe("ProfilePage", () => {
   const user = userEvent.setup();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
 
     // Default mock setup
     mockUseSession.mockReturnValue({
       data: mockSessionData,
       status: "authenticated",
-      update: jest.fn(),
+      update: vi.fn(),
     });
 
     mockFetch.mockResolvedValue({
@@ -137,7 +148,7 @@ describe("ProfilePage", () => {
       mockUseSession.mockReturnValue({
         data: null,
         status: "loading",
-        update: jest.fn(),
+        update: vi.fn(),
       });
 
       render(<ProfilePage />);
@@ -160,7 +171,7 @@ describe("ProfilePage", () => {
       mockUseSession.mockReturnValue({
         data: null,
         status: "unauthenticated",
-        update: jest.fn(),
+        update: vi.fn(),
       });
 
       render(<ProfilePage />);
@@ -176,7 +187,7 @@ describe("ProfilePage", () => {
       mockUseSession.mockReturnValue({
         data: null,
         status: "unauthenticated",
-        update: jest.fn(),
+        update: vi.fn(),
       });
 
       render(<ProfilePage />);
@@ -247,7 +258,7 @@ describe("ProfilePage", () => {
 
   describe("Form Submission", () => {
     it("should handle successful profile update", async () => {
-      const mockUpdate = jest.fn();
+      const mockUpdate = vi.fn();
       mockUseSession.mockReturnValue({
         data: mockSessionData,
         status: "authenticated",
