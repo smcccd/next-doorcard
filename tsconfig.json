@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "types": ["jest", "@testing-library/jest-dom"],
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -31,12 +31,5 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "cypress",
-    "**/*.stories.tsx",
-    "**/*.stories.ts",
-    // Temporarily exclude all test files until test suite is updated for new Prisma version
-    "**/__tests__/**/*"
-  ]
+  "exclude": ["node_modules", "cypress", "**/*.stories.tsx", "**/*.stories.ts"]
 }

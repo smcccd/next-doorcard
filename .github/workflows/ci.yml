@@ -116,6 +116,9 @@ jobs:
       - name: Install dependencies if cache miss
         run: npm ci --prefer-offline --no-audit
 
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
       - name: Run unit tests
         run: npm run test:ci
         env:
