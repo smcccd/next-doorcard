@@ -23,7 +23,23 @@ export async function POST(req: Request) {
     }
     const { user } = auth;
 
-    const body = await req.json();
+    let body;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON in request body" },
+        { status: 400 }
+      );
+    }
+
+    if (!body) {
+      return NextResponse.json(
+        { error: "Request body is required" },
+        { status: 400 }
+      );
+    }
+
     const { college, term, year, excludeDoorcardId } =
       validateSchema.parse(body);
 

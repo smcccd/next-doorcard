@@ -428,8 +428,8 @@ describe("Doorcard Validate API Route", () => {
         const response = await POST(request);
         const data = await response.json();
 
-        expect(response.status).toBe(500);
-        expect(data).toEqual({ error: "Failed to validate doorcard" });
+        expect(response.status).toBe(400);
+        expect(data).toEqual({ error: "Invalid JSON in request body" });
       });
 
       it("should handle database errors", async () => {
@@ -463,7 +463,7 @@ describe("Doorcard Validate API Route", () => {
         const data = await response.json();
 
         expect(response.status).toBe(400);
-        expect(data.error).toBe("Validation error");
+        expect(data.error).toBe("Invalid JSON in request body");
       });
     });
 

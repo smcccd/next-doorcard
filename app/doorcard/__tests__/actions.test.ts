@@ -1,6 +1,12 @@
-/**
- * @jest-environment node
- */
+import {
+  vi,
+  beforeEach,
+  describe,
+  it,
+  expect,
+  type MockedFunction,
+} from "vitest";
+import type { MockedObject } from "vitest";
 
 import {
   createDoorcardWithCampusTerm,
@@ -14,19 +20,50 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 // Mock dependencies
-jest.mock("@/lib/require-auth-user");
-jest.mock("@/lib/prisma");
-jest.mock("next/navigation");
-jest.mock("next/cache");
+vi.mock("@/lib/require-auth-user");
+vi.mock("@/lib/prisma");
+vi.mock("next/navigation");
+vi.mock("next/cache");
+
+// Mock Next.js server runtime for server actions
+vi.mock("next/dist/server/app-render/work-unit-async-storage.external", () => ({
+  workUnitAsyncStorage: {
+    getStore: () => ({
+      type: "request",
+    }),
+  },
+}));
+
+vi.mock("next/dist/server/app-render/work-async-storage.external", () => ({
+  workAsyncStorage: {
+    getStore: () => ({}),
+  },
+}));
 
 const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI
 >;
-const mockPrisma = prisma as MockedObject<typeof prisma>;
 const mockRedirect = redirect as MockedFunction<typeof redirect>;
 const mockRevalidatePath = revalidatePath as MockedFunction<
   typeof revalidatePath
 >;
+
+// Set up Prisma mock with proper methods
+const mockPrisma = {
+  doorcard: {
+    findFirst: vi.fn(),
+    findUnique: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+  },
+  user: {
+    findUnique: vi.fn(),
+  },
+};
+
+// Override the global prisma mock for this test file
+vi.mocked(prisma as any).doorcard = mockPrisma.doorcard;
+vi.mocked(prisma as any).user = mockPrisma.user;
 
 // Mock user
 const mockUser = {
@@ -53,14 +90,19 @@ const mockDoorcard = {
 
 describe("Doorcard Server Actions", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
-    // Default auth success
+    // Default auth success - mock the actual function that gets called
     mockRequireAuthUserAPI.mockResolvedValue({ user: mockUser });
 
-    // Prevent actual redirects in tests
+    // Also mock any direct database calls in require-auth-user
+    mockPrisma.user.findUnique.mockResolvedValue(mockUser);
+
+    // Mock redirect to prevent actual redirects in tests - Next.js 15 compatible
     mockRedirect.mockImplementation(() => {
-      throw new Error("REDIRECT"); // This is expected behavior
+      const error = new Error("REDIRECT");
+      error.name = "RedirectError";
+      throw error;
     });
   });
 
