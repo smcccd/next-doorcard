@@ -129,13 +129,13 @@ export const vitestHelpers = {
   },
 
   // Mock NextAuth session with custom user
-  mockSession: (sessionData = {}) => {
+  mockSession: (sessionData: any = {}) => {
     const mockSession = {
       user: {
         id: "test-user-id",
         name: "Test User",
         email: "test@example.com",
-        ...sessionData.user,
+        ...(sessionData.user || {}),
       },
       expires: "2024-12-31",
       ...sessionData,
