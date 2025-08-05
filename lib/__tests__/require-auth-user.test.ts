@@ -10,16 +10,16 @@ import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
-// Unmock the module we're testing so we can test the real implementation
-vi.unmock("@/lib/require-auth-user");
-
-import {
+// Get the actual implementation instead of the mock
+const {
   requireAuthUser,
   getOptionalAuthUser,
   getAuthUser,
   requireAuthUserAPI,
   clientAuthHelpers,
-} from "../require-auth-user";
+} = await vi.importActual<typeof import("../require-auth-user")>(
+  "../require-auth-user"
+);
 
 // Mock dependencies
 vi.mock("next-auth/next");

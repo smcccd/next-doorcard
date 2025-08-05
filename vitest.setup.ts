@@ -94,13 +94,14 @@ vi.mock("next-auth/next", () => ({
   getServerSession: vi.fn(),
 }));
 
-// Mock auth utilities
+// Mock auth utilities - NOTE: require-auth-user.test.ts will import the actual implementation
 vi.mock("@/lib/require-auth-user", () => ({
   requireAuthUserAPI: vi.fn(),
   requireAuthUser: vi.fn(),
   getOptionalAuthUser: vi.fn(),
   getAuthUser: vi.fn(),
   clientAuthHelpers: {
+    isAuthenticated: vi.fn(),
     getUserEmail: vi.fn((session) => session?.user?.email),
     getUserId: vi.fn((session) => session?.user?.id),
   },
