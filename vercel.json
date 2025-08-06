@@ -1,15 +1,19 @@
 {
   "git": {
-    "deploymentEnabled": false,
-    "silent": true
+    "deploymentEnabled": {
+      "main": true,
+      "*": false
+    }
   },
   "github": {
-    "enabled": false,
-    "autoAlias": false
+    "enabled": true,
+    "autoAlias": true,
+    "silent": false,
+    "autoJobCancelation": true
   },
   "buildCommand": "npm run build",
   "framework": "nextjs",
-  "installCommand": "npm ci --force",
+  "installCommand": "npm ci --force --include=dev",
   "build": {
     "env": {
       "NEXT_TELEMETRY_DISABLED": "1",
@@ -19,7 +23,6 @@
   },
   "functions": {
     "app/api/**": {
-      "runtime": "nodejs22.x",
       "maxDuration": 30
     }
   },

@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
-import { DarkModeToggle } from "./DarkModeToggle";
 
 interface NavDropdownProps {
   userDisplay: string;
@@ -116,18 +115,7 @@ export function NavDropdown({
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator className="my-1 border-gray-200 dark:border-gray-700" />
-
-        <DropdownMenuItem
-          asChild
-          className="p-0 focus:bg-transparent focus:text-inherit"
-        >
-          <div className="px-1">
-            <DarkModeToggle />
-          </div>
-        </DropdownMenuItem>
-
-        <DropdownMenuSeparator className="my-1 border-gray-200 dark:border-gray-700" />
+        <DropdownMenuSeparator className="my-1 border-gray-200" />
 
         <DropdownMenuItem
           onClick={handleSignOut}
