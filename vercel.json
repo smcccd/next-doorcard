@@ -1,6 +1,11 @@
 {
   "git": {
-    "deploymentEnabled": false
+    "deploymentEnabled": false,
+    "silent": true
+  },
+  "github": {
+    "enabled": false,
+    "autoAlias": false
   },
   "buildCommand": "npm run build",
   "framework": "nextjs",
