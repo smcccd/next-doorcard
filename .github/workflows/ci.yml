@@ -1,18 +1,14 @@
-name: CI/CD Pipeline
+name: PR Quality Checks
 
 on:
-  push:
-    branches: [main, optimize-ci-workflow]
   pull_request:
     branches: [main]
 
 jobs:
-  test:
-    name: Test
+  quality:
+    name: Quality Checks
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Run tests on PRs and pushes to feature branches (not main)
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')
 
     steps:
       - name: Checkout
@@ -42,52 +38,3 @@ jobs:
           DATABASE_URL: postgresql://test:test@localhost:5432/test
           NEXTAUTH_SECRET: test-secret
           NEXTAUTH_URL: http://localhost:3000
-
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    # Run build on PRs (after tests) and on main pushes (for deployment)
-    needs: [test]
-    if: always() && ((github.event_name == 'pull_request' && needs.test.result == 'success') || (github.event_name == 'push' && github.ref != 'refs/heads/main' && needs.test.result == 'success') || (github.event_name == 'push' && github.ref == 'refs/heads/main'))
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Generate Prisma Client
-        run: npx prisma generate
-
-      - name: Build application
-        run: npm run build
-        env:
-          SKIP_ENV_VALIDATION: true
-
-  deploy:
-    name: Deploy to Vercel
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: build
-    # Only deploy on main branch pushes (after successful build)
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: "--prod"
