@@ -61,13 +61,6 @@ export default function Home() {
     }
   };
 
-  // Check if user has applied any filters or search beyond the default current term filter
-  const hasActiveFilters =
-    !!debouncedSearchTerm ||
-    selectedCampus !== "ALL" ||
-    selectedDepartment !== "ALL" ||
-    selectedDay !== "ALL";
-
   // Memoized filtered doorcards using debounced search
   const filteredDoorcards = useMemo(() => {
     let filtered = doorcards;
@@ -135,6 +128,13 @@ export default function Home() {
       return a.name.localeCompare(b.name);
     });
 
+    // Check if user has applied any filters or search beyond the default current term filter
+    const hasActiveFilters =
+      !!debouncedSearchTerm ||
+      selectedCampus !== "ALL" ||
+      selectedDepartment !== "ALL" ||
+      selectedDay !== "ALL";
+
     // If no active filters applied, show top 24 results for better performance
     if (!hasActiveFilters) {
       return filtered.slice(0, 24);
@@ -148,10 +148,16 @@ export default function Home() {
     showCurrentTermOnly,
     activeTerm,
     debouncedSearchTerm,
-    hasActiveFilters,
     selectedDay,
     termLoading,
   ]);
+
+  // Check if user has applied any filters or search beyond the default current term filter
+  const hasActiveFilters =
+    !!debouncedSearchTerm ||
+    selectedCampus !== "ALL" ||
+    selectedDepartment !== "ALL" ||
+    selectedDay !== "ALL";
 
   const handleDoorcardClick = (doorcard: PublicDoorcard) => {
     const username =
