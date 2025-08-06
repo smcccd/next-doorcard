@@ -301,5 +301,6 @@ export async function createDoorcardWithCampusTerm(
   }
 
   revalidatePath(`/doorcard/${newDoorcardId}/edit`);
+  revalidatePath("/dashboard");
   redirect(`/doorcard/${newDoorcardId}/edit?step=1`);
 }
