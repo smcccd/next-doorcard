@@ -137,13 +137,14 @@ function isDoorcardComplete(
  * "Upcoming" means it's from a future term
  */
 export function getDoorcardDisplayStatus(
-  doorcard: Doorcard & { appointments?: any[] }
+  doorcard: Doorcard & { appointments?: any[] },
+  activeTerm?: { season: TermSeason; year: number } | null
 ): {
   status: "live" | "draft" | "incomplete" | "archived" | "upcoming";
   label: string;
   description: string;
 } {
-  const termStatus = getTermStatus(doorcard);
+  const termStatus = getTermStatus(doorcard, activeTerm);
 
   // Check if doorcard is complete first (applies to all terms)
   const isComplete = isDoorcardComplete(doorcard);
