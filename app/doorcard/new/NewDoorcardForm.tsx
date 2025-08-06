@@ -88,8 +88,8 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [clientTried, setClientTried] = useState(false);
 
-  // Stable server action that doesn't change identity
-  const stableActionFn = useCallback(
+  // Simple server action without useCallback to avoid hook ordering issues
+  const [state, serverAction] = useActionState<ActionState, FormData>(
     (prev: ActionState, formData: FormData) => {
       if (doorcard?.id) {
         return validateCampusTerm(doorcard.id, prev, formData); // edit flow
@@ -97,11 +97,6 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
         return createDoorcardWithCampusTerm(prev, formData); // new flow
       }
     },
-    [doorcard?.id] // Only depend on the ID to avoid unnecessary re-renders
-  );
-
-  const [state, serverAction] = useActionState<ActionState, FormData>(
-    stableActionFn,
     { success: true }
   );
 
