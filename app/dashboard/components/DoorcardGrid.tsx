@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { type College, COLLEGE_META } from "@/types/doorcard";
 import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
-import type { Doorcard, Appointment, User } from "@prisma/client";
+import type { Doorcard, Appointment, User, TermSeason } from "@prisma/client";
 
 interface Props {
   doorcards: (Doorcard & {
@@ -23,6 +23,7 @@ interface Props {
   title: string;
   emptyMessage: string;
   variant?: "grid" | "list";
+  activeTerm?: { season: TermSeason; year: number } | null;
 }
 
 export default function DoorcardGrid({
@@ -30,6 +31,7 @@ export default function DoorcardGrid({
   title,
   emptyMessage,
   variant = "grid",
+  activeTerm,
 }: Props) {
   return (
     <section className="space-y-4">
@@ -41,13 +43,13 @@ export default function DoorcardGrid({
       ) : variant === "grid" ? (
         <div className="grid gap-6 md:grid-cols-2">
           {doorcards.map((dc) => (
-            <DoorcardCard key={dc.id} doorcard={dc} />
+            <DoorcardCard key={dc.id} doorcard={dc} activeTerm={activeTerm} />
           ))}
         </div>
       ) : (
         <div className="space-y-4">
           {doorcards.map((dc) => (
-            <DoorcardRow key={dc.id} doorcard={dc} />
+            <DoorcardRow key={dc.id} doorcard={dc} activeTerm={activeTerm} />
           ))}
         </div>
       )}
@@ -71,10 +73,12 @@ function publicSlug(user?: { username?: string | null; name?: string | null }) {
 
 function DoorcardCard({
   doorcard,
+  activeTerm,
 }: {
   doorcard: Doorcard & { appointments: Appointment[]; user?: any };
+  activeTerm?: { season: TermSeason; year: number } | null;
 }) {
-  const displayStatus = getDoorcardDisplayStatus(doorcard);
+  const displayStatus = getDoorcardDisplayStatus(doorcard, activeTerm);
 
   // Determine the correct view URL based on doorcard status
   const getViewUrl = () => {
@@ -240,10 +244,12 @@ function DoorcardCard({
 
 function DoorcardRow({
   doorcard,
+  activeTerm,
 }: {
   doorcard: Doorcard & { appointments: Appointment[]; user?: any };
+  activeTerm?: { season: TermSeason; year: number } | null;
 }) {
-  const displayStatus = getDoorcardDisplayStatus(doorcard);
+  const displayStatus = getDoorcardDisplayStatus(doorcard, activeTerm);
 
   // Determine the correct view URL based on doorcard status
   const getViewUrl = () => {
