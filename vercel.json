@@ -19,7 +19,6 @@
   },
   "functions": {
     "app/api/**": {
-      "runtime": "nodejs22.x",
       "maxDuration": 30
     }
   },
