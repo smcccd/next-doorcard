@@ -300,6 +300,7 @@ export async function createDoorcardWithCampusTerm(
     return handleActionError(err);
   }
 
+  // Revalidate paths to ensure fresh data
   revalidatePath(`/doorcard/${newDoorcardId}/edit`);
   revalidatePath("/dashboard");
   redirect(`/doorcard/${newDoorcardId}/edit?step=1`);
