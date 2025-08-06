@@ -1,10 +1,10 @@
 {
   "git": {
-    "deploymentEnabled": false,
+    "deploymentEnabled": true,
     "silent": true
   },
   "github": {
-    "enabled": false,
+    "enabled": true,
     "autoAlias": false
   },
   "buildCommand": "npm run build",
