@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [main, optimize-ci-workflow]
   pull_request:
     branches: [main]
 
