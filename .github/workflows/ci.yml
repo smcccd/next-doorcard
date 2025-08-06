@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -11,6 +11,8 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # Only run tests on PRs and non-main branches
+    if: github.event_name == 'pull_request'
 
     steps:
       - name: Checkout
@@ -45,7 +47,9 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: test
+    # Run build on PRs (after tests) and on main pushes (for deployment)
+    needs: [test]
+    if: always() && (needs.test.result == 'success' || (github.event_name == 'push' && github.ref == 'refs/heads/main'))
 
     steps:
       - name: Checkout
@@ -73,6 +77,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: build
+    # Only deploy on main branch pushes (after successful build)
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
