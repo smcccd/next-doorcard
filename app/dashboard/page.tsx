@@ -173,6 +173,7 @@ export default async function DashboardPage() {
           doorcards={current}
           title={`Current Term (${currentTermInfo.displayName})`}
           emptyMessage={`No doorcards for ${currentTermInfo.displayName} yet.`}
+          activeTerm={activeTermForCategorization}
         />
 
         {upcoming.length > 0 && (
@@ -181,6 +182,7 @@ export default async function DashboardPage() {
             doorcards={upcoming}
             title="Upcoming Terms"
             emptyMessage="No upcoming doorcards."
+            activeTerm={activeTermForCategorization}
           />
         )}
 
@@ -190,6 +192,7 @@ export default async function DashboardPage() {
             doorcards={archived}
             title="Past Terms (Archived)"
             emptyMessage="No archived doorcards."
+            activeTerm={activeTermForCategorization}
           />
         )}
       </div>
