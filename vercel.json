@@ -9,7 +9,7 @@
   },
   "buildCommand": "npm run build",
   "framework": "nextjs",
-  "installCommand": "npm ci --force",
+  "installCommand": "npm ci --force --include=dev",
   "build": {
     "env": {
       "NEXT_TELEMETRY_DISABLED": "1",
