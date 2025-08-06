@@ -91,13 +91,13 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
   // Stable server action that doesn't change identity
   const stableActionFn = useCallback(
     (prev: ActionState, formData: FormData) => {
-      if (doorcard) {
+      if (doorcard?.id) {
         return validateCampusTerm(doorcard.id, prev, formData); // edit flow
       } else {
         return createDoorcardWithCampusTerm(prev, formData); // new flow
       }
     },
-    [doorcard] // Include the entire doorcard object as required by the dependency
+    [doorcard?.id] // Only depend on the ID to avoid unnecessary re-renders
   );
 
   const [state, serverAction] = useActionState<ActionState, FormData>(
