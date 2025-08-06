@@ -18,13 +18,8 @@ export function DarkModeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setMounted(true);
 
-    // Check localStorage first, then system preference
-    const saved = localStorage.getItem("darkMode");
-    if (saved !== null) {
-      setIsDarkMode(JSON.parse(saved));
-    } else {
-      setIsDarkMode(window.matchMedia("(prefers-color-scheme: dark)").matches);
-    }
+    // Force light mode for demo - ignore localStorage and system preference
+    setIsDarkMode(false);
   }, []);
 
   useEffect(() => {
