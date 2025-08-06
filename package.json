@@ -40,7 +40,7 @@
     "vpat:verify": "npm run vpat:generate && echo 'VPAT generated successfully'",
     "accessibility:test": "npm run cypress:run -- --spec='cypress/e2e/accessibility.cy.ts'",
     "accessibility:report": "npm run accessibility:test && npm run vpat:generate",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "dependencies": {
     "@microsoft/clarity": "^1.0.0",
