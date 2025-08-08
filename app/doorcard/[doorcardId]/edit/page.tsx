@@ -149,7 +149,7 @@ export default async function EditDoorcardPage({
   const progressPct = (step / (STEPS.length - 1)) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <div className="mx-auto max-w-4xl p-6">
         {/* Header */}
         <div className="mb-8">

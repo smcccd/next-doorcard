@@ -178,7 +178,7 @@ export default async function PublicDoorcardView({
   if ("error" in result) {
     // Render a simple error page (could also call notFound())
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex items-center justify-center bg-gray-50 py-12">
         <div className="bg-white rounded-lg shadow p-8 max-w-md text-center">
           <h1 className="text-xl font-semibold mb-2">Doorcard Not Available</h1>
           <p className="text-gray-600 mb-6">{result.error}</p>
@@ -207,7 +207,7 @@ export default async function PublicDoorcardView({
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white">
       {/* Auto-print handler */}
       <AutoPrintHandler autoPrint={autoPrint} />
 
