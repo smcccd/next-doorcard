@@ -73,7 +73,7 @@ function transformLegacyDoorcard(csvRow: any, userId: string): any {
     term,
     year,
     college,
-    slug: `${csvRow.username}-${term.toLowerCase()}-${year}`,
+    slug: `${csvRow.username}-${term.toLowerCase()}-${year}-${csvRow.doorcardID}-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
     isActive: true,
     isPublic: true,
     userId,
@@ -298,10 +298,11 @@ async function runLegacyTransformation() {
 
     log(`   ✅ Created ${stats.modernUsers} modern user records`);
 
-    // Step 5: Create modern doorcards
+    // Step 5: Create modern doorcards (with constraint handling)
     log("🚪 Step 5/6: Creating modernized doorcards...");
 
     const doorcardMapping = new Map<string, string>();
+    const userCollegeConstraintTracker = new Set<string>();
 
     for (const legacyDoorcard of doorcardRows) {
       const userId = userMapping.get(legacyDoorcard.username);
@@ -309,16 +310,44 @@ async function runLegacyTransformation() {
 
       const modernDoorcard = transformLegacyDoorcard(legacyDoorcard, userId);
 
-      const createdDoorcard = await prisma.doorcard.create({
-        data: modernDoorcard,
-      });
-      doorcardMapping.set(legacyDoorcard.doorcardID, createdDoorcard.id);
-      stats.modernDoorcards++;
+      // Create unique key for constraint checking
+      const constraintKey = `${userId}-${modernDoorcard.college}-${modernDoorcard.term}-${modernDoorcard.year}-${modernDoorcard.isActive}`;
 
-      if (stats.modernDoorcards % 50 === 0) {
-        log(
-          `   Progress: ${stats.modernDoorcards}/${stats.legacyDoorcards} doorcards created`
-        );
+      if (userCollegeConstraintTracker.has(constraintKey)) {
+        // Skip duplicate, but still map the legacy doorcard ID to existing one
+        const existingDoorcard = await prisma.doorcard.findFirst({
+          where: {
+            userId,
+            college: modernDoorcard.college,
+            term: modernDoorcard.term,
+            year: modernDoorcard.year,
+            isActive: modernDoorcard.isActive,
+          },
+        });
+        if (existingDoorcard) {
+          doorcardMapping.set(legacyDoorcard.doorcardID, existingDoorcard.id);
+        }
+        stats.duplicatesRemoved++;
+        continue;
+      }
+
+      try {
+        const createdDoorcard = await prisma.doorcard.create({
+          data: modernDoorcard,
+        });
+        doorcardMapping.set(legacyDoorcard.doorcardID, createdDoorcard.id);
+        userCollegeConstraintTracker.add(constraintKey);
+        stats.modernDoorcards++;
+
+        if (stats.modernDoorcards % 50 === 0) {
+          log(
+            `   Progress: ${stats.modernDoorcards}/${stats.legacyDoorcards} doorcards created, ${stats.duplicatesRemoved} constraint duplicates skipped`
+          );
+        }
+      } catch (error) {
+        // Handle any remaining constraint violations
+        stats.duplicatesRemoved++;
+        log(`   Skipped duplicate doorcard for ${legacyDoorcard.username}`);
       }
     }
 

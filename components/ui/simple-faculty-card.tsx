@@ -78,34 +78,43 @@ export function SimpleFacultyCard({
             </div>
           </div>
 
-          {/* Office Hours Days */}
-          {doorcard.availableDays && doorcard.availableDays.length > 0 && (
-            <div className="text-center">
-              <div className="flex justify-center gap-1">
-                {doorcard.availableDays.map((day) => {
+          {/* Office Hours Days - Fixed Layout for Vertical Alignment */}
+          <div className="text-center">
+            <div className="flex justify-center gap-1">
+              {["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"].map(
+                (day) => {
                   const dayAbbreviations: Record<string, string> = {
                     MONDAY: "M",
                     TUESDAY: "T",
                     WEDNESDAY: "W",
                     THURSDAY: "Th",
                     FRIDAY: "F",
-                    SATURDAY: "Sa",
-                    SUNDAY: "Su",
                   };
-                  const abbrev = dayAbbreviations[day] || day.charAt(0);
+                  const abbrev = dayAbbreviations[day];
+                  const hasOfficeHours =
+                    doorcard.availableDays?.includes(day as any) ?? false;
+
                   return (
                     <span
                       key={day}
-                      className="inline-flex items-center justify-center min-w-[20px] h-5 px-1 text-xs font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded"
-                      title={`Office hours on ${day.charAt(0) + day.slice(1).toLowerCase()}`}
+                      className={`inline-flex items-center justify-center min-w-[26px] h-6 px-1 text-xs font-semibold rounded transition-colors ${
+                        hasOfficeHours
+                          ? "bg-smccd-blue-100 dark:bg-smccd-blue-800 text-smccd-blue-900 dark:text-smccd-blue-100 border border-smccd-blue-300 dark:border-smccd-blue-600"
+                          : "bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700"
+                      }`}
+                      title={
+                        hasOfficeHours
+                          ? `Office hours on ${day.charAt(0) + day.slice(1).toLowerCase()}`
+                          : `No office hours on ${day.charAt(0) + day.slice(1).toLowerCase()}`
+                      }
                     >
                       {abbrev}
                     </span>
                   );
-                })}
-              </div>
+                }
+              )}
             </div>
-          )}
+          </div>
         </div>
       </CardContent>
     </Card>

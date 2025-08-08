@@ -12,7 +12,6 @@ import {
 import { useDebounce } from "@/hooks/useDebounce";
 import { SimpleFacultyGrid } from "@/components/ui/simple-faculty-grid";
 import { Button } from "@/components/ui/button";
-import { RecentDoorcards } from "@/components/RecentDoorcards";
 import Link from "next/link";
 
 import type { PublicDoorcard } from "@/types/pages/public";
@@ -361,7 +360,11 @@ export function HomeSearchClient({
             onDoorcardClick={handleDoorcardClick}
           />
         ) : (
-          <RecentDoorcards limit={25} showTitle={false} showFilter={false} />
+          <SimpleFacultyGrid
+            doorcards={doorcards.slice(0, 25)}
+            loading={termLoading}
+            onDoorcardClick={handleDoorcardClick}
+          />
         )}
       </div>
     </>

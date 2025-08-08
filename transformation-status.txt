@@ -1,10 +1,2 @@
-❌ TRANSFORMATION FAILED: PrismaClientKnownRequestError: 
-Invalid `prisma.doorcard.create()` invocation in
-/Users/besnyib/next-doorcard/scripts/legacy-to-production.ts:267:53
-
-  264 
-  265 const modernDoorcard = transformLegacyDoorcard(legacyDoorcard, userId);
-  266 
-→ 267 const createdDoorcard = await prisma.doorcard.create(
-Unique constraint failed on the fields: (`slug`)
-2025-08-08T05:06:58.449Z
+   Progress: 150/2271 users created
+2025-08-08T06:59:54.368Z

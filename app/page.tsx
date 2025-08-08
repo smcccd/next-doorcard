@@ -2,22 +2,25 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentAcademicTerm } from "@/lib/active-term";
 import { HomeSearchClient } from "@/components/HomeSearchClient";
 import { Calendar } from "lucide-react";
+import { unstable_cache } from "next/cache";
 
 import type { PublicDoorcard } from "@/types/pages/public";
 import type { ActiveTermInfo } from "@/lib/active-term";
 import { TermSeason } from "@prisma/client";
 
-export default async function Home() {
-  // Get current term info first to filter data properly
-  const currentTerm = getCurrentAcademicTerm();
+// Configure page-level caching
+export const revalidate = 300; // Revalidate every 5 minutes
+export const dynamic = "force-static"; // Force static generation
 
-  const [rawDoorcards, activeTerm] = await Promise.all([
-    prisma.doorcard.findMany({
+// Cache the expensive doorcard query for 5 minutes
+const getCachedDoorcards = unstable_cache(
+  async (season: TermSeason, year: number) => {
+    const doorcards = await prisma.doorcard.findMany({
       where: {
         isPublic: true,
         isActive: true,
-        term: currentTerm.season,
-        year: currentTerm.year,
+        term: season,
+        year: year,
       },
       include: {
         User: {
@@ -44,7 +47,29 @@ export default async function Home() {
       orderBy: {
         updatedAt: "desc",
       },
-    }),
+    });
+
+    // Convert dates to strings for caching
+    return doorcards.map((dc) => ({
+      ...dc,
+      createdAt: dc.createdAt.toISOString(),
+      updatedAt: dc.updatedAt.toISOString(),
+    }));
+  },
+  ["homepage-doorcards"],
+  {
+    revalidate: 300, // Cache for 5 minutes
+    tags: ["doorcards"],
+  }
+);
+
+export default async function Home() {
+  // Get current term info first to filter data properly
+  const currentTerm = getCurrentAcademicTerm();
+
+  const [rawDoorcards, activeTerm] = await Promise.all([
+    // Use cached version
+    getCachedDoorcards(currentTerm.season, currentTerm.year),
     // Try to get active term from database, fallback to computed
     prisma.term
       .findFirst({
@@ -69,8 +94,14 @@ export default async function Home() {
     },
     appointmentCount: dc._count.Appointment,
     availableDays: [...new Set(dc.Appointment.map((apt) => apt.dayOfWeek))],
-    createdAt: dc.createdAt.toISOString(),
-    updatedAt: dc.updatedAt.toISOString(),
+    createdAt:
+      typeof dc.createdAt === "string"
+        ? dc.createdAt
+        : (dc.createdAt as Date).toISOString(),
+    updatedAt:
+      typeof dc.updatedAt === "string"
+        ? dc.updatedAt
+        : (dc.updatedAt as Date).toISOString(),
   }));
 
   // Get current term info (database or computed)
