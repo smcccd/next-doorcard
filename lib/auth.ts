@@ -20,12 +20,35 @@ interface OneLoginProfile {
   department?: string;
 }
 
-// Custom PrismaAdapter that handles PascalCase relations
+// Custom PrismaAdapter that handles PascalCase relations and ID generation
 function CustomPrismaAdapter(): Adapter {
   const baseAdapter = PrismaAdapter(prisma);
 
   return {
     ...baseAdapter,
+    async createUser(user: any) {
+      console.log("[ADAPTER] createUser called with:", user);
+      try {
+        const result = await prisma.user.create({
+          data: {
+            id: crypto.randomUUID(), // Generate ID for our schema
+            name: user.name,
+            email: user.email,
+            image: user.image,
+            emailVerified: user.emailVerified,
+            updatedAt: new Date(), // Required field in our schema
+            // Add custom fields with defaults
+            role: "FACULTY",
+            college: null,
+          },
+        });
+        console.log("[ADAPTER] createUser success:", result.id);
+        return result;
+      } catch (error) {
+        console.error("[ADAPTER] createUser failed:", error);
+        throw error;
+      }
+    },
     async getUserByAccount({ providerAccountId, provider }) {
       const account = await prisma.account.findUnique({
         where: { provider_providerAccountId: { provider, providerAccountId } },
@@ -47,22 +70,36 @@ function CustomPrismaAdapter(): Adapter {
       };
     },
     async linkAccount(account: AdapterAccount) {
-      return await prisma.account.create({
-        data: {
-          id: crypto.randomUUID(),
-          userId: account.userId,
-          type: account.type,
-          provider: account.provider,
-          providerAccountId: account.providerAccountId,
-          refresh_token: account.refresh_token,
-          access_token: account.access_token,
-          expires_at: account.expires_at,
-          token_type: account.token_type,
-          scope: account.scope,
-          id_token: account.id_token,
-          session_state: account.session_state,
-        },
+      console.log("[ADAPTER] linkAccount called with:", {
+        provider: account.provider,
+        providerAccountId: account.providerAccountId,
+        userId: account.userId,
+        type: account.type,
       });
+
+      try {
+        const result = await prisma.account.create({
+          data: {
+            id: crypto.randomUUID(),
+            userId: account.userId,
+            type: account.type,
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+            refresh_token: account.refresh_token,
+            access_token: account.access_token,
+            expires_at: account.expires_at,
+            token_type: account.token_type,
+            scope: account.scope,
+            id_token: account.id_token,
+            session_state: account.session_state,
+          },
+        });
+        console.log("[ADAPTER] linkAccount success:", result.id);
+        return result;
+      } catch (error) {
+        console.error("[ADAPTER] linkAccount failed:", error);
+        throw error;
+      }
     },
   };
 }
@@ -207,32 +244,39 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        // Regular auth logic
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
 
-        if (!user || !user.password) {
+          if (!user || !user.password) {
+            return null;
+          }
+
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+
+          if (!isPasswordValid) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+          };
+        } catch (error) {
+          console.error("[CREDENTIALS] Database error:", error);
           return null;
         }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-        };
       },
     }),
   ],
@@ -258,6 +302,12 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user, account, profile }) {
+      console.log("[SIGNIN] Callback triggered:", {
+        provider: account?.provider,
+        userEmail: user?.email,
+        accountType: account?.type,
+      });
+
       // Skip database operations in test environment to avoid timeouts
       if (process.env.NODE_ENV === "test" || process.env.CYPRESS) {
         return true;
@@ -265,6 +315,7 @@ export const authOptions: NextAuthOptions = {
 
       // Allow OneLogin account linking to existing users
       if (account?.provider === "onelogin") {
+        console.log("[SIGNIN] OneLogin flow starting for:", user?.email);
         try {
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email! },

@@ -7,13 +7,13 @@ const meta = {
   parameters: {
     layout: "centered",
     backgrounds: {
-      default: "dark",
+      default: "light",
     },
   },
   tags: ["autodocs"],
   decorators: [
     (Story) => (
-      <div className="bg-gray-800 p-4 rounded-lg">
+      <div className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 min-w-[200px]">
         <Story />
       </div>
     ),

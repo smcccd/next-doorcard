@@ -1,11 +1,9 @@
 "use client";
 
-import { useCallback, useState, useActionState } from "react";
+import { useState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
-import {
-  createDoorcardWithCampusTerm,
-  validateCampusTerm,
-} from "@/app/doorcard/actions";
+import { useSearchParams } from "next/navigation";
+import { handleNewDoorcardForm, handleEditDoorcardCampusForm } from "./action";
 import { COLLEGE_META, type College } from "@/types/doorcard";
 import {
   Select,
@@ -37,7 +35,6 @@ const BASE_YEARS = Array.from({ length: 5 }, (_, i) =>
 );
 
 type FieldErrors = { college?: string; term?: string; year?: string };
-type ActionState = { success: boolean; message?: string };
 
 interface Props {
   /** If undefined => new doorcard flow */
@@ -87,18 +84,23 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
   const [year, setYear] = useState(existingYear ?? "");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [clientTried, setClientTried] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  // Simple server action without useCallback to avoid hook ordering issues
-  const [state, serverAction] = useActionState<ActionState, FormData>(
-    (prev: ActionState, formData: FormData) => {
-      if (doorcard?.id) {
-        return validateCampusTerm(doorcard.id, prev, formData); // edit flow
-      } else {
-        return createDoorcardWithCampusTerm(prev, formData); // new flow
-      }
-    },
-    { success: true }
-  );
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    console.log("[FORM] URL error param:", error);
+    if (error) {
+      console.log("[FORM] Setting server error:", error);
+      setServerError(error);
+    }
+  }, [searchParams]);
+
+  // Create the appropriate server action
+  const formAction = doorcard?.id
+    ? handleEditDoorcardCampusForm.bind(null, doorcard.id)
+    : handleNewDoorcardForm;
 
   const validateField = (
     name: keyof FieldErrors,
@@ -120,17 +122,18 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
     setClientTried(true);
     const errs = validateAll();
     setFieldErrors(errs);
-    if (Object.values(errs).some(Boolean)) return;
 
-    const formData = new FormData();
-    formData.set("college", college);
-    formData.set("term", term);
-    formData.set("year", year);
-    serverAction(formData);
+    // If there are client-side validation errors, prevent submission
+    if (Object.values(errs).some(Boolean)) {
+      e.preventDefault();
+      return;
+    }
+
+    // If validation passes, let the form submit naturally to the action
+    // The form action will handle the server-side logic
   };
 
   const anyClientErrors = Object.values(fieldErrors).some(Boolean);
@@ -152,12 +155,22 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
         </div>
       </div>
 
-      {!state?.success && state?.message && <Alert>{state.message}</Alert>}
+      {serverError && <Alert>{serverError}</Alert>}
       {clientTried && anyClientErrors && (
         <Alert>Please fill in all required fields correctly.</Alert>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+      <form
+        action={formAction}
+        onSubmit={handleSubmit}
+        className="space-y-8"
+        noValidate
+      >
+        {/* Hidden inputs to pass form values */}
+        <input type="hidden" name="college" value={college} />
+        <input type="hidden" name="term" value={term} />
+        <input type="hidden" name="year" value={year} />
+
         <fieldset className="border border-gray-200 rounded-lg p-6">
           <legend className="text-base font-medium text-gray-900 px-2">
             Campus and Term Selection

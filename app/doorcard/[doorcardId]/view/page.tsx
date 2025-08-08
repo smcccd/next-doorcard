@@ -222,6 +222,7 @@ export default async function DoorcardViewById({
                   ...transformedDoorcard,
                   year: transformedDoorcard.year.toString(),
                 }}
+                showWeekendDays={false}
               />
             </div>
 

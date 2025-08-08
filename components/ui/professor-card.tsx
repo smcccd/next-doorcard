@@ -19,12 +19,14 @@ const COLLEGE_BADGE_NAMES: Record<College, string> = {
   CSM: "CSM",
   SKYLINE: "Skyline",
   CANADA: "Cañada",
+  DISTRICT_OFFICE: "District",
 };
 
 const COLLEGE_FULL_NAMES: Record<College, string> = {
   CSM: "College of San Mateo",
   SKYLINE: "Skyline College",
   CANADA: "Cañada College",
+  DISTRICT_OFFICE: "SMCCD District Office",
 };
 
 interface ProfessorCardProps {

@@ -51,7 +51,7 @@ async function fetchDoorcard(
     user = await prisma.user.findFirst({
       where: {
         OR: namePatterns.map((name) => ({
-          name: { equals: name, mode: "insensitive" as const },
+          name: { equals: name },
         })),
       },
       select: { id: true, name: true, college: true, email: true },
@@ -63,32 +63,58 @@ async function fetchDoorcard(
   // If termSlug is provided we need to find the matching doorcard
   let doorcard;
   if (termSlug) {
-    // The termSlug might be partial (e.g., "fall-2021") or full slug
-    doorcard = await prisma.doorcard.findFirst({
-      where: {
-        userId: user.id,
-        OR: [
-          { slug: termSlug }, // Exact match
-          { slug: { endsWith: `-${termSlug}` } }, // Ends with term slug
-          { slug: { contains: termSlug } }, // Contains term slug
-        ],
-      },
-      include: {
-        Appointment: true,
-        User: {
-          select: {
-            name: true,
-            firstName: true,
-            lastName: true,
-            title: true,
-            pronouns: true,
-            displayFormat: true,
-            college: true,
-            website: true,
+    // Handle "current" as a special case to find active doorcard
+    if (termSlug === "current") {
+      doorcard = await prisma.doorcard.findFirst({
+        where: {
+          userId: user.id,
+          isActive: true,
+        },
+        orderBy: { updatedAt: "desc" },
+        include: {
+          Appointment: true,
+          User: {
+            select: {
+              name: true,
+              firstName: true,
+              lastName: true,
+              title: true,
+              pronouns: true,
+              displayFormat: true,
+              college: true,
+              website: true,
+            },
           },
         },
-      },
-    });
+      });
+    } else {
+      // The termSlug might be partial (e.g., "fall-2021") or full slug
+      doorcard = await prisma.doorcard.findFirst({
+        where: {
+          userId: user.id,
+          OR: [
+            { slug: termSlug }, // Exact match
+            { slug: { endsWith: `-${termSlug}` } }, // Ends with term slug
+            { slug: { contains: termSlug } }, // Contains term slug
+          ],
+        },
+        include: {
+          Appointment: true,
+          User: {
+            select: {
+              name: true,
+              firstName: true,
+              lastName: true,
+              title: true,
+              pronouns: true,
+              displayFormat: true,
+              college: true,
+              website: true,
+            },
+          },
+        },
+      });
+    }
     if (!doorcard) return { error: "Doorcard not found" } as const;
   } else {
     // Current active doorcard for this user (implementation may vary)
@@ -311,7 +337,10 @@ export default async function PublicDoorcardView({
           <>
             {/* Screen version - full schedule with all features */}
             <div className="w-full print:hidden">
-              <UnifiedDoorcard doorcard={doorcardLite} />
+              <UnifiedDoorcard
+                doorcard={doorcardLite}
+                showWeekendDays={false}
+              />
             </div>
 
             {/* Print version - optimized for single page */}

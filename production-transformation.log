@@ -1,0 +1,86 @@
+[2025-08-08T04:52:45.897Z] 🔄 LEGACY ACCESS DATA TRANSFORMATION STARTED
+[2025-08-08T04:52:47.232Z] ✅ Connected to Neon PostgreSQL
+[2025-08-08T04:52:47.233Z] 📁 Step 1/6: Reading legacy Access CSV exports...
+[2025-08-08T04:52:48.216Z]    Legacy data: 10944 doorcards, 184935 appointments
+[2025-08-08T04:52:48.216Z] 👥 Step 2/6: Extracting and transforming users...
+[2025-08-08T04:52:48.239Z]    Found 2271 unique faculty members
+[2025-08-08T04:52:48.239Z] 🧹 Step 3/6: Clearing production database...
+[2025-08-08T04:52:48.848Z]    ✅ Production database cleared
+[2025-08-08T04:52:48.849Z] 🎨 Step 4/6: Creating modernized user records...
+[2025-08-08T04:52:58.274Z]    Progress: 50/2271 users created
+[2025-08-08T04:53:07.494Z]    Progress: 100/2271 users created
+[2025-08-08T04:53:16.755Z]    Progress: 150/2271 users created
+[2025-08-08T04:53:25.784Z]    Progress: 200/2271 users created
+[2025-08-08T04:53:34.900Z]    Progress: 250/2271 users created
+[2025-08-08T04:53:43.907Z]    Progress: 300/2271 users created
+[2025-08-08T04:53:53.121Z]    Progress: 350/2271 users created
+[2025-08-08T04:54:02.085Z]    Progress: 400/2271 users created
+[2025-08-08T04:54:11.319Z]    Progress: 450/2271 users created
+[2025-08-08T04:54:20.520Z]    Progress: 500/2271 users created
+[2025-08-08T04:54:29.744Z]    Progress: 550/2271 users created
+[2025-08-08T04:54:39.040Z]    Progress: 600/2271 users created
+[2025-08-08T04:59:41.947Z] 🔄 LEGACY ACCESS DATA TRANSFORMATION STARTED
+[2025-08-08T04:59:42.963Z] ✅ Connected to Neon PostgreSQL
+[2025-08-08T04:59:42.963Z] 📁 Step 1/6: Reading legacy Access CSV exports...
+[2025-08-08T04:59:43.944Z]    Legacy data: 10944 doorcards, 184935 appointments
+[2025-08-08T04:59:43.944Z] 👥 Step 2/6: Extracting and transforming users...
+[2025-08-08T04:59:43.967Z]    Found 2271 unique faculty members
+[2025-08-08T04:59:43.968Z] 🧹 Step 3/6: Clearing production database...
+[2025-08-08T04:59:44.607Z]    ✅ Production database cleared
+[2025-08-08T04:59:44.608Z] 🎨 Step 4/6: Creating modernized user records...
+[2025-08-08T04:59:53.805Z]    Progress: 50/2271 users created
+[2025-08-08T05:00:02.815Z]    Progress: 100/2271 users created
+[2025-08-08T05:00:11.808Z]    Progress: 150/2271 users created
+[2025-08-08T05:00:20.848Z]    Progress: 200/2271 users created
+[2025-08-08T05:00:29.905Z]    Progress: 250/2271 users created
+[2025-08-08T05:00:38.921Z]    Progress: 300/2271 users created
+[2025-08-08T05:00:47.977Z]    Progress: 350/2271 users created
+[2025-08-08T05:00:56.999Z]    Progress: 400/2271 users created
+[2025-08-08T05:01:06.090Z]    Progress: 450/2271 users created
+[2025-08-08T05:01:15.170Z]    Progress: 500/2271 users created
+[2025-08-08T05:01:24.358Z]    Progress: 550/2271 users created
+[2025-08-08T05:01:33.379Z]    Progress: 600/2271 users created
+[2025-08-08T05:01:42.335Z]    Progress: 650/2271 users created
+[2025-08-08T05:01:51.527Z]    Progress: 700/2271 users created
+[2025-08-08T05:02:00.670Z]    Progress: 750/2271 users created
+[2025-08-08T05:02:09.672Z]    Progress: 800/2271 users created
+[2025-08-08T05:02:18.896Z]    Progress: 850/2271 users created
+[2025-08-08T05:02:28.028Z]    Progress: 900/2271 users created
+[2025-08-08T05:02:37.390Z]    Progress: 950/2271 users created
+[2025-08-08T05:02:46.608Z]    Progress: 1000/2271 users created
+[2025-08-08T05:02:55.589Z]    Progress: 1050/2271 users created
+[2025-08-08T05:03:04.776Z]    Progress: 1100/2271 users created
+[2025-08-08T05:03:14.022Z]    Progress: 1150/2271 users created
+[2025-08-08T05:03:23.148Z]    Progress: 1200/2271 users created
+[2025-08-08T05:03:32.425Z]    Progress: 1250/2271 users created
+[2025-08-08T05:03:41.540Z]    Progress: 1300/2271 users created
+[2025-08-08T05:03:50.611Z]    Progress: 1350/2271 users created
+[2025-08-08T05:03:59.551Z]    Progress: 1400/2271 users created
+[2025-08-08T05:04:08.754Z]    Progress: 1450/2271 users created
+[2025-08-08T05:04:17.930Z]    Progress: 1500/2271 users created
+[2025-08-08T05:04:26.985Z]    Progress: 1550/2271 users created
+[2025-08-08T05:04:36.257Z]    Progress: 1600/2271 users created
+[2025-08-08T05:04:46.558Z]    Progress: 1650/2271 users created
+[2025-08-08T05:04:55.973Z]    Progress: 1700/2271 users created
+[2025-08-08T05:05:05.317Z]    Progress: 1750/2271 users created
+[2025-08-08T05:05:14.565Z]    Progress: 1800/2271 users created
+[2025-08-08T05:05:23.747Z]    Progress: 1850/2271 users created
+[2025-08-08T05:05:33.064Z]    Progress: 1900/2271 users created
+[2025-08-08T05:05:42.129Z]    Progress: 1950/2271 users created
+[2025-08-08T05:05:51.364Z]    Progress: 2000/2271 users created
+[2025-08-08T05:06:00.581Z]    Progress: 2050/2271 users created
+[2025-08-08T05:06:10.157Z]    Progress: 2100/2271 users created
+[2025-08-08T05:06:19.386Z]    Progress: 2150/2271 users created
+[2025-08-08T05:06:40.805Z]    Progress: 2200/2271 users created
+[2025-08-08T05:06:49.885Z]    Progress: 2250/2271 users created
+[2025-08-08T05:06:54.174Z]    ✅ Created 2271 modern user records
+[2025-08-08T05:06:54.174Z] 🚪 Step 5/6: Creating modernized doorcards...
+[2025-08-08T05:06:58.449Z] ❌ TRANSFORMATION FAILED: PrismaClientKnownRequestError: 
+Invalid `prisma.doorcard.create()` invocation in
+/Users/besnyib/next-doorcard/scripts/legacy-to-production.ts:267:53
+
+  264 
+  265 const modernDoorcard = transformLegacyDoorcard(legacyDoorcard, userId);
+  266 
+→ 267 const createdDoorcard = await prisma.doorcard.create(
+Unique constraint failed on the fields: (`slug`)

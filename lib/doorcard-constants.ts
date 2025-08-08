@@ -33,6 +33,65 @@ export const DAY_ABBREVIATIONS = [
   "Sun",
 ];
 
+// Short day abbreviations for badges (clearer than academic R for Thursday)
+export const DAY_SHORT_ABBREV = {
+  MONDAY: "M",
+  TUESDAY: "T",
+  WEDNESDAY: "W",
+  THURSDAY: "Th",
+  FRIDAY: "F",
+  SATURDAY: "S",
+  SUNDAY: "Su",
+} as const;
+
+// Full day labels for display
+export const DAY_LABELS = {
+  MONDAY: "Monday",
+  TUESDAY: "Tuesday",
+  WEDNESDAY: "Wednesday",
+  THURSDAY: "Thursday",
+  FRIDAY: "Friday",
+  SATURDAY: "Saturday",
+  SUNDAY: "Sunday",
+} as const;
+
+// Day display arrays for components
+export const ALL_DAYS = [
+  { key: "MONDAY" as const, label: "Monday" },
+  { key: "TUESDAY" as const, label: "Tuesday" },
+  { key: "WEDNESDAY" as const, label: "Wednesday" },
+  { key: "THURSDAY" as const, label: "Thursday" },
+  { key: "FRIDAY" as const, label: "Friday" },
+  { key: "SATURDAY" as const, label: "Saturday" },
+  { key: "SUNDAY" as const, label: "Sunday" },
+] as const;
+
+export const WEEKDAYS_ONLY = ALL_DAYS.slice(0, 5);
+
+// Day options for filters (includes 'ALL' option)
+export const DAY_OPTIONS = [
+  { value: "ALL" as const, label: "Any Day" },
+  ...ALL_DAYS.map((day) => ({ value: day.key, label: day.label })),
+] as const;
+
+// Day order for sorting (Monday = 0, Sunday = 6)
+export const DAY_ORDER = {
+  MONDAY: 0,
+  TUESDAY: 1,
+  WEDNESDAY: 2,
+  THURSDAY: 3,
+  FRIDAY: 4,
+  SATURDAY: 5,
+  SUNDAY: 6,
+} as const;
+
+// Sort days in calendar order (M-T-W-Th-F-S-Su)
+export function sortDaysByCalendarOrder<T extends keyof typeof DAY_ORDER>(
+  days: T[]
+): T[] {
+  return [...days].sort((a, b) => DAY_ORDER[a] - DAY_ORDER[b]);
+}
+
 // Time slots - standardized to 7AM-10PM (30 slots)
 export const TIME_SLOTS = Array.from({ length: 30 }, (_, i) => {
   const hour = Math.floor(i / 2) + 7;
@@ -52,6 +111,7 @@ export const CATEGORY_COLORS = {
   LAB: "#EDAC80",
   HOURS_BY_ARRANGEMENT: "#99D5A1",
   REFERENCE: "#AD99D5",
+  OTHER: "#E5E7EB",
 };
 
 export const CATEGORY_LABELS = {
@@ -61,6 +121,7 @@ export const CATEGORY_LABELS = {
   LAB: "Lab",
   HOURS_BY_ARRANGEMENT: "Hours by Arrangement",
   REFERENCE: "Reference",
+  OTHER: "Other",
 };
 
 export const extractCourseCode = (activity: string) => {

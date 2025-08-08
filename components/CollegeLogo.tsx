@@ -27,6 +27,11 @@ const COLLEGE_LOGOS: Record<
     src: "/skyline.svg",
     alt: "Skyline College Logo",
   },
+  DISTRICT_OFFICE: {
+    src: "/smccd-logo.png",
+    alt: "SMCCD District Office Logo",
+    isJpg: true,
+  },
 };
 
 const CollegeLogo: React.FC<CollegeLogoProps> = ({

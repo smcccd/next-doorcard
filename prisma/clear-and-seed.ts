@@ -246,6 +246,7 @@ function getRandomOfficeNumber(college: College): string {
     [College.SKYLINE]: ["23", "24", "13", "14"],
     [College.CSM]: ["17-", "18-", "32-", "36-"],
     [College.CANADA]: ["7-", "4-", "1-", "9-"],
+    [College.DISTRICT_OFFICE]: ["DO-", "ADM-", "HR-", "IT-"],
   };
 
   const prefix = getRandomElement(prefixes[college]);

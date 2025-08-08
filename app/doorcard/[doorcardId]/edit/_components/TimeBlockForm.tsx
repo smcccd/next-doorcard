@@ -15,6 +15,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { CalendarDays, Clock, Plus, X, AlertCircle } from "lucide-react";
 import { updateTimeBlocks } from "@/app/doorcard/actions";
+import { DAY_LABELS, sortDaysByCalendarOrder } from "@/lib/doorcard-constants";
 import type { AppointmentCategory, DayOfWeek } from "@prisma/client";
 
 /* -------------------------------------------------------------------------- */
@@ -36,7 +37,7 @@ interface Props {
   draftId?: string;
 }
 
-const DAYS: DayOfWeek[] = [
+const DAYS: DayOfWeek[] = sortDaysByCalendarOrder([
   "MONDAY",
   "TUESDAY",
   "WEDNESDAY",
@@ -44,16 +45,8 @@ const DAYS: DayOfWeek[] = [
   "FRIDAY",
   "SATURDAY",
   "SUNDAY",
-];
-const DAY_LABEL: Record<DayOfWeek, string> = {
-  MONDAY: "Monday",
-  TUESDAY: "Tuesday",
-  WEDNESDAY: "Wednesday",
-  THURSDAY: "Thursday",
-  FRIDAY: "Friday",
-  SATURDAY: "Saturday",
-  SUNDAY: "Sunday",
-};
+]);
+const DAY_LABEL = DAY_LABELS;
 
 const CATEGORY_OPTIONS: { value: AppointmentCategory; label: string }[] = [
   { value: "OFFICE_HOURS", label: "Office Hours" },

@@ -56,6 +56,11 @@ function campusLabel(code: string) {
 }
 
 function handleActionError(err: unknown): ActionResult {
+  // Re-throw redirect errors - they should not be handled as regular errors
+  if (err instanceof Error && err.message === "NEXT_REDIRECT") {
+    throw err;
+  }
+
   if (err instanceof z.ZodError) {
     return {
       success: false,

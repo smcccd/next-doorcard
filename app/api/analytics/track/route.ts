@@ -4,7 +4,7 @@ import { z } from "zod";
 import { randomUUID } from "crypto";
 
 const trackingSchema = z.object({
-  doorcardId: z.string().cuid(),
+  doorcardId: z.string().uuid(),
   eventType: z.enum([
     "VIEW",
     "PRINT_PREVIEW",

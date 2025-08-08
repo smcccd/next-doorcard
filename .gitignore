@@ -57,3 +57,7 @@ storybook-static
 
 # Claude configuration
 CLAUDE.md
+
+# Legacy code analysis (contains secrets)
+/old-doorcard/
+/legacy-analysis/legacy/

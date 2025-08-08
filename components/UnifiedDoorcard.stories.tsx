@@ -117,6 +117,36 @@ export const WithWeekends: Story = {
   },
 };
 
+export const WithWeekendAppointments: Story = {
+  args: {
+    doorcard: {
+      ...mockDoorcard,
+      appointments: [
+        ...mockAppointments,
+        {
+          id: "7",
+          name: "Saturday Office Hours",
+          startTime: "10:00",
+          endTime: "12:00",
+          dayOfWeek: "SATURDAY" as DayOfWeek,
+          category: "OFFICE_HOURS" as AppointmentCategory,
+          location: "Building 36, Room 301",
+        },
+        {
+          id: "8",
+          name: "Sunday Lab Session",
+          startTime: "14:00",
+          endTime: "16:00",
+          dayOfWeek: "SUNDAY" as DayOfWeek,
+          category: "LAB" as AppointmentCategory,
+          location: "Lab 12-108",
+        },
+      ],
+    },
+    showWeekendDays: true,
+  },
+};
+
 export const MinimalSchedule: Story = {
   args: {
     doorcard: {

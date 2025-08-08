@@ -78,6 +78,7 @@ async function sampleDataCheck() {
     SKYLINE: 0,
     CSM: 0,
     CANADA: 0,
+    DISTRICT_OFFICE: 0,
   };
 
   recentDoorcards.forEach((doorcard) => {

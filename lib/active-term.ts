@@ -18,12 +18,12 @@ export function getCurrentAcademicTerm(): ActiveTermInfo {
 
   // Academic year logic:
   // January-May = Spring of current year
-  // June-August = Summer of current year
-  // September-December = Fall of current year
+  // June-July = Summer of current year
+  // August-December = Fall of current year
   if (currentMonth >= 1 && currentMonth <= 5) {
     season = TermSeason.SPRING;
     year = currentYear;
-  } else if (currentMonth >= 6 && currentMonth <= 8) {
+  } else if (currentMonth >= 6 && currentMonth <= 7) {
     season = TermSeason.SUMMER;
     year = currentYear;
   } else {

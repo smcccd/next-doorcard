@@ -15,7 +15,21 @@ export default {
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        "hero-blue": "#223c8c", // A sample color from your image
+        // Official SMCCD Brand Colors
+        "smccd-blue": {
+          DEFAULT: "#012147", // Official SMCCD Blue
+          50: "#e6f2ff",
+          100: "#cce5ff",
+          200: "#99cbff",
+          300: "#66b0ff",
+          400: "#3395ff",
+          500: "#007bff",
+          600: "#0056b3",
+          700: "#004080",
+          800: "#002a4d",
+          900: "#012147", // Primary brand color
+          950: "#001220",
+        },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -56,9 +70,11 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", ...fontFamily.sans],
+        sans: ["var(--font-geist)", ...fontFamily.sans],
         heading: ["var(--font-source-sans)", "system-ui", "sans-serif"],
         "source-sans": ["var(--font-source-sans)"],
+        geist: ["var(--font-geist)"],
+        inter: ["var(--font-inter)"],
       },
       borderRadius: {
         lg: "var(--radius)",
