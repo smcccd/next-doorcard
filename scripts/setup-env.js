@@ -55,15 +55,23 @@ if (currentSchema !== newSchema) {
 
 // Create a .env file specifically for Prisma CLI (since it reads .env first)
 const prismaEnvPath = path.join(__dirname, "..", ".env");
-const currentEnvContent = fs.readFileSync(prismaEnvPath, "utf8");
-const updatedEnvContent = currentEnvContent.replace(
-  /DATABASE_URL=.*/,
-  `DATABASE_URL="${databaseConfig}"`
-);
 
-if (currentEnvContent !== updatedEnvContent) {
-  fs.writeFileSync(prismaEnvPath, updatedEnvContent);
-  console.log("✅ Updated .env with current database URL");
+// Check if .env exists first (won't exist in Vercel)
+if (fs.existsSync(prismaEnvPath)) {
+  const currentEnvContent = fs.readFileSync(prismaEnvPath, "utf8");
+  const updatedEnvContent = currentEnvContent.replace(
+    /DATABASE_URL=.*/,
+    `DATABASE_URL="${databaseConfig}"`
+  );
+
+  if (currentEnvContent !== updatedEnvContent) {
+    fs.writeFileSync(prismaEnvPath, updatedEnvContent);
+    console.log("✅ Updated .env with current database URL");
+  }
+} else {
+  // In Vercel, create minimal .env for Prisma CLI
+  fs.writeFileSync(prismaEnvPath, `DATABASE_URL="${databaseConfig}"`);
+  console.log("✅ Created .env file for Prisma CLI");
 }
 
 console.log("🎉 Environment setup complete");
