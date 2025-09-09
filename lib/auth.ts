@@ -323,15 +323,28 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (existingUser) {
-            // Check if OneLogin account is already linked
-            const linkedAccount = existingUser.Account.find(
-              (acc) => acc.provider === "onelogin"
-            );
-
-            if (!linkedAccount) {
-              // Link OneLogin account to existing user
-              await prisma.account.create({
-                data: {
+            // Use transaction with upsert to prevent race conditions when linking accounts
+            await prisma.$transaction(async (tx) => {
+              // Use upsert to handle concurrent account linking attempts
+              await tx.account.upsert({
+                where: {
+                  provider_providerAccountId: {
+                    provider: account.provider,
+                    providerAccountId: account.providerAccountId,
+                  },
+                },
+                update: {
+                  // Update tokens if account already exists
+                  access_token: account.access_token,
+                  refresh_token: account.refresh_token,
+                  expires_at: account.expires_at,
+                  token_type: account.token_type,
+                  scope: account.scope,
+                  id_token: account.id_token,
+                  session_state: account.session_state,
+                },
+                create: {
+                  // Create new account link
                   id: crypto.randomUUID(),
                   userId: existingUser.id,
                   type: account.type,
@@ -348,7 +361,7 @@ export const authOptions: NextAuthOptions = {
               });
 
               // Update user with OneLogin profile data if needed
-              await prisma.user.update({
+              await tx.user.update({
                 where: { email: user.email! },
                 data: {
                   name:
@@ -358,7 +371,7 @@ export const authOptions: NextAuthOptions = {
                   lastName: (profile as OneLoginProfile)?.family_name,
                 },
               });
-            }
+            });
           }
         } catch (error) {
           console.error("Error linking OneLogin account:", error);

@@ -141,8 +141,9 @@ export default async function Home() {
                 Find Office Hours
               </h1>
               <p className="text-sm sm:text-base md:text-lg text-smccd-blue-100 font-normal max-w-2xl mx-auto mb-8">
-                Connect with your favorite faculty at Skyline, College of San
-                Mateo, and Cañada College
+                Connect with faculty at
+                <br />
+                Skyline College, College of San Mateo, and Cañada College
               </p>
 
               <HomeSearchClient

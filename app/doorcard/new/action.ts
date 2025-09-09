@@ -41,60 +41,54 @@ export async function handleNewDoorcardForm(formData: FormData) {
       year: formData.get("year") as string,
     };
 
-    // Validate the data
-    const validatedData = campusTermSchema.parse(rawData);
+    try {
+      // Validate the data
+      const validatedData = campusTermSchema.parse(rawData);
 
-    // Check if user already has an active doorcard for this term/college
-    const existingActive = await prisma.doorcard.findFirst({
-      where: {
-        userId: user.id,
-        college: validatedData.college as College,
-        term: toEnumSeason(validatedData.term),
-        year: validatedData.year,
-        isActive: true,
-      },
-    });
+      // Remove the pre-check - let the database constraint handle duplicates
+      // This eliminates the race condition between check and create
 
-    if (existingActive) {
-      console.log(
-        "[ACTION] Existing active doorcard found, redirecting with error"
+      // Create the doorcard
+      const doorcard = await prisma.doorcard.create({
+        data: {
+          id: crypto.randomUUID(),
+          name: user.name || user.email || "Faculty Member",
+          doorcardName: user.name || user.email || "Faculty Member",
+          officeNumber: "",
+          term: toEnumSeason(validatedData.term),
+          year: validatedData.year,
+          college: validatedData.college as College,
+          isActive: true,
+          isPublic: false,
+          userId: user.id,
+          updatedAt: new Date(),
+        },
+      });
+
+      // Revalidate and redirect
+      revalidatePath("/doorcard");
+      redirect(`/doorcard/${doorcard.id}/edit`);
+    } catch (error: any) {
+      console.error("Error creating doorcard:", error);
+
+      if (error instanceof z.ZodError) {
+        const errorMessages = error.errors.map((err) => err.message).join(", ");
+        redirect(`/doorcard/new?error=${encodeURIComponent(errorMessages)}`);
+      }
+
+      // Handle unique constraint violation
+      if (error.code === "P2002") {
+        const errorMessage =
+          "You already have a doorcard for this term and campus.";
+        redirect(`/doorcard/new?error=${encodeURIComponent(errorMessage)}`);
+      }
+
+      redirect(
+        `/doorcard/new?error=${encodeURIComponent("An unexpected error occurred")}`
       );
-      const errorMessage =
-        "You already have an active doorcard for this term and campus.";
-      const encodedError = encodeURIComponent(errorMessage);
-      console.log("[ACTION] Error message:", errorMessage);
-      console.log("[ACTION] Encoded error:", encodedError);
-      redirect(`/doorcard/new?error=${encodedError}`);
     }
-
-    // Create the doorcard
-    const doorcard = await prisma.doorcard.create({
-      data: {
-        id: crypto.randomUUID(),
-        name: user.name || user.email || "Faculty Member",
-        doorcardName: user.name || user.email || "Faculty Member",
-        officeNumber: "",
-        term: toEnumSeason(validatedData.term),
-        year: validatedData.year,
-        college: validatedData.college as College,
-        isActive: true,
-        isPublic: false,
-        userId: user.id,
-        updatedAt: new Date(),
-      },
-    });
-
-    // Revalidate and redirect
-    revalidatePath("/doorcard");
-    redirect(`/doorcard/${doorcard.id}/edit`);
-  } catch (error) {
-    console.error("Error creating doorcard:", error);
-
-    if (error instanceof z.ZodError) {
-      const errorMessages = error.errors.map((err) => err.message).join(", ");
-      redirect(`/doorcard/new?error=${encodeURIComponent(errorMessages)}`);
-    }
-
+  } catch (err) {
+    console.error("Error in handleNewDoorcardForm:", err);
     redirect(
       `/doorcard/new?error=${encodeURIComponent("An unexpected error occurred")}`
     );

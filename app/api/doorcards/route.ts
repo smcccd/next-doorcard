@@ -1,12 +1,18 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 import { doorcardSchema } from "@/lib/validations/doorcard";
 import { z } from "zod";
 import crypto from "crypto";
 import { PrismaErrorHandler, withRetry } from "@/lib/prisma-error-handler";
+import { validateAppointments } from "@/lib/appointment-validation";
+import { applyRateLimit, apiRateLimit } from "@/lib/rate-limit";
+import { sanitizeDoorcardData, sanitizeAppointmentData } from "@/lib/sanitize";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  // Apply rate limiting
+  const rateLimitResult = await applyRateLimit(req, apiRateLimit);
+  if (rateLimitResult) return rateLimitResult;
   try {
     const authResult = await requireAuthUserAPI();
     if ("error" in authResult) {
@@ -17,41 +23,41 @@ export async function POST(req: Request) {
     }
     const { user } = authResult;
 
-    const json = await req.json();
+    const rawData = await req.json();
+
+    // Sanitize input data before validation
+    const sanitizedData = sanitizeDoorcardData(rawData);
+
+    // Sanitize appointments if they exist
+    if (
+      sanitizedData.appointments &&
+      Array.isArray(sanitizedData.appointments)
+    ) {
+      sanitizedData.appointments = sanitizedData.appointments.map((apt: any) =>
+        sanitizeAppointmentData(apt)
+      );
+    }
 
     try {
-      const validatedData = doorcardSchema.parse(json);
+      const validatedData = doorcardSchema.parse(sanitizedData);
 
-      // Check for existing doorcard with same college/term/year combination (per user)
-      const existingDoorcard = await withRetry(() =>
-        prisma.doorcard.findFirst({
-          where: {
-            userId: user.id,
-            college: validatedData.college,
-            term: validatedData.term,
-            year: validatedData.year,
-            // Check ALL doorcards for this user/college/term/year, not just active ones
-          },
-        })
+      // We'll rely on the database unique constraint to prevent duplicates
+      // This eliminates the race condition between check and create
+
+      // Validate appointments for overlaps
+      const validation = validateAppointments(
+        validatedData.appointments as any,
+        []
       );
 
-      if (existingDoorcard) {
-        const campusName = validatedData.college
-          ? validatedData.college === "SKYLINE"
-            ? "Skyline College"
-            : validatedData.college === "CSM"
-              ? "College of San Mateo"
-              : validatedData.college === "CANADA"
-                ? "Cañada College"
-                : validatedData.college
-          : "this campus";
-
+      if (!validation.isValid) {
         return NextResponse.json(
           {
-            error: `You already have a doorcard for ${campusName} - ${validatedData.term} ${validatedData.year}. Please edit your existing doorcard instead.`,
-            existingDoorcardId: existingDoorcard.id,
+            error: "Appointment validation failed",
+            details: validation.errors,
+            warnings: validation.warnings,
           },
-          { status: 409 }
+          { status: 400 }
         );
       }
 
@@ -63,6 +69,7 @@ export async function POST(req: Request) {
       }`;
       const cleanSlug = baseSlug.replace(/-+/g, "-").replace(/^-|-$/g, "");
 
+      // Try to create the doorcard - let the database constraint prevent duplicates
       const doorcard = await withRetry(() =>
         prisma.doorcard.create({
           data: {
@@ -97,7 +104,12 @@ export async function POST(req: Request) {
         })
       );
 
-      return NextResponse.json(doorcard, { status: 201 });
+      const response: any = { ...doorcard };
+      if (validation.warnings && validation.warnings.length > 0) {
+        response.warnings = validation.warnings;
+      }
+
+      return NextResponse.json(response, { status: 201 });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return NextResponse.json(
@@ -105,6 +117,44 @@ export async function POST(req: Request) {
           { status: 400 }
         );
       }
+
+      // Handle unique constraint violations
+      if (
+        error &&
+        typeof error === "object" &&
+        "code" in error &&
+        error.code === "P2002"
+      ) {
+        const meta = (error as any).meta;
+        if (meta?.target?.includes("userId")) {
+          return NextResponse.json(
+            {
+              error:
+                "A doorcard already exists for this term and campus. Please edit your existing doorcard instead.",
+              code: "DUPLICATE_DOORCARD",
+            },
+            { status: 409 }
+          );
+        } else if (meta?.target?.includes("doorcardId")) {
+          return NextResponse.json(
+            {
+              error:
+                "Duplicate appointment detected. Each time slot can only have one appointment.",
+              code: "DUPLICATE_APPOINTMENT",
+            },
+            { status: 409 }
+          );
+        } else {
+          return NextResponse.json(
+            {
+              error: "A duplicate entry was detected. Please check your data.",
+              code: "DUPLICATE_ENTRY",
+            },
+            { status: 409 }
+          );
+        }
+      }
+
       throw error;
     }
   } catch (error) {

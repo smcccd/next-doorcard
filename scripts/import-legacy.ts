@@ -268,12 +268,23 @@ async function processUsers(
 
           if (!dryRun && validUsers.length > 0) {
             try {
-              // Use createMany with skipDuplicates for batch insert
-              const result = await prisma.user.createMany({
-                data: validUsers,
-                skipDuplicates: true,
-              });
-              created += result.count;
+              // Process users individually since SQLite doesn't fully support skipDuplicates
+              let batchCreated = 0;
+              for (const userData of validUsers) {
+                try {
+                  await prisma.user.create({ data: userData });
+                  batchCreated++;
+                } catch (error: any) {
+                  // Skip if user already exists (P2002 = unique constraint violation)
+                  if (error.code !== "P2002") {
+                    console.warn(
+                      `⚠️ Failed to create user ${userData.email}:`,
+                      error.message
+                    );
+                  }
+                }
+              }
+              created += batchCreated;
 
               // Get the created users to populate the ID map
               const createdUsers = await prisma.user.findMany({
@@ -631,11 +642,38 @@ async function processAppointments(
               try {
                 const result = await prisma.appointment.createMany({
                   data: batch,
-                  skipDuplicates: true,
                 });
                 created += result.count;
-              } catch (error) {
-                console.error(`❌ Batch insert failed:`, error);
+              } catch (error: any) {
+                // Handle unique constraint violations (duplicates)
+                if (error.code === "P2002") {
+                  console.warn(
+                    `⚠️  Batch contains duplicate appointments - trying individual inserts...`
+                  );
+
+                  // Fallback: insert appointments one by one, skipping duplicates
+                  for (const appointment of batch) {
+                    try {
+                      await prisma.appointment.create({
+                        data: appointment,
+                      });
+                      created++;
+                    } catch (individualError: any) {
+                      if (individualError.code === "P2002") {
+                        console.log(
+                          `⏭️  Skipped duplicate appointment: ${appointment.name} on ${appointment.dayOfWeek} ${appointment.startTime}-${appointment.endTime}`
+                        );
+                      } else {
+                        console.error(
+                          `❌ Failed to create individual appointment:`,
+                          individualError.message
+                        );
+                      }
+                    }
+                  }
+                } else {
+                  console.error(`❌ Batch insert failed:`, error.message);
+                }
               }
             }
 
@@ -811,11 +849,23 @@ async function createMissingUsers(
       );
 
       try {
-        const result = await prisma.user.createMany({
-          data: batch,
-          skipDuplicates: true,
-        });
-        created += result.count;
+        // Process users individually since SQLite doesn't fully support skipDuplicates
+        let batchCreated = 0;
+        for (const userData of batch) {
+          try {
+            await prisma.user.create({ data: userData });
+            batchCreated++;
+          } catch (error: any) {
+            // Skip if user already exists (P2002 = unique constraint violation)
+            if (error.code !== "P2002") {
+              console.warn(
+                `⚠️ Failed to create user ${userData.email}:`,
+                error.message
+              );
+            }
+          }
+        }
+        created += batchCreated;
 
         // Get the created users to populate the ID map
         const createdUsers = await prisma.user.findMany({

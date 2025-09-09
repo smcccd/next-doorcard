@@ -15,6 +15,7 @@ import CollegeLogo from "@/components/CollegeLogo";
 import { College } from "@/types/doorcard";
 import { User, MapPin, Calendar, ArrowLeft, Globe } from "lucide-react";
 import { formatDisplayName } from "@/lib/display-name";
+import { DoorcardSelectionPage } from "@/components/doorcard/DoorcardSelectionPage";
 
 /* ----------------------------------------------------------------------------
    Helpers
@@ -69,8 +70,14 @@ async function fetchDoorcard(
         where: {
           userId: user.id,
           isActive: true,
+          // If not using auth, only look for public doorcards
+          ...(useAuth ? {} : { isPublic: true }),
         },
-        orderBy: { updatedAt: "desc" },
+        orderBy: [
+          // Prioritize public doorcards, then most recent
+          { isPublic: "desc" },
+          { updatedAt: "desc" },
+        ],
         include: {
           Appointment: true,
           User: {
@@ -88,7 +95,7 @@ async function fetchDoorcard(
         },
       });
     } else {
-      // The termSlug might be partial (e.g., "fall-2021") or full slug
+      // The termSlug might be partial (e.g., "fall-2021") or term-year format
       doorcard = await prisma.doorcard.findFirst({
         where: {
           userId: user.id,
@@ -96,6 +103,29 @@ async function fetchDoorcard(
             { slug: termSlug }, // Exact match
             { slug: { endsWith: `-${termSlug}` } }, // Ends with term slug
             { slug: { contains: termSlug } }, // Contains term slug
+            // Also match college-term-year pattern (e.g., "csm-fall-2025") or term-year pattern (e.g., "fall-2025")
+            ...(termSlug.match(
+              /^(skyline|csm|canada)-(fall|spring|summer)-(\d{4})$/i
+            )
+              ? [
+                  {
+                    AND: [
+                      { college: termSlug.split("-")[0].toUpperCase() as any },
+                      { term: termSlug.split("-")[1].toUpperCase() as any },
+                      { year: parseInt(termSlug.split("-")[2]) },
+                    ],
+                  },
+                ]
+              : termSlug.match(/^(fall|spring|summer)-(\d{4})$/i)
+                ? [
+                    {
+                      AND: [
+                        { term: termSlug.split("-")[0].toUpperCase() as any },
+                        { year: parseInt(termSlug.split("-")[1]) },
+                      ],
+                    },
+                  ]
+                : []),
           ],
         },
         include: {
@@ -117,13 +147,21 @@ async function fetchDoorcard(
     }
     if (!doorcard) return { error: "Doorcard not found" } as const;
   } else {
-    // Current active doorcard for this user (implementation may vary)
-    doorcard = await prisma.doorcard.findFirst({
+    // Check for multiple active doorcards - show selection if more than one
+    const availableDoorcards = await prisma.doorcard.findMany({
       where: {
         userId: user.id,
         isActive: true,
+        // If not using auth, only look for public doorcards
+        ...(useAuth ? {} : { isPublic: true }),
       },
-      orderBy: { updatedAt: "desc" },
+      orderBy: [
+        // Prioritize public doorcards, then most recent
+        { isPublic: "desc" },
+        { year: "desc" },
+        { term: "asc" },
+        { updatedAt: "desc" },
+      ],
       include: {
         Appointment: true,
         User: {
@@ -140,7 +178,18 @@ async function fetchDoorcard(
         },
       },
     });
-    if (!doorcard) return { error: "Doorcard not found" } as const;
+
+    if (availableDoorcards.length === 0) {
+      return { error: "Doorcard not found" } as const;
+    }
+
+    if (availableDoorcards.length > 1) {
+      // Return multiple doorcards for selection UI
+      return { multipleDoorcards: availableDoorcards, user } as const;
+    }
+
+    // Single doorcard - use it directly
+    doorcard = availableDoorcards[0];
   }
 
   // Enforce public visibility unless ?auth=true with valid session
@@ -190,7 +239,19 @@ export default async function PublicDoorcardView({
     );
   }
 
-  const { doorcard } = result;
+  // Handle multiple doorcards - show selection UI
+  if ("multipleDoorcards" in result) {
+    return (
+      <DoorcardSelectionPage
+        username={username}
+        doorcards={result.multipleDoorcards || []}
+        user={result.user}
+        useAuth={useAuth}
+      />
+    );
+  }
+
+  const { doorcard } = result as { doorcard: any };
   const isSpecificTerm = Boolean(termSlug);
 
   // Transform Prisma data and convert to match DoorcardLite interface

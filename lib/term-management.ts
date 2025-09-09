@@ -34,28 +34,31 @@ export class TermManager {
    * Create a new term
    */
   static async createTerm(termData: TermData) {
-    // Ensure only one term is active at a time
-    if (termData.isActive) {
-      await prisma.term.updateMany({
-        where: { isActive: true },
-        data: { isActive: false },
-      });
-    }
+    // Use transaction to ensure atomic term creation and activation
+    return await prisma.$transaction(async (tx) => {
+      // Ensure only one term is active at a time
+      if (termData.isActive) {
+        await tx.term.updateMany({
+          where: { isActive: true },
+          data: { isActive: false },
+        });
+      }
 
-    return await prisma.term.create({
-      data: {
-        id: crypto.randomUUID(),
-        name: termData.name,
-        year: termData.year,
-        season: termData.season,
-        startDate: termData.startDate,
-        endDate: termData.endDate,
-        isActive: termData.isActive || false,
-        isArchived: termData.isArchived || false,
-        isUpcoming: termData.isUpcoming || false,
-        archiveDate: termData.archiveDate,
-        updatedAt: new Date(),
-      },
+      return await tx.term.create({
+        data: {
+          id: crypto.randomUUID(),
+          name: termData.name,
+          year: termData.year,
+          season: termData.season,
+          startDate: termData.startDate,
+          endDate: termData.endDate,
+          isActive: termData.isActive || false,
+          isArchived: termData.isArchived || false,
+          isUpcoming: termData.isUpcoming || false,
+          archiveDate: termData.archiveDate,
+          updatedAt: new Date(),
+        },
+      });
     });
   }
 

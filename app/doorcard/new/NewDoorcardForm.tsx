@@ -17,7 +17,8 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 const TERM_OPTIONS = ["Fall", "Spring", "Summer"] as const;
-const COLLEGE_OPTIONS = Object.keys(COLLEGE_META) as College[];
+const COLLEGE_OPTIONS = ["SKYLINE", "CSM", "CANADA"] as const;
+type ValidCollege = (typeof COLLEGE_OPTIONS)[number];
 // Generate academic years starting from current year
 const getCurrentAcademicYear = () => {
   const now = new Date();
@@ -77,8 +78,8 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
       ? [existingYear, ...BASE_YEARS]
       : BASE_YEARS;
 
-  const [college, setCollege] = useState<College | "">(
-    (doorcard?.college as College) ?? (userCollege as College) ?? ""
+  const [college, setCollege] = useState<ValidCollege | "">(
+    (doorcard?.college as ValidCollege) ?? (userCollege as ValidCollege) ?? ""
   );
   const [term, setTerm] = useState(doorcard?.term ?? "");
   const [year, setYear] = useState(existingYear ?? "");
@@ -107,9 +108,12 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
     value: string
   ): string | undefined => {
     if (!value) return "Required";
-    if (name === "college" && !COLLEGE_OPTIONS.includes(value as College))
+    if (name === "college" && !COLLEGE_OPTIONS.includes(value as ValidCollege))
       return "Invalid campus";
-    if (name === "term" && !TERM_OPTIONS.includes(value as any))
+    if (
+      name === "term" &&
+      !TERM_OPTIONS.includes(value as (typeof TERM_OPTIONS)[number])
+    )
       return "Invalid term";
     if (name === "year" && !YEAR_OPTIONS.includes(value)) return "Invalid year";
     return undefined;
@@ -184,7 +188,7 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
               <Select
                 value={college}
                 onValueChange={(v) => {
-                  setCollege(v as College);
+                  setCollege(v as ValidCollege);
                   if (clientTried)
                     setFieldErrors((p) => ({
                       ...p,
@@ -206,7 +210,7 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
                 <SelectContent>
                   {COLLEGE_OPTIONS.map((c) => (
                     <SelectItem key={c} value={c}>
-                      {COLLEGE_META[c].label}
+                      {COLLEGE_META[c as keyof typeof COLLEGE_META].label}
                     </SelectItem>
                   ))}
                 </SelectContent>

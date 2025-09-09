@@ -6,6 +6,10 @@ import { redirect } from "next/navigation";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 import { timeBlockSchema } from "@/lib/validations/doorcard-edit";
+import {
+  validateAppointments,
+  normalizeAppointments,
+} from "@/lib/appointment-validation";
 import type { College, TermSeason } from "@prisma/client";
 import crypto from "crypto";
 
@@ -93,41 +97,36 @@ export async function validateCampusTerm(
       college: formData.get("college"),
     });
 
-    const existing = await prisma.doorcard.findFirst({
-      where: {
-        userId: user.id,
-        college: data.college as College,
-        term: toEnumSeason(data.term),
-        year: data.year,
-        isActive: true,
-        NOT: { id: doorcardId },
-      },
-    });
-    if (existing) {
-      return {
-        success: false,
-        message: `You already have a doorcard for ${campusLabel(
-          data.college
-        )} - ${data.term} ${data.year}. Please edit your existing doorcard "${
-          existing.doorcardName
-        }" instead.`,
-      };
+    // Remove the pre-check for existing doorcard - let the database constraint handle it
+    // This eliminates the race condition between check and update
+
+    try {
+      await prisma.doorcard.update({
+        where: { id: doorcardId, userId: user.id },
+        data: {
+          term: toEnumSeason(data.term),
+          year: data.year,
+          college: data.college as College,
+        },
+      });
+    } catch (err: any) {
+      // Handle unique constraint violation
+      if (err.code === "P2002") {
+        return {
+          success: false,
+          message: `You already have a doorcard for ${campusLabel(
+            data.college
+          )} - ${data.term} ${data.year}. Please edit your existing doorcard instead.`,
+        };
+      }
+      return handleActionError(err);
     }
 
-    await prisma.doorcard.update({
-      where: { id: doorcardId, userId: user.id },
-      data: {
-        term: toEnumSeason(data.term),
-        year: data.year,
-        college: data.college as College,
-      },
-    });
+    revalidatePath(`/doorcard/${doorcardId}/edit`);
+    redirect(`/doorcard/${doorcardId}/edit?step=1`);
   } catch (err) {
     return handleActionError(err);
   }
-
-  revalidatePath(`/doorcard/${doorcardId}/edit`);
-  redirect(`/doorcard/${doorcardId}/edit?step=1`);
 }
 
 export async function updateBasicInfo(
@@ -186,20 +185,56 @@ export async function updateTimeBlocks(
       return { success: false, message: "At least one time block is required" };
     }
 
-    await prisma.appointment.deleteMany({ where: { doorcardId } });
-    await prisma.appointment.createMany({
-      data: blocks.map((b) => ({
-        id: crypto.randomUUID(),
-        doorcardId,
-        name: b.activity,
-        startTime: b.startTime,
-        endTime: b.endTime,
-        dayOfWeek: b.day,
-        category: b.category || "OFFICE_HOURS",
-        location: b.location,
-        updatedAt: new Date(),
-      })),
-    });
+    // Map the blocks to the format expected by validateAppointments
+    const blocksForValidation = blocks.map((b) => ({
+      ...b,
+      dayOfWeek: b.day, // Map 'day' to 'dayOfWeek'
+      name: b.activity,
+    }));
+
+    // Since we're replacing ALL appointments, we don't need to compare against existing ones
+    // Just validate the new blocks against themselves
+    const validation = validateAppointments(blocksForValidation, []);
+
+    if (!validation.isValid) {
+      return {
+        success: false,
+        message: `Appointment validation failed: ${validation.errors.join(". ")}`,
+      };
+    }
+
+    // Use transaction to ensure atomic appointment replacement
+    try {
+      await prisma.$transaction(async (tx) => {
+        // Delete all existing appointments for this doorcard
+        await tx.appointment.deleteMany({ where: { doorcardId } });
+
+        // Create new appointments
+        await tx.appointment.createMany({
+          data: blocks.map((b) => ({
+            id: crypto.randomUUID(),
+            doorcardId,
+            name: b.activity,
+            startTime: b.startTime,
+            endTime: b.endTime,
+            dayOfWeek: b.day,
+            category: b.category || "OFFICE_HOURS",
+            location: b.location,
+            updatedAt: new Date(),
+          })),
+        });
+      });
+    } catch (err: any) {
+      // Handle unique constraint violation (duplicate appointment)
+      if (err.code === "P2002") {
+        return {
+          success: false,
+          message:
+            "Duplicate appointment detected. Each time slot can only have one appointment.",
+        };
+      }
+      throw err; // Re-throw other errors to be handled by outer catch
+    }
   } catch (err) {
     return handleActionError(err);
   }
@@ -239,7 +274,6 @@ export async function createDoorcardWithCampusTerm(
         college: data.college as College,
         term: toEnumSeason(data.term),
         year: data.year,
-        isActive: true,
       },
     });
     if (existing) {

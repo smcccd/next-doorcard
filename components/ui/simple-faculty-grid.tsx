@@ -47,7 +47,7 @@ export function SimpleFacultyGrid({
           <div
             key={doorcard.id}
             onClick={() => onDoorcardClick(doorcard)}
-            className={`group grid grid-cols-[2fr,1fr,2fr] gap-4 items-center px-4 py-3 bg-white dark:bg-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors ${
+            className={`group grid grid-cols-[2fr,auto,1fr,2fr] gap-4 items-center px-4 py-4 bg-white dark:bg-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors ${
               index !== doorcards.length - 1
                 ? "border-b border-gray-200 dark:border-gray-700"
                 : ""
@@ -63,36 +63,36 @@ export function SimpleFacultyGrid({
             aria-label={`View office hours for ${doorcard.user.name} at ${doorcard.college}`}
           >
             {/* Faculty Info */}
-            <div className="min-w-0">
+            <div className="min-w-0 flex items-center gap-2">
               <h3 className="font-medium text-sm text-gray-900 dark:text-white group-hover:text-smccd-blue-700 dark:group-hover:text-smccd-blue-400 transition-colors truncate">
                 {doorcard.user.name}
               </h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span
-                  className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                    doorcard.college === "CSM"
-                      ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                      : doorcard.college === "SKYLINE"
-                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-                        : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                  }`}
-                >
-                  {doorcard.college === "CSM"
-                    ? "CSM"
-                    : doorcard.college === "SKYLINE"
-                      ? "Skyline"
-                      : doorcard.college === "CANADA"
-                        ? "Cañada"
-                        : doorcard.college}
-                </span>
-                <span className="text-xs text-gray-600 dark:text-gray-400">
-                  {doorcard.officeNumber || "TBA"}
-                </span>
-              </div>
+              <span className="text-xs text-gray-600 dark:text-gray-400">
+                {doorcard.officeNumber || "TBA"}
+              </span>
             </div>
 
+            {/* Campus Badge */}
+            <span
+              className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                doorcard.college === "CSM"
+                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                  : doorcard.college === "SKYLINE"
+                    ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                    : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+              }`}
+            >
+              {doorcard.college === "CSM"
+                ? "CSM"
+                : doorcard.college === "SKYLINE"
+                  ? "Skyline"
+                  : doorcard.college === "CANADA"
+                    ? "Cañada"
+                    : doorcard.college}
+            </span>
+
             {/* Schedule Hours */}
-            <div className="text-center">
+            <div className="flex items-center justify-center h-full">
               {doorcard.appointmentCount > 0 ? (
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {doorcard.appointmentCount} hours/week

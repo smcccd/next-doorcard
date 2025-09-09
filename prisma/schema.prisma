@@ -38,6 +38,7 @@ model Appointment {
   updatedAt  DateTime
   Doorcard   Doorcard            @relation(fields: [doorcardId], references: [id], onDelete: Cascade)
 
+  @@unique([doorcardId, dayOfWeek, startTime, endTime])
   @@index([category])
   @@index([dayOfWeek])
   @@index([doorcardId])
@@ -65,7 +66,7 @@ model Doorcard {
   DoorcardAnalytics DoorcardAnalytics[]
   DoorcardMetrics   DoorcardMetrics?
 
-  @@unique([userId, college, term, year, isActive])
+  @@unique([userId, college, term, year])
   @@index([college])
   @@index([term, year])
   @@index([userId, createdAt])

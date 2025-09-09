@@ -53,7 +53,7 @@ const errorCounts = new Map<string, number>();
 const errorExamples = new Map<string, any[]>();
 
 // Categorize errors
-errors.forEach((error) => {
+errors.forEach((error: any) => {
   const type = error.type;
   errorCounts.set(type, (errorCounts.get(type) || 0) + 1);
 
@@ -124,12 +124,12 @@ console.log(`\n📊 DETAILED COMPONENT ANALYSIS:`);
 console.log("-".repeat(60));
 
 // User Creation Analysis
-const userErrors = errors.filter((e) => e.type.includes("USER"));
+const userErrors = errors.filter((e: any) => e.type.includes("USER"));
 console.log(`\n👥 USER CREATION ISSUES:`);
 console.log(`Total User Errors: ${userErrors.length.toLocaleString()}`);
 
 const userErrorReasons = new Map<string, number>();
-userErrors.forEach((error) => {
+userErrors.forEach((error: any) => {
   let reason = "Unknown";
 
   if (error.data?.error) {
@@ -161,12 +161,12 @@ userErrorReasons.forEach((count, reason) => {
 });
 
 // Doorcard Analysis
-const doorcardErrors = errors.filter((e) => e.type.includes("DOORCARD"));
+const doorcardErrors = errors.filter((e: any) => e.type.includes("DOORCARD"));
 console.log(`\n🚪 DOORCARD IMPORT ISSUES:`);
 console.log(`Total Doorcard Errors: ${doorcardErrors.length.toLocaleString()}`);
 
 const doorcardErrorReasons = new Map<string, number>();
-doorcardErrors.forEach((error) => {
+doorcardErrors.forEach((error: any) => {
   let reason = "Unknown";
 
   if (error.type === "DOORCARD_NO_USER") {
@@ -189,14 +189,16 @@ doorcardErrorReasons.forEach((count, reason) => {
 });
 
 // Appointment Analysis
-const appointmentErrors = errors.filter((e) => e.type.includes("APPOINTMENT"));
+const appointmentErrors = errors.filter((e: any) =>
+  e.type.includes("APPOINTMENT")
+);
 console.log(`\n📅 APPOINTMENT IMPORT ISSUES:`);
 console.log(
   `Total Appointment Errors: ${appointmentErrors.length.toLocaleString()}`
 );
 
 const appointmentErrorReasons = new Map<string, number>();
-appointmentErrors.forEach((error) => {
+appointmentErrors.forEach((error: any) => {
   let reason = "Unknown";
 
   if (error.type === "APPOINTMENT_NO_USER") {
