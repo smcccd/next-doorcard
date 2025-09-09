@@ -5,6 +5,18 @@ const path = require("path");
 
 console.log("🔍 Checking for existing development processes...");
 
+// Function to check if Next.js dev server is already running and healthy
+const checkHealthyServer = () => {
+  return new Promise((resolve) => {
+    exec(
+      'curl -s http://localhost:3000 > /dev/null && echo "healthy"',
+      (error, stdout) => {
+        resolve(!error && stdout.includes("healthy"));
+      }
+    );
+  });
+};
+
 // Function to kill processes by pattern
 const killProcesses = (pattern, description) => {
   return new Promise((resolve) => {
@@ -39,7 +51,20 @@ const killProcesses = (pattern, description) => {
 
 async function main() {
   try {
-    // Kill existing Next.js dev servers
+    // Check if there's already a healthy server running
+    const isHealthy = await checkHealthyServer();
+
+    if (isHealthy) {
+      console.log(
+        "✅ Development server already running and healthy at http://localhost:3000"
+      );
+      console.log(
+        "💡 Use Ctrl+C to stop the existing server if you need to restart"
+      );
+      process.exit(0);
+    }
+
+    // Kill existing Next.js dev servers only if no healthy server found
     await killProcesses("next.*dev|next-server", "Next.js dev server");
 
     // Kill any processes using ports 3000-3001

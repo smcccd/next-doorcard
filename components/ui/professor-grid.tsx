@@ -16,6 +16,7 @@ const COLLEGE_BADGE_NAMES: Record<College, string> = {
   CSM: "CSM",
   SKYLINE: "Skyline",
   CANADA: "Cañada",
+  DISTRICT_OFFICE: "District",
 };
 
 interface ProfessorGridProps {

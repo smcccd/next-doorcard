@@ -8,6 +8,7 @@ import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,
   TIME_SLOTS,
+  ALL_DAYS,
 } from "@/lib/doorcard-constants";
 
 // Appointment interface for PDF generation
@@ -27,14 +28,7 @@ interface SimplePDFProps {
   onDownload?: () => void;
 }
 
-// Days for weekday-only view
-const DAYS = [
-  { key: "MONDAY", label: "Monday" },
-  { key: "TUESDAY", label: "Tuesday" },
-  { key: "WEDNESDAY", label: "Wednesday" },
-  { key: "THURSDAY", label: "Thursday" },
-  { key: "FRIDAY", label: "Friday" },
-];
+// Days are now imported from shared constants
 
 function generatePrintableHTML(doorcard: DoorcardLite): string {
   const displayName = doorcard.user
@@ -49,6 +43,14 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
     }
     byDay[apt.dayOfWeek].push(apt);
   });
+
+  // Auto-detect if weekend appointments exist
+  const hasWeekendAppointments = Boolean(
+    byDay.SATURDAY?.length || byDay.SUNDAY?.length
+  );
+
+  // Show weekends only if weekend appointments exist
+  const daysToShow = hasWeekendAppointments ? ALL_DAYS : ALL_DAYS.slice(0, 5);
 
   // Helper to calculate rowspan for appointments
   const getRowspan = (appointment: AppointmentForPDF) => {
@@ -116,6 +118,18 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
       line-height: 1.4;
       color: #1f2937;
       background: white;
+    }
+    
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
     }
     
     .header {
@@ -335,11 +349,41 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
     }
   </div>
 
-  <table class="schedule-table">
+  <!-- Screen reader accessible appointment list -->
+  <div class="sr-only" aria-label="Appointment Schedule">
+    <h2>Weekly Schedule</h2>
+    ${daysToShow
+      .map((day) => {
+        const dayAppointments = byDay[day.key] || [];
+        if (dayAppointments.length === 0) return "";
+
+        return `
+        <div>
+          <h3>${day.label}</h3>
+          <ol>
+            ${dayAppointments
+              .map(
+                (appointment) => `
+              <li>
+                ${appointment.name} from ${appointment.startTime} to ${appointment.endTime}
+                ${appointment.location ? ` at ${appointment.location}` : ""}
+                , Category: ${CATEGORY_LABELS[appointment.category as keyof typeof CATEGORY_LABELS] || appointment.category}
+              </li>
+            `
+              )
+              .join("")}
+          </ol>
+        </div>
+      `;
+      })
+      .join("")}
+  </div>
+
+  <table class="schedule-table" aria-hidden="true">
     <thead>
       <tr>
         <th class="time-cell">Time</th>
-        ${DAYS.map((day) => `<th class="day-header">${day.label}</th>`).join("")}
+        ${daysToShow.map((day) => `<th class="day-header">${day.label}</th>`).join("")}
       </tr>
     </thead>
     <tbody>
@@ -353,7 +397,7 @@ function generatePrintableHTML(doorcard: DoorcardLite): string {
         html += `<td class="time-cell">${showTime ? slot.label : ""}</td>`;
 
         // Day columns
-        DAYS.forEach((day) => {
+        daysToShow.forEach((day) => {
           const appointment = byDay[day.key]?.find((apt) =>
             isSlotCovered(apt, slot.value)
           );

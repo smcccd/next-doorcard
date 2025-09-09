@@ -1,11 +1,9 @@
 "use client";
 
-import { useCallback, useState, useActionState } from "react";
+import { useState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
-import {
-  createDoorcardWithCampusTerm,
-  validateCampusTerm,
-} from "@/app/doorcard/actions";
+import { useSearchParams } from "next/navigation";
+import { handleNewDoorcardForm, handleEditDoorcardCampusForm } from "./action";
 import { COLLEGE_META, type College } from "@/types/doorcard";
 import {
   Select,
@@ -19,7 +17,8 @@ import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 const TERM_OPTIONS = ["Fall", "Spring", "Summer"] as const;
-const COLLEGE_OPTIONS = Object.keys(COLLEGE_META) as College[];
+const COLLEGE_OPTIONS = ["SKYLINE", "CSM", "CANADA"] as const;
+type ValidCollege = (typeof COLLEGE_OPTIONS)[number];
 // Generate academic years starting from current year
 const getCurrentAcademicYear = () => {
   const now = new Date();
@@ -37,7 +36,6 @@ const BASE_YEARS = Array.from({ length: 5 }, (_, i) =>
 );
 
 type FieldErrors = { college?: string; term?: string; year?: string };
-type ActionState = { success: boolean; message?: string };
 
 interface Props {
   /** If undefined => new doorcard flow */
@@ -80,34 +78,42 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
       ? [existingYear, ...BASE_YEARS]
       : BASE_YEARS;
 
-  const [college, setCollege] = useState<College | "">(
-    (doorcard?.college as College) ?? (userCollege as College) ?? ""
+  const [college, setCollege] = useState<ValidCollege | "">(
+    (doorcard?.college as ValidCollege) ?? (userCollege as ValidCollege) ?? ""
   );
   const [term, setTerm] = useState(doorcard?.term ?? "");
   const [year, setYear] = useState(existingYear ?? "");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [clientTried, setClientTried] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
-  // Simple server action without useCallback to avoid hook ordering issues
-  const [state, serverAction] = useActionState<ActionState, FormData>(
-    (prev: ActionState, formData: FormData) => {
-      if (doorcard?.id) {
-        return validateCampusTerm(doorcard.id, prev, formData); // edit flow
-      } else {
-        return createDoorcardWithCampusTerm(prev, formData); // new flow
-      }
-    },
-    { success: true }
-  );
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const error = searchParams.get("error");
+    console.log("[FORM] URL error param:", error);
+    if (error) {
+      console.log("[FORM] Setting server error:", error);
+      setServerError(error);
+    }
+  }, [searchParams]);
+
+  // Create the appropriate server action
+  const formAction = doorcard?.id
+    ? handleEditDoorcardCampusForm.bind(null, doorcard.id)
+    : handleNewDoorcardForm;
 
   const validateField = (
     name: keyof FieldErrors,
     value: string
   ): string | undefined => {
     if (!value) return "Required";
-    if (name === "college" && !COLLEGE_OPTIONS.includes(value as College))
+    if (name === "college" && !COLLEGE_OPTIONS.includes(value as ValidCollege))
       return "Invalid campus";
-    if (name === "term" && !TERM_OPTIONS.includes(value as any))
+    if (
+      name === "term" &&
+      !TERM_OPTIONS.includes(value as (typeof TERM_OPTIONS)[number])
+    )
       return "Invalid term";
     if (name === "year" && !YEAR_OPTIONS.includes(value)) return "Invalid year";
     return undefined;
@@ -120,17 +126,18 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
   });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
     setClientTried(true);
     const errs = validateAll();
     setFieldErrors(errs);
-    if (Object.values(errs).some(Boolean)) return;
 
-    const formData = new FormData();
-    formData.set("college", college);
-    formData.set("term", term);
-    formData.set("year", year);
-    serverAction(formData);
+    // If there are client-side validation errors, prevent submission
+    if (Object.values(errs).some(Boolean)) {
+      e.preventDefault();
+      return;
+    }
+
+    // If validation passes, let the form submit naturally to the action
+    // The form action will handle the server-side logic
   };
 
   const anyClientErrors = Object.values(fieldErrors).some(Boolean);
@@ -152,12 +159,22 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
         </div>
       </div>
 
-      {!state?.success && state?.message && <Alert>{state.message}</Alert>}
+      {serverError && <Alert>{serverError}</Alert>}
       {clientTried && anyClientErrors && (
         <Alert>Please fill in all required fields correctly.</Alert>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+      <form
+        action={formAction}
+        onSubmit={handleSubmit}
+        className="space-y-8"
+        noValidate
+      >
+        {/* Hidden inputs to pass form values */}
+        <input type="hidden" name="college" value={college} />
+        <input type="hidden" name="term" value={term} />
+        <input type="hidden" name="year" value={year} />
+
         <fieldset className="border border-gray-200 rounded-lg p-6">
           <legend className="text-base font-medium text-gray-900 px-2">
             Campus and Term Selection
@@ -171,7 +188,7 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
               <Select
                 value={college}
                 onValueChange={(v) => {
-                  setCollege(v as College);
+                  setCollege(v as ValidCollege);
                   if (clientTried)
                     setFieldErrors((p) => ({
                       ...p,
@@ -193,7 +210,7 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
                 <SelectContent>
                   {COLLEGE_OPTIONS.map((c) => (
                     <SelectItem key={c} value={c}>
-                      {COLLEGE_META[c].label}
+                      {COLLEGE_META[c as keyof typeof COLLEGE_META].label}
                     </SelectItem>
                   ))}
                 </SelectContent>

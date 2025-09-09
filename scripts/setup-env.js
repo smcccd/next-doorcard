@@ -1,0 +1,69 @@
+#!/usr/bin/env node
+
+const fs = require("fs");
+const path = require("path");
+
+// Load environment variables in correct precedence (.env.local overrides .env)
+require("dotenv").config({ path: ".env" });
+require("dotenv").config({ path: ".env.local", override: true });
+
+const isProduction = process.env.NODE_ENV === "production";
+const isDevelopment =
+  process.env.NODE_ENV === "development" || !process.env.NODE_ENV;
+
+console.log("🔧 Setting up environment...");
+console.log(`Environment: ${isProduction ? "production" : "development"}`);
+
+// Determine database configuration
+const databaseConfig = process.env.DATABASE_URL;
+console.log(
+  `Database: ${databaseConfig ? (databaseConfig.startsWith("file:") ? "SQLite (local)" : "PostgreSQL (remote)") : "NOT SET"}`
+);
+
+// Create schema based on environment
+const schemaTemplate = `generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "${databaseConfig?.startsWith("file:") ? "sqlite" : "postgresql"}"
+  url      = env("DATABASE_URL")
+}`;
+
+// Read the current schema
+const schemaPath = path.join(__dirname, "..", "prisma", "schema.prisma");
+const currentSchema = fs.readFileSync(schemaPath, "utf8");
+
+// Extract everything after the datasource block
+const modelStart = currentSchema.indexOf("\nmodel ");
+if (modelStart === -1) {
+  console.error("❌ Could not find models in schema.prisma");
+  process.exit(1);
+}
+
+const models = currentSchema.substring(modelStart);
+const newSchema = schemaTemplate + models;
+
+// Only write if changed to avoid unnecessary rebuilds
+if (currentSchema !== newSchema) {
+  fs.writeFileSync(schemaPath, newSchema);
+  console.log("✅ Updated prisma/schema.prisma for current environment");
+} else {
+  console.log("✅ Schema is already configured correctly");
+}
+
+// Create a .env file specifically for Prisma CLI (since it reads .env first)
+const prismaEnvPath = path.join(__dirname, "..", ".env");
+const currentEnvContent = fs.readFileSync(prismaEnvPath, "utf8");
+const updatedEnvContent = currentEnvContent.replace(
+  /DATABASE_URL=.*/,
+  `DATABASE_URL="${databaseConfig}"`
+);
+
+if (currentEnvContent !== updatedEnvContent) {
+  fs.writeFileSync(prismaEnvPath, updatedEnvContent);
+  console.log("✅ Updated .env with current database URL");
+}
+
+console.log("🎉 Environment setup complete");

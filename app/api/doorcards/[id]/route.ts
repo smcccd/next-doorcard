@@ -6,6 +6,12 @@ import { COLLEGES } from "@/types/doorcard";
 import { Prisma, College, TermSeason } from "@prisma/client";
 import { getTermStatus } from "@/lib/doorcard-status";
 import { randomUUID } from "crypto";
+import {
+  validateAppointments,
+  normalizeAppointments,
+  timeBlockSchema,
+} from "@/lib/appointment-validation";
+import { sanitizeDoorcardData, sanitizeAppointmentData } from "@/lib/sanitize";
 
 /* ----------------------------------------------------------------------------
  * Schemas / Helpers
@@ -20,16 +26,7 @@ const baseUpdateSchema = z.object({
   college: z.enum(COLLEGES).optional(),
 });
 
-const timeBlockLegacySchema = z.object({
-  activity: z.string().optional(),
-  name: z.string().optional(),
-  startTime: z.string(),
-  endTime: z.string(),
-  day: z.string().optional(), // legacy
-  dayOfWeek: z.string().optional(), // current
-  category: z.string().optional(),
-  location: z.string().nullable().optional(),
-});
+const timeBlockLegacySchema = timeBlockSchema;
 
 const requestSchemaPUT = baseUpdateSchema.extend({
   timeBlocks: z.array(timeBlockLegacySchema).optional(), // legacy create/edit
@@ -48,25 +45,76 @@ async function replaceAppointments(
   doorcardId: string,
   blocks: z.infer<typeof timeBlockLegacySchema>[] | undefined
 ) {
-  if (!blocks) return;
+  if (!blocks) return { success: true };
 
-  await prisma.appointment.deleteMany({ where: { doorcardId } });
+  // Get existing appointments for validation
+  const existingAppointments = await prisma.appointment.findMany({
+    where: { doorcardId },
+  });
 
-  if (blocks.length === 0) return;
+  // Validate appointments
+  const normalized = normalizeAppointments(blocks, doorcardId);
+  const validation = validateAppointments(blocks as any, existingAppointments);
 
-  const data = blocks.map((b) => ({
-    id: randomUUID(),
-    doorcardId,
-    name: b.activity || b.name || "Office Hours",
-    startTime: b.startTime,
-    endTime: b.endTime,
-    dayOfWeek: (b.dayOfWeek || b.day || "MONDAY") as any,
-    category: (b.category as any) || "OFFICE_HOURS",
-    location: b.location ?? null,
-    updatedAt: new Date(),
-  }));
+  if (!validation.isValid) {
+    return {
+      success: false,
+      errors: validation.errors,
+      warnings: validation.warnings,
+    };
+  }
 
-  await prisma.appointment.createMany({ data });
+  // Delete existing and create new appointments atomically
+  try {
+    await prisma.$transaction(async (tx) => {
+      // Delete all existing appointments for this doorcard
+      await tx.appointment.deleteMany({ where: { doorcardId } });
+
+      // If no new appointments, we're done
+      if (blocks.length === 0) return;
+
+      // Create new appointments
+      const data = normalized.map((b) => ({
+        id: b.id || randomUUID(),
+        doorcardId: b.doorcardId,
+        name: b.name,
+        startTime: b.startTime,
+        endTime: b.endTime,
+        dayOfWeek: b.dayOfWeek,
+        category: b.category,
+        location: b.location,
+        updatedAt: new Date(),
+      }));
+
+      await tx.appointment.createMany({ data });
+    });
+
+    return { success: true, warnings: validation.warnings };
+  } catch (error) {
+    console.error("Transaction failed in replaceAppointments:", error);
+
+    // Handle unique constraint violation (duplicate appointment)
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return {
+        success: false,
+        errors: [
+          "Duplicate appointment detected. Each time slot can only have one appointment.",
+        ],
+        warnings: validation.warnings,
+      };
+    }
+
+    return {
+      success: false,
+      errors: ["Failed to update appointments. Please try again."],
+      warnings: validation.warnings,
+    };
+  }
 }
 
 function includeDoorcard(): Prisma.DoorcardInclude {
@@ -117,8 +165,19 @@ export async function PUT(
   }
 
   try {
-    const body = await req.json();
-    const parsed = requestSchemaPUT.parse(body);
+    const rawBody = await req.json();
+
+    // Sanitize doorcard data
+    const sanitizedData = sanitizeDoorcardData(rawBody);
+
+    // Sanitize time blocks if they exist
+    if (sanitizedData.timeBlocks && Array.isArray(sanitizedData.timeBlocks)) {
+      sanitizedData.timeBlocks = sanitizedData.timeBlocks.map((block: any) =>
+        sanitizeAppointmentData(block)
+      );
+    }
+
+    const parsed = requestSchemaPUT.parse(sanitizedData);
 
     const resolvedParams = await params;
     // Ensure doorcard belongs to user and is not archived
@@ -144,7 +203,21 @@ export async function PUT(
       );
     }
 
-    await replaceAppointments(resolvedParams.id, parsed.timeBlocks);
+    const appointmentResult = await replaceAppointments(
+      resolvedParams.id,
+      parsed.timeBlocks
+    );
+
+    if (!appointmentResult.success) {
+      return NextResponse.json(
+        {
+          error: "Appointment validation failed",
+          details: appointmentResult.errors,
+          warnings: appointmentResult.warnings,
+        },
+        { status: 400 }
+      );
+    }
 
     const doorcard = await prisma.doorcard.update({
       where: { id: resolvedParams.id },
@@ -159,7 +232,12 @@ export async function PUT(
       include: includeDoorcard(),
     });
 
-    return NextResponse.json(doorcard);
+    const response: any = { ...doorcard };
+    if (appointmentResult.warnings && appointmentResult.warnings.length > 0) {
+      response.warnings = appointmentResult.warnings;
+    }
+
+    return NextResponse.json(response);
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
@@ -189,8 +267,19 @@ export async function PATCH(
   }
 
   try {
-    const body = await req.json();
-    const parsed = requestSchemaPATCH.parse(body);
+    const rawBody = await req.json();
+
+    // Sanitize doorcard data
+    const sanitizedData = sanitizeDoorcardData(rawBody);
+
+    // Sanitize timeblocks if they exist
+    if (sanitizedData.timeblocks && Array.isArray(sanitizedData.timeblocks)) {
+      sanitizedData.timeblocks = sanitizedData.timeblocks.map((block: any) =>
+        sanitizeAppointmentData(block)
+      );
+    }
+
+    const parsed = requestSchemaPATCH.parse(sanitizedData);
 
     const resolvedParams = await params;
     const exists = await prisma.doorcard.findFirst({
@@ -215,7 +304,21 @@ export async function PATCH(
       );
     }
 
-    await replaceAppointments(resolvedParams.id, parsed.timeblocks);
+    const appointmentResult = await replaceAppointments(
+      resolvedParams.id,
+      parsed.timeblocks
+    );
+
+    if (!appointmentResult.success) {
+      return NextResponse.json(
+        {
+          error: "Appointment validation failed",
+          details: appointmentResult.errors,
+          warnings: appointmentResult.warnings,
+        },
+        { status: 400 }
+      );
+    }
 
     const doorcard = await prisma.doorcard.update({
       where: { id: resolvedParams.id },
@@ -232,7 +335,12 @@ export async function PATCH(
       include: includeDoorcard(),
     });
 
-    return NextResponse.json(doorcard);
+    const response: any = { ...doorcard };
+    if (appointmentResult.warnings && appointmentResult.warnings.length > 0) {
+      response.warnings = appointmentResult.warnings;
+    }
+
+    return NextResponse.json(response);
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(

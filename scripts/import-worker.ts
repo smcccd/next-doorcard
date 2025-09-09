@@ -87,8 +87,8 @@ async function processUserBatch(users: UserData[]): Promise<WorkerResult> {
 
     return {
       success: true,
-      created: result.count,
-      errors: [],
+      created,
+      errors,
       idMappings,
     };
   } catch (error) {
@@ -134,15 +134,26 @@ async function processAppointmentBatch(
   appointments: AppointmentData[]
 ): Promise<WorkerResult> {
   try {
-    const result = await prisma.appointment.createMany({
-      data: appointments,
-      skipDuplicates: true,
-    });
+    // Process appointments individually to handle constraint violations
+    let created = 0;
+    const errors: string[] = [];
+
+    for (const appointmentData of appointments) {
+      try {
+        await prisma.appointment.create({ data: appointmentData });
+        created++;
+      } catch (error: any) {
+        // Skip if appointment already exists or violates unique constraint
+        if (error.code !== "P2002") {
+          errors.push(`Failed to create appointment: ${error.message}`);
+        }
+      }
+    }
 
     return {
       success: true,
-      created: result.count,
-      errors: [],
+      created,
+      errors,
     };
   } catch (error) {
     return {

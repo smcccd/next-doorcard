@@ -1,0 +1,15 @@
+[2025-08-08T04:09:02.988Z] 🚀 NEON PRODUCTION MIGRATION STARTED
+[2025-08-08T04:09:02.990Z] 📡 Connecting to databases...
+[2025-08-08T04:09:03.013Z] ❌ NEON MIGRATION FAILED: PrismaClientInitializationError: 
+Invalid `prisma.$queryRaw()` invocation:
+
+
+error: Error validating datasource `db`: the URL must start with the protocol `file:`.
+  -->  schema.prisma:8
+   | 
+ 7 |   provider = "sqlite"
+ 8 |   url      = env("DATABASE_URL")
+   | 
+
+Validation Error Count: 1
+[2025-08-08T04:09:35.534Z] 🚀 NEON PRODUCTION MIGRATION STARTED

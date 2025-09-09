@@ -60,10 +60,33 @@ function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-// Wrap with withAuth for non-Cypress requests
+// Export middleware properly
 export default function (req: NextRequest) {
-  // TEMPORARY: Always use simplified middleware
-  return middleware(req);
+  // Check if it's Cypress first
+  const userAgent = req.headers.get("user-agent") || "";
+  const isCypress =
+    userAgent.includes("Cypress") ||
+    userAgent.includes("Chrome-Lighthouse") ||
+    req.cookies.get("cypress-test")?.value === "true" ||
+    req.headers.get("x-cypress-test") === "true" ||
+    process.env.CYPRESS === "true";
+
+  // Use simplified middleware for Cypress
+  if (isCypress) {
+    return middleware(req);
+  }
+
+  // For production, use proper withAuth wrapper
+  return (withAuth as any)(
+    function middleware(req: any) {
+      return NextResponse.next();
+    },
+    {
+      callbacks: {
+        authorized: ({ token }: any) => !!token,
+      },
+    }
+  )(req, undefined as any);
 }
 
 export const config = {

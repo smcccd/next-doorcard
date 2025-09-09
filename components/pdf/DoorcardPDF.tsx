@@ -15,6 +15,7 @@ import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,
   TIME_SLOTS,
+  WEEKDAYS_ONLY,
 } from "@/lib/doorcard-constants";
 
 // Register fonts for better typography
@@ -207,14 +208,10 @@ const styles = StyleSheet.create({
 });
 
 // Days for weekday-only view (more compact for single page)
-
-const DAYS = [
-  { key: "MONDAY", label: "Mon" },
-  { key: "TUESDAY", label: "Tue" },
-  { key: "WEDNESDAY", label: "Wed" },
-  { key: "THURSDAY", label: "Thu" },
-  { key: "FRIDAY", label: "Fri" },
-];
+const DAYS = WEEKDAYS_ONLY.map((day) => ({
+  key: day.key,
+  label: day.label.substring(0, 3), // Mon, Tue, Wed, Thu, Fri
+}));
 
 interface DoorcardPDFProps {
   doorcard: DoorcardLite;

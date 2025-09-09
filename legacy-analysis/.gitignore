@@ -1,0 +1,13 @@
+# Ignore all legacy code to prevent accidental commits
+legacy/
+old-doorcard/
+*.asp
+*.asa
+*.inc
+web.config
+*.mdb
+*.accdb
+connection_strings.txt
+passwords.txt
+secrets.txt
+EOF < /dev/null

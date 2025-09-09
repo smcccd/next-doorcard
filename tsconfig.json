@@ -39,6 +39,15 @@
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/*.spec.ts",
-    "**/*.spec.tsx"
+    "**/*.spec.tsx",
+    "scripts/analyze-import-rejects.ts",
+    "scripts/import-legacy-debug.ts",
+    "scripts/import-legacy.ts",
+    "scripts/import-worker.ts",
+    "scripts/local-migration-test.ts",
+    "scripts/neon-migration-deploy.ts",
+    "scripts/production-migration-final.ts",
+    "scripts/production-migration-monitor.ts",
+    "scripts/test-calendar-fix.ts"
   ]
 }

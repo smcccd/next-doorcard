@@ -38,17 +38,13 @@ export function NavDropdown({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="text-white hover:text-white focus:text-white hover:bg-gray-900 focus:bg-gray-900 gap-2 bg-transparent border-gray-600 hover:border-gray-400 focus:border-gray-400"
+          className="text-gray-700 dark:text-gray-300 hover:text-smccd-blue-900 dark:hover:text-smccd-blue-400 hover:bg-smccd-blue-50 dark:hover:bg-smccd-blue-950/20 gap-2 bg-transparent border-gray-300 dark:border-gray-600 hover:border-smccd-blue-300 dark:hover:border-smccd-blue-700 focus:border-smccd-blue-500 transition-all duration-200"
         >
-          {/* Show different content on mobile vs desktop */}
-          <span className="hidden xl:block text-sm font-medium">Menu</span>
-          <span className="hidden sm:block xl:hidden text-sm font-medium">
-            Menu
+          <User className="h-4 w-4" />
+          <span className="hidden sm:block text-sm font-medium truncate max-w-[150px]">
+            {userDisplay}
           </span>
-          <span className="sm:hidden">
-            <Menu className="h-5 w-5" />
-          </span>
-          <ChevronDown className="h-4 w-4 hidden sm:block" />
+          <ChevronDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent

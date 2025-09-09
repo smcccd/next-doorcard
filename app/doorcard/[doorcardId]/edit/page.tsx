@@ -145,81 +145,87 @@ export default async function EditDoorcardPage({
     !doorcard.college ||
     doorcard.Appointment.length === 0;
 
-  /* Progress line width (0%, 33%, 66%, 100%) */
-  const progressPct = (step / (STEPS.length - 1)) * 100;
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-4xl p-6">
+      <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="mb-4 flex items-center justify-between">
-            <Button variant="ghost" asChild>
+          <div className="mb-6">
+            <Button variant="ghost" size="sm" asChild className="mb-4 -ml-3">
               <Link href="/dashboard">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Dashboard
               </Link>
             </Button>
+            <h1 className="text-3xl font-bold text-gray-900">Edit Doorcard</h1>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            {doorcard.name
-              ? `Edit ${doorcard.name}'s Doorcard`
-              : "Edit Doorcard"}
-          </h1>
 
-          {/* Step indicator */}
-          <div className="relative mt-6">
-            {/* Base line */}
-            <div className="absolute top-5 left-0 right-0 h-px bg-gray-200" />
-            {/* Progress line */}
-            <div
-              className="absolute top-5 left-0 h-px bg-blue-600 transition-all"
-              style={{ width: `${progressPct}%` }}
-            />
-
-            <ol className="relative flex justify-between">
+          {/* Step indicator - Clean shadcn pattern */}
+          <div className="relative mt-8">
+            <nav
+              aria-label="Progress"
+              className="flex items-center justify-between"
+            >
               {STEPS.map((s, idx) => {
-                const state =
-                  step === idx
-                    ? "current"
-                    : step > idx
-                      ? "complete"
-                      : "upcoming";
+                const isComplete = step > idx;
+                const isCurrent = step === idx;
+
                 return (
-                  <li key={s.title} className="flex flex-col items-center">
-                    <div
-                      className={[
-                        "flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-medium transition-colors",
-                        state === "complete" &&
-                          "bg-blue-600 border-blue-600 text-white",
-                        state === "current" &&
-                          "bg-white border-blue-600 text-blue-600",
-                        state === "upcoming" &&
-                          "bg-white border-gray-300 text-gray-500",
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                      aria-current={state === "current" ? "step" : undefined}
-                    >
-                      {idx + 1}
-                    </div>
-                    <div className="mt-2 text-center">
-                      <div className="text-sm font-medium text-gray-900">
-                        {s.title}
+                  <div key={s.title} className="flex items-center">
+                    {/* Step circle */}
+                    <div className="relative flex flex-col items-center">
+                      <div
+                        className={`flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-medium transition-colors ${
+                          isComplete
+                            ? "border-blue-600 bg-blue-600 text-white"
+                            : isCurrent
+                              ? "border-blue-600 bg-white text-blue-600"
+                              : "border-gray-300 bg-white text-gray-500"
+                        }`}
+                        aria-current={isCurrent ? "step" : undefined}
+                      >
+                        {isComplete ? (
+                          <span className="text-white">✓</span>
+                        ) : (
+                          idx + 1
+                        )}
                       </div>
-                      <div className="text-xs text-gray-500">{s.desc}</div>
+
+                      {/* Step labels */}
+                      <div className="mt-2 text-center">
+                        <div className="text-sm font-medium text-gray-900">
+                          {s.title}
+                        </div>
+                        <div className="text-xs text-gray-700">{s.desc}</div>
+                      </div>
                     </div>
-                  </li>
+
+                    {/* Connecting line */}
+                    {idx < STEPS.length - 1 && (
+                      <div className="flex-1 mx-4 mt-[-20px]">
+                        <div
+                          className={`h-0.5 transition-colors ${
+                            step > idx ? "bg-blue-600" : "bg-gray-200"
+                          }`}
+                        />
+                      </div>
+                    )}
+                  </div>
                 );
               })}
-            </ol>
+            </nav>
+
+            {/* Screen reader announcements */}
+            <div className="sr-only" aria-live="polite" aria-atomic="true">
+              Step {step + 1} of {STEPS.length}: {STEPS[step]?.title}
+            </div>
           </div>
         </div>
 
         {/* Step content */}
         <Card>
           <CardHeader>
-            <CardTitle>{STEPS[step]?.title ?? "Step"}</CardTitle>
+            <CardTitle as="h2">{STEPS[step]?.title ?? "Step"}</CardTitle>
           </CardHeader>
           <CardContent>
             {step === 0 && <CampusTermForm doorcard={doorcardForForms} />}

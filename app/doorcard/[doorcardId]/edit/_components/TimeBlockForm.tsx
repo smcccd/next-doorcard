@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useActionState } from "react";
+import { useState, useActionState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,8 +13,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { CalendarDays, Clock, Plus, X, AlertCircle } from "lucide-react";
 import { updateTimeBlocks } from "@/app/doorcard/actions";
+import { DAY_LABELS, sortDaysByCalendarOrder } from "@/lib/doorcard-constants";
 import type { AppointmentCategory, DayOfWeek } from "@prisma/client";
 
 /* -------------------------------------------------------------------------- */
@@ -36,7 +44,7 @@ interface Props {
   draftId?: string;
 }
 
-const DAYS: DayOfWeek[] = [
+const DAYS: DayOfWeek[] = sortDaysByCalendarOrder([
   "MONDAY",
   "TUESDAY",
   "WEDNESDAY",
@@ -44,16 +52,8 @@ const DAYS: DayOfWeek[] = [
   "FRIDAY",
   "SATURDAY",
   "SUNDAY",
-];
-const DAY_LABEL: Record<DayOfWeek, string> = {
-  MONDAY: "Monday",
-  TUESDAY: "Tuesday",
-  WEDNESDAY: "Wednesday",
-  THURSDAY: "Thursday",
-  FRIDAY: "Friday",
-  SATURDAY: "Saturday",
-  SUNDAY: "Sunday",
-};
+]);
+const DAY_LABEL = DAY_LABELS;
 
 const CATEGORY_OPTIONS: { value: AppointmentCategory; label: string }[] = [
   { value: "OFFICE_HOURS", label: "Office Hours" },
@@ -94,15 +94,78 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Time Formatting Utility                                                   */
+/* -------------------------------------------------------------------------- */
+function formatTime12Hour(time24: string): string {
+  const [hours, minutes] = time24.split(":").map(Number);
+  const period = hours >= 12 ? "PM" : "AM";
+  const hours12 = hours % 12 || 12;
+  return `${hours12}:${minutes.toString().padStart(2, "0")} ${period}`;
+}
+
+function formatTimeRange(startTime: string, endTime: string): string {
+  return `${formatTime12Hour(startTime)}–${formatTime12Hour(endTime)}`;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Conflict Detection Utility                                                */
+/* -------------------------------------------------------------------------- */
+function checkConflicts(
+  days: DayOfWeek[],
+  startTime: string,
+  endTime: string,
+  existingBlocks: TimeBlock[]
+): string | null {
+  for (const day of days) {
+    const dayBlocks = existingBlocks.filter((b) => b.day === day);
+
+    for (const block of dayBlocks) {
+      // Check if times overlap
+      if (
+        (startTime >= block.startTime && startTime < block.endTime) ||
+        (endTime > block.startTime && endTime <= block.endTime) ||
+        (startTime <= block.startTime && endTime >= block.endTime)
+      ) {
+        return `Time conflict on ${DAY_LABEL[day]} with ${formatTimeRange(
+          block.startTime,
+          block.endTime
+        )} ${block.activity}`;
+      }
+    }
+  }
+
+  return null;
+}
+
+/* -------------------------------------------------------------------------- */
 /* Component                                                                  */
 /* -------------------------------------------------------------------------- */
 export default function TimeBlockForm({ doorcard, draftId }: Props) {
   console.log("draftId", draftId);
-  const [blocks, setBlocks] = useState<TimeBlock[]>(doorcard.timeBlocks || []);
+
+  // Create a unique key for this doorcard's time blocks
+  const storageKey = `doorcard-timeblocks-${doorcard.id}`;
+
+  // Initialize blocks from localStorage if available, otherwise from doorcard
+  const [blocks, setBlocks] = useState<TimeBlock[]>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error("Failed to parse saved time blocks:", e);
+        }
+      }
+    }
+    return doorcard.timeBlocks || [];
+  });
+
   const [adding, setAdding] = useState(false);
   const [mode, setMode] = useState<"single" | "repeat">("single");
   const [selectedDays, setSelectedDays] = useState<DayOfWeek[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   const [draft, setDraft] = useState<BlockDraft>({
     startTime: "",
@@ -117,6 +180,27 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
     updateTimeBlocks.bind(null, doorcard.id),
     { success: true } as { success: boolean; message?: string }
   );
+
+  // Save blocks to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(storageKey, JSON.stringify(blocks));
+    }
+  }, [blocks, storageKey]);
+
+  // Clear localStorage when navigating away or on successful submission
+  useEffect(() => {
+    // The updateTimeBlocks action redirects on success, so we need to clean up
+    // localStorage when the component unmounts
+    return () => {
+      // Only clear if we're navigating away after a successful save
+      // We can detect this by checking if we're on step 3 (preview)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get("step") === "3") {
+        localStorage.removeItem(storageKey);
+      }
+    };
+  }, [storageKey]);
 
   /* ---------------------------------------------------------------------- */
   /* Validation                                                             */
@@ -211,7 +295,6 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
   };
 
   const handleEdit = (b: TimeBlock) => {
-    setAdding(true);
     setMode("single");
     setEditingId(b.id);
     setSelectedDays([b.day]);
@@ -222,6 +305,7 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
       location: b.location || "",
       category: b.category,
     });
+    setEditModalOpen(true);
   };
 
   const handleRemove = (id: string) =>
@@ -278,7 +362,7 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
                       <div>
                         <div className="font-medium">
                           <Clock className="mr-1 inline h-4 w-4" />
-                          {b.startTime}–{b.endTime}
+                          {formatTimeRange(b.startTime, b.endTime)}
                         </div>
                         <div className="text-gray-600">
                           {b.activity}
@@ -646,6 +730,193 @@ export default function TimeBlockForm({ doorcard, draftId }: Props) {
           <SubmitButton disabled={blocks.length === 0} />
         </form>
       )}
+
+      {/* Edit Modal */}
+      <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Time Block</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-4">
+            {/* Day (read-only for edit) */}
+            <div>
+              <Label className="mb-1 block">Day</Label>
+              <div className="text-sm font-medium bg-gray-50 rounded px-3 py-2">
+                {selectedDays[0] ? DAY_LABEL[selectedDays[0]] : ""}
+              </div>
+            </div>
+
+            {/* Times */}
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <Label htmlFor="modal-startTime">
+                  Start <span className="text-red-600">*</span>
+                </Label>
+                <Input
+                  id="modal-startTime"
+                  type="time"
+                  value={draft.startTime}
+                  onChange={(e) => {
+                    setDraft((d) => ({ ...d, startTime: e.target.value }));
+                    setErrors({});
+                  }}
+                  className={errors.startTime ? "border-red-500" : ""}
+                />
+                {errors.startTime && (
+                  <p className="mt-1 text-xs text-red-600">
+                    {errors.startTime}
+                  </p>
+                )}
+              </div>
+              <div className="flex-1">
+                <Label htmlFor="modal-endTime">
+                  End <span className="text-red-600">*</span>
+                </Label>
+                <Input
+                  id="modal-endTime"
+                  type="time"
+                  value={draft.endTime}
+                  onChange={(e) => {
+                    setDraft((d) => ({ ...d, endTime: e.target.value }));
+                    setErrors({});
+                  }}
+                  className={errors.endTime ? "border-red-500" : ""}
+                />
+                {errors.endTime && (
+                  <p className="mt-1 text-xs text-red-600">{errors.endTime}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Type */}
+            <div>
+              <Label htmlFor="modal-category">
+                Type <span className="text-red-600">*</span>
+              </Label>
+              <Select
+                value={draft.category}
+                onValueChange={(v) => {
+                  setDraft((d) => ({
+                    ...d,
+                    category: v as AppointmentCategory,
+                    activity: v === "OFFICE_HOURS" ? "" : d.activity,
+                  }));
+                  setErrors({});
+                }}
+              >
+                <SelectTrigger id="modal-category">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORY_OPTIONS.map((c) => (
+                    <SelectItem key={c.value} value={c.value}>
+                      {c.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Activity */}
+            <div>
+              <Label htmlFor="modal-activity">
+                {draft.category === "OFFICE_HOURS"
+                  ? "Title (optional)"
+                  : "Activity / Course"}
+                {draft.category !== "OFFICE_HOURS" && (
+                  <span className="text-red-600">*</span>
+                )}
+              </Label>
+              <Input
+                id="modal-activity"
+                value={draft.activity}
+                placeholder={
+                  draft.category === "OFFICE_HOURS"
+                    ? "Office Hours"
+                    : "e.g. MATH 101"
+                }
+                onChange={(e) => {
+                  setDraft((d) => ({ ...d, activity: e.target.value }));
+                  setErrors({});
+                }}
+                className={errors.activity ? "border-red-500" : ""}
+              />
+              {errors.activity && (
+                <p className="mt-1 text-xs text-red-600">{errors.activity}</p>
+              )}
+            </div>
+
+            {/* Location */}
+            <div>
+              <Label htmlFor="modal-location">
+                Location <span className="text-gray-400">(optional)</span>
+              </Label>
+              <Input
+                id="modal-location"
+                value={draft.location}
+                onChange={(e) => {
+                  setDraft((d) => ({ ...d, location: e.target.value }));
+                  setErrors({});
+                }}
+                placeholder="Building / Room"
+              />
+            </div>
+
+            {errors.conflict && (
+              <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                <AlertCircle className="inline h-4 w-4 mr-1" />
+                {errors.conflict}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setEditModalOpen(false);
+                  reset();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  const validationErrors = validate();
+                  setErrors(validationErrors);
+
+                  if (Object.values(validationErrors).some(Boolean)) return;
+
+                  // Update the block
+                  setBlocks((prev) =>
+                    prev.map((b) =>
+                      b.id === editingId
+                        ? {
+                            ...b,
+                            startTime: draft.startTime,
+                            endTime: draft.endTime,
+                            activity:
+                              draft.category === "OFFICE_HOURS"
+                                ? "Office Hours"
+                                : draft.activity.trim(),
+                            location: draft.location.trim() || undefined,
+                            category: draft.category,
+                          }
+                        : b
+                    )
+                  );
+
+                  setEditModalOpen(false);
+                  reset();
+                }}
+              >
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

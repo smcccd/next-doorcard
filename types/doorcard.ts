@@ -50,12 +50,14 @@ export const APPOINTMENT_CATEGORY_META: Record<
   LAB: { label: "Lab", color: "#EDAC80" },
   HOURS_BY_ARRANGEMENT: { label: "Hours by Arrangement", color: "#99D5A1" },
   REFERENCE: { label: "Reference", color: "#AD99D5" },
+  OTHER: { label: "Other", color: "#D1D5DB" },
 };
 
 export const COLLEGE_META: Record<College, { label: string }> = {
   SKYLINE: { label: "Skyline College" },
   CSM: { label: "College of San Mateo" },
   CANADA: { label: "Cañada College" },
+  DISTRICT_OFFICE: { label: "District Office" },
 };
 
 /* ============================================================================

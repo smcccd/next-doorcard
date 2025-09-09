@@ -79,9 +79,13 @@ export default function BasicInfoForm({ doorcard }: Props) {
     if (field === "name") setName(value);
     if (field === "doorcardName") setDoorcardName(value);
     if (field === "officeNumber") setOfficeNumber(value);
-    if (touched || errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: validateField(field, value) }));
-    }
+
+    // Always validate for real-time feedback (but only show errors if touched)
+    const fieldError = validateField(field, value);
+    setErrors((prev) => ({
+      ...prev,
+      [field]: touched || prev[field] ? fieldError : undefined,
+    }));
   };
 
   const handleSubmit = (fd: FormData) => {
@@ -108,22 +112,11 @@ export default function BasicInfoForm({ doorcard }: Props) {
       <div className="flex items-start gap-3">
         <CheckCircle2 className="h-5 w-5 text-blue-500 mt-1 shrink-0" />
         <div>
-          <h2 className="text-lg font-medium text-gray-900">
-            Enter Your Information
-          </h2>
-          <p className="text-sm text-gray-500">
-            These details appear on the public doorcard.
+          <p className="text-sm text-gray-900">
+            Enter your details as they should appear on your doorcard.
           </p>
         </div>
       </div>
-
-      {/* Context banner */}
-      {doorcard.college && doorcard.term && doorcard.year && (
-        <div className="flex items-center gap-2 rounded border border-blue-100 bg-blue-50 px-4 py-2 text-sm text-blue-700">
-          <Building2 className="h-4 w-4" />
-          {doorcard.college} — {doorcard.term} {doorcard.year}
-        </div>
-      )}
 
       {/* Server error */}
       {!state.success && state.message && <Alert message={state.message} />}
@@ -145,6 +138,7 @@ export default function BasicInfoForm({ doorcard }: Props) {
             error={errors.name}
             onChange={(v) => handleChange("name", v)}
             help="Your full name as you'd like it to appear"
+            isValid={!validateField("name", name) && name.trim().length >= 2}
           />
           {/* Doorcard name */}
           <Field
@@ -156,6 +150,10 @@ export default function BasicInfoForm({ doorcard }: Props) {
             error={errors.doorcardName}
             onChange={(v) => handleChange("doorcardName", v)}
             help="Title for this doorcard (e.g., Fall 2024 Doorcard)"
+            isValid={
+              !validateField("doorcardName", doorcardName) &&
+              doorcardName.trim().length >= 2
+            }
           />
           {/* Office location */}
           <div className="md:col-span-2">
@@ -168,6 +166,10 @@ export default function BasicInfoForm({ doorcard }: Props) {
               error={errors.officeNumber}
               onChange={(v) => handleChange("officeNumber", v)}
               help="Include building and room number"
+              isValid={
+                !validateField("officeNumber", officeNumber) &&
+                officeNumber.trim().length >= 2
+              }
             />
           </div>
         </div>
@@ -187,6 +189,7 @@ function Field({
   icon,
   error,
   help,
+  isValid = false,
 }: {
   id: string;
   label: string;
@@ -196,11 +199,20 @@ function Field({
   icon: React.ReactNode;
   error?: string;
   help?: string;
+  isValid?: boolean;
 }) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id} className="text-sm font-medium text-gray-900">
-        {label} <span className="text-red-500">*</span>
+        {label} <span className="text-red-600">*</span>
+        {isValid && (
+          <span
+            className="ml-2 inline-flex animate-in fade-in-50 slide-in-from-right-2 duration-300"
+            aria-label={`${label} completed successfully`}
+          >
+            ✓
+          </span>
+        )}
       </Label>
       <div className="relative">
         <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -217,12 +229,22 @@ function Field({
           aria-describedby={
             error ? `${id}-error` : help ? `${id}-help` : undefined
           }
-          className={`pl-10 ${
+          className={`pl-10 transition-all duration-200 ${
             error
               ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-              : ""
+              : isValid
+                ? "border-green-300 focus:border-green-500 focus:ring-green-100"
+                : ""
           }`}
         />
+        {isValid && (
+          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <CheckCircle2
+              className="h-4 w-4 text-green-500 animate-in fade-in-50 zoom-in-95 duration-200"
+              aria-label={`${label} validation passed`}
+            />
+          </span>
+        )}
       </div>
       {error ? (
         <p id={`${id}-error`} role="alert" className="text-xs text-red-600">

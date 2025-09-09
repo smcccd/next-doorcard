@@ -22,7 +22,7 @@ export async function GET(
         OR: [
           { username: username },
           { email: username },
-          { name: { contains: username, mode: "insensitive" } },
+          { name: { contains: username } },
         ],
       },
       select: { id: true },

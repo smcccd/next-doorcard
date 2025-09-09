@@ -59,7 +59,7 @@ export const createAppointmentSchema = appointmentSchema;
 
 // Update appointment schema (for API)
 export const updateAppointmentSchema = baseAppointmentSchema.partial().extend({
-  id: z.string().cuid().optional(),
+  id: z.string().uuid().optional(),
 });
 
 // Basic info validation
@@ -108,7 +108,7 @@ export const createDoorcardSchema = doorcardSchema;
 
 // Update doorcard schema (for API) - simplified
 export const updateDoorcardSchema = z.object({
-  id: z.string().cuid().optional(),
+  id: z.string().uuid().optional(),
   name: z.string().min(1, "Name is required").max(100).optional(),
   doorcardName: z
     .string()
@@ -131,7 +131,7 @@ export const updateDoorcardSchema = z.object({
 
 // Draft doorcard schema (more flexible)
 export const doorcardDraftSchema = z.object({
-  originalDoorcardId: z.string().cuid().optional(),
+  originalDoorcardId: z.string().uuid().optional(),
   data: z.record(z.unknown()), // Flexible JSON data
 });
 
