@@ -41,13 +41,13 @@ export function SimpleFacultyGrid({
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
         {doorcards.map((doorcard, index) => (
           <div
             key={doorcard.id}
             onClick={() => onDoorcardClick(doorcard)}
-            className={`group grid grid-cols-[2fr,auto,1fr,2fr] gap-4 items-center px-4 py-4 bg-white dark:bg-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors ${
+            className={`group grid grid-cols-1 sm:grid-cols-[2fr,auto,1fr,2fr] gap-4 items-center px-4 sm:px-6 py-4 bg-white dark:bg-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors ${
               index !== doorcards.length - 1
                 ? "border-b border-gray-200 dark:border-gray-700"
                 : ""
@@ -62,19 +62,52 @@ export function SimpleFacultyGrid({
             }}
             aria-label={`View office hours for ${doorcard.user.name} at ${doorcard.college}`}
           >
-            {/* Faculty Info */}
-            <div className="min-w-0 flex items-center gap-2">
-              <h3 className="font-medium text-sm text-gray-900 dark:text-white group-hover:text-smccd-blue-700 dark:group-hover:text-smccd-blue-400 transition-colors truncate">
-                {doorcard.user.name}
-              </h3>
-              <span className="text-xs text-gray-600 dark:text-gray-400">
-                {doorcard.officeNumber || "TBA"}
-              </span>
+            {/* Faculty Info - Mobile stacked, Desktop in grid */}
+            <div className="min-w-0 sm:col-span-1">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                <h3 className="font-medium text-sm text-gray-900 dark:text-white group-hover:text-smccd-blue-700 dark:group-hover:text-smccd-blue-400 transition-colors truncate">
+                  {doorcard.user.name}
+                </h3>
+                <span className="text-xs text-gray-600 dark:text-gray-400">
+                  {doorcard.officeNumber || "TBA"}
+                </span>
+              </div>
+
+              {/* Mobile: Show campus and hours below name */}
+              <div className="flex items-center gap-3 mt-2 sm:hidden">
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                    doorcard.college === "CSM"
+                      ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                      : doorcard.college === "SKYLINE"
+                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                        : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                  }`}
+                >
+                  {doorcard.college === "CSM"
+                    ? "CSM"
+                    : doorcard.college === "SKYLINE"
+                      ? "Skyline"
+                      : doorcard.college === "CANADA"
+                        ? "Cañada"
+                        : doorcard.college}
+                </span>
+
+                {doorcard.appointmentCount > 0 ? (
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {doorcard.appointmentCount} hours/week
+                  </span>
+                ) : (
+                  <span className="text-sm text-gray-400 dark:text-gray-500">
+                    No hours
+                  </span>
+                )}
+              </div>
             </div>
 
-            {/* Campus Badge */}
+            {/* Campus Badge - Desktop only */}
             <span
-              className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+              className={`hidden sm:inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                 doorcard.college === "CSM"
                   ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
                   : doorcard.college === "SKYLINE"
@@ -91,8 +124,8 @@ export function SimpleFacultyGrid({
                     : doorcard.college}
             </span>
 
-            {/* Schedule Hours */}
-            <div className="flex items-center justify-center h-full">
+            {/* Schedule Hours - Desktop only */}
+            <div className="hidden sm:flex items-center justify-center h-full">
               {doorcard.appointmentCount > 0 ? (
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {doorcard.appointmentCount} hours/week
@@ -105,7 +138,7 @@ export function SimpleFacultyGrid({
             </div>
 
             {/* Available Days */}
-            <div className="flex items-center justify-end gap-1">
+            <div className="flex items-center justify-start sm:justify-end gap-1 mt-3 sm:mt-0">
               {["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"].map(
                 (day) => {
                   const dayAbbrev: Record<string, string> = {

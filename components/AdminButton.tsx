@@ -1,42 +1,13 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useNavigationAuth } from "@/hooks/useNavigation";
 
 export function AdminButton() {
-  const { data: session, status } = useSession();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const { isAdmin, isLoading, isAuthenticated } = useNavigationAuth();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const checkAdminRole = async () => {
-      if (status === "authenticated" && session?.user?.email) {
-        try {
-          const response = await fetch("/api/user/profile");
-          if (response.ok) {
-            const userData = await response.json();
-            setIsAdmin(userData.role === "ADMIN");
-          }
-        } catch (error) {
-          console.error("Error checking admin role:", error);
-        }
-      }
-    };
-
-    checkAdminRole();
-  }, [session, status]);
-
-  // Don't render anything during SSR or if not mounted to prevent hydration issues
-  if (!mounted || status === "loading" || !session) {
-    return null;
-  }
-
-  if (!isAdmin) {
+  // Don't render anything during loading or if not authenticated
+  if (isLoading || !isAuthenticated || !isAdmin) {
     return null;
   }
 

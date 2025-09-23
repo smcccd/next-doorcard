@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useFormStatus } from "react-dom";
 import { useSearchParams } from "next/navigation";
-import { handleNewDoorcardForm, handleEditDoorcardCampusForm } from "./action";
+import { handleNewDoorcardForm } from "./action";
 import { COLLEGE_META, type College } from "@/types/doorcard";
 import {
   Select,
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 const TERM_OPTIONS = ["Fall", "Spring", "Summer"] as const;
@@ -38,8 +39,6 @@ const BASE_YEARS = Array.from({ length: 5 }, (_, i) =>
 type FieldErrors = { college?: string; term?: string; year?: string };
 
 interface Props {
-  /** If undefined => new doorcard flow */
-  doorcard?: { id: string; college?: string; term?: string; year?: string };
   /** User's college from profile for pre-filling */
   userCollege?: string | null;
 }
@@ -48,7 +47,14 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="w-full">
-      {pending ? "Validating…" : "Continue to Basic Info"}
+      {pending ? (
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          Creating doorcard…
+        </div>
+      ) : (
+        "Continue to Basic Info"
+      )}
     </Button>
   );
 }
@@ -71,37 +77,33 @@ function Alert({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function CampusTermForm({ doorcard, userCollege }: Props) {
-  const existingYear = doorcard?.year;
-  const YEAR_OPTIONS =
-    existingYear && !BASE_YEARS.includes(existingYear)
-      ? [existingYear, ...BASE_YEARS]
-      : BASE_YEARS;
+export default function CampusTermForm({ userCollege }: Props) {
+  const YEAR_OPTIONS = BASE_YEARS;
 
   const [college, setCollege] = useState<ValidCollege | "">(
-    (doorcard?.college as ValidCollege) ?? (userCollege as ValidCollege) ?? ""
+    (userCollege as ValidCollege) ?? ""
   );
-  const [term, setTerm] = useState(doorcard?.term ?? "");
-  const [year, setYear] = useState(existingYear ?? "");
+  const [term, setTerm] = useState("");
+  const [year, setYear] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [clientTried, setClientTried] = useState(false);
-  const [serverError, setServerError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const searchParams = useSearchParams();
+  // Server error handling using URL parameters (traditional approach)
+  const [serverError, setServerError] = useState<string | null>(null);
+  const searchParams = useSearchParams(); // Get URL search parameters
 
   useEffect(() => {
     const error = searchParams.get("error");
-    console.log("[FORM] URL error param:", error);
     if (error) {
-      console.log("[FORM] Setting server error:", error);
-      setServerError(error);
+      setServerError(decodeURIComponent(error));
+    } else {
+      setServerError(null);
     }
   }, [searchParams]);
 
-  // Create the appropriate server action
-  const formAction = doorcard?.id
-    ? handleEditDoorcardCampusForm.bind(null, doorcard.id)
-    : handleNewDoorcardForm;
+  // Use the action directly - no need for .bind() pattern here
+  const formAction = handleNewDoorcardForm;
 
   const validateField = (
     name: keyof FieldErrors,
@@ -136,6 +138,12 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
       return;
     }
 
+    // Set submitting state for visual feedback
+    setIsSubmitting(true);
+
+    // Clear any previous server errors
+    setServerError(null);
+
     // If validation passes, let the form submit naturally to the action
     // The form action will handle the server-side logic
   };
@@ -145,167 +153,189 @@ export default function CampusTermForm({ doorcard, userCollege }: Props) {
     "mt-1.5 border-red-300 focus:ring-red-500 focus:border-red-500";
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-start gap-3">
-        <CheckCircle2 className="h-5 w-5 text-blue-500 mt-1 shrink-0" />
-        <div>
-          <h2 className="text-lg font-medium text-gray-900">
-            {doorcard ? "Edit Campus & Term" : "Select Campus & Term"}
-          </h2>
-          <p className="text-sm text-gray-500">
-            One doorcard per campus per term.{" "}
-            {doorcard ? "Update if needed." : "Choose where this one applies."}
-          </p>
-        </div>
-      </div>
-
-      {serverError && <Alert>{serverError}</Alert>}
-      {clientTried && anyClientErrors && (
-        <Alert>Please fill in all required fields correctly.</Alert>
-      )}
-
-      <form
-        action={formAction}
-        onSubmit={handleSubmit}
-        className="space-y-8"
-        noValidate
-      >
-        {/* Hidden inputs to pass form values */}
-        <input type="hidden" name="college" value={college} />
-        <input type="hidden" name="term" value={term} />
-        <input type="hidden" name="year" value={year} />
-
-        <fieldset className="border border-gray-200 rounded-lg p-6">
-          <legend className="text-base font-medium text-gray-900 px-2">
-            Campus and Term Selection
-          </legend>
-          <div className="grid gap-6 md:grid-cols-3 mt-4">
-            {/* Campus */}
-            <div>
-              <Label htmlFor="college" className="text-sm font-medium">
-                Campus <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                value={college}
-                onValueChange={(v) => {
-                  setCollege(v as ValidCollege);
-                  if (clientTried)
-                    setFieldErrors((p) => ({
-                      ...p,
-                      college: validateField("college", v),
-                    }));
-                }}
-              >
-                <SelectTrigger
-                  id="college"
-                  aria-invalid={!!fieldErrors.college}
-                  aria-describedby={
-                    fieldErrors.college ? "college-error" : undefined
-                  }
-                  aria-required="true"
-                  className={fieldErrors.college ? errorClass : "mt-1.5"}
-                >
-                  <SelectValue placeholder="Select campus" />
-                </SelectTrigger>
-                <SelectContent>
-                  {COLLEGE_OPTIONS.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {COLLEGE_META[c as keyof typeof COLLEGE_META].label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {fieldErrors.college && (
-                <ErrorText id="college-error" role="alert">
-                  {fieldErrors.college}
-                </ErrorText>
-              )}
-            </div>
-
-            {/* Term */}
-            <div>
-              <Label htmlFor="term" className="text-sm font-medium">
-                Term <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                value={term}
-                onValueChange={(v) => {
-                  setTerm(v);
-                  if (clientTried)
-                    setFieldErrors((p) => ({
-                      ...p,
-                      term: validateField("term", v),
-                    }));
-                }}
-              >
-                <SelectTrigger
-                  id="term"
-                  aria-invalid={!!fieldErrors.term}
-                  aria-describedby={fieldErrors.term ? "term-error" : undefined}
-                  aria-required="true"
-                  className={fieldErrors.term ? errorClass : "mt-1.5"}
-                >
-                  <SelectValue placeholder="Select term" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TERM_OPTIONS.map((t) => (
-                    <SelectItem key={t} value={t}>
-                      {t}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {fieldErrors.term && (
-                <ErrorText id="term-error" role="alert">
-                  {fieldErrors.term}
-                </ErrorText>
-              )}
-            </div>
-
-            {/* Year */}
-            <div>
-              <Label htmlFor="year" className="text-sm font-medium">
-                Year <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                value={year}
-                onValueChange={(v) => {
-                  setYear(v);
-                  if (clientTried)
-                    setFieldErrors((p) => ({
-                      ...p,
-                      year: validateField("year", v),
-                    }));
-                }}
-              >
-                <SelectTrigger
-                  id="year"
-                  aria-invalid={!!fieldErrors.year}
-                  aria-describedby={fieldErrors.year ? "year-error" : undefined}
-                  aria-required="true"
-                  className={fieldErrors.year ? errorClass : "mt-1.5"}
-                >
-                  <SelectValue placeholder="Select year" />
-                </SelectTrigger>
-                <SelectContent>
-                  {YEAR_OPTIONS.map((y) => (
-                    <SelectItem key={y} value={y}>
-                      {y}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {fieldErrors.year && (
-                <ErrorText id="year-error" role="alert">
-                  {fieldErrors.year}
-                </ErrorText>
-              )}
+    <Card className="relative">
+      {/* Loading overlay */}
+      {isSubmitting && (
+        <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10 rounded-lg">
+          <div className="flex items-center gap-3 bg-white shadow-lg rounded-lg px-6 py-4">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+            <div className="text-sm font-medium text-gray-900">
+              Creating doorcard...
             </div>
           </div>
-        </fieldset>
+        </div>
+      )}
 
-        <SubmitButton />
-      </form>
-    </div>
+      <CardHeader>
+        <div className="flex items-start gap-3">
+          <CheckCircle2 className="h-5 w-5 text-blue-500 mt-1 shrink-0" />
+          <div>
+            <CardTitle className="text-lg font-medium text-gray-900">
+              Select Campus & Term
+            </CardTitle>
+            <p className="text-sm text-gray-500 mt-1">
+              One doorcard per campus per term. Choose where this one applies.
+            </p>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
+        {serverError && <Alert>{serverError}</Alert>}
+        {clientTried && anyClientErrors && (
+          <Alert>Please fill in all required fields correctly.</Alert>
+        )}
+
+        <form
+          action={formAction}
+          onSubmit={handleSubmit}
+          className="space-y-6"
+          noValidate
+        >
+          {/* Hidden inputs to pass form values */}
+          <input type="hidden" name="college" value={college} />
+          <input type="hidden" name="term" value={term} />
+          <input type="hidden" name="year" value={year} />
+
+          <fieldset
+            className="border border-gray-200 rounded-lg p-6"
+            disabled={isSubmitting}
+          >
+            <legend className="text-base font-medium text-gray-900 px-2">
+              Campus and Term Selection
+            </legend>
+            <div className="grid gap-6 md:grid-cols-3 mt-4">
+              {/* Campus */}
+              <div>
+                <Label htmlFor="college" className="text-sm font-medium">
+                  Campus <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={college}
+                  onValueChange={(v) => {
+                    setCollege(v as ValidCollege);
+                    if (clientTried)
+                      setFieldErrors((p) => ({
+                        ...p,
+                        college: validateField("college", v),
+                      }));
+                  }}
+                >
+                  <SelectTrigger
+                    id="college"
+                    aria-invalid={!!fieldErrors.college}
+                    aria-describedby={
+                      fieldErrors.college ? "college-error" : undefined
+                    }
+                    aria-required="true"
+                    className={fieldErrors.college ? errorClass : "mt-1.5"}
+                  >
+                    <SelectValue placeholder="Select campus" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COLLEGE_OPTIONS.map((c) => (
+                      <SelectItem key={c} value={c}>
+                        {COLLEGE_META[c as keyof typeof COLLEGE_META].label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {fieldErrors.college && (
+                  <ErrorText id="college-error" role="alert">
+                    {fieldErrors.college}
+                  </ErrorText>
+                )}
+              </div>
+
+              {/* Term */}
+              <div>
+                <Label htmlFor="term" className="text-sm font-medium">
+                  Term <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={term}
+                  onValueChange={(v) => {
+                    setTerm(v);
+                    if (clientTried)
+                      setFieldErrors((p) => ({
+                        ...p,
+                        term: validateField("term", v),
+                      }));
+                  }}
+                >
+                  <SelectTrigger
+                    id="term"
+                    aria-invalid={!!fieldErrors.term}
+                    aria-describedby={
+                      fieldErrors.term ? "term-error" : undefined
+                    }
+                    aria-required="true"
+                    className={fieldErrors.term ? errorClass : "mt-1.5"}
+                  >
+                    <SelectValue placeholder="Select term" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TERM_OPTIONS.map((t) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {fieldErrors.term && (
+                  <ErrorText id="term-error" role="alert">
+                    {fieldErrors.term}
+                  </ErrorText>
+                )}
+              </div>
+
+              {/* Year */}
+              <div>
+                <Label htmlFor="year" className="text-sm font-medium">
+                  Year <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={year}
+                  onValueChange={(v) => {
+                    setYear(v);
+                    if (clientTried)
+                      setFieldErrors((p) => ({
+                        ...p,
+                        year: validateField("year", v),
+                      }));
+                  }}
+                >
+                  <SelectTrigger
+                    id="year"
+                    aria-invalid={!!fieldErrors.year}
+                    aria-describedby={
+                      fieldErrors.year ? "year-error" : undefined
+                    }
+                    aria-required="true"
+                    className={fieldErrors.year ? errorClass : "mt-1.5"}
+                  >
+                    <SelectValue placeholder="Select year" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {YEAR_OPTIONS.map((y) => (
+                      <SelectItem key={y} value={y}>
+                        {y}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {fieldErrors.year && (
+                  <ErrorText id="year-error" role="alert">
+                    {fieldErrors.year}
+                  </ErrorText>
+                )}
+              </div>
+            </div>
+          </fieldset>
+
+          <SubmitButton />
+        </form>
+      </CardContent>
+    </Card>
   );
 }

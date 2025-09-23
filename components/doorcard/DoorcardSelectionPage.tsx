@@ -114,7 +114,15 @@ export function DoorcardSelectionPage({
                 </div>
 
                 {/* Doorcards for this college */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div
+                  className={`grid gap-4 ${
+                    (collegeDoorcards as any[]).length === 1
+                      ? "grid-cols-1"
+                      : (collegeDoorcards as any[]).length === 2
+                        ? "md:grid-cols-2"
+                        : "md:grid-cols-2 lg:grid-cols-3"
+                  }`}
+                >
                   {(collegeDoorcards as any[]).map((doorcard: any) => (
                     <Card
                       key={doorcard.id}

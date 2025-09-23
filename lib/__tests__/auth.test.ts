@@ -1,4 +1,3 @@
-import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import {
@@ -7,7 +6,6 @@ import {
   describe,
   expect,
   it,
-  type,
   MockedFunction,
   vi,
 } from "vitest";
@@ -24,6 +22,7 @@ vi.mock("@/lib/prisma", () => ({
     account: {
       findUnique: vi.fn(),
       create: vi.fn(),
+      upsert: vi.fn(),
     },
     session: {
       create: vi.fn(),
@@ -35,16 +34,22 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: vi.fn(),
       delete: vi.fn(),
     },
+    $transaction: vi.fn(),
   },
 }));
 
-vi.mock("bcryptjs", () => ({
-  compare: vi.fn(),
-  hash: vi.fn(),
+vi.mock("@/lib/logger", () => ({
+  logger: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+  },
 }));
 
 vi.mock("crypto", () => ({
-  randomUUID: vi.fn(() => "mock-uuid"),
+  default: {
+    randomUUID: vi.fn(() => "mock-uuid-123"),
+  },
 }));
 
 // Mock the adapter before defining mockAdapter
@@ -66,6 +71,9 @@ vi.mock("@next-auth/prisma-adapter", () => ({
     useVerificationToken: vi.fn(),
   })),
 }));
+
+// Mock fetch for token and userinfo requests
+global.fetch = vi.fn();
 
 // Store original env
 const originalEnv = process.env;
@@ -91,7 +99,7 @@ describe("Auth Configuration", () => {
 
   describe("authOptions", () => {
     it("should have correct configuration", () => {
-      expect(authOptions.providers).toHaveLength(2);
+      expect(authOptions.providers).toHaveLength(1);
       expect(authOptions.session?.strategy).toBe("jwt");
       expect(authOptions.session?.maxAge).toBe(8 * 60 * 60); // 8 hours
       expect(authOptions.pages).toEqual({
@@ -100,10 +108,38 @@ describe("Auth Configuration", () => {
       });
     });
 
-    it("should include credentials and onelogin providers", () => {
+    it("should only include onelogin provider", () => {
       const providerIds = authOptions.providers.map((p) => p.id);
-      expect(providerIds).toContain("credentials");
-      expect(providerIds).toContain("onelogin");
+      expect(providerIds).toEqual(["onelogin"]);
+      expect(providerIds).not.toContain("credentials");
+    });
+
+    it("should have OneLogin provider correctly configured", () => {
+      const oneLoginProvider = authOptions.providers[0] as any;
+      expect(oneLoginProvider.id).toBe("onelogin");
+      expect(oneLoginProvider.name).toBe("SMCCD OneLogin");
+      expect(oneLoginProvider.type).toBe("oauth");
+      expect(oneLoginProvider.clientId).toBe("test-client-id");
+      expect(oneLoginProvider.clientSecret).toBe("test-client-secret");
+    });
+
+    it("should have correct URLs configured", () => {
+      const oneLoginProvider = authOptions.providers[0] as any;
+      expect(oneLoginProvider.authorization.url).toBe(
+        "https://smccd.onelogin.com/oidc/2/auth"
+      );
+      expect(oneLoginProvider.token.url).toBe(
+        "https://smccd.onelogin.com/oidc/2/token"
+      );
+      expect(oneLoginProvider.userinfo.url).toBe(
+        "https://smccd.onelogin.com/oidc/2/me"
+      );
+    });
+
+    it("should have secure cookie configuration", () => {
+      expect(authOptions.cookies?.state?.options?.httpOnly).toBe(true);
+      expect(authOptions.cookies?.state?.options?.sameSite).toBe("lax");
+      expect(authOptions.cookies?.state?.options?.maxAge).toBe(900); // 15 minutes
     });
   });
 

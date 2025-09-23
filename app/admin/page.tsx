@@ -50,7 +50,7 @@ import {
   User,
   Globe,
 } from "lucide-react";
-import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
+import { LazyAdminAnalytics } from "@/components/admin/LazyAdminAnalytics";
 
 interface AdminStats {
   totalUsers: number;
@@ -777,7 +777,7 @@ export default function AdminPage() {
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
-          <AdminAnalytics />
+          <LazyAdminAnalytics />
         </TabsContent>
       </Tabs>
 

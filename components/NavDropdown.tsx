@@ -39,6 +39,8 @@ export function NavDropdown({
         <Button
           variant="outline"
           className="text-gray-700 dark:text-gray-300 hover:text-smccd-blue-900 dark:hover:text-smccd-blue-400 hover:bg-smccd-blue-50 dark:hover:bg-smccd-blue-950/20 gap-2 bg-transparent border-gray-300 dark:border-gray-600 hover:border-smccd-blue-300 dark:hover:border-smccd-blue-700 focus:border-smccd-blue-500 transition-all duration-200"
+          aria-label={`Account menu for ${userDisplay}`}
+          aria-expanded="false"
         >
           <User className="h-4 w-4" />
           <span className="hidden sm:block text-sm font-medium truncate max-w-[150px]">
@@ -116,8 +118,12 @@ export function NavDropdown({
         <DropdownMenuItem
           onClick={handleSignOut}
           className="flex items-center gap-3 cursor-pointer px-3 py-2 mx-1 rounded-md group transition-all duration-200 text-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20 focus:text-red-800 dark:focus:text-red-300"
+          aria-label="Sign out of your account"
         >
-          <LogOut className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+          <LogOut
+            className="h-4 w-4 transition-transform duration-200 group-hover:scale-110"
+            aria-hidden="true"
+          />
           <span className="transition-colors duration-200">Sign Out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

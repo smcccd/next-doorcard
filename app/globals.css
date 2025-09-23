@@ -10,6 +10,11 @@
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
 
+    /* Campus Colors */
+    --campus-skyline: 2 75% 57%; /* #ee3c39 - Skyline red (from logo) */
+    --campus-csm: 213 100% 38%; /* #003C71 - CSM blue */
+    --campus-canada: 162 100% 22%; /* #00573F - Cañada green */
+
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 

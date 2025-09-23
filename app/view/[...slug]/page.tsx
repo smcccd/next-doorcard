@@ -5,9 +5,10 @@ import { prisma } from "@/lib/prisma";
 
 import { UnifiedDoorcard } from "@/components/UnifiedDoorcard";
 import { PrintOptimizedDoorcard } from "@/components/PrintOptimizedDoorcard";
-import { DoorcardActions } from "@/components/UnifiedDoorcardActions";
 import { DoorcardViewTracker } from "@/components/doorcard/DoorcardViewTracker";
 import { AutoPrintHandler } from "@/components/AutoPrintHandler";
+import { LazyDoorcardPDF } from "@/components/pdf/LazyDoorcardPDF";
+import { analytics } from "@/lib/analytics";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -16,6 +17,7 @@ import { College } from "@/types/doorcard";
 import { User, MapPin, Calendar, ArrowLeft, Globe } from "lucide-react";
 import { formatDisplayName } from "@/lib/display-name";
 import { DoorcardSelectionPage } from "@/components/doorcard/DoorcardSelectionPage";
+import { TermManager } from "@/lib/term-management";
 
 /* ----------------------------------------------------------------------------
    Helpers
@@ -64,12 +66,21 @@ async function fetchDoorcard(
   // If termSlug is provided we need to find the matching doorcard
   let doorcard;
   if (termSlug) {
-    // Handle "current" as a special case to find active doorcard
+    // Handle "current" as a special case to find active doorcard in current term
     if (termSlug === "current") {
+      // Get current active term
+      const activeTerm = await TermManager.getActiveTerm();
+      if (!activeTerm) {
+        return { error: "No active term found" } as const;
+      }
+
       doorcard = await prisma.doorcard.findFirst({
         where: {
           userId: user.id,
           isActive: true,
+          // Filter by current term
+          term: activeTerm.season as any,
+          year: parseInt(activeTerm.year),
           // If not using auth, only look for public doorcards
           ...(useAuth ? {} : { isPublic: true }),
         },
@@ -147,11 +158,20 @@ async function fetchDoorcard(
     }
     if (!doorcard) return { error: "Doorcard not found" } as const;
   } else {
-    // Check for multiple active doorcards - show selection if more than one
+    // Get current active term to filter doorcards
+    const activeTerm = await TermManager.getActiveTerm();
+    if (!activeTerm) {
+      return { error: "No active term found" } as const;
+    }
+
+    // Check for active doorcards in the current term only
     const availableDoorcards = await prisma.doorcard.findMany({
       where: {
         userId: user.id,
         isActive: true,
+        // Filter by current term
+        term: activeTerm.season as any,
+        year: parseInt(activeTerm.year),
         // If not using auth, only look for public doorcards
         ...(useAuth ? {} : { isPublic: true }),
       },
@@ -280,100 +300,16 @@ export default async function PublicDoorcardView({
         isSpecificTerm={isSpecificTerm}
       />
 
-      {/* Header */}
+      {/* Simplified Header */}
       <div className="bg-white border-b border-gray-200 print:hidden">
-        <div className="max-w-4xl mx-auto px-4 py-6 print:py-4">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div className="flex-1">
-              <div className="mb-3">
-                <h1 className="text-2xl font-bold text-gray-900 print:text-xl mb-2">
-                  {transformedDoorcard.doorcardName || "Faculty Doorcard"}
-                </h1>
-                {/* Badge row with better spacing */}
-                <div className="flex flex-wrap items-center gap-2">
-                  {useAuth && (
-                    <Badge variant="outline" className="text-xs">
-                      Admin View
-                    </Badge>
-                  )}
-                  {isSpecificTerm && (
-                    <Badge variant="outline" className="text-xs">
-                      {transformedDoorcard.term} {transformedDoorcard.year}
-                    </Badge>
-                  )}
-                  {transformedDoorcard.isActive ? (
-                    <Badge
-                      variant="default"
-                      className="text-xs bg-green-100 text-green-800"
-                    >
-                      Live
-                    </Badge>
-                  ) : (
-                    <Badge variant="secondary" className="text-xs">
-                      Draft
-                    </Badge>
-                  )}
-                  {!transformedDoorcard.isPublic && (
-                    <Badge
-                      variant="outline"
-                      className="text-xs border-amber-200 text-amber-700"
-                    >
-                      Private
-                    </Badge>
-                  )}
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 print:text-xs">
-                <div className="flex items-center gap-1">
-                  <User className="h-4 w-4" />
-                  <span className="font-medium">
-                    {transformedDoorcard.user
-                      ? formatDisplayName(transformedDoorcard.user)
-                      : transformedDoorcard.name}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  <span>Office {transformedDoorcard.officeNumber}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>
-                    {transformedDoorcard.term} {transformedDoorcard.year}
-                  </span>
-                </div>
-                {transformedDoorcard.college && (
-                  <div className="flex items-center gap-1">
-                    <CollegeLogo
-                      college={transformedDoorcard.college as College}
-                      height={16}
-                      className="flex-shrink-0"
-                    />
-                    <span>{transformedDoorcard.college}</span>
-                  </div>
-                )}
-                {transformedDoorcard.user?.website && (
-                  <div className="flex items-center gap-1">
-                    <Globe className="h-4 w-4" />
-                    <a
-                      href={
-                        transformedDoorcard.user.website.startsWith("http")
-                          ? transformedDoorcard.user.website
-                          : `https://${transformedDoorcard.user.website}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 hover:underline"
-                    >
-                      Faculty Website
-                    </a>
-                  </div>
-                )}
-              </div>
-            </div>
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-semibold text-gray-900">
+              {transformedDoorcard.doorcardName || "Faculty Doorcard"}
+            </h1>
 
-            {/* Buttons (client) */}
-            <div className="print:hidden flex gap-2">
+            {/* Only Download PDF Button */}
+            <div className="flex gap-2">
               {useAuth && (
                 <Button variant="outline" size="sm" asChild>
                   <Link href="/dashboard">
@@ -382,7 +318,7 @@ export default async function PublicDoorcardView({
                   </Link>
                 </Button>
               )}
-              <DoorcardActions
+              <LazyDoorcardPDF
                 doorcard={doorcardLite}
                 doorcardId={transformedDoorcard.id}
               />
@@ -392,12 +328,12 @@ export default async function PublicDoorcardView({
       </div>
 
       {/* Schedule - Screen and Print versions */}
-      <div className="w-full my-4 max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto px-6 py-6">
         {transformedDoorcard.appointments &&
         transformedDoorcard.appointments.length > 0 ? (
           <>
             {/* Screen version - full schedule with all features */}
-            <div className="w-full print:hidden">
+            <div className="print:hidden">
               <UnifiedDoorcard
                 doorcard={doorcardLite}
                 showWeekendDays={false}
@@ -410,7 +346,7 @@ export default async function PublicDoorcardView({
             </div>
           </>
         ) : (
-          <div className="max-w-4xl mx-auto px-4 py-12 text-center">
+          <div className="py-12 text-center">
             <p className="text-gray-600">
               No scheduled appointments or office hours.
             </p>

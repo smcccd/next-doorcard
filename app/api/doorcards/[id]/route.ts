@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
@@ -91,7 +92,7 @@ async function replaceAppointments(
 
     return { success: true, warnings: validation.warnings };
   } catch (error) {
-    console.error("Transaction failed in replaceAppointments:", error);
+    logger.error("Transaction failed in replaceAppointments:", error);
 
     // Handle unique constraint violation (duplicate appointment)
     if (
@@ -245,7 +246,7 @@ export async function PUT(
         { status: 400 }
       );
     }
-    console.error("Error updating doorcard (PUT):", err);
+    logger.error("Error updating doorcard (PUT):", err);
     return NextResponse.json(
       { error: "Failed to update doorcard" },
       { status: 500 }
@@ -348,7 +349,7 @@ export async function PATCH(
         { status: 400 }
       );
     }
-    console.error("Error updating doorcard (PATCH):", err);
+    logger.error("Error updating doorcard (PATCH):", err);
     return NextResponse.json(
       { error: "Failed to update doorcard" },
       { status: 500 }
@@ -375,7 +376,7 @@ export async function DELETE(
     });
     return NextResponse.json({ message: "Doorcard deleted successfully" });
   } catch (err) {
-    console.error("Error deleting doorcard:", err);
+    logger.error("Error deleting doorcard:", err);
     return NextResponse.json(
       { error: "Failed to delete doorcard" },
       { status: 500 }

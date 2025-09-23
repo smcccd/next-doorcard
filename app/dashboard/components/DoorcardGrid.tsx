@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -10,9 +12,23 @@ import {
   Clock,
   Archive,
   AlertTriangle,
+  Trash2,
 } from "lucide-react";
+import { useState } from "react";
+import { deleteDoorcard } from "@/app/dashboard/server-actions";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { type College, COLLEGE_META } from "@/types/doorcard";
 import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
+import { getPrintUrl } from "@/lib/url-utils";
 import type { Doorcard, Appointment, User, TermSeason } from "@prisma/client";
 
 interface Props {
@@ -33,11 +49,19 @@ export default function DoorcardGrid({
   variant = "grid",
   activeTerm,
 }: Props) {
+  const headingId = `doorcard-grid-${title.toLowerCase().replace(/\s+/g, "-")}`;
+
   return (
-    <section className="space-y-4">
-      <h2 className="text-lg font-semibold">{title}</h2>
+    <section className="space-y-4" aria-labelledby={headingId}>
+      <h2 id={headingId} className="text-lg font-semibold">
+        {title}
+      </h2>
       {doorcards.length === 0 ? (
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p
+          className="text-sm text-gray-600 dark:text-gray-400"
+          role="status"
+          aria-live="polite"
+        >
           {emptyMessage}
         </p>
       ) : variant === "grid" ? (
@@ -60,6 +84,101 @@ export default function DoorcardGrid({
 /* -------------------------------------------------------------------------- */
 /* Shared Helpers                                                             */
 /* -------------------------------------------------------------------------- */
+
+function DeleteButton({
+  doorcard,
+  displayStatus,
+}: {
+  doorcard: Doorcard;
+  displayStatus: {
+    status: "live" | "draft" | "incomplete" | "archived" | "upcoming";
+    label: string;
+    description: string;
+  };
+}) {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const result = await deleteDoorcard(doorcard.id);
+      if (!result.success) {
+        alert(result.message || "Failed to delete doorcard");
+      } else {
+        setDialogOpen(false);
+      }
+    } catch (error) {
+      alert("Failed to delete doorcard");
+    }
+    setIsDeleting(false);
+  };
+
+  const isLive = displayStatus.status === "live";
+  const doorcardName =
+    doorcard.doorcardName ||
+    `${doorcard.name || "Faculty Member"}'s ${doorcard.term} ${doorcard.year} Doorcard`;
+
+  return (
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogTrigger asChild>
+        <button
+          className="inline-flex items-center text-xs text-red-600 hover:text-red-800 underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 rounded px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
+          aria-label={`Delete doorcard ${doorcardName}`}
+        >
+          <Trash2 className="h-4 w-4 mr-1" aria-hidden="true" /> Delete
+        </button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-red-600" />
+            Delete Doorcard
+          </DialogTitle>
+          <DialogDescription className="text-left">
+            {isLive ? (
+              <>
+                <strong className="text-red-600">Warning:</strong> This doorcard
+                is currently <strong>live and public</strong>. Deleting it will
+                immediately remove it from public view and break any existing
+                links.
+                <br />
+                <br />
+                Are you sure you want to permanently delete{" "}
+                <strong>"{doorcardName}"</strong>?
+              </>
+            ) : (
+              <>
+                Are you sure you want to permanently delete{" "}
+                <strong>"{doorcardName}"</strong>?
+                <br />
+                <br />
+                This action cannot be undone.
+              </>
+            )}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setDialogOpen(false)}
+            disabled={isDeleting}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="bg-red-600 hover:bg-red-700"
+          >
+            {isDeleting ? "Deleting..." : "Delete Doorcard"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 function publicSlug(user?: { username?: string | null; name?: string | null }) {
   if (user?.username) return user.username;
@@ -138,11 +257,11 @@ function DoorcardCard({
 
     switch (college) {
       case "SKYLINE":
-        return "hover:shadow-sm border-l-4 border-l-blue-500 hover:border-l-blue-600 bg-gradient-to-r from-blue-50/30 to-transparent dark:from-blue-950/30";
+        return "hover:shadow-sm border-l-4 border-l-campus-skyline bg-gradient-to-r from-red-50/80 to-white dark:from-red-950/30 dark:to-gray-800";
       case "CSM":
-        return "hover:shadow-sm border-l-4 border-l-red-500 hover:border-l-red-600 bg-gradient-to-r from-red-50/30 to-transparent dark:from-red-950/30";
+        return "hover:shadow-sm border-l-4 border-l-campus-csm bg-gradient-to-r from-blue-50/80 to-white dark:from-blue-950/30 dark:to-gray-800";
       case "CANADA":
-        return "hover:shadow-sm border-l-4 border-l-green-500 hover:border-l-green-600 bg-gradient-to-r from-green-50/30 to-transparent dark:from-green-950/30";
+        return "hover:shadow-sm border-l-4 border-l-campus-canada bg-gradient-to-r from-green-50/80 to-white dark:from-green-950/30 dark:to-gray-800";
       default:
         return "hover:shadow-sm";
     }
@@ -158,6 +277,7 @@ function DoorcardCard({
               className={`flex items-center gap-1 ${badgeProps.className} text-xs`}
               data-testid="status-badge"
               title={displayStatus.description}
+              aria-label={`Status: ${displayStatus.label}. ${displayStatus.description}`}
             >
               {badgeProps.icon}
               {displayStatus.label}
@@ -193,14 +313,17 @@ function DoorcardCard({
         <div className="flex gap-2 pt-2">
           {displayStatus.status === "incomplete" ? (
             // For incomplete doorcards, only show edit action with helpful text
-            <Link
-              href={`/doorcard/${doorcard.id}/edit?step=1`}
-              className="inline-flex items-center text-xs text-orange-700 bg-orange-50 border border-orange-200 rounded px-3 py-2 hover:bg-orange-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
-              aria-label={`Complete setup for ${doorcard.doorcardName}`}
-            >
-              <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Complete
-              Setup
-            </Link>
+            <>
+              <Link
+                href={`/doorcard/${doorcard.id}/edit?step=1`}
+                className="inline-flex items-center text-xs text-orange-700 bg-orange-50 border border-orange-200 rounded px-3 py-2 hover:bg-orange-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
+                aria-label={`Complete setup for ${doorcard.doorcardName}`}
+              >
+                <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Complete
+                Setup
+              </Link>
+              <DeleteButton doorcard={doorcard} displayStatus={displayStatus} />
+            </>
           ) : (
             // For complete doorcards, show all actions
             <>
@@ -223,13 +346,14 @@ function DoorcardCard({
                 </Link>
               )}
               <Link
-                href={`${getViewUrl()}&print=true`}
+                href={getPrintUrl(getViewUrl())}
                 className="inline-flex items-center text-xs underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 rounded px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
                 target="_blank"
                 aria-label={`Print doorcard ${doorcard.doorcardName}`}
               >
                 <Printer className="h-4 w-4 mr-1" aria-hidden="true" /> Print
               </Link>
+              <DeleteButton doorcard={doorcard} displayStatus={displayStatus} />
             </>
           )}
         </div>
@@ -309,11 +433,11 @@ function DoorcardRow({
 
     switch (college) {
       case "SKYLINE":
-        return "border-l-4 border-l-blue-500 bg-gradient-to-r from-blue-50/20 to-transparent dark:from-blue-950/20";
+        return "border-l-4 border-l-campus-skyline bg-gradient-to-r from-red-50/80 to-white dark:from-red-950/30 dark:to-gray-800";
       case "CSM":
-        return "border-l-4 border-l-red-500 bg-gradient-to-r from-red-50/20 to-transparent dark:from-red-950/20";
+        return "border-l-4 border-l-campus-csm bg-gradient-to-r from-blue-50/80 to-white dark:from-blue-950/30 dark:to-gray-800";
       case "CANADA":
-        return "border-l-4 border-l-green-500 bg-gradient-to-r from-green-50/20 to-transparent dark:from-green-950/20";
+        return "border-l-4 border-l-campus-canada bg-gradient-to-r from-green-50/80 to-white dark:from-green-950/30 dark:to-gray-800";
       default:
         return "";
     }
@@ -335,6 +459,7 @@ function DoorcardRow({
               className={`flex items-center gap-1 ${badgeProps.className} text-xs`}
               data-testid="status-badge"
               title={displayStatus.description}
+              aria-label={`Status: ${displayStatus.label}. ${displayStatus.description}`}
             >
               {badgeProps.icon}
               {displayStatus.label}
@@ -349,14 +474,17 @@ function DoorcardRow({
         <div className="flex gap-2 text-xs">
           {displayStatus.status === "incomplete" ? (
             // For incomplete doorcards, only show edit action with helpful text
-            <Link
-              href={`/doorcard/${doorcard.id}/edit?step=1`}
-              className="text-orange-700 bg-orange-50 border border-orange-200 rounded px-3 py-2 hover:bg-orange-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 flex items-center"
-              aria-label={`Complete setup for ${doorcard.doorcardName}`}
-            >
-              <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Complete
-              Setup
-            </Link>
+            <>
+              <Link
+                href={`/doorcard/${doorcard.id}/edit?step=1`}
+                className="text-orange-700 bg-orange-50 border border-orange-200 rounded px-3 py-2 hover:bg-orange-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 flex items-center"
+                aria-label={`Complete setup for ${doorcard.doorcardName}`}
+              >
+                <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Complete
+                Setup
+              </Link>
+              <DeleteButton doorcard={doorcard} displayStatus={displayStatus} />
+            </>
           ) : (
             // For complete doorcards, show all actions
             <>
@@ -379,13 +507,14 @@ function DoorcardRow({
                 </Link>
               )}
               <Link
-                href={`${getViewUrl()}&print=true`}
+                href={getPrintUrl(getViewUrl())}
                 className="underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 rounded flex items-center px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
                 target="_blank"
                 aria-label={`Print doorcard ${doorcard.doorcardName}`}
               >
                 <Printer className="h-4 w-4 mr-1" aria-hidden="true" /> Print
               </Link>
+              <DeleteButton doorcard={doorcard} displayStatus={displayStatus} />
             </>
           )}
         </div>

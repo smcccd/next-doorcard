@@ -18,180 +18,205 @@ import {
   WEEKDAYS_ONLY,
 } from "@/lib/doorcard-constants";
 
-// Register fonts for better typography
-Font.register({
-  family: "Inter",
-  fonts: [
-    {
-      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2",
-      fontWeight: 400,
-    },
-    {
-      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFuYAZ9hiA.woff2",
-      fontWeight: 600,
-    },
-    {
-      src: "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuDyYAZ9hiA.woff2",
-      fontWeight: 700,
-    },
-  ],
-});
+// Use built-in fonts to avoid CORS issues with external font loading
+// Helvetica is a built-in PDF font that provides excellent readability
+// This eliminates the "Failed to fetch" errors from Google Fonts CDN
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "Inter",
+    fontFamily: "Helvetica",
     fontSize: 10,
     padding: 30,
     backgroundColor: "#ffffff",
     color: "#1f2937",
+    flexDirection: "column",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
-    paddingBottom: 10,
-    borderBottomWidth: 2,
+    marginBottom: 12,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
     borderBottomColor: "#3b82f6",
   },
   logo: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 700,
     color: "#1f2937",
   },
   term: {
-    fontSize: 12,
+    fontSize: 11,
     color: "#6b7280",
     fontWeight: 600,
   },
+  facultyInfo: {
+    alignItems: "center",
+    marginBottom: 12,
+  },
   facultyName: {
-    fontSize: 28,
+    fontSize: 20,
+    fontWeight: 700,
+    color: "#1f2937",
+    textAlign: "center",
+    marginBottom: 2,
+  },
+  facultyTitle: {
+    fontSize: 11,
+    color: "#6b7280",
+    textAlign: "center",
+  },
+  officeInfo: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 15,
+    padding: 8,
+    backgroundColor: "#f8fafc",
+    borderRadius: 4,
+  },
+  officeItem: {
+    alignItems: "center",
+  },
+  officeLabel: {
+    fontSize: 8,
+    color: "#6b7280",
+    marginBottom: 3,
+    fontWeight: 600,
+    textTransform: "uppercase",
+  },
+  officeValue: {
+    fontSize: 10,
+    color: "#1f2937",
+    fontWeight: 600,
+  },
+  scheduleTitle: {
+    fontSize: 14,
     fontWeight: 700,
     color: "#1f2937",
     marginBottom: 8,
     textAlign: "center",
   },
-  facultyTitle: {
-    fontSize: 14,
-    color: "#6b7280",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  officeInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 25,
-    padding: 15,
-    backgroundColor: "#f8fafc",
-    borderRadius: 8,
-  },
-  officeItem: {
+  scheduleContainer: {
     flex: 1,
-    alignItems: "center",
-  },
-  officeLabel: {
-    fontSize: 10,
-    color: "#6b7280",
-    marginBottom: 4,
-    fontWeight: 600,
-    textTransform: "uppercase",
-  },
-  officeValue: {
-    fontSize: 13,
-    color: "#1f2937",
-    fontWeight: 600,
-  },
-  scheduleTitle: {
-    fontSize: 18,
-    fontWeight: 700,
-    color: "#1f2937",
-    marginBottom: 15,
-    textAlign: "center",
+    maxHeight: 480,
+    position: "relative",
   },
   scheduleGrid: {
     flexDirection: "row",
-    marginBottom: 20,
+    height: "100%",
+    marginLeft: 45,
+  },
+  timeColumn: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    width: 45,
+    height: "100%",
+  },
+  timeSlotLabel: {
+    height: 15,
+    justifyContent: "center",
+    alignItems: "flex-end",
+    paddingRight: 5,
+    marginBottom: 0,
+    borderBottomWidth: 0.25,
+    borderBottomColor: "#e5e7eb",
+    borderRightWidth: 0.5,
+    borderRightColor: "#d1d5db",
+  },
+  timeText: {
+    fontSize: 7,
+    color: "#6b7280",
   },
   dayColumn: {
     flex: 1,
-    marginRight: 4,
+    marginRight: 0,
+    borderRightWidth: 0.25,
+    borderRightColor: "#d1d5db",
   },
   dayHeader: {
-    backgroundColor: "#3b82f6",
+    backgroundColor: "#60a5fa",
     color: "#ffffff",
-    padding: 8,
-    fontSize: 10,
+    padding: 2,
+    fontSize: 8,
     fontWeight: 600,
     textAlign: "center",
-    marginBottom: 2,
+    marginBottom: 1,
+    height: 14,
+    borderBottomWidth: 0.25,
+    borderBottomColor: "#374151",
+    justifyContent: "center",
+    alignItems: "center",
   },
   timeSlot: {
-    height: 18,
-    marginBottom: 1,
+    height: 15,
+    marginBottom: 0,
+    margin: 0,
+    padding: 0,
     position: "relative",
-  },
-  timeLabel: {
-    position: "absolute",
-    left: -60,
-    top: 0,
-    fontSize: 8,
-    color: "#6b7280",
-    width: 50,
-    textAlign: "right",
+    borderBottomWidth: 0.25,
+    borderBottomColor: "#e5e7eb",
+    borderRightWidth: 0.25,
+    borderRightColor: "#e5e7eb",
   },
   appointment: {
-    borderLeftWidth: 3,
-    padding: 3,
+    borderLeftWidth: 0,
+    padding: 2,
     height: "100%",
     justifyContent: "center",
+    alignItems: "center",
+    minHeight: 15,
   },
   appointmentText: {
     fontSize: 7,
     color: "#1f2937",
-    fontWeight: 600,
+    fontWeight: 500,
     textAlign: "center",
+    lineHeight: 1.2,
   },
   appointmentLocation: {
     fontSize: 7,
     color: "#6b7280",
     textAlign: "center",
+    marginTop: 1,
   },
   legend: {
-    marginTop: 15,
-    padding: 10,
+    marginTop: 12,
+    padding: 6,
     backgroundColor: "#f8fafc",
-    borderRadius: 4,
+    borderRadius: 3,
   },
   legendTitle: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: 600,
     color: "#1f2937",
-    marginBottom: 6,
+    marginBottom: 4,
   },
   legendItems: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 6,
   },
   legendItem: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 2,
+    marginRight: 8,
   },
   legendColor: {
-    width: 10,
-    height: 10,
-    marginRight: 4,
+    width: 8,
+    height: 8,
+    marginRight: 3,
     borderRadius: 1,
   },
   legendText: {
-    fontSize: 8,
+    fontSize: 7,
     color: "#4b5563",
   },
   footer: {
-    marginTop: 10,
-    paddingTop: 10,
-    borderTopWidth: 1,
+    marginTop: 8,
+    paddingTop: 6,
+    borderTopWidth: 0.5,
     borderTopColor: "#e5e7eb",
     flexDirection: "row",
     justifyContent: "space-between",
@@ -202,15 +227,15 @@ const styles = StyleSheet.create({
     color: "#6b7280",
   },
   website: {
-    fontSize: 8,
+    fontSize: 7,
     color: "#3b82f6",
   },
 });
 
-// Days for weekday-only view (more compact for single page)
+// Days for weekday-only view (full names for PDF)
 const DAYS = WEEKDAYS_ONLY.map((day) => ({
   key: day.key,
-  label: day.label.substring(0, 3), // Mon, Tue, Wed, Thu, Fri
+  label: day.label, // Monday, Tuesday, Wednesday, Thursday, Friday
 }));
 
 interface DoorcardPDFProps {
@@ -253,7 +278,7 @@ function groupByDay(appointments: AppointmentForPDF[]) {
   return grouped;
 }
 
-function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
+export function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
   const byDay = groupByDay(doorcard.appointments);
   const displayName = doorcard.user
     ? formatDisplayName(doorcard.user)
@@ -270,7 +295,7 @@ function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
 
   return (
     <Document>
-      <Page size="LETTER" style={styles.page}>
+      <Page size="LETTER" style={styles.page} wrap={false}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.logo}>Faculty Doorcard</Text>
@@ -279,11 +304,10 @@ function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
           </Text>
         </View>
 
-        {/* Faculty Info */}
-        <Text style={styles.facultyName}>{displayName}</Text>
-        {doorcard.user?.title && (
-          <Text style={styles.facultyTitle}>{doorcard.user.title}</Text>
-        )}
+        {/* Faculty Info - Keep together to prevent orphaning */}
+        <View style={styles.facultyInfo} wrap={false}>
+          <Text style={styles.facultyName}>{displayName}</Text>
+        </View>
 
         {/* Office Information */}
         <View style={styles.officeInfo}>
@@ -310,54 +334,105 @@ function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
         {/* Schedule Title */}
         <Text style={styles.scheduleTitle}>Weekly Schedule</Text>
 
-        {/* Schedule Grid */}
-        <View style={styles.scheduleGrid}>
-          {DAYS.map((day, dayIndex) => (
-            <View key={day.key} style={styles.dayColumn}>
-              <Text style={styles.dayHeader}>{day.label}</Text>
-              {TIME_SLOTS.map((slot, slotIndex) => {
-                const appointment = byDay[day.key]?.find((apt) =>
-                  isSlotCovered(apt, slot.value)
-                );
+        {/* Schedule Container with proper layout */}
+        <View style={styles.scheduleContainer} wrap={false}>
+          {/* Time Column - Absolute positioned */}
+          <View style={styles.timeColumn}>
+            {/* Empty header slot to align with day headers */}
+            <View style={{ height: 14, marginBottom: 1 }} />
+            {TIME_SLOTS.map((slot, slotIndex) => (
+              <View key={slot.value} style={styles.timeSlotLabel}>
+                <Text style={styles.timeText}>{slot.label}</Text>
+              </View>
+            ))}
+          </View>
 
-                return (
-                  <View key={slot.value} style={styles.timeSlot}>
-                    {dayIndex === 0 && slotIndex % 2 === 0 && (
-                      <Text style={styles.timeLabel}>{slot.label}</Text>
-                    )}
-                    {appointment ? (
-                      <View
-                        style={[
-                          styles.appointment,
-                          {
-                            backgroundColor:
-                              CATEGORY_COLORS[
-                                appointment.category as keyof typeof CATEGORY_COLORS
-                              ] || CATEGORY_COLORS.REFERENCE,
-                            borderLeftWidth: 3,
-                            borderLeftColor: "#1f2937",
-                          },
-                        ]}
-                      >
-                        <Text style={styles.appointmentText}>
-                          {appointment.name.replace(/^(.*?)\s*-\s*/, "")}
-                        </Text>
-                        {appointment.location && (
-                          <Text style={styles.appointmentLocation}>
-                            {appointment.location}
+          {/* Days Grid */}
+          <View style={styles.scheduleGrid}>
+            {DAYS.map((day, dayIndex) => (
+              <View key={day.key} style={styles.dayColumn}>
+                <Text style={styles.dayHeader}>{day.label}</Text>
+                {TIME_SLOTS.map((slot, slotIndex) => {
+                  const appointment = byDay[day.key]?.find((apt) =>
+                    isSlotCovered(apt, slot.value)
+                  );
+
+                  // Skip rendering slots that are covered by previous appointments
+                  const previousSlotHasAppointment =
+                    slotIndex > 0 &&
+                    byDay[day.key]?.find((apt) => {
+                      const prevSlot = TIME_SLOTS[slotIndex - 1];
+                      return (
+                        isSlotCovered(apt, prevSlot.value) &&
+                        apt.startTime !== prevSlot.value
+                      );
+                    });
+
+                  if (
+                    previousSlotHasAppointment &&
+                    appointment &&
+                    appointment.startTime !== slot.value
+                  ) {
+                    return null; // Skip this slot as it's covered by previous appointment
+                  }
+
+                  const isStartingSlot =
+                    appointment && appointment.startTime === slot.value;
+
+                  // Calculate appointment height for spanning
+                  let appointmentHeight = 15;
+                  let slotHeight = 15;
+
+                  if (isStartingSlot) {
+                    const [startHour, startMin] = appointment.startTime
+                      .split(":")
+                      .map(Number);
+                    const [endHour, endMin] = appointment.endTime
+                      .split(":")
+                      .map(Number);
+                    const durationMinutes =
+                      endHour * 60 + endMin - (startHour * 60 + startMin);
+                    const slotCount = Math.ceil(durationMinutes / 30);
+                    appointmentHeight = 15 * slotCount; // No margin gaps now
+                    slotHeight = appointmentHeight;
+                  }
+
+                  return (
+                    <View
+                      key={slot.value}
+                      style={[styles.timeSlot, { height: slotHeight }]}
+                    >
+                      {isStartingSlot ? (
+                        <View
+                          style={[
+                            styles.appointment,
+                            {
+                              backgroundColor:
+                                CATEGORY_COLORS[
+                                  appointment.category as keyof typeof CATEGORY_COLORS
+                                ] || CATEGORY_COLORS.REFERENCE,
+                              height: appointmentHeight,
+                            },
+                          ]}
+                        >
+                          <Text style={styles.appointmentText}>
+                            {appointment.name.replace(/^(.*?)\s*-\s*/, "")}{" "}
+                            {appointment.startTime}-{appointment.endTime}
+                            {appointment.location &&
+                              ` • ${appointment.location}`}
                           </Text>
-                        )}
-                      </View>
-                    ) : (
-                      <View
-                        style={{ height: "100%", backgroundColor: "#ffffff" }}
-                      />
-                    )}
-                  </View>
-                );
-              })}
-            </View>
-          ))}
+                        </View>
+                      ) : (
+                        <View
+                          style={{ height: "100%", backgroundColor: "#ffffff" }}
+                        />
+                      )}
+                    </View>
+                  );
+                }).filter(Boolean)}
+              </View>
+            ))}
+          </View>
         </View>
 
         {/* Legend */}
