@@ -74,3 +74,4 @@ import-debug-report-*.json
 # Build artifacts
 /storybook-static/
 licenses.json
+.claude/
