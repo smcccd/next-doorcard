@@ -8,6 +8,8 @@ import { prisma } from "@/lib/prisma";
 import type { College, TermSeason } from "@prisma/client";
 import crypto from "crypto";
 
+type ActionResult = { success: boolean; message?: string };
+
 const CAMPUS_VALUES = ["SKYLINE", "CSM", "CANADA"] as const;
 const TERM_DISPLAY = ["Fall", "Spring", "Summer"] as const;
 
@@ -23,131 +25,198 @@ function toEnumSeason(display: (typeof TERM_DISPLAY)[number]): TermSeason {
   return display.toUpperCase() as TermSeason;
 }
 
-export async function handleNewDoorcardForm(formData: FormData) {
-  try {
-    // Validate user is authenticated
-    const authResult = await requireAuthUserAPI();
+async function requireAuth() {
+  const authResult = await requireAuthUserAPI();
+  if ("error" in authResult) throw new Error(authResult.error);
+  return authResult.user;
+}
 
-    if ("error" in authResult) {
-      redirect("/login");
-    }
+function campusLabel(code: string) {
+  switch (code) {
+    case "SKYLINE":
+      return "Skyline College";
+    case "CSM":
+      return "College of San Mateo";
+    case "CANADA":
+      return "Cañada College";
+    default:
+      return code;
+  }
+}
 
-    const user = authResult.user;
+function handleActionError(err: unknown): ActionResult {
+  // Re-throw redirect errors - they should not be handled as regular errors
+  if (err instanceof Error && err.message === "NEXT_REDIRECT") {
+    throw err;
+  }
 
-    // Parse form data
-    const rawData = {
-      college: formData.get("college") as string,
-      term: formData.get("term") as string,
-      year: formData.get("year") as string,
+  if (err instanceof z.ZodError) {
+    return {
+      success: false,
+      message: `Validation failed: ${err.errors
+        .map((e) => e.message)
+        .join(", ")}`,
     };
+  }
+  return {
+    success: false,
+    message:
+      err instanceof Error ? err.message : "An unexpected error occurred",
+  };
+}
 
+export async function handleNewDoorcardForm(formData: FormData): Promise<void> {
+  let newDoorcardId: string | null = null;
+
+  // Log for debugging
+  console.log("[NEW_DOORCARD] Starting form submission", {
+    term: formData.get("term"),
+    year: formData.get("year"),
+    college: formData.get("college"),
+  });
+
+  try {
+    const user = await requireAuth();
+    console.log("[NEW_DOORCARD] User authenticated", { userId: user.id });
+
+    const data = campusTermSchema.parse({
+      term: formData.get("term"),
+      year: formData.get("year"),
+      college: formData.get("college"),
+    });
+    console.log("[NEW_DOORCARD] Data validated", data);
+
+    // Multiple doorcards per term are now allowed - no need to check for existing
+
+    // Get user's profile info for smart defaults
+    console.log("[NEW_DOORCARD] Fetching user profile");
+    const userProfile = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        firstName: true,
+        lastName: true,
+        title: true,
+        name: true,
+        college: true,
+      },
+    });
+    console.log("[NEW_DOORCARD] User profile fetched", {
+      hasProfile: !!userProfile,
+    });
+
+    // Create smart default display name with better error handling
+    let defaultDisplayName = "";
     try {
-      // Validate the data
-      const validatedData = campusTermSchema.parse(rawData);
-
-      // Remove the pre-check - let the database constraint handle duplicates
-      // This eliminates the race condition between check and create
-
-      // Create the doorcard
-      const doorcard = await prisma.doorcard.create({
-        data: {
-          id: crypto.randomUUID(),
-          name: user.name || user.email || "Faculty Member",
-          doorcardName: user.name || user.email || "Faculty Member",
-          officeNumber: "",
-          term: toEnumSeason(validatedData.term),
-          year: validatedData.year,
-          college: validatedData.college as College,
-          isActive: true,
-          isPublic: false,
-          userId: user.id,
-          updatedAt: new Date(),
-        },
-      });
-
-      // Revalidate and redirect
-      revalidatePath("/doorcard");
-      redirect(`/doorcard/${doorcard.id}/edit`);
-    } catch (error: any) {
-      console.error("Error creating doorcard:", error);
-
-      if (error instanceof z.ZodError) {
-        const errorMessages = error.errors.map((err) => err.message).join(", ");
-        redirect(`/doorcard/new?error=${encodeURIComponent(errorMessages)}`);
+      if (userProfile?.firstName && userProfile?.lastName) {
+        // Use firstName/lastName if available
+        if (userProfile.title && userProfile.title !== "none") {
+          defaultDisplayName = `${userProfile.title} ${userProfile.firstName} ${userProfile.lastName}`;
+        } else {
+          defaultDisplayName = `${userProfile.firstName} ${userProfile.lastName}`;
+        }
+      } else if (userProfile?.name) {
+        // Fallback to legacy name field
+        defaultDisplayName = userProfile.name;
+      } else {
+        // Ultimate fallback
+        defaultDisplayName = user.email?.split("@")[0] || "Faculty Member";
       }
-
-      // Handle unique constraint violation
-      if (error.code === "P2002") {
-        const errorMessage =
-          "You already have a doorcard for this term and campus.";
-        redirect(`/doorcard/new?error=${encodeURIComponent(errorMessage)}`);
-      }
-
-      redirect(
-        `/doorcard/new?error=${encodeURIComponent("An unexpected error occurred")}`
+    } catch (nameError) {
+      console.warn(
+        "[NEW_DOORCARD] Error generating display name, using fallback",
+        nameError
       );
+      defaultDisplayName = user.email?.split("@")[0] || "Faculty Member";
     }
-  } catch (err) {
-    console.error("Error in handleNewDoorcardForm:", err);
+
+    // Ensure we have a non-empty display name
+    if (!defaultDisplayName || defaultDisplayName.trim() === "") {
+      defaultDisplayName = "Faculty Member";
+    }
+
+    // Create smart default doorcard title
+    const defaultDoorcardTitle = `${defaultDisplayName}'s ${data.term} ${data.year} Doorcard`;
+
+    console.log("[NEW_DOORCARD] Creating doorcard", {
+      name: defaultDisplayName,
+      doorcardName: defaultDoorcardTitle,
+      term: toEnumSeason(data.term),
+      year: data.year,
+      college: data.college,
+      userId: user.id,
+    });
+
+    const newDoorcard = await prisma.doorcard.create({
+      data: {
+        id: crypto.randomUUID(),
+        name: defaultDisplayName,
+        doorcardName: defaultDoorcardTitle,
+        officeNumber: "",
+        term: toEnumSeason(data.term),
+        year: data.year,
+        college: data.college as College,
+        isActive: false,
+        isPublic: false,
+        userId: user.id,
+        updatedAt: new Date(),
+      },
+    });
+    newDoorcardId = newDoorcard.id;
+    console.log("[NEW_DOORCARD] Doorcard created successfully", {
+      id: newDoorcardId,
+    });
+  } catch (error: any) {
+    console.error("[NEW_DOORCARD] Error creating doorcard:", {
+      error: error.message,
+      stack: error.stack,
+      name: error.name,
+      code: error.code,
+    });
+
+    if (error instanceof z.ZodError) {
+      const errorMessages = error.errors.map((err) => err.message).join(", ");
+      redirect(`/doorcard/new?error=${encodeURIComponent(errorMessages)}`);
+    }
+
+    // Multiple doorcards per term are now allowed - no unique constraint to handle
+
     redirect(
       `/doorcard/new?error=${encodeURIComponent("An unexpected error occurred")}`
     );
   }
+
+  // Revalidate paths to ensure fresh data
+  revalidatePath(`/doorcard/${newDoorcardId}/edit`);
+  revalidatePath("/dashboard");
+  redirect(`/doorcard/${newDoorcardId}/edit?step=1`);
 }
 
 export async function handleEditDoorcardCampusForm(
   doorcardId: string,
+  _prevState: ActionResult,
   formData: FormData
-) {
+): Promise<ActionResult> {
   try {
-    // Validate user is authenticated
-    const authResult = await requireAuthUserAPI();
+    const user = await requireAuth();
+    const data = campusTermSchema.parse({
+      term: formData.get("term"),
+      year: formData.get("year"),
+      college: formData.get("college"),
+    });
 
-    if ("error" in authResult) {
-      redirect("/login");
-    }
-
-    const user = authResult.user;
-
-    // Parse form data
-    const rawData = {
-      college: formData.get("college") as string,
-      term: formData.get("term") as string,
-      year: formData.get("year") as string,
-    };
-
-    // Validate the data
-    const validatedData = campusTermSchema.parse(rawData);
-
-    // Update the doorcard
+    // Update doorcard - multiple doorcards per term are now allowed
     await prisma.doorcard.update({
-      where: {
-        id: doorcardId,
-        userId: user.id, // Ensure user owns this doorcard
-      },
+      where: { id: doorcardId, userId: user.id },
       data: {
-        term: toEnumSeason(validatedData.term),
-        year: validatedData.year,
-        college: validatedData.college as College,
-        updatedAt: new Date(),
+        term: toEnumSeason(data.term),
+        year: data.year,
+        college: data.college as College,
       },
     });
 
-    // Revalidate and redirect
-    revalidatePath(`/doorcard/${doorcardId}`);
-    redirect(`/doorcard/${doorcardId}/edit`);
-  } catch (error) {
-    console.error("Error updating doorcard:", error);
-
-    if (error instanceof z.ZodError) {
-      const errorMessages = error.errors.map((err) => err.message).join(", ");
-      redirect(
-        `/doorcard/${doorcardId}/edit?error=${encodeURIComponent(errorMessages)}`
-      );
-    }
-
-    redirect(
-      `/doorcard/${doorcardId}/edit?error=${encodeURIComponent("An unexpected error occurred")}`
-    );
+    revalidatePath(`/doorcard/${doorcardId}/edit`);
+    redirect(`/doorcard/${doorcardId}/edit?step=1`);
+  } catch (err) {
+    return handleActionError(err);
   }
 }
