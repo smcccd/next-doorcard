@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Source_Sans_3, Geist } from "next/font/google";
 import AuthProvider from "@/components/AuthProvider";
 import Navbar from "@/components/Navbar";
-
+import { SessionRefresher } from "@/components/SessionRefresher";
 import { ProfileSetupProvider } from "@/components/ProfileSetupProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { DarkModeProvider } from "@/components/DarkModeProvider";
@@ -22,7 +22,6 @@ const inter = Inter({
 const geist = Geist({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-geist",
 });
 
 const sourceSans = Source_Sans_3({
@@ -57,39 +56,11 @@ export const viewport: Viewport = {
 const CURRENT_YEAR = new Date().getFullYear();
 
 function Footer() {
-  const districtLinks = [
-    { href: "https://smccd.edu/", text: "District Home" },
-    { href: "https://smccd.edu/aboutus/", text: "About Us" },
-    { href: "https://smccd.edu/boardoftrustees/", text: "Board of Trustees" },
-    { href: "https://smccd.edu/departments/", text: "Departments" },
-    { href: "https://jobs.smccd.edu/", text: "Employment" },
-    { href: "http://foundation.smccd.edu", text: "Foundation" },
-    { href: "https://smccd.edu/aboutus/contactus.php", text: "Contact Us" },
-  ];
-
   return (
     <footer className="bg-smccd-blue-900 dark:bg-smccd-blue-950 text-white mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* District Links */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
-          {districtLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-smccd-blue-100 hover:text-white text-sm transition-colors duration-150 hover:underline"
-            >
-              {link.text}
-            </a>
-          ))}
-        </div>
-
-        {/* Copyright */}
-        <div className="border-t border-smccd-blue-800 pt-6">
-          <div className="text-center text-smccd-blue-200 text-sm">
-            <p>© {CURRENT_YEAR} San Mateo County Community College District</p>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="text-center text-smccd-blue-200 text-sm">
+          <p>© {CURRENT_YEAR} San Mateo County Community College District</p>
         </div>
       </div>
     </footer>
@@ -105,7 +76,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`h-full ${inter.variable} ${sourceSans.variable} ${geist.variable}`}
+      className={`h-full ${inter.variable} ${sourceSans.variable}`}
     >
       <body
         className={`${geist.className} bg-gray-50 dark:bg-gray-900 min-h-screen flex flex-col antialiased`}
@@ -120,6 +91,7 @@ export default async function RootLayout({
 
         <DarkModeProvider>
           <AuthProvider session={session}>
+            <SessionRefresher />
             <ProfileSetupProvider>
               {/* Wrap Navbar in Suspense if it does async work */}
               <Suspense fallback={<div className="h-16" />}>

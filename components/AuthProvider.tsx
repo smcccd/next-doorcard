@@ -11,5 +11,15 @@ export default function AuthProvider({
   children: ReactNode;
   session?: Session | null;
 }) {
-  return <SessionProvider session={session}>{children}</SessionProvider>;
+  return (
+    <SessionProvider
+      session={session}
+      // Avoid aggressive refetching - only refetch on window focus
+      refetchOnWindowFocus={true} // This is actually the default
+      // Don't use refetchInterval unless you have a specific need
+      // It causes unnecessary server load and can create race conditions
+    >
+      {children}
+    </SessionProvider>
+  );
 }

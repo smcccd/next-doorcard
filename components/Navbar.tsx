@@ -1,43 +1,26 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { NavDropdown } from "./NavDropdown";
-import { prisma } from "@/lib/prisma";
 import SMCCDLogoFresh from "./SMCCDLogoFresh";
 import MobileNav from "./MobileNav";
+import {
+  getNavigationAuth,
+  navigationItems,
+  navStyles,
+} from "@/lib/navigation";
 
 export default async function Navbar() {
-  const session = await getServerSession(authOptions);
-  const userDisplay =
-    session?.user?.name || session?.user?.email || "Faculty Member";
-
-  // Check if user is admin
-  let isAdmin = false;
-  if (session?.user?.email) {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        select: { role: true },
-      });
-      isAdmin = user?.role === "ADMIN";
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-    }
-  }
+  const { session, userDisplay, isAdmin } = await getNavigationAuth();
 
   return (
-    <nav
-      className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 relative"
-      aria-label="Primary"
-    >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-28 items-center justify-between">
+    <nav className={`${navStyles.container.nav} relative`} aria-label="Primary">
+      <div className={navStyles.container.wrapper}>
+        <div className={`${navStyles.container.flex} h-28`}>
           {/* Logo & App Branding */}
           <div className="flex items-center">
             <Link
               href="/"
-              prefetch={false}
               className="flex items-center group flex-shrink-0 transition-colors duration-200 hover:opacity-90"
+              aria-label="Faculty Doorcard System - Home"
             >
               {/* SMCCD Logo */}
               <SMCCDLogoFresh
@@ -61,20 +44,21 @@ export default async function Navbar() {
           {/* Right Side Navigation & Actions */}
           <div className="flex items-center space-x-6">
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-1">
-              <Link
-                href="/"
-                className="text-gray-700 dark:text-gray-300 hover:text-smccd-blue-900 dark:hover:text-smccd-blue-400 hover:bg-smccd-blue-50 dark:hover:bg-smccd-blue-950/20 font-semibold text-base transition-all duration-200 px-4 py-2.5 rounded-md relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-0.5 after:bg-smccd-blue-600 after:transition-all after:duration-200 hover:after:w-3/4"
-              >
-                Home
-              </Link>
-              <Link
-                href="/browse"
-                className="text-gray-700 dark:text-gray-300 hover:text-smccd-blue-900 dark:hover:text-smccd-blue-400 hover:bg-smccd-blue-50 dark:hover:bg-smccd-blue-950/20 font-semibold text-base transition-all duration-200 px-4 py-2.5 rounded-md relative after:absolute after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:w-0 after:h-0.5 after:bg-smccd-blue-600 after:transition-all after:duration-200 hover:after:w-3/4"
-              >
-                Find Faculty
-              </Link>
-            </div>
+            <nav
+              className="hidden md:flex items-center space-x-1"
+              aria-label="Primary navigation"
+            >
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${navStyles.navLink.base} ${navStyles.navLink.desktop} ${navStyles.navLink.underlineEffect} font-semibold text-base`}
+                  aria-label={item.ariaLabel}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
 
             {/* Desktop Auth */}
             <div className="hidden md:flex items-center">
@@ -83,8 +67,8 @@ export default async function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="bg-smccd-blue-900 hover:bg-smccd-blue-800 text-white px-5 py-2.5 rounded-md text-base font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-smccd-blue-700 focus:ring-offset-2"
-                  prefetch={false}
+                  className={`${navStyles.loginButton.base} ${navStyles.loginButton.desktop}`}
+                  aria-label="Sign in to your faculty account"
                 >
                   Login
                 </Link>

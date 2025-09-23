@@ -1,10 +1,9 @@
 import type { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import type { Adapter, AdapterAccount } from "next-auth/adapters";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
 import crypto from "crypto";
+import { logger } from "@/lib/logger";
 
 // OneLogin profile interface
 interface OneLoginProfile {
@@ -27,7 +26,10 @@ function CustomPrismaAdapter(): Adapter {
   return {
     ...baseAdapter,
     async createUser(user: any) {
-      console.log("[ADAPTER] createUser called with:", user);
+      logger.debug("[ADAPTER] createUser called", {
+        email: user.email,
+        name: user.name,
+      });
       try {
         const result = await prisma.user.create({
           data: {
@@ -42,10 +44,12 @@ function CustomPrismaAdapter(): Adapter {
             college: null,
           },
         });
-        console.log("[ADAPTER] createUser success:", result.id);
+        logger.debug("[ADAPTER] createUser success", { userId: result.id });
         return result;
       } catch (error) {
-        console.error("[ADAPTER] createUser failed:", error);
+        logger.error("[ADAPTER] createUser failed", {
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
         throw error;
       }
     },
@@ -70,9 +74,8 @@ function CustomPrismaAdapter(): Adapter {
       };
     },
     async linkAccount(account: AdapterAccount) {
-      console.log("[ADAPTER] linkAccount called with:", {
+      logger.debug("[ADAPTER] linkAccount called", {
         provider: account.provider,
-        providerAccountId: account.providerAccountId,
         userId: account.userId,
         type: account.type,
       });
@@ -94,10 +97,12 @@ function CustomPrismaAdapter(): Adapter {
             session_state: account.session_state,
           },
         });
-        console.log("[ADAPTER] linkAccount success:", result.id);
+        logger.debug("[ADAPTER] linkAccount success", { accountId: result.id });
         return result;
       } catch (error) {
-        console.error("[ADAPTER] linkAccount failed:", error);
+        logger.error("[ADAPTER] linkAccount failed", {
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
         throw error;
       }
     },
@@ -105,7 +110,9 @@ function CustomPrismaAdapter(): Adapter {
 }
 
 export const authOptions: NextAuthOptions = {
-  debug: process.env.NEXTAUTH_DEBUG === "true",
+  debug:
+    process.env.NODE_ENV === "development" &&
+    process.env.NEXTAUTH_DEBUG === "true",
   adapter: CustomPrismaAdapter(),
   providers: [
     // OneLogin OIDC Provider - Custom OAuth Configuration
@@ -149,10 +156,8 @@ export const authOptions: NextAuthOptions = {
             "base64"
           );
 
-          console.log("Token request params (Basic Auth):", {
+          logger.debug("Token request initiated", {
             grant_type: "authorization_code",
-            code: params.code?.substring(0, 10) + "...",
-            redirect_uri: redirectUri,
             auth_method: "Basic",
             client_id: clientId,
           });
@@ -171,7 +176,12 @@ export const authOptions: NextAuthOptions = {
           });
 
           const tokens = await response.json();
-          console.log("Token response:", response.status, tokens);
+          logger.debug("Token response received", {
+            status: response.status,
+            hasAccessToken: !!tokens.access_token,
+            hasRefreshToken: !!tokens.refresh_token,
+            tokenType: tokens.token_type,
+          });
 
           if (!response.ok) {
             throw new Error(
@@ -185,10 +195,7 @@ export const authOptions: NextAuthOptions = {
       userinfo: {
         url: "https://smccd.onelogin.com/oidc/2/me",
         async request({ tokens, provider }) {
-          console.log(
-            "UserInfo request with token:",
-            tokens.access_token?.substring(0, 20) + "..."
-          );
+          logger.debug("Fetching UserInfo with access token");
 
           const userinfoUrl =
             typeof provider.userinfo === "string"
@@ -201,7 +208,11 @@ export const authOptions: NextAuthOptions = {
           });
 
           const userInfo = await response.json();
-          console.log("UserInfo response:", response.status, userInfo);
+          logger.debug("UserInfo response received", {
+            status: response.status,
+            hasUserInfo: !!userInfo,
+            userEmail: userInfo?.email,
+          });
 
           if (!response.ok) {
             throw new Error(
@@ -214,7 +225,11 @@ export const authOptions: NextAuthOptions = {
       },
 
       profile(profile) {
-        console.log("Profile data received:", profile);
+        logger.debug("Profile data received", {
+          sub: profile.sub,
+          email: profile.email,
+          name: profile.name,
+        });
 
         // Ensure we have required fields
         if (!profile.sub && !profile.id) {
@@ -235,64 +250,21 @@ export const authOptions: NextAuthOptions = {
         };
       },
     },
-
-    // Credentials Provider (Development/Fallback)
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        // Regular auth logic
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-
-        try {
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
-          });
-
-          if (!user || !user.password) {
-            return null;
-          }
-
-          const isPasswordValid = await bcrypt.compare(
-            credentials.password,
-            user.password
-          );
-
-          if (!isPasswordValid) {
-            return null;
-          }
-
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            role: user.role,
-          };
-        } catch (error) {
-          console.error("[CREDENTIALS] Database error:", error);
-          return null;
-        }
-      },
-    }),
   ],
   session: {
     strategy: "jwt",
     maxAge: 8 * 60 * 60, // 8 hours for production
+    updateAge: 24 * 60 * 60, // Update session only once per day (best practice to reduce server load)
   },
   cookies: {
-    state: {
-      name: `next-auth.state`,
+    sessionToken: {
+      name: `${process.env.NODE_ENV === "production" ? "__Secure-" : ""}next-auth.session-token`,
       options: {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
         secure: process.env.NODE_ENV === "production",
-        maxAge: 900, // 15 minutes
+        maxAge: 8 * 60 * 60, // Match session.maxAge
       },
     },
   },
@@ -302,7 +274,7 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user, account, profile }) {
-      console.log("[SIGNIN] Callback triggered:", {
+      logger.debug("[SIGNIN] Callback triggered", {
         provider: account?.provider,
         userEmail: user?.email,
         accountType: account?.type,
@@ -315,7 +287,7 @@ export const authOptions: NextAuthOptions = {
 
       // Allow OneLogin account linking to existing users
       if (account?.provider === "onelogin") {
-        console.log("[SIGNIN] OneLogin flow starting for:", user?.email);
+        logger.debug("[SIGNIN] OneLogin flow starting", { email: user?.email });
         try {
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email! },
@@ -374,7 +346,9 @@ export const authOptions: NextAuthOptions = {
             });
           }
         } catch (error) {
-          console.error("Error linking OneLogin account:", error);
+          logger.error("Error linking OneLogin account", {
+            error: error instanceof Error ? error.message : "Unknown error",
+          });
           return false;
         }
       }
@@ -408,7 +382,9 @@ export const authOptions: NextAuthOptions = {
             token.college = userDetails.college || undefined;
           }
         } catch (error) {
-          console.error("Error fetching user details:", error);
+          logger.error("Error fetching user details", {
+            error: error instanceof Error ? error.message : "Unknown error",
+          });
         }
       }
 
@@ -426,9 +402,10 @@ export const authOptions: NextAuthOptions = {
   events: {
     async signIn({ user, account, isNewUser }) {
       if (isNewUser) {
-        console.log(
-          `🎉 New user signed in: ${user.email} via ${account?.provider}`
-        );
+        logger.info("New user signed in", {
+          email: user.email,
+          provider: account?.provider,
+        });
       }
     },
   },
