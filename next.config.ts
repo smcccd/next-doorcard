@@ -96,7 +96,7 @@ const nextConfig: NextConfig = {
         // Microsoft Clarity
         "https://www.clarity.ms",
         // Sentry
-        "https://o4507609983934464.ingest.us.sentry.io",
+        "https://o4509746708611072.ingest.us.sentry.io",
         // Development hot reload
         ...(isDevelopment
           ? ["ws://localhost:3000", "http://localhost:3000"]
