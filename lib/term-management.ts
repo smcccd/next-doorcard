@@ -25,11 +25,14 @@ export class TermManager {
     const fallbackYear = process.env.FALLBACK_ACTIVE_TERM_YEAR;
 
     if (fallbackSeason && fallbackYear) {
+      // Ensure season is uppercase for enum compatibility
+      const normalizedSeason = fallbackSeason.toUpperCase();
+
       // Return a mock term object that matches the expected structure
       return {
         id: "fallback-term",
         name: `${fallbackSeason.charAt(0).toUpperCase() + fallbackSeason.slice(1).toLowerCase()} ${fallbackYear}`,
-        season: fallbackSeason as any,
+        season: normalizedSeason as any,
         year: fallbackYear,
         startDate: new Date(`${fallbackYear}-01-01`),
         endDate: new Date(`${fallbackYear}-12-31`),
