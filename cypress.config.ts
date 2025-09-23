@@ -1,114 +1,147 @@
 import { defineConfig } from "cypress";
+import jwt from "jsonwebtoken";
 
 export default defineConfig({
   e2e: {
-    baseUrl: process.env.CYPRESS_BASE_URL || "http://localhost:3000",
+    baseUrl: "http://localhost:3000",
+    supportFile: "cypress/support/e2e.ts",
+    specPattern: "cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
     viewportWidth: 1280,
     viewportHeight: 720,
     video: true,
-    screenshotOnRunFailure: true,
-    defaultCommandTimeout: 20000,
-    requestTimeout: 15000,
-    responseTimeout: 15000,
+    videosFolder: "cypress/videos",
+    screenshotsFolder: "cypress/screenshots",
+    defaultCommandTimeout: 10000,
+    requestTimeout: 10000,
+    responseTimeout: 10000,
     pageLoadTimeout: 30000,
-    retries: {
-      runMode: 2,
-      openMode: 0,
-    },
+    
+    // Testing modes configuration
     env: {
-      failOnStatusCode: false,
-      CYPRESS: true, // Flag to identify Cypress environment
-    },
-    setupNodeEvents(on, config) {
-      // Server health check
-      on("task", {
-        log(message) {
-          console.log(message);
-          return null;
+      // Authentication mode: 'manual', 'programmatic', 'mock'
+      AUTH_MODE: "manual",
+      
+      // Interactive mode settings
+      INTERACTIVE_LOGIN: true,
+      MFA_WAIT_TIME: 60000, // 60 seconds for MFA entry
+      
+      // Session persistence
+      PERSIST_SESSIONS: true,
+      SESSION_CACHE_DIR: "cypress/cache",
+      
+      // OneLogin configuration
+      ONELOGIN_MANUAL_LOGIN_URL: "https://smccd.onelogin.com",
+      ONELOGIN_TEST_USERS: {
+        FACULTY: {
+          role: "FACULTY",
+          college: "SKYLINE"
         },
-        table(message) {
-          console.table(message);
-          return null;
+        ADMIN: {
+          role: "ADMIN", 
+          college: "SKYLINE"
         },
-        async ping() {
-          try {
-            const response = await fetch(
-              config.baseUrl || "http://localhost:3000"
-            );
-            return response.ok;
-          } catch (error) {
-            return false;
-          }
-        },
-        async createAuthToken({
-          email,
-          name,
-          id = "test-user-id",
-          role = "ADMIN",
-        }) {
-          try {
-            // Create a JWT token for NextAuth.js
-            const { encode } = require("next-auth/jwt");
-
-            const secret =
-              process.env.NEXTAUTH_SECRET || "development-secret-key";
-
-            console.log(
-              "Using NEXTAUTH_SECRET:",
-              secret ? "***set***" : "not set"
-            );
-            console.log("NODE_ENV:", process.env.NODE_ENV);
-
-            const tokenPayload = {
-              sub: id,
-              id: id, // Include both sub and id
-              name: name,
-              email: email,
-              role: role,
-              college: "SKYLINE",
-              iat: Math.floor(Date.now() / 1000),
-              exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
-              jti: `test-${Date.now()}`,
-            };
-
-            console.log("Creating auth token with payload:", tokenPayload);
-
-            const token = await encode({
-              token: tokenPayload,
-              secret: secret,
-              maxAge: 24 * 60 * 60, // Match NextAuth session maxAge
-              encryption: true,
-            });
-
-            console.log(
-              "Token created successfully:",
-              token?.substring(0, 50) + "..."
-            );
-            return token;
-          } catch (error) {
-            console.error("Error creating auth token:", error);
-            throw error;
-          }
-        },
-      });
-
-      // Performance metrics collection
-      on("before:browser:launch", (browser, launchOptions) => {
-        if (browser.name === "chrome" && browser.isHeadless) {
-          launchOptions.args.push("--disable-dev-shm-usage");
-          launchOptions.args.push("--no-sandbox");
-          launchOptions.args.push("--disable-web-security");
+        STAFF: {
+          role: "STAFF",
+          college: "CAÑADA"
         }
+      },
+      
+      // Development fallback
+      DEV_LOGIN_ENABLED: true
+    },
 
-        // Set custom user agent to help identify Cypress requests
-        launchOptions.args.push("--user-agent=Cypress Test Runner");
-        return launchOptions;
+    setupNodeEvents(on, config) {
+      // Task to check if dev server is running
+      on("task", {
+        ping() {
+          return new Promise((resolve) => {
+            const http = require("http");
+            const req = http.get("http://localhost:3000", (res) => {
+              resolve(true);
+            });
+            req.on("error", () => resolve(false));
+            req.setTimeout(5000, () => {
+              req.destroy();
+              resolve(false);
+            });
+          });
+        },
+
+        // Create JWT token for programmatic authentication
+        createAuthToken(payload: any) {
+          const secret = process.env.NEXTAUTH_SECRET || "dev-secret-key";
+          const token = jwt.sign(
+            {
+              ...payload,
+              iat: Math.floor(Date.now() / 1000),
+              exp: Math.floor(Date.now() / 1000) + 60 * 60 * 8, // 8 hours
+            },
+            secret
+          );
+          return token;
+        },
+
+        // Manual login session management
+        saveSession(sessionData: any) {
+          const fs = require("fs");
+          const path = require("path");
+          const cacheDir = path.join(process.cwd(), "cypress/cache");
+          
+          if (!fs.existsSync(cacheDir)) {
+            fs.mkdirSync(cacheDir, { recursive: true });
+          }
+          
+          const sessionFile = path.join(cacheDir, `session-${sessionData.userRole}.json`);
+          fs.writeFileSync(sessionFile, JSON.stringify(sessionData, null, 2));
+          return true;
+        },
+
+        loadSession(userRole: string) {
+          const fs = require("fs");
+          const path = require("path");
+          const sessionFile = path.join(process.cwd(), "cypress/cache", `session-${userRole}.json`);
+          
+          if (fs.existsSync(sessionFile)) {
+            const sessionData = JSON.parse(fs.readFileSync(sessionFile, "utf8"));
+            // Check if session is still valid (within 6 hours)
+            const sixHoursAgo = Date.now() - (6 * 60 * 60 * 1000);
+            if (sessionData.timestamp > sixHoursAgo) {
+              return sessionData;
+            }
+          }
+          return null;
+        },
+
+        clearSessions() {
+          const fs = require("fs");
+          const path = require("path");
+          const cacheDir = path.join(process.cwd(), "cypress/cache");
+          
+          if (fs.existsSync(cacheDir)) {
+            const files = fs.readdirSync(cacheDir);
+            files.forEach((file: string) => {
+              if (file.startsWith("session-")) {
+                fs.unlinkSync(path.join(cacheDir, file));
+              }
+            });
+          }
+          return true;
+        },
+
+        // Log test environment info
+        logTestEnvironment() {
+          console.log("=== TEST ENVIRONMENT INFO ===");
+          console.log(`Base URL: ${config.baseUrl}`);
+          console.log(`Auth Mode: ${config.env.AUTH_MODE}`);
+          console.log(`Interactive Login: ${config.env.INTERACTIVE_LOGIN}`);
+          console.log(`Session Persistence: ${config.env.PERSIST_SESSIONS}`);
+          console.log("============================");
+          return null;
+        }
       });
 
       return config;
     },
-    experimentalStudio: true,
-    experimentalWebKitSupport: true,
   },
 
   component: {
@@ -116,18 +149,7 @@ export default defineConfig({
       framework: "next",
       bundler: "webpack",
     },
-    viewportWidth: 1000,
-    viewportHeight: 600,
+    supportFile: "cypress/support/component.ts",
+    specPattern: "src/**/*.cy.{js,jsx,ts,tsx}",
   },
-
-  // Global configuration
-  chromeWebSecurity: false,
-  modifyObstructiveCode: false,
-  blockHosts: [
-    // Block analytics and tracking scripts during testing
-    "*.google-analytics.com",
-    "*.googletagmanager.com",
-    "*.facebook.com",
-    "*.twitter.com",
-  ],
 });

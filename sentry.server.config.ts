@@ -5,14 +5,32 @@
 import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
-  dsn: "https://ffc6a191acb1f807ebf01f1b73432d51@o4509746708611072.ingest.us.sentry.io/4509746709397504",
+  dsn: process.env.SENTRY_DSN,
+  environment: process.env.NODE_ENV,
 
-  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
-  tracesSampleRate: 1,
+  // Environment-based sampling rates to control costs and performance
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
+  profilesSampleRate: process.env.NODE_ENV === "production" ? 0.01 : 1.0,
 
   // Enable logs to be sent to Sentry
-  enableLogs: true,
+  enableLogs: process.env.NODE_ENV !== "production",
 
-  // Setting this option to true will print useful information to the console while you're setting up Sentry.
-  debug: false,
+  // Debug mode only in development
+  debug: process.env.NODE_ENV === "development",
+
+  // Filter out known noise and add error handling
+  beforeSend(event) {
+    // Filter out known client-side errors that aren't actionable
+    if (event.exception?.values?.[0]?.value?.includes('ChunkLoadError')) {
+      return null;
+    }
+    
+    // Scrub sensitive data for compliance
+    if (event.user) {
+      delete event.user.email;
+      delete event.user.ip_address;
+    }
+    
+    return event;
+  },
 });

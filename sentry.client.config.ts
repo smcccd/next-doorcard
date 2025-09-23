@@ -1,20 +1,32 @@
-// This file configures the initialization of Sentry for edge features (middleware, edge routes, and so on).
-// The config you add here will be used whenever one of the edge features is loaded.
-// Note that this config is unrelated to the Vercel Edge Runtime and is also required when running locally.
+// This file configures the initialization of Sentry on the client.
+// The added config here will be used whenever a users loads a page in their browser.
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
-  dsn: process.env.SENTRY_DSN,
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   environment: process.env.NODE_ENV,
+
+  // Add optional integrations for additional features
+  integrations: [
+    Sentry.replayIntegration({
+      // Mask sensitive text content
+      maskAllText: process.env.NODE_ENV === "production",
+      blockAllMedia: process.env.NODE_ENV === "production",
+    }),
+  ],
 
   // Environment-based sampling rates to control costs and performance
   tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
   profilesSampleRate: process.env.NODE_ENV === "production" ? 0.01 : 1.0,
 
-  // Enable logs to be sent to Sentry
+  // Enable logs only in development
   enableLogs: process.env.NODE_ENV !== "production",
+
+  // Conservative replay sampling for production
+  replaysSessionSampleRate: process.env.NODE_ENV === "production" ? 0.01 : 0.1,
+  replaysOnErrorSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
 
   // Debug mode only in development
   debug: process.env.NODE_ENV === "development",
@@ -23,6 +35,9 @@ Sentry.init({
   beforeSend(event) {
     // Filter out known client-side errors that aren't actionable
     if (event.exception?.values?.[0]?.value?.includes('ChunkLoadError')) {
+      return null;
+    }
+    if (event.exception?.values?.[0]?.value?.includes('NetworkError')) {
       return null;
     }
     
@@ -35,3 +50,5 @@ Sentry.init({
     return event;
   },
 });
+
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
