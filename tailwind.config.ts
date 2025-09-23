@@ -15,6 +15,10 @@ export default {
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        // Campus Brand Colors
+        "campus-skyline": "hsl(var(--campus-skyline))",
+        "campus-csm": "hsl(var(--campus-csm))",
+        "campus-canada": "hsl(var(--campus-canada))",
         // Official SMCCD Brand Colors
         "smccd-blue": {
           DEFAULT: "#012147", // Official SMCCD Blue

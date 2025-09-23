@@ -1,20 +1,37 @@
-import Link from "next/link";
-import { Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Plus, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function NewDoorcardButton() {
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const handleCreateDoorcard = () => {
+    setIsLoading(true);
+    router.push("/doorcard/new");
+  };
+
   return (
-    <Link
-      href="/doorcard/new"
+    <Button
+      onClick={handleCreateDoorcard}
+      disabled={isLoading}
       data-testid="create-doorcard-button"
-      className={cn(
-        "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-        "h-11 px-4 py-2", // default size
-        "bg-primary text-primary-foreground shadow hover:bg-primary/90" // default variant
-      )}
+      className="gap-2"
     >
-      <Plus className="h-5 w-5 mr-1" />
-      Create Doorcard
-    </Link>
+      {isLoading ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Creating...
+        </>
+      ) : (
+        <>
+          <Plus className="h-5 w-5" />
+          Create Doorcard
+        </>
+      )}
+    </Button>
   );
 }

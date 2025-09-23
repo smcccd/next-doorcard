@@ -41,6 +41,10 @@
     "vpat:verify": "npm run vpat:generate && echo 'VPAT generated successfully'",
     "accessibility:test": "npm run cypress:run -- --spec='cypress/e2e/accessibility.cy.ts'",
     "accessibility:report": "npm run accessibility:test && npm run vpat:generate",
+    "qa:urls": "tsx scripts/qa-url-testing.ts",
+    "qa:urls:quick": "tsx scripts/qa-url-quick-test.ts",
+    "security:headers": "node scripts/verify-security-headers.js",
+    "security:headers:prod": "node scripts/verify-security-headers.js https://doorcard.vercel.app",
     "prepare": "husky || true"
   },
   "dependencies": {
@@ -61,6 +65,8 @@
     "@tailwindcss/typography": "^0.5.16",
     "@types/dompurify": "^3.0.5",
     "@types/marked": "^5.0.2",
+    "@upstash/ratelimit": "^2.0.6",
+    "@upstash/redis": "^1.35.3",
     "@vercel/analytics": "^1.5.0",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",

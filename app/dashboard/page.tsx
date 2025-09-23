@@ -9,9 +9,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Eye, Calendar, Clock } from "lucide-react";
 import { getCurrentAcademicTerm } from "@/lib/active-term";
 
-/* -------------------------------------------------------------------------- */
-/* Types (optional)                                                           */
-/* -------------------------------------------------------------------------- */
 import type { Doorcard, Appointment, User, TermSeason } from "@prisma/client";
 
 type DashboardDoorcard = Doorcard & {
@@ -19,9 +16,6 @@ type DashboardDoorcard = Doorcard & {
   user: Pick<User, "username" | "name">;
 };
 
-/* -------------------------------------------------------------------------- */
-/* Page                                                                       */
-/* -------------------------------------------------------------------------- */
 export default async function DashboardPage() {
   const user = await requireAuthUser();
 
@@ -125,9 +119,7 @@ export default async function DashboardPage() {
                   <p className="text-3xl font-bold">
                     {doorcards.filter((d) => d.isActive && d.isPublic).length}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                    Public & active
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Public & active</p>
                 </div>
                 <Eye className="h-8 w-8 text-green-600" />
               </CardContent>
@@ -170,6 +162,7 @@ export default async function DashboardPage() {
         </section>
 
         <DoorcardGrid
+          variant="list"
           doorcards={current}
           title={`Current Term (${currentTermInfo.displayName})`}
           emptyMessage={`No doorcards for ${currentTermInfo.displayName} yet.`}

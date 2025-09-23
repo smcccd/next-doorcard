@@ -1,29 +1,84 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { NavDropdown } from "./NavDropdown";
-import { prisma } from "@/lib/prisma";
 import SMCCDLogoFresh from "./SMCCDLogoFresh";
 import MobileNav from "./MobileNav";
+import {
+  getNavigationAuth,
+  navigationItems,
+  navStyles,
+} from "@/lib/navigation";
 
-// VARIANT 1: Minimal & Clean (Current Implementation)
+// Shared component for rendering navigation links
+function NavigationLinks({
+  variant = "default",
+  className = "",
+}: {
+  variant?: "default" | "clean" | "underline";
+  className?: string;
+}) {
+  const linkStyles = {
+    default: `${navStyles.navLink.base} ${navStyles.navLink.desktop}`,
+    clean:
+      "px-3 py-2 text-sm font-medium text-gray-700 hover:text-smccd-blue-900 rounded-md hover:bg-gray-50",
+    underline:
+      "relative py-2 text-gray-700 hover:text-smccd-blue-900 font-medium transition-all duration-200 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-smccd-blue-900 after:transition-all after:duration-200 hover:after:w-full",
+  };
+
+  return (
+    <div className={className}>
+      {navigationItems.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          className={linkStyles[variant]}
+          aria-label={item.ariaLabel}
+        >
+          {item.label}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+// Shared component for auth section
+function AuthSection({
+  session,
+  userDisplay,
+  isAdmin,
+  variant = "default",
+}: {
+  session: any;
+  userDisplay: string;
+  isAdmin: boolean;
+  variant?: "default" | "clean";
+}) {
+  const buttonStyles = {
+    default: `${navStyles.loginButton.base} ${navStyles.loginButton.desktop}`,
+    clean:
+      "bg-smccd-blue-900 hover:bg-smccd-blue-800 text-white px-4 py-2 rounded-md text-sm font-medium",
+  };
+
+  return (
+    <>
+      {session ? (
+        <NavDropdown userDisplay={userDisplay} isAdmin={isAdmin} />
+      ) : (
+        <Link
+          href="/login"
+          className={buttonStyles[variant]}
+          prefetch={false}
+          aria-label="Sign in to your faculty account"
+        >
+          {variant === "default" ? "Login" : "Login"}
+        </Link>
+      )}
+    </>
+  );
+}
+
+// VARIANT 1: Minimal & Clean
 export async function NavbarVariant1() {
-  const session = await getServerSession(authOptions);
-  const userDisplay =
-    session?.user?.name || session?.user?.email || "Faculty Member";
-
-  let isAdmin = false;
-  if (session?.user?.email) {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        select: { role: true },
-      });
-      isAdmin = user?.role === "ADMIN";
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-    }
-  }
+  const { session, userDisplay, isAdmin } = await getNavigationAuth();
 
   return (
     <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -53,32 +108,18 @@ export async function NavbarVariant1() {
 
           {/* Navigation */}
           <div className="flex items-center space-x-6">
-            <div className="hidden md:flex items-center space-x-1">
-              <Link
-                href="/"
-                className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-smccd-blue-900 rounded-md hover:bg-gray-50"
-              >
-                Home
-              </Link>
-              <Link
-                href="/browse"
-                className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-smccd-blue-900 rounded-md hover:bg-gray-50"
-              >
-                Find Faculty
-              </Link>
-            </div>
+            <NavigationLinks
+              variant="clean"
+              className="hidden md:flex items-center space-x-1"
+            />
 
             <div className="hidden md:flex items-center">
-              {session ? (
-                <NavDropdown userDisplay={userDisplay} isAdmin={isAdmin} />
-              ) : (
-                <Link
-                  href="/login"
-                  className="bg-smccd-blue-900 hover:bg-smccd-blue-800 text-white px-4 py-2 rounded-md text-sm font-medium"
-                >
-                  Login
-                </Link>
-              )}
+              <AuthSection
+                session={session}
+                userDisplay={userDisplay}
+                isAdmin={isAdmin}
+                variant="clean"
+              />
             </div>
 
             <MobileNav
@@ -95,22 +136,7 @@ export async function NavbarVariant1() {
 
 // VARIANT 2: Enterprise Style with Divider
 export async function NavbarVariant2() {
-  const session = await getServerSession(authOptions);
-  const userDisplay =
-    session?.user?.name || session?.user?.email || "Faculty Member";
-
-  let isAdmin = false;
-  if (session?.user?.email) {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        select: { role: true },
-      });
-      isAdmin = user?.role === "ADMIN";
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-    }
-  }
+  const { session, userDisplay, isAdmin } = await getNavigationAuth();
 
   return (
     <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -141,32 +167,18 @@ export async function NavbarVariant2() {
 
           {/* Navigation */}
           <div className="flex items-center space-x-8">
-            <div className="hidden md:flex items-center space-x-6">
-              <Link
-                href="/"
-                className="text-gray-700 hover:text-smccd-blue-900 font-medium transition-colors"
-              >
-                Home
-              </Link>
-              <Link
-                href="/browse"
-                className="text-gray-700 hover:text-smccd-blue-900 font-medium transition-colors"
-              >
-                Find Faculty
-              </Link>
-            </div>
+            <NavigationLinks
+              variant="clean"
+              className="hidden md:flex items-center space-x-6"
+            />
 
             <div className="hidden md:flex items-center">
-              {session ? (
-                <NavDropdown userDisplay={userDisplay} isAdmin={isAdmin} />
-              ) : (
-                <Link
-                  href="/login"
-                  className="bg-smccd-blue-900 hover:bg-smccd-blue-800 text-white px-5 py-2.5 rounded-md font-medium"
-                >
-                  Login
-                </Link>
-              )}
+              <AuthSection
+                session={session}
+                userDisplay={userDisplay}
+                isAdmin={isAdmin}
+                variant="clean"
+              />
             </div>
 
             <MobileNav
@@ -183,22 +195,7 @@ export async function NavbarVariant2() {
 
 // VARIANT 3: Modern University Style
 export async function NavbarVariant3() {
-  const session = await getServerSession(authOptions);
-  const userDisplay =
-    session?.user?.name || session?.user?.email || "Faculty Member";
-
-  let isAdmin = false;
-  if (session?.user?.email) {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        select: { role: true },
-      });
-      isAdmin = user?.role === "ADMIN";
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-    }
-  }
+  const { session, userDisplay, isAdmin } = await getNavigationAuth();
 
   return (
     <nav className="bg-white dark:bg-gray-900 border-b-2 border-smccd-blue-900 dark:border-smccd-blue-400">
@@ -228,32 +225,18 @@ export async function NavbarVariant3() {
 
           {/* Navigation with Underline Effect */}
           <div className="flex items-center space-x-8">
-            <div className="hidden md:flex items-center space-x-8">
-              <Link
-                href="/"
-                className="relative py-2 text-gray-700 hover:text-smccd-blue-900 font-medium transition-all duration-200 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-smccd-blue-900 after:transition-all after:duration-200 hover:after:w-full"
-              >
-                Home
-              </Link>
-              <Link
-                href="/browse"
-                className="relative py-2 text-gray-700 hover:text-smccd-blue-900 font-medium transition-all duration-200 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-smccd-blue-900 after:transition-all after:duration-200 hover:after:w-full"
-              >
-                Find Faculty
-              </Link>
-            </div>
+            <NavigationLinks
+              variant="underline"
+              className="hidden md:flex items-center space-x-8"
+            />
 
             <div className="hidden md:flex items-center">
-              {session ? (
-                <NavDropdown userDisplay={userDisplay} isAdmin={isAdmin} />
-              ) : (
-                <Link
-                  href="/login"
-                  className="bg-smccd-blue-900 hover:bg-smccd-blue-800 text-white px-5 py-2.5 rounded-lg font-semibold shadow-sm hover:shadow-md transition-all duration-200"
-                >
-                  Faculty Login
-                </Link>
-              )}
+              <AuthSection
+                session={session}
+                userDisplay={userDisplay}
+                isAdmin={isAdmin}
+                variant="default"
+              />
             </div>
 
             <MobileNav
@@ -270,22 +253,7 @@ export async function NavbarVariant3() {
 
 // VARIANT 4: Ultra-Clean Corporate
 export async function NavbarVariant4() {
-  const session = await getServerSession(authOptions);
-  const userDisplay =
-    session?.user?.name || session?.user?.email || "Faculty Member";
-
-  let isAdmin = false;
-  if (session?.user?.email) {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { email: session.user.email },
-        select: { role: true },
-      });
-      isAdmin = user?.role === "ADMIN";
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-    }
-  }
+  const { session, userDisplay, isAdmin } = await getNavigationAuth();
 
   return (
     <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
@@ -311,18 +279,16 @@ export async function NavbarVariant4() {
           {/* Clean Navigation */}
           <div className="flex items-center space-x-6">
             <div className="hidden md:flex items-center space-x-6">
-              <Link
-                href="/"
-                className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-medium transition-colors duration-150"
-              >
-                Home
-              </Link>
-              <Link
-                href="/browse"
-                className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-medium transition-colors duration-150"
-              >
-                Find Faculty
-              </Link>
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-medium transition-colors duration-150"
+                  aria-label={item.ariaLabel}
+                >
+                  {item.label}
+                </Link>
+              ))}
             </div>
 
             <div className="hidden md:flex items-center">
@@ -332,6 +298,7 @@ export async function NavbarVariant4() {
                 <Link
                   href="/login"
                   className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-smccd-blue-900 hover:bg-smccd-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-smccd-blue-700 transition-colors duration-150"
+                  aria-label="Sign in to your faculty account"
                 >
                   Login
                 </Link>

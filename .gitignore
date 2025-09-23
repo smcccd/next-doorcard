@@ -58,6 +58,19 @@ storybook-static
 # Claude configuration
 CLAUDE.md
 
-# Legacy code analysis (contains secrets)
-/old-doorcard/
-/legacy-analysis/legacy/
+# Data and temporary files
+/data/
+/temp/
+*.db
+*.log
+*-analysis-*.md
+*-status.txt
+import-debug-report-*.json
+
+# Archive and legacy content
+/docs/archive/
+/docs/analysis/
+
+# Build artifacts
+/storybook-static/
+licenses.json

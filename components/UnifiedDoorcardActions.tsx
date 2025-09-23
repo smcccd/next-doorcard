@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { renderToStaticMarkup } from "react-dom/server";
 import { DoorcardLite } from "./UnifiedDoorcard";
 import { PrintOptimizedDoorcard } from "./PrintOptimizedDoorcard";
-import { SimplePDF } from "./pdf/SimplePDF";
+import { LazyDoorcardPDF } from "./pdf/LazyDoorcardPDF";
 import { analytics } from "@/lib/analytics";
 
 interface DoorcardActionsProps {
@@ -89,15 +89,7 @@ export function DoorcardActions({
       >
         <Printer className="h-4 w-4 mr-1" /> Print
       </Button>
-      <SimplePDF
-        doorcard={doorcard}
-        doorcardId={doorcardId}
-        onDownload={() => {
-          if (doorcardId) {
-            analytics.trackPrint(doorcardId, "download");
-          }
-        }}
-      />
+      <LazyDoorcardPDF doorcard={doorcard} doorcardId={doorcardId} />
       <Button variant="outline" onClick={share}>
         <Share2 className="h-4 w-4 mr-1" /> Share
       </Button>

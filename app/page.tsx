@@ -12,8 +12,57 @@ import { TermSeason } from "@prisma/client";
 export const revalidate = 300; // Revalidate every 5 minutes
 export const dynamic = "force-static"; // Force static generation
 
-// Cache the expensive doorcard query for 5 minutes
-const getCachedDoorcards = unstable_cache(
+const getCachedTop25Doorcards = unstable_cache(
+  async (season: TermSeason, year: number) => {
+    const doorcards = await prisma.doorcard.findMany({
+      where: {
+        isPublic: true,
+        isActive: true,
+        term: season,
+        year: year,
+      },
+      include: {
+        User: {
+          select: {
+            id: true,
+            name: true,
+            username: true,
+          },
+        },
+        Appointment: {
+          select: {
+            dayOfWeek: true,
+            startTime: true,
+            endTime: true,
+            category: true,
+          },
+        },
+        _count: {
+          select: {
+            Appointment: true,
+          },
+        },
+      },
+      orderBy: [{ updatedAt: "desc" }],
+      take: 25, // Only fetch top 25 for performance
+    });
+
+    // Convert dates to strings for caching
+    return doorcards.map((dc) => ({
+      ...dc,
+      createdAt: dc.createdAt.toISOString(),
+      updatedAt: dc.updatedAt.toISOString(),
+    }));
+  },
+  ["homepage-top25-doorcards"],
+  {
+    revalidate: 900, // Cache for 15 minutes (heavy caching)
+    tags: ["doorcards"],
+  }
+);
+
+// Cache all doorcards for pagination (lighter cache)
+const getCachedAllDoorcards = unstable_cache(
   async (season: TermSeason, year: number) => {
     const doorcards = await prisma.doorcard.findMany({
       where: {
@@ -56,7 +105,7 @@ const getCachedDoorcards = unstable_cache(
       updatedAt: dc.updatedAt.toISOString(),
     }));
   },
-  ["homepage-doorcards"],
+  ["homepage-all-doorcards"],
   {
     revalidate: 300, // Cache for 5 minutes
     tags: ["doorcards"],
@@ -68,8 +117,8 @@ export default async function Home() {
   const currentTerm = getCurrentAcademicTerm();
 
   const [rawDoorcards, activeTerm] = await Promise.all([
-    // Use cached version
-    getCachedDoorcards(currentTerm.season, currentTerm.year),
+    // Use cached version for all doorcards (needed for pagination)
+    getCachedAllDoorcards(currentTerm.season, currentTerm.year),
     // Try to get active term from database, fallback to computed
     prisma.term
       .findFirst({
@@ -133,42 +182,37 @@ export default async function Home() {
 
           {/* Hero Content */}
           <div className="relative px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-            <div className="text-center max-w-5xl mx-auto">
-              <p className="text-xs sm:text-sm font-semibold text-smccd-blue-100 mb-3 uppercase tracking-widest">
+            <div className="text-center max-w-6xl mx-auto">
+              <p className="text-xs sm:text-sm font-semibold text-white mb-3 uppercase tracking-widest">
                 San Mateo County Community College District
               </p>
               <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-white mb-6 leading-[1.1] tracking-tight">
                 Find Office Hours
               </h1>
-              <p className="text-sm sm:text-base md:text-lg text-smccd-blue-100 font-normal max-w-2xl mx-auto mb-8">
+              <p className="text-sm sm:text-base md:text-lg text-white font-normal max-w-2xl mx-auto mb-8">
                 Connect with faculty at
                 <br />
                 Skyline College, College of San Mateo, and Cañada College
               </p>
-
-              <HomeSearchClient
-                initialDoorcards={doorcards}
-                activeTerm={currentTermInfo}
-                termLoading={false}
-              />
-              {currentTermInfo && (
-                <div className="mt-8">
-                  <div className="inline-flex items-center gap-2 bg-smccd-blue-900/30 backdrop-blur-sm border border-smccd-blue-400/30 rounded-full px-5 py-2.5">
-                    <Calendar className="h-4 w-4 text-white" />
-                    <span className="text-sm font-medium text-white">
-                      {currentTermInfo.displayName}
-                    </span>
-                    {currentTermInfo.isFromDatabase && (
-                      <span className="text-xs text-smccd-blue-200 font-medium">
-                        (Active)
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
+
+            {/* Search and Login section within hero */}
+            <HomeSearchClient
+              initialDoorcards={doorcards}
+              activeTerm={currentTermInfo}
+              termLoading={false}
+              inHero={true}
+            />
           </div>
         </div>
+
+        {/* Search Results Section */}
+        <HomeSearchClient
+          initialDoorcards={doorcards}
+          activeTerm={currentTermInfo}
+          termLoading={false}
+          inHero={false}
+        />
       </div>
     </>
   );

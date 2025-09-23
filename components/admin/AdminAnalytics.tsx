@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnalyticsChart } from "@/components/analytics/AnalyticsChart";
-import { TestChart } from "@/components/analytics/TestChart";
+import { LazyAnalyticsChart } from "@/components/analytics/LazyAnalyticsChart";
+import { LazyTestChart } from "@/components/analytics/LazyTestChart";
 import {
   Card,
   CardContent,
@@ -119,7 +119,7 @@ export function AdminAnalytics() {
   return (
     <div className="space-y-6">
       {/* Test Chart */}
-      <TestChart />
+      <LazyTestChart />
 
       {/* Header with refresh button */}
       <div className="flex items-center justify-between">
@@ -202,7 +202,7 @@ export function AdminAnalytics() {
       </div>
 
       {/* Main Analytics Chart */}
-      <AnalyticsChart
+      <LazyAnalyticsChart
         data={analytics}
         doorcardAnalytics={doorcards}
         title="Platform Analytics Dashboard"

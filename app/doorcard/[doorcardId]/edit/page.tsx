@@ -15,10 +15,6 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import type { TermSeason } from "@prisma/client";
 
-/* -------------------------------------------------------------------------- */
-/* Helpers                                                                    */
-/* -------------------------------------------------------------------------- */
-
 function seasonToDisplay(season?: TermSeason | null): string {
   if (!season) return "";
   return season.charAt(0) + season.slice(1).toLowerCase(); // FALL -> Fall
@@ -30,17 +26,6 @@ const STEPS = [
   { title: "Schedule", desc: "Add your time blocks" },
   { title: "Preview", desc: "Review and publish" },
 ];
-
-/* Local server action for publishing (just wraps publishDoorcard) */
-async function publishAction(formData: FormData) {
-  "use server";
-  const id = formData.get("doorcardId")?.toString();
-  if (!id) return;
-  await publishDoorcard(id);
-  redirect("/dashboard");
-}
-
-/* -------------------------------------------------------------------------- */
 
 export default async function EditDoorcardPage({
   params,
@@ -266,12 +251,12 @@ export default async function EditDoorcardPage({
                         Back to Schedule
                       </Link>
                     </Button>
-                    <form action={publishAction}>
-                      <input
-                        type="hidden"
-                        name="doorcardId"
-                        value={doorcardId}
-                      />
+                    <form
+                      action={async () => {
+                        "use server";
+                        await publishDoorcard(doorcardId);
+                      }}
+                    >
                       <Button type="submit" disabled={publishDisabled}>
                         Publish Doorcard
                       </Button>

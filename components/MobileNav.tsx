@@ -3,16 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
-
-const navLinks = [
-  { href: "https://smccd.edu/", text: "Home" },
-  { href: "https://smccd.edu/aboutus/", text: "About Us" },
-  { href: "https://smccd.edu/boardoftrustees/", text: "Board of Trustees" },
-  { href: "https://smccd.edu/departments/", text: "Departments" },
-  { href: "https://jobs.smccd.edu/", text: "Employment" },
-  { href: "http://foundation.smccd.edu", text: "Foundation" },
-  { href: "https://smccd.edu/aboutus/contactus.php", text: "Contact Us" },
-];
+import { externalLinks, navigationItems } from "@/lib/navigation";
 
 interface MobileNavProps {
   session?: any;
@@ -81,7 +72,7 @@ export default function MobileNav({ session, isAdmin }: MobileNavProps) {
             aria-orientation="vertical"
           >
             <div className="py-2">
-              {navLinks.map((link) => (
+              {externalLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
@@ -107,21 +98,17 @@ export default function MobileNav({ session, isAdmin }: MobileNavProps) {
               </a>
 
               {/* App Navigation Links */}
-              <Link
-                href="/"
-                className="block px-4 py-3 text-base text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
-                onClick={closeMenu}
-              >
-                Home
-              </Link>
-
-              <Link
-                href="/browse"
-                className="block px-4 py-3 text-base text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
-                onClick={closeMenu}
-              >
-                Find Faculty
-              </Link>
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="block px-4 py-3 text-base text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                  onClick={closeMenu}
+                  aria-label={item.ariaLabel}
+                >
+                  {item.label}
+                </Link>
+              ))}
 
               {session ? (
                 <>

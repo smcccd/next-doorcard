@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -10,15 +11,15 @@ export async function GET() {
   }
 
   try {
-    console.log("🔍 Doorcards Admin API: Starting request...");
+    logger.debug("🔍 Doorcards Admin API: Starting request...");
     // const session = await getServerSession(authOptions); // This line is removed
 
-    // console.log("🔍 Doorcards Admin API: Session check:", !!session); // This line is removed
+    // logger.debug("🔍 Doorcards Admin API: Session check:", !!session); // This line is removed
     // if (!session) { // This line is removed
     //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 }); // This line is removed
     // } // This line is removed
 
-    console.log("🔍 Doorcards Admin API: Querying database...");
+    logger.debug("🔍 Doorcards Admin API: Querying database...");
     const doorcards = await prisma.doorcard.findMany({
       include: {
         User: {
@@ -38,18 +39,16 @@ export async function GET() {
       orderBy: [{ createdAt: "desc" }],
     });
 
-    console.log(
-      "🔍 Doorcards Admin API: Got doorcards:",
-      doorcards.length,
-      "items"
-    );
+    logger.debug("🔍 Doorcards Admin API: Got doorcards", {
+      count: doorcards.length,
+      unit: "items",
+    });
     return NextResponse.json(doorcards);
   } catch (error) {
-    console.error("❌ Doorcards Admin API Error:", error);
-    console.error(
-      "❌ Error stack:",
-      error instanceof Error ? error.stack : "No stack"
-    );
+    logger.error("❌ Doorcards Admin API Error:", error);
+    logger.error("❌ Error stack:", {
+      stack: error instanceof Error ? error.stack : "No stack",
+    });
     return NextResponse.json(
       { error: "Failed to fetch doorcards" },
       { status: 500 }

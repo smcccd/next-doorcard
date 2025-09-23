@@ -455,17 +455,6 @@ export function RecentDoorcards({
           </table>
         </div>
       </Card>
-
-      {filteredAndSortedDoorcards.length === limit && (
-        <div className="text-center">
-          <Button asChild variant="outline">
-            <Link href="/browse">
-              View All Faculty Doorcards
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Link>
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

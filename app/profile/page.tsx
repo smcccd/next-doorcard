@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
+import { logger } from "@/lib/logger";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,6 +27,7 @@ import {
   Globe,
   GraduationCap,
   Building2,
+  Lock,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -70,25 +72,25 @@ export default function ProfilePage() {
 
   const fetchProfile = useCallback(async () => {
     try {
-      console.log("[Profile] Fetching profile data...");
-      console.log("[Profile] Session status:", session?.user?.email);
+      logger.debug("[Profile] Fetching profile data...");
+      logger.debug("[Profile] Session status:", session?.user?.email);
 
       if (!session?.user?.email) {
-        console.log("[Profile] No session available, skipping API call");
+        logger.debug("[Profile] No session available, skipping API call");
         setIsLoading(false);
         return;
       }
 
       const response = await fetch("/api/user/profile");
-      console.log("[Profile] Response status:", response.status);
-      console.log(
+      logger.debug("[Profile] Response status:", response.status);
+      logger.debug(
         "[Profile] Response headers:",
         Object.fromEntries(response.headers.entries())
       );
 
       if (response.ok) {
         const data = await response.json();
-        console.log("[Profile] Profile data received:", data);
+        logger.debug("[Profile] Profile data received:", data);
         setProfile(data);
 
         // Use firstName/lastName if available, otherwise parse legacy name
@@ -106,11 +108,10 @@ export default function ProfilePage() {
         setDisplayFormat(data.displayFormat || "FULL_NAME");
         setWebsite(data.website || "");
       } else {
-        console.error(
-          "[Profile] API request failed:",
-          response.status,
-          response.statusText
-        );
+        logger.error("[Profile] API request failed:", {
+          status: response.status,
+          statusText: response.statusText,
+        });
         setError("Failed to load profile");
         toast({
           title: "Error",
@@ -119,7 +120,7 @@ export default function ProfilePage() {
         });
       }
     } catch (error) {
-      console.error("Failed to fetch profile:", error);
+      logger.error("Failed to fetch profile:", error);
       setError("Failed to load profile");
       toast({
         title: "Error",
@@ -132,20 +133,18 @@ export default function ProfilePage() {
   }, [session, toast]);
 
   useEffect(() => {
-    console.log(
-      "[Profile] Session status changed:",
+    logger.debug("[Profile] Session status changed:", {
       status,
-      "Email:",
-      session?.user?.email
-    );
+      email: session?.user?.email,
+    });
 
     if (status === "loading") {
-      console.log("[Profile] Session is still loading, waiting...");
+      logger.debug("[Profile] Session is still loading, waiting...");
       return;
     }
 
     if (status === "authenticated" && session?.user?.email) {
-      console.log("[Profile] Session authenticated, fetching profile");
+      logger.debug("[Profile] Session authenticated, fetching profile");
       fetchProfile();
 
       // Reset profile setup dismissal when user visits profile page
@@ -154,7 +153,7 @@ export default function ProfilePage() {
         localStorage.removeItem(`profile-setup-dismissed-${session.user.id}`);
       }
     } else if (status === "unauthenticated") {
-      console.log("[Profile] User not authenticated");
+      logger.debug("[Profile] User not authenticated");
       setIsLoading(false);
     }
   }, [session, status, fetchProfile]);
@@ -186,7 +185,7 @@ export default function ProfilePage() {
     if (!firstName.trim() || !lastName.trim()) {
       toast({
         title: "Error",
-        description: "Please provide both first and last name",
+        description: "First and last name are required from OneLogin SSO",
         variant: "destructive",
       });
       return;
@@ -195,8 +194,7 @@ export default function ProfilePage() {
     setIsSubmitting(true);
     try {
       const updateData = {
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
+        // Don't update firstName/lastName - they come from OneLogin
         title: title === "none" ? null : title.trim(),
         pronouns: pronouns === "none" ? null : pronouns.trim(),
         displayFormat,
@@ -204,7 +202,7 @@ export default function ProfilePage() {
         website: website.trim() || null,
       };
 
-      console.log("[Profile] Submitting:", updateData);
+      logger.debug("[Profile] Submitting:", updateData);
 
       const response = await fetch("/api/user/profile", {
         method: "PATCH",
@@ -214,15 +212,15 @@ export default function ProfilePage() {
         body: JSON.stringify(updateData),
       });
 
-      console.log("[Profile] Response status:", response.status);
+      logger.debug("[Profile] Response status:", response.status);
 
       if (response.ok) {
         const updatedProfile = await response.json();
-        console.log("[Profile] Updated profile:", updatedProfile);
+        logger.debug("[Profile] Updated profile:", updatedProfile);
         setProfile(updatedProfile);
 
         // Update the session with new name
-        console.log("[Profile] Updating session...");
+        logger.debug("[Profile] Updating session...");
         const displayName = formatDisplayName({
           firstName: updatedProfile.firstName,
           lastName: updatedProfile.lastName,
@@ -244,11 +242,11 @@ export default function ProfilePage() {
         });
       } else {
         const errorData = await response.json();
-        console.error("[Profile] Error response:", errorData);
+        logger.error("[Profile] Error response:", errorData);
         throw new Error(errorData.error || "Failed to update profile");
       }
     } catch (error) {
-      console.error("Failed to update profile:", error);
+      logger.error("Failed to update profile:", error);
       toast({
         title: "Error",
         description: "Failed to update profile",
@@ -349,17 +347,39 @@ export default function ProfilePage() {
       )}
 
       <div className="space-y-6">
-        {/* Account Information */}
+        {/* Imported Data Section */}
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle as="h2" className="text-gray-900 dark:text-gray-100">
-              Account Information
+            <CardTitle
+              as="h2"
+              className="text-gray-900 dark:text-gray-100 flex items-center gap-2"
+            >
+              <Lock className="h-5 w-5" />
+              Imported Data
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-400">
-              Your account details and login information
+              Information imported from OneLogin SSO - cannot be edited
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  First Name
+                </h3>
+                <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
+                  {firstName || "Not set"}
+                </p>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Last Name
+                </h3>
+                <p className="text-sm text-gray-900 dark:text-gray-100 mt-1">
+                  {lastName || "Not set"}
+                </p>
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -406,47 +426,11 @@ export default function ProfilePage() {
               Personal Information
             </CardTitle>
             <CardDescription className="text-gray-600 dark:text-gray-400">
-              Update your name and contact information
+              Update your preferences and contact information
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Name Fields */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="firstName"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    First Name *
-                  </Label>
-                  <Input
-                    id="firstName"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Bryan"
-                    required
-                    className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="lastName"
-                    className="text-gray-700 dark:text-gray-300"
-                  >
-                    Last Name *
-                  </Label>
-                  <Input
-                    id="lastName"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Besnyi"
-                    required
-                    className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-400"
-                  />
-                </div>
-              </div>
-
               {/* Title and Pronouns */}
               <div className="grid grid-cols-2 gap-4 items-end">
                 <div className="space-y-2">
@@ -592,14 +576,23 @@ export default function ProfilePage() {
                   value={website}
                   onChange={(e) => setWebsite(e.target.value)}
                   placeholder="https://yourwebsite.com"
+                  aria-describedby="website-help website-error"
                   className="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder:text-gray-400"
                 />
                 {website && !isValidWebsite(website) && (
-                  <p className="text-sm text-red-600 dark:text-red-400">
+                  <p
+                    id="website-error"
+                    className="text-sm text-red-600 dark:text-red-400"
+                    role="alert"
+                    aria-live="polite"
+                  >
                     Please enter a valid website URL
                   </p>
                 )}
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p
+                  id="website-help"
+                  className="text-sm text-gray-500 dark:text-gray-400"
+                >
                   This will be displayed on your doorcard for students to find
                   more information about you
                 </p>

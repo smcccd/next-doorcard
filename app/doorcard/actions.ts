@@ -89,6 +89,9 @@ export async function validateCampusTerm(
   _prevState: ActionResult,
   formData: FormData
 ): Promise<ActionResult> {
+  if (!doorcardId) {
+    return { success: false, message: "Doorcard ID is required" };
+  }
   try {
     const user = await requireAuth();
     const data = campusTermSchema.parse({
@@ -97,30 +100,15 @@ export async function validateCampusTerm(
       college: formData.get("college"),
     });
 
-    // Remove the pre-check for existing doorcard - let the database constraint handle it
-    // This eliminates the race condition between check and update
-
-    try {
-      await prisma.doorcard.update({
-        where: { id: doorcardId, userId: user.id },
-        data: {
-          term: toEnumSeason(data.term),
-          year: data.year,
-          college: data.college as College,
-        },
-      });
-    } catch (err: any) {
-      // Handle unique constraint violation
-      if (err.code === "P2002") {
-        return {
-          success: false,
-          message: `You already have a doorcard for ${campusLabel(
-            data.college
-          )} - ${data.term} ${data.year}. Please edit your existing doorcard instead.`,
-        };
-      }
-      return handleActionError(err);
-    }
+    // Update doorcard - multiple doorcards per term are now allowed
+    await prisma.doorcard.update({
+      where: { id: doorcardId, userId: user.id },
+      data: {
+        term: toEnumSeason(data.term),
+        year: data.year,
+        college: data.college as College,
+      },
+    });
 
     revalidatePath(`/doorcard/${doorcardId}/edit`);
     redirect(`/doorcard/${doorcardId}/edit?step=1`);
@@ -134,6 +122,9 @@ export async function updateBasicInfo(
   _prevState: ActionResult,
   formData: FormData
 ): Promise<ActionResult> {
+  if (!doorcardId) {
+    return { success: false, message: "Doorcard ID is required" };
+  }
   try {
     const user = await requireAuth();
     const data = personalInfoSchema.parse({
@@ -163,6 +154,9 @@ export async function updateTimeBlocks(
   _prevState: ActionResult,
   formData: FormData
 ): Promise<ActionResult> {
+  if (!doorcardId) {
+    return { success: false, message: "Doorcard ID is required" };
+  }
   try {
     const user = await requireAuth();
 
