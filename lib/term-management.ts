@@ -10,10 +10,39 @@ export class TermManager {
    * Get the currently active term
    */
   static async getActiveTerm() {
-    return await prisma.term.findFirst({
+    // First try to get from database
+    const dbTerm = await prisma.term.findFirst({
       where: { isActive: true },
       include: { Doorcard: true },
     });
+
+    if (dbTerm) {
+      return dbTerm;
+    }
+
+    // Fallback to environment variables if no active term in database
+    const fallbackSeason = process.env.FALLBACK_ACTIVE_TERM_SEASON;
+    const fallbackYear = process.env.FALLBACK_ACTIVE_TERM_YEAR;
+
+    if (fallbackSeason && fallbackYear) {
+      // Return a mock term object that matches the expected structure
+      return {
+        id: "fallback-term",
+        name: `${fallbackSeason.charAt(0).toUpperCase() + fallbackSeason.slice(1).toLowerCase()} ${fallbackYear}`,
+        season: fallbackSeason as any,
+        year: fallbackYear,
+        startDate: new Date(`${fallbackYear}-01-01`),
+        endDate: new Date(`${fallbackYear}-12-31`),
+        isActive: true,
+        isArchived: false,
+        isUpcoming: false,
+        archiveDate: null,
+        updatedAt: new Date(),
+        Doorcard: [], // Empty array since we're just using this for term matching
+      };
+    }
+
+    return null;
   }
 
   /**
