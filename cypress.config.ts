@@ -1,5 +1,5 @@
 import { defineConfig } from "cypress";
-import jwt from "jsonwebtoken";
+import * as jwt from "jsonwebtoken";
 
 export default defineConfig({
   e2e: {
@@ -56,7 +56,7 @@ export default defineConfig({
         ping() {
           return new Promise((resolve) => {
             const http = require("http");
-            const req = http.get("http://localhost:3000", (res) => {
+            const req = http.get("http://localhost:3000", (res: any) => {
               resolve(true);
             });
             req.on("error", () => resolve(false));
