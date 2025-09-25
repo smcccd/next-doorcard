@@ -52,11 +52,13 @@ const nextConfig: NextConfig = {
         "'self'",
         // NextAuth and Next.js chunks
         "'unsafe-inline'", // Required for Next.js dev and some components
+        "'unsafe-eval'", // Required for Next.js runtime in some browsers
         // Vercel Analytics and Live Features
         "https://va.vercel-scripts.com",
         "https://vercel.live",
         // Microsoft Clarity
         "https://www.clarity.ms",
+        "https://c.clarity.ms",
         // Sentry
         "https://js.sentry-cdn.com",
         // OneLogin domains for SSO
@@ -68,6 +70,7 @@ const nextConfig: NextConfig = {
         "'self'",
         "'unsafe-inline'", // Required for Tailwind CSS and inline styles
         "https://fonts.googleapis.com",
+        "data:", // For inline CSS data URLs
       ],
       "font-src": [
         "'self'",
@@ -235,33 +238,40 @@ const nextConfig: NextConfig = {
 };
 
 export default withSentryConfig(withBundleAnalyzer(nextConfig), {
-  // For all available options, see:
-  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
-
+  // Sentry organization and project configuration
   org: "smcccd",
   project: "javascript-nextjs",
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  // Modern sourcemaps configuration (2025 best practices)
+  sourcemaps: {
+    disable: false,
+    assets: ["**/*.js", "**/*.js.map"],
+    ignore: ["**/node_modules/**"],
+    deleteSourcemapsAfterUpload: true, // Security: remove source maps after upload
+  },
+
+  // Release configuration
+  release: {
+    create: true,
+    finalize: true,
+  },
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
 
-  // For all available options, see:
-  // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-
-  // Upload a larger set of source maps for prettier stack traces (increases build time)
+  // Upload a larger set of source maps for prettier stack traces
   widenClientFileUpload: true,
 
-  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-  // This can increase your server load as well as your hosting bill.
-  // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-  // side errors will fail.
+  // Route browser requests to Sentry through Next.js rewrite (circumvent ad-blockers)
   tunnelRoute: "/monitoring",
 
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
 
-  // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-  // See the following for more information:
-  // https://docs.sentry.io/product/crons/
-  // https://vercel.com/docs/cron-jobs
+  // Disable internal telemetry to avoid info messages
+  telemetry: false,
+
+  // Enables automatic instrumentation of Vercel Cron Monitors
   automaticVercelMonitors: true,
 });
