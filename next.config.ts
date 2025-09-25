@@ -56,9 +56,10 @@ const nextConfig: NextConfig = {
         // Vercel Analytics and Live Features
         "https://va.vercel-scripts.com",
         "https://vercel.live",
-        // Microsoft Clarity
+        // Microsoft Clarity (official CSP requirements)
         "https://www.clarity.ms",
-        "https://c.clarity.ms",
+        "https://*.clarity.ms",
+        "https://c.bing.com",
         // Sentry
         "https://js.sentry-cdn.com",
         // OneLogin domains for SSO
@@ -85,8 +86,10 @@ const nextConfig: NextConfig = {
         "https:",
         // OneLogin profile pictures
         "https://smccd.onelogin.com",
-        // Microsoft Clarity
+        // Microsoft Clarity (official CSP requirements)
         "https://www.clarity.ms",
+        "https://*.clarity.ms",
+        "https://c.bing.com",
       ],
       "connect-src": [
         "'self'",
@@ -96,8 +99,10 @@ const nextConfig: NextConfig = {
         "https://vitals.vercel-insights.com",
         "https://vercel.live",
         "wss://vercel.live",
-        // Microsoft Clarity
+        // Microsoft Clarity (official CSP requirements)
         "https://www.clarity.ms",
+        "https://*.clarity.ms",
+        "https://c.bing.com",
         // Sentry
         "https://o4509746708611072.ingest.us.sentry.io",
         // Development hot reload
