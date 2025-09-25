@@ -192,7 +192,6 @@ const nextConfig: NextConfig = {
               "magnetometer=()",
               "gyroscope=()",
               "accelerometer=()",
-              "ambient-light-sensor=()",
               "autoplay=(self)",
               "encrypted-media=(self)",
               "fullscreen=(self)",
