@@ -105,6 +105,12 @@ const nextConfig: NextConfig = {
       "frame-src": [
         // OneLogin iframe for SSO
         "https://smccd.onelogin.com",
+        // Vercel Live features
+        "https://vercel.live",
+      ],
+      "worker-src": [
+        "'self'",
+        "blob:", // For Next.js service workers and web workers
       ],
       "object-src": ["'none'"],
       "base-uri": ["'self'"],
