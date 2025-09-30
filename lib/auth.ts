@@ -285,72 +285,13 @@ export const authOptions: NextAuthOptions = {
         return true;
       }
 
-      // Allow OneLogin account linking to existing users
+      // Allow OneLogin authentication - let Prisma adapter handle user/account creation
       if (account?.provider === "onelogin") {
-        logger.debug("[SIGNIN] OneLogin flow starting", { email: user?.email });
-        try {
-          const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! },
-            include: { Account: true },
-          });
-
-          if (existingUser) {
-            // Use transaction with upsert to prevent race conditions when linking accounts
-            await prisma.$transaction(async (tx) => {
-              // Use upsert to handle concurrent account linking attempts
-              await tx.account.upsert({
-                where: {
-                  provider_providerAccountId: {
-                    provider: account.provider,
-                    providerAccountId: account.providerAccountId,
-                  },
-                },
-                update: {
-                  // Update tokens if account already exists
-                  access_token: account.access_token,
-                  refresh_token: account.refresh_token,
-                  expires_at: account.expires_at,
-                  token_type: account.token_type,
-                  scope: account.scope,
-                  id_token: account.id_token,
-                  session_state: account.session_state,
-                },
-                create: {
-                  // Create new account link
-                  id: crypto.randomUUID(),
-                  userId: existingUser.id,
-                  type: account.type,
-                  provider: account.provider,
-                  providerAccountId: account.providerAccountId,
-                  access_token: account.access_token,
-                  refresh_token: account.refresh_token,
-                  expires_at: account.expires_at,
-                  token_type: account.token_type,
-                  scope: account.scope,
-                  id_token: account.id_token,
-                  session_state: account.session_state,
-                },
-              });
-
-              // Update user with OneLogin profile data if needed
-              await tx.user.update({
-                where: { email: user.email! },
-                data: {
-                  name:
-                    user.name ||
-                    `${(profile as OneLoginProfile)?.given_name || ""} ${(profile as OneLoginProfile)?.family_name || ""}`.trim(),
-                  firstName: (profile as OneLoginProfile)?.given_name,
-                  lastName: (profile as OneLoginProfile)?.family_name,
-                },
-              });
-            });
-          }
-        } catch (error) {
-          logger.error("Error linking OneLogin account", {
-            error: error instanceof Error ? error.message : "Unknown error",
-          });
-          return false;
-        }
+        logger.debug("[SIGNIN] OneLogin authentication successful", { 
+          email: user?.email,
+          name: user?.name 
+        });
+        return true; // Let Prisma adapter handle everything
       }
 
       return true;
