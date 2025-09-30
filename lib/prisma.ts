@@ -11,6 +11,11 @@ const createPrismaClient = () => {
     process.env.DATABASE_URL ||
     "postgresql://placeholder:placeholder@localhost:5432/placeholder";
 
+  // Add connection string parameters for Neon pooling
+  const connectionString = databaseUrl.includes("neon.tech")
+    ? `${databaseUrl}?pgbouncer=true&connect_timeout=10&connection_limit=5`
+    : databaseUrl;
+
   return new PrismaClient({
     log:
       process.env.NODE_ENV === "development"
@@ -18,7 +23,7 @@ const createPrismaClient = () => {
         : ["error"],
     datasources: {
       db: {
-        url: databaseUrl,
+        url: connectionString,
       },
     },
   });

@@ -70,17 +70,16 @@ async function fetchDoorcard(
     if (termSlug === "current") {
       // Get current active term
       const activeTerm = await TermManager.getActiveTerm();
-      if (!activeTerm) {
-        return { error: "No active term found" } as const;
-      }
-
+      
       doorcard = await prisma.doorcard.findFirst({
         where: {
           userId: user.id,
           isActive: true,
-          // Filter by current term
-          term: activeTerm.season as any,
-          year: parseInt(activeTerm.year),
+          // If there's an active term, prefer doorcards from that term, otherwise get any active doorcard
+          ...(activeTerm ? {
+            term: activeTerm.season as any,
+            year: parseInt(activeTerm.year),
+          } : {}),
           // If not using auth, only look for public doorcards
           ...(useAuth ? {} : { isPublic: true }),
         },
@@ -158,20 +157,11 @@ async function fetchDoorcard(
     }
     if (!doorcard) return { error: "Doorcard not found" } as const;
   } else {
-    // Get current active term to filter doorcards
-    const activeTerm = await TermManager.getActiveTerm();
-    if (!activeTerm) {
-      return { error: "No active term found" } as const;
-    }
-
-    // Check for active doorcards in the current term only
+    // Check for ALL active doorcards - don't filter by term to ensure all published doorcards remain viewable
     const availableDoorcards = await prisma.doorcard.findMany({
       where: {
         userId: user.id,
         isActive: true,
-        // Filter by current term
-        term: activeTerm.season as any,
-        year: parseInt(activeTerm.year),
         // If not using auth, only look for public doorcards
         ...(useAuth ? {} : { isPublic: true }),
       },

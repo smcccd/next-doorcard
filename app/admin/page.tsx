@@ -51,6 +51,7 @@ import {
   Globe,
 } from "lucide-react";
 import { LazyAdminAnalytics } from "@/components/admin/LazyAdminAnalytics";
+import TermManagement from "./components/TermManagement";
 
 interface AdminStats {
   totalUsers: number;
@@ -148,18 +149,36 @@ interface UserDetail {
   }[];
 }
 
+interface Term {
+  id: string;
+  name: string;
+  year: string;
+  season: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  isArchived: boolean;
+  isUpcoming: boolean;
+  archiveDate?: string;
+  _count: {
+    Doorcard: number;
+  };
+}
+
 export default function AdminPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [doorcards, setDoorcards] = useState<Doorcard[]>([]);
+  const [terms, setTerms] = useState<Term[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [campusFilter, setCampusFilter] = useState("all");
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("terms");
   const [selectedUser, setSelectedUser] = useState<UserDetail | null>(null);
   const [userDetailsOpen, setUserDetailsOpen] = useState(false);
   const [loadingUserDetails, setLoadingUserDetails] = useState(false);
+  const [archivingTerm, setArchivingTerm] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAdminData();
@@ -168,10 +187,11 @@ export default function AdminPage() {
   const fetchAdminData = async () => {
     try {
       setLoading(true);
-      const [statsRes, usersRes, doorcardsRes] = await Promise.all([
+      const [statsRes, usersRes, doorcardsRes, termsRes] = await Promise.all([
         fetch("/api/admin/stats"),
         fetch("/api/admin/users"),
         fetch("/api/admin/doorcards"),
+        fetch("/api/terms"),
       ]);
 
       if (statsRes.ok) {
@@ -189,7 +209,12 @@ export default function AdminPage() {
         setDoorcards(doorcardsData);
       }
 
-      if (!statsRes.ok && !usersRes.ok && !doorcardsRes.ok) {
+      if (termsRes.ok) {
+        const termsData = await termsRes.json();
+        setTerms(termsData);
+      }
+
+      if (!statsRes.ok && !usersRes.ok && !doorcardsRes.ok && !termsRes.ok) {
         setError("Failed to load admin data");
       }
     } catch (err) {
@@ -216,6 +241,53 @@ export default function AdminPage() {
       console.error("Error fetching user details:", err);
     } finally {
       setLoadingUserDetails(false);
+    }
+  };
+
+  const handleCreateTerm = () => {
+    window.open("/admin/terms/create", "_blank");
+  };
+
+  const handleArchiveTerm = async (termId: string, termName: string) => {
+    if (!confirm(`Are you sure you want to archive "${termName}"? This will deactivate all associated doorcards.`)) {
+      return;
+    }
+
+    try {
+      setArchivingTerm(termId);
+      const response = await fetch(`/api/admin/terms/${termId}/archive`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        fetchAdminData();
+      } else {
+        console.error("Failed to archive term");
+      }
+    } catch (err) {
+      console.error("Error archiving term:", err);
+    } finally {
+      setArchivingTerm(null);
+    }
+  };
+
+  const handleTransitionTerm = async (termId: string, termName: string) => {
+    if (!confirm(`Are you sure you want to activate "${termName}"? This will deactivate the current active term.`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/terms/${termId}/activate`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        fetchAdminData();
+      } else {
+        console.error("Failed to activate term");
+      }
+    } catch (err) {
+      console.error("Error activating term:", err);
     }
   };
 
@@ -382,12 +454,26 @@ export default function AdminPage() {
         onValueChange={setActiveTab}
         className="space-y-6"
       >
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="terms">Terms</TabsTrigger>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="doorcards">Doorcards</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="terms" className="space-y-6">
+          <TermManagement
+            terms={terms.map(term => ({
+              ...term,
+              _count: { doorcards: term._count.Doorcard }
+            }))}
+            onCreateTerm={handleCreateTerm}
+            onArchiveTerm={handleArchiveTerm}
+            onTransitionTerm={handleTransitionTerm}
+            archiving={archivingTerm}
+          />
+        </TabsContent>
 
         <TabsContent value="overview" className="space-y-6">
           {/* Stats Overview */}
