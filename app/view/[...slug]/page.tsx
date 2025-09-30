@@ -70,16 +70,18 @@ async function fetchDoorcard(
     if (termSlug === "current") {
       // Get current active term
       const activeTerm = await TermManager.getActiveTerm();
-      
+
       doorcard = await prisma.doorcard.findFirst({
         where: {
           userId: user.id,
           isActive: true,
           // If there's an active term, prefer doorcards from that term, otherwise get any active doorcard
-          ...(activeTerm ? {
-            term: activeTerm.season as any,
-            year: parseInt(activeTerm.year),
-          } : {}),
+          ...(activeTerm
+            ? {
+                term: activeTerm.season as any,
+                year: parseInt(activeTerm.year),
+              }
+            : {}),
           // If not using auth, only look for public doorcards
           ...(useAuth ? {} : { isPublic: true }),
         },

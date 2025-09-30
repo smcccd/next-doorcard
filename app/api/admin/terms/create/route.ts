@@ -18,7 +18,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, year, season, startDate, endDate, isActive, isUpcoming } = body;
+    const { name, year, season, startDate, endDate, isActive, isUpcoming } =
+      body;
 
     // Validate required fields
     if (!name || !year || !season || !startDate || !endDate) {
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
     // Validate dates
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
+
     if (start >= end) {
       return NextResponse.json(
         { error: "Start date must be before end date" },

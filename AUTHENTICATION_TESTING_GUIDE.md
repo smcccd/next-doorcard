@@ -1,12 +1,16 @@
 # OneLogin Authentication Testing Strategy
 
-This guide provides comprehensive strategies for testing OneLogin authentication with manual credential entry and MFA support in the Next.js Doorcard application.
+This guide provides comprehensive strategies for testing OneLogin authentication
+with manual credential entry and MFA support in the Next.js Doorcard
+application.
 
 ## Overview
 
-The authentication testing system supports multiple modes to handle different scenarios:
+The authentication testing system supports multiple modes to handle different
+scenarios:
 
-- **Manual/Interactive Mode**: Real OneLogin authentication with manual credential entry
+- **Manual/Interactive Mode**: Real OneLogin authentication with manual
+  credential entry
 - **Programmatic Mode**: JWT-based authentication for automated testing
 - **Mock Mode**: Simulated authentication for unit testing
 - **Hybrid Mode**: Manual authentication with session caching
@@ -44,6 +48,7 @@ npm run test:auth:ci:auto
 **Use Case**: Manual testing, development, debugging authentication flows
 
 **Features**:
+
 - Real OneLogin authentication
 - Manual credential entry
 - MFA support (SMS, authenticator apps)
@@ -51,11 +56,13 @@ npm run test:auth:ci:auto
 - Visual overlay with instructions
 
 **Command**:
+
 ```bash
 npm run test:auth:manual
 ```
 
 **Flow**:
+
 1. Test navigates to login page
 2. Clicks "Sign in with OneLogin"
 3. Redirects to OneLogin domain
@@ -69,17 +76,20 @@ npm run test:auth:manual
 **Use Case**: Automated testing without external dependencies
 
 **Features**:
+
 - JWT token-based authentication
 - No external service calls
 - Predictable test user data
 - Fast execution
 
 **Command**:
+
 ```bash
 npm run test:auth:programmatic
 ```
 
 **Configuration**:
+
 ```javascript
 // Test users are automatically created with roles:
 {
@@ -94,12 +104,14 @@ npm run test:auth:programmatic
 **Use Case**: Unit testing, fastest execution
 
 **Features**:
+
 - Simulated authentication responses
 - No network calls
 - Minimal dependencies
 - Ideal for CI/CD pipelines
 
 **Command**:
+
 ```bash
 npm run test:auth:mock
 ```
@@ -109,11 +121,13 @@ npm run test:auth:mock
 **Use Case**: Development with session reuse
 
 **Features**:
+
 - Manual authentication on first run
 - Session caching for subsequent runs
 - Balance between realism and speed
 
 **Command**:
+
 ```bash
 npm run test:auth:hybrid
 ```
@@ -124,7 +138,7 @@ npm run test:auth:hybrid
 
 1. **Microsoft Authenticator** (recommended)
 2. **SMS codes**
-3. **Email codes** 
+3. **Email codes**
 4. **Hardware tokens** (if configured)
 
 ### MFA Testing Process
@@ -172,6 +186,7 @@ ls -la cypress/cache/session-*.json
 ### Session Validation
 
 Sessions are validated before reuse:
+
 - Token expiry check
 - API session verification
 - Automatic refresh if needed
@@ -229,17 +244,18 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
-      
+          node-version: "18"
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run auth tests
         run: npm run test:auth:ci:auto
         env:
           # Optional: Service account for full OneLogin testing
           ONELOGIN_SERVICE_CLIENT_ID: ${{ secrets.ONELOGIN_SERVICE_CLIENT_ID }}
-          ONELOGIN_SERVICE_CLIENT_SECRET: ${{ secrets.ONELOGIN_SERVICE_CLIENT_SECRET }}
+          ONELOGIN_SERVICE_CLIENT_SECRET:
+            ${{ secrets.ONELOGIN_SERVICE_CLIENT_SECRET }}
 ```
 
 ### CI Strategy Selection
@@ -265,12 +281,14 @@ npm run test:auth:ci:service  # Requires service account
 ### Common Issues
 
 #### Authentication Timeout
+
 ```bash
 # Increase MFA timeout
 CYPRESS_MFA_WAIT_TIME=120000 npm run test:auth:manual
 ```
 
 #### Session Expired
+
 ```bash
 # Clear cache and re-authenticate
 npm run test:auth:clear-cache
@@ -278,6 +296,7 @@ npm run test:auth:manual
 ```
 
 #### OneLogin Access Denied
+
 ```bash
 # Check user permissions
 # Verify account has doorcard application access
@@ -285,6 +304,7 @@ npm run test:auth:manual
 ```
 
 #### MFA Not Working
+
 ```bash
 # Verify MFA device is synced
 # Try SMS instead of authenticator
@@ -346,20 +366,20 @@ describe("Admin Authentication", () => {
 
 ```javascript
 // Main authentication command
-cy.authenticateAs(userRole, options)
+cy.authenticateAs(userRole, options);
 
 // Manual OneLogin authentication
-cy.interactiveOneLoginAuth(userRole, options)
+cy.interactiveOneLoginAuth(userRole, options);
 
 // Role-based authentication with permission verification
-cy.loginAsRole(role)
+cy.loginAsRole(role);
 
 // Session management
-cy.clearAuthSessions()
-cy.switchUser(newUserRole)
+cy.clearAuthSessions();
+cy.switchUser(newUserRole);
 
 // MFA simulation (for testing environments)
-cy.simulateMFA(code)
+cy.simulateMFA(code);
 ```
 
 ### Configuration Options
@@ -422,4 +442,6 @@ npm run test:auth:ci:programmatic          # Force programmatic
 npm run test:auth:ci:mock                  # Force mock
 ```
 
-This authentication testing system provides flexible, robust testing capabilities for OneLogin integration while maintaining security and usability across different environments.
+This authentication testing system provides flexible, robust testing
+capabilities for OneLogin integration while maintaining security and usability
+across different environments.

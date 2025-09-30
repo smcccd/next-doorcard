@@ -24,7 +24,8 @@ console.log(
 );
 
 // Force PostgreSQL for production and Neon databases
-const dbProvider = (isProduction || isNeonDb) ? "postgresql" : (isSqlite ? "sqlite" : "postgresql");
+const dbProvider =
+  isProduction || isNeonDb ? "postgresql" : isSqlite ? "sqlite" : "postgresql";
 
 // Create schema based on environment
 const schemaTemplate = `generator client {

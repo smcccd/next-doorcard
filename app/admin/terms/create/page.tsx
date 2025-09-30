@@ -44,7 +44,7 @@ export default function CreateTermPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.season || !formData.startDate || !formData.endDate) {
       setError("Please fill in all required fields");
       return;
@@ -88,7 +88,9 @@ export default function CreateTermPage() {
 
   const generateTermName = () => {
     if (formData.season && formData.year) {
-      const seasonLabel = SEASONS.find(s => s.value === formData.season)?.label;
+      const seasonLabel = SEASONS.find(
+        (s) => s.value === formData.season
+      )?.label;
       return `${seasonLabel} ${formData.year}`;
     }
     return "";
@@ -105,12 +107,14 @@ export default function CreateTermPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Admin
         </Button>
-        
+
         <div className="flex items-center gap-2">
           <Calendar className="h-6 w-6 text-blue-600" />
           <div>
             <h1 className="text-3xl font-bold">Create New Term</h1>
-            <p className="text-gray-600">Add a new academic term to the system</p>
+            <p className="text-gray-600">
+              Add a new academic term to the system
+            </p>
           </div>
         </div>
       </div>
@@ -221,7 +225,8 @@ export default function CreateTermPage() {
                   }
                 />
                 <Label htmlFor="isActive" className="text-sm">
-                  Make this the active term (will deactivate current active term)
+                  Make this the active term (will deactivate current active
+                  term)
                 </Label>
               </div>
 

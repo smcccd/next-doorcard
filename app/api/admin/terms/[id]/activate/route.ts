@@ -22,7 +22,7 @@ export async function POST(
     }
 
     const termId = id;
-    
+
     const activatedTerm = await TermManager.transitionToNewTerm(termId, {
       archiveOldTerm: true,
       activateNewTerm: true,

@@ -2,7 +2,7 @@
 
 /**
  * Authentication Cache Cleaner
- * 
+ *
  * Clears all cached authentication sessions and related data.
  * Useful for debugging authentication issues or starting fresh.
  */
@@ -19,8 +19,8 @@ let clearedCount = 0;
 // Clear session cache files
 if (fs.existsSync(cacheDir)) {
   const files = fs.readdirSync(cacheDir);
-  
-  files.forEach(file => {
+
+  files.forEach((file) => {
     if (file.startsWith("session-") && file.endsWith(".json")) {
       const filePath = path.join(cacheDir, file);
       try {
@@ -32,15 +32,16 @@ if (fs.existsSync(cacheDir)) {
       }
     }
   });
-  
+
   // Remove any other auth-related cache files
-  const authFiles = files.filter(file => 
-    file.includes("auth") || 
-    file.includes("token") || 
-    file.includes("onelogin")
+  const authFiles = files.filter(
+    (file) =>
+      file.includes("auth") ||
+      file.includes("token") ||
+      file.includes("onelogin")
   );
-  
-  authFiles.forEach(file => {
+
+  authFiles.forEach((file) => {
     const filePath = path.join(cacheDir, file);
     try {
       fs.unlinkSync(filePath);
@@ -57,11 +58,11 @@ if (fs.existsSync(cacheDir)) {
 // Clear browser storage files if they exist
 const storagePatterns = [
   "cypress/downloads/*auth*",
-  "cypress/screenshots/*auth*", 
-  "cypress/videos/*auth*"
+  "cypress/screenshots/*auth*",
+  "cypress/videos/*auth*",
 ];
 
-storagePatterns.forEach(pattern => {
+storagePatterns.forEach((pattern) => {
   const globPath = path.join(process.cwd(), pattern);
   // Note: This is a simple implementation. In a real scenario, you might use a glob library
   console.log(`🔍 Checking pattern: ${pattern}`);

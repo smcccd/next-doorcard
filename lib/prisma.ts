@@ -13,20 +13,29 @@ const createPrismaClient = () => {
 
   // For Neon, ensure proper pooling configuration
   let connectionString = databaseUrl;
-  
+
   // Only modify if it's a real Neon connection (not placeholder)
-  if (databaseUrl.includes("neon.tech") && !databaseUrl.includes("placeholder")) {
+  if (
+    databaseUrl.includes("neon.tech") &&
+    !databaseUrl.includes("placeholder")
+  ) {
     // Check if pooling params already exist
     const hasParams = databaseUrl.includes("?");
     const separator = hasParams ? "&" : "?";
-    
+
     // Add Neon-optimized pooling parameters if not present
     if (!databaseUrl.includes("pgbouncer")) {
-      connectionString = `${databaseUrl}${separator}pgbouncer=true&connect_timeout=15&pool_timeout=10`;
+      connectionString = `${databaseUrl}${separator}pgbouncer=true&connect_timeout=15&pool_timeout=10&connection_limit=1`;
     }
   }
 
-  console.log("Prisma connecting to:", connectionString.replace(/:[^:@]+@/, ':***@')); // Log URL without password
+  // Only log in development or when debugging
+  if (process.env.NODE_ENV === "development" || process.env.DEBUG_DB === "true") {
+    console.log(
+      "Prisma connecting to:",
+      connectionString.replace(/:[^:@]+@/, ":***@")
+    ); // Log URL without password
+  }
 
   return new PrismaClient({
     log:
@@ -38,6 +47,10 @@ const createPrismaClient = () => {
         url: connectionString,
       },
     },
+    // Add connection pool settings for production
+    ...(process.env.NODE_ENV === "production" && {
+      errorFormat: "minimal",
+    }),
   });
 };
 

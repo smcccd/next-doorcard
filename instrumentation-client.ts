@@ -34,19 +34,19 @@ Sentry.init({
   // Filter out known noise and add error handling
   beforeSend(event) {
     // Filter out known client-side errors that aren't actionable
-    if (event.exception?.values?.[0]?.value?.includes('ChunkLoadError')) {
+    if (event.exception?.values?.[0]?.value?.includes("ChunkLoadError")) {
       return null;
     }
-    if (event.exception?.values?.[0]?.value?.includes('NetworkError')) {
+    if (event.exception?.values?.[0]?.value?.includes("NetworkError")) {
       return null;
     }
-    
+
     // Scrub sensitive data for compliance
     if (event.user) {
       delete event.user.email;
       delete event.user.ip_address;
     }
-    
+
     return event;
   },
 });

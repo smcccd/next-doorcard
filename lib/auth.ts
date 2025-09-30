@@ -287,9 +287,9 @@ export const authOptions: NextAuthOptions = {
 
       // Allow OneLogin authentication - let Prisma adapter handle user/account creation
       if (account?.provider === "onelogin") {
-        logger.debug("[SIGNIN] OneLogin authentication successful", { 
+        logger.debug("[SIGNIN] OneLogin authentication successful", {
           email: user?.email,
-          name: user?.name 
+          name: user?.name,
         });
         return true; // Let Prisma adapter handle everything
       }

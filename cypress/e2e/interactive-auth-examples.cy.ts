@@ -2,7 +2,7 @@
 
 /**
  * Interactive OneLogin Authentication Examples
- * 
+ *
  * These tests demonstrate different authentication strategies for OneLogin with MFA support.
  * Run with different AUTH_MODE environment variables to test various scenarios.
  */
@@ -28,7 +28,7 @@ describe("Interactive OneLogin Authentication", () => {
       // Verify successful authentication
       cy.url().should("include", "/dashboard");
       cy.contains("My Doorcards").should("be.visible");
-      
+
       // Verify user session contains expected data
       cy.request("/api/auth/session").then((response) => {
         expect(response.status).to.eq(200);
@@ -39,10 +39,10 @@ describe("Interactive OneLogin Authentication", () => {
 
     it("should reuse cached session for subsequent logins", () => {
       Cypress.env("AUTH_MODE", "manual");
-      
+
       // First authentication (will use cached session if available)
       cy.authenticateAs("FACULTY", { skipIfCached: true });
-      
+
       // Should reach dashboard quickly without manual intervention
       cy.url().should("include", "/dashboard");
       cy.get("[data-testid='session-indicator']", { timeout: 5000 })
@@ -72,10 +72,10 @@ describe("Interactive OneLogin Authentication", () => {
       Cypress.env("INTERACTIVE_LOGIN", false);
 
       cy.authenticateAs("FACULTY");
-      
+
       cy.url().should("include", "/dashboard");
       cy.contains("My Doorcards").should("be.visible");
-      
+
       // Verify it's using a test account
       cy.request("/api/auth/session").then((response) => {
         expect(response.body.user.email).to.include("test-faculty@smccd.edu");
@@ -86,25 +86,25 @@ describe("Interactive OneLogin Authentication", () => {
   describe("Mixed Authentication Scenarios", () => {
     it("should handle authentication timeout gracefully", () => {
       Cypress.env("AUTH_MODE", "manual");
-      
+
       cy.authenticateAs("FACULTY", {
         mfaTimeout: 5000, // Very short timeout for testing
-        persistSession: false
+        persistSession: false,
       });
-      
+
       // Should still work with fallback mechanisms
       cy.url({ timeout: 10000 }).should("include", "/dashboard");
     });
 
     it("should test different user roles and permissions", () => {
       const roles = ["FACULTY", "ADMIN", "STAFF"];
-      
+
       roles.forEach((role) => {
         cy.log(`Testing authentication for role: ${role}`);
-        
+
         cy.clearAuthSessions();
         cy.loginAsRole(role);
-        
+
         // Role-specific assertions
         switch (role) {
           case "ADMIN":
@@ -127,14 +127,14 @@ describe("Interactive OneLogin Authentication", () => {
   describe("Session Management", () => {
     it("should persist sessions across browser restarts", () => {
       Cypress.env("PERSIST_SESSIONS", true);
-      
+
       cy.authenticateAs("FACULTY");
       cy.visit("/dashboard");
-      
+
       // Simulate browser restart by clearing everything except session cache
       cy.clearCookies();
       cy.clearLocalStorage();
-      
+
       // Should be able to restore session
       cy.authenticateAs("FACULTY", { skipIfCached: true });
       cy.visit("/dashboard");
@@ -146,7 +146,7 @@ describe("Interactive OneLogin Authentication", () => {
       cy.task("saveSession", {
         userRole: "FACULTY",
         sessionToken: "expired-token",
-        timestamp: Date.now() - (7 * 60 * 60 * 1000) // 7 hours ago
+        timestamp: Date.now() - 7 * 60 * 60 * 1000, // 7 hours ago
       });
 
       // Should create new session when old one is expired
@@ -160,24 +160,24 @@ describe("Interactive OneLogin Authentication", () => {
     it("should handle authentication failures gracefully", () => {
       // Test with invalid configuration to trigger fallbacks
       Cypress.env("AUTH_MODE", "invalid");
-      
+
       cy.authenticateAs("FACULTY");
-      
+
       // Should still reach dashboard via fallback
       cy.url().should("include", "/dashboard");
     });
 
     it("should provide clear error messages for authentication issues", () => {
       cy.visit("/login");
-      
+
       // Simulate authentication error
       cy.intercept("POST", "/api/auth/signin/onelogin", {
         statusCode: 500,
-        body: { error: "Authentication service unavailable" }
+        body: { error: "Authentication service unavailable" },
       });
 
       cy.get('button:contains("Sign in with OneLogin")').click();
-      
+
       // Should show user-friendly error message
       cy.contains("Unable to sign in").should("be.visible");
     });
@@ -195,7 +195,7 @@ describe("Interactive OneLogin Authentication", () => {
 describe("Authentication Debug Utilities", () => {
   it("should provide debug information for authentication setup", () => {
     cy.task("logTestEnvironment");
-    
+
     // Log current configuration
     cy.log(`Auth Mode: ${Cypress.env("AUTH_MODE")}`);
     cy.log(`Interactive Login: ${Cypress.env("INTERACTIVE_LOGIN")}`);
@@ -205,7 +205,7 @@ describe("Authentication Debug Utilities", () => {
     // Test session APIs
     cy.request({
       url: "/api/auth/session",
-      failOnStatusCode: false
+      failOnStatusCode: false,
     }).then((response) => {
       cy.log(`Session API Status: ${response.status}`);
       if (response.body?.user) {

@@ -22,7 +22,7 @@ export async function POST(
     }
 
     const termId = id;
-    
+
     const archivedTerm = await TermManager.archiveTerm(termId, true);
 
     return NextResponse.json({

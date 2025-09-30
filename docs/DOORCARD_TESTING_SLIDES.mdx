@@ -1,4 +1,5 @@
 # Doorcard App Testing Prep
+
 ## Getting Ready to Test Our New Faculty Office Hours System
 
 ---
@@ -6,12 +7,14 @@
 ## What We're Replacing 🏠➡️🏗️
 
 **The Old System:** `doorcard.smccd.edu`
+
 - Classic ASP (from like... 2000s era)
 - PHP + Access Database + LDAP mess
 - **The Problem**: 20+ person-hours just to investigate ONE failure
 - Data corruption everywhere (we found 9,627 broken records!)
 
 **The New System:** Next.js Modern Web App
+
 - Built for 2025, not 2005
 - Clean data, fast performance, mobile-friendly
 
@@ -20,12 +23,14 @@
 ## The Big Problem We Solved 🔧
 
 ### What Was Broken
+
 - Homepage showing "Bes Nyib" instead of real names
 - 53.6% of appointment data was orphaned (broken links)
 - Faculty couldn't rely on the system
 - IT spent way too much time firefighting
 
 ### Root Cause Found
+
 ```php
 // This terrible code in the old dev script:
 $firstName = username.charAt(0).toUpperCase() + username.slice(1, 3);
@@ -39,6 +44,7 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 ## What We Built ✨
 
 ### Core Features
+
 - **Faculty Dashboard**: Create/edit your doorcard
 - **Public View**: Students find office hours easily
 - **Search & Filter**: By name, campus, department
@@ -46,6 +52,7 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 - **Mobile Friendly**: Works on phones/tablets
 
 ### The Tech Stack
+
 - **Frontend**: Next.js 15 + React 19 + TypeScript
 - **Database**: PostgreSQL (Neon) with Prisma ORM
 - **Auth**: NextAuth v4 (ready for OneLogin SSO)
@@ -56,18 +63,21 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 ## Major Wins 🎉
 
 ### Data Quality Victory
+
 - **Fixed 9,627** corrupted faculty records
 - **Migrated 2,271** users from legacy Access DB
 - **Processed 93,484** valid appointments
 - **Filtered out 91,451** orphaned records
 
-### Performance Improvements  
+### Performance Improvements
+
 - **5-minute caching** = super fast homepage
 - **Sub-2 second** page loads
 - **Mobile-responsive** design
 - **Accessibility compliant** (WCAG 2.1 AA path)
 
 ### User Experience
+
 - Clean, table-like faculty grid (based on your feedback!)
 - Real-time search with autocomplete
 - Visual campus selection with college logos
@@ -78,12 +88,14 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 ## What Didn't Go Smoothly 😅
 
 ### Migration Challenges
+
 - **Legacy data was a mess**: 53.6% broken relationships
 - **Only 1 user** in TBL_USER vs 2,271 needed
 - **Multiple migration restarts**: Script kept stalling around 1650 users
 - **Cultural names**: Had to handle "Dr. María de la Cruz" properly
 
 ### Technical Hurdles
+
 - **Jest → Vitest migration**: Still 50% complete
 - **TypeScript strict mode**: Lots of type fixes needed
 - **Date serialization**: Caching issues with Date objects
@@ -94,11 +106,13 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 ## What We're Still Working On 🚧
 
 ### Almost Done
+
 - **Production migration**: Postgres DB migration (commands ready)
 - **Accessibility audit**: WCAG compliance validation
 - **Test coverage**: Complete Vitest migration
 
 ### Future Enhancements
+
 - **Advanced analytics**: Usage tracking and insights
 - **Bulk operations**: Import/export for admins
 - **Template system**: Custom doorcard layouts
@@ -109,6 +123,7 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 ## What You Should Test 🧪
 
 ### Happy Path Testing
+
 1. **Homepage**: Browse faculty, search by name/campus
 2. **Faculty Login**: Create account, edit profile
 3. **Doorcard Creation**: Add office hours, save changes
@@ -116,6 +131,7 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 5. **Print View**: Generate clean PDF for posting
 
 ### Edge Cases to Check
+
 1. **Empty states**: No office hours, no search results
 2. **Long names**: "Dr. María Fernández de la Cruz-González"
 3. **Mobile usage**: Small screens, touch interactions
@@ -127,18 +143,21 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 ## Testing Focus Areas 🎯
 
 ### Data Integrity
+
 - **Names display correctly**: No more "Bes Nyib"
 - **Schedule accuracy**: Times, days, locations match
 - **Campus colors**: Skyline=red, CSM=blue, Cañada=green
 - **Search results**: Accurate and complete
 
-### User Experience  
+### User Experience
+
 - **Navigation flow**: Intuitive for faculty and students
 - **Visual hierarchy**: Important info stands out
 - **Loading states**: Smooth transitions, no jarring jumps
 - **Error messages**: Helpful and actionable
 
 ### Performance
+
 - **Page load speed**: Sub-2 seconds target
 - **Search responsiveness**: Instant autocomplete
 - **Mobile performance**: Smooth scrolling, tap targets
@@ -149,6 +168,7 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 ## Common Issues to Watch For ⚠️
 
 ### Potential Gotchas
+
 - **Cache stale data**: Homepage might show old info
 - **TypeScript errors**: Build failures during development
 - **Authentication flows**: OneLogin integration edge cases
@@ -156,6 +176,7 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 - **Mobile keyboard**: Form field interactions
 
 ### Known Limitations
+
 - **Import process**: Still manual for bulk data
 - **Offline support**: Requires internet connection
 - **Browser support**: Modern browsers only (IE is dead to us)
@@ -166,6 +187,7 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 ## Success Criteria ✅
 
 ### Must-Pass Tests
+
 - [ ] Homepage loads in under 2 seconds
 - [ ] Search finds faculty by name correctly
 - [ ] Faculty can create/edit doorcards
@@ -174,6 +196,7 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 - [ ] No broken links or 404 errors
 
 ### Nice-to-Have
+
 - [ ] Accessibility with screen reader
 - [ ] Performance on slow connections
 - [ ] Edge case error handling
@@ -184,12 +207,14 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 ## Questions for You 🤔
 
 ### Testing Strategy
+
 1. **What devices** should we prioritize? (phones, tablets, laptops)
 2. **Which browsers** are most important? (Chrome, Safari, Firefox)
 3. **What's the faculty workflow** you want to focus on?
 4. **Student use cases** we should simulate?
 
 ### Feedback Areas
+
 1. **UI/UX improvements** you notice
 2. **Performance issues** on your setup
 3. **Missing features** that would be helpful
@@ -200,14 +225,16 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 ## Next Steps 🚀
 
 ### After Testing Session
+
 1. **Collect feedback** and prioritize fixes
 2. **Address critical bugs** before production
 3. **Document test results** for stakeholders
 4. **Plan production cutover** timeline
 
 ### Production Readiness
+
 - Migration script is ready to run
-- Vercel deployment pipeline configured  
+- Vercel deployment pipeline configured
 - Monitoring and error tracking in place
 - Rollback plan documented
 
@@ -220,4 +247,5 @@ $lastName = username.slice(3).charAt(0).toUpperCase() + username.slice(4);
 **Focus Areas**: Usability, performance, data accuracy
 
 ### Ready to break stuff? 😈
-*That's how we make it stronger!*
+
+_That's how we make it stronger!_

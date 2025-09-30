@@ -561,8 +561,8 @@ export default function ProfilePage() {
                 </Select>
               </div>
 
-              {/* Website */}
-              <div className="space-y-2">
+              {/* Website - Hidden for initial launch */}
+              {/* <div className="space-y-2">
                 <Label
                   htmlFor="website"
                   className="flex items-center gap-2 text-gray-700 dark:text-gray-300"
@@ -596,7 +596,7 @@ export default function ProfilePage() {
                   This will be displayed on your doorcard for students to find
                   more information about you
                 </p>
-              </div>
+              </div> */}
 
               <div className="flex justify-end pt-4">
                 <Button

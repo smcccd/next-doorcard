@@ -249,7 +249,11 @@ export default function AdminPage() {
   };
 
   const handleArchiveTerm = async (termId: string, termName: string) => {
-    if (!confirm(`Are you sure you want to archive "${termName}"? This will deactivate all associated doorcards.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to archive "${termName}"? This will deactivate all associated doorcards.`
+      )
+    ) {
       return;
     }
 
@@ -272,7 +276,11 @@ export default function AdminPage() {
   };
 
   const handleTransitionTerm = async (termId: string, termName: string) => {
-    if (!confirm(`Are you sure you want to activate "${termName}"? This will deactivate the current active term.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to activate "${termName}"? This will deactivate the current active term.`
+      )
+    ) {
       return;
     }
 
@@ -464,9 +472,9 @@ export default function AdminPage() {
 
         <TabsContent value="terms" className="space-y-6">
           <TermManagement
-            terms={terms.map(term => ({
+            terms={terms.map((term) => ({
               ...term,
-              _count: { doorcards: term._count.Doorcard }
+              _count: { doorcards: term._count.Doorcard },
             }))}
             onCreateTerm={handleCreateTerm}
             onArchiveTerm={handleArchiveTerm}

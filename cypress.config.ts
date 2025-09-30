@@ -15,39 +15,39 @@ export default defineConfig({
     requestTimeout: 10000,
     responseTimeout: 10000,
     pageLoadTimeout: 30000,
-    
+
     // Testing modes configuration
     env: {
       // Authentication mode: 'manual', 'programmatic', 'mock'
       AUTH_MODE: "manual",
-      
+
       // Interactive mode settings
       INTERACTIVE_LOGIN: true,
       MFA_WAIT_TIME: 60000, // 60 seconds for MFA entry
-      
+
       // Session persistence
       PERSIST_SESSIONS: true,
       SESSION_CACHE_DIR: "cypress/cache",
-      
+
       // OneLogin configuration
       ONELOGIN_MANUAL_LOGIN_URL: "https://smccd.onelogin.com",
       ONELOGIN_TEST_USERS: {
         FACULTY: {
           role: "FACULTY",
-          college: "SKYLINE"
+          college: "SKYLINE",
         },
         ADMIN: {
-          role: "ADMIN", 
-          college: "SKYLINE"
+          role: "ADMIN",
+          college: "SKYLINE",
         },
         STAFF: {
           role: "STAFF",
-          college: "CAÑADA"
-        }
+          college: "CAÑADA",
+        },
       },
-      
+
       // Development fallback
-      DEV_LOGIN_ENABLED: true
+      DEV_LOGIN_ENABLED: true,
     },
 
     setupNodeEvents(on, config) {
@@ -86,12 +86,15 @@ export default defineConfig({
           const fs = require("fs");
           const path = require("path");
           const cacheDir = path.join(process.cwd(), "cypress/cache");
-          
+
           if (!fs.existsSync(cacheDir)) {
             fs.mkdirSync(cacheDir, { recursive: true });
           }
-          
-          const sessionFile = path.join(cacheDir, `session-${sessionData.userRole}.json`);
+
+          const sessionFile = path.join(
+            cacheDir,
+            `session-${sessionData.userRole}.json`
+          );
           fs.writeFileSync(sessionFile, JSON.stringify(sessionData, null, 2));
           return true;
         },
@@ -99,12 +102,18 @@ export default defineConfig({
         loadSession(userRole: string) {
           const fs = require("fs");
           const path = require("path");
-          const sessionFile = path.join(process.cwd(), "cypress/cache", `session-${userRole}.json`);
-          
+          const sessionFile = path.join(
+            process.cwd(),
+            "cypress/cache",
+            `session-${userRole}.json`
+          );
+
           if (fs.existsSync(sessionFile)) {
-            const sessionData = JSON.parse(fs.readFileSync(sessionFile, "utf8"));
+            const sessionData = JSON.parse(
+              fs.readFileSync(sessionFile, "utf8")
+            );
             // Check if session is still valid (within 6 hours)
-            const sixHoursAgo = Date.now() - (6 * 60 * 60 * 1000);
+            const sixHoursAgo = Date.now() - 6 * 60 * 60 * 1000;
             if (sessionData.timestamp > sixHoursAgo) {
               return sessionData;
             }
@@ -116,7 +125,7 @@ export default defineConfig({
           const fs = require("fs");
           const path = require("path");
           const cacheDir = path.join(process.cwd(), "cypress/cache");
-          
+
           if (fs.existsSync(cacheDir)) {
             const files = fs.readdirSync(cacheDir);
             files.forEach((file: string) => {
@@ -137,7 +146,7 @@ export default defineConfig({
           console.log(`Session Persistence: ${config.env.PERSIST_SESSIONS}`);
           console.log("============================");
           return null;
-        }
+        },
       });
 
       return config;

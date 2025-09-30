@@ -2,7 +2,7 @@
 
 /**
  * CI/CD Authentication Strategy
- * 
+ *
  * Handles authentication in automated environments where manual input isn't possible.
  * Provides fallback strategies and environment detection.
  */
@@ -19,11 +19,12 @@ const CI_ENVIRONMENTS = {
   CIRCLECI: process.env.CIRCLECI === "true",
   JENKINS: process.env.JENKINS_URL !== undefined,
   GITLAB: process.env.GITLAB_CI === "true",
-  AZURE: process.env.TF_BUILD === "True"
+  AZURE: process.env.TF_BUILD === "True",
 };
 
-const isCI = Object.values(CI_ENVIRONMENTS).some(env => env);
-const ciPlatform = Object.keys(CI_ENVIRONMENTS).find(key => CI_ENVIRONMENTS[key]) || "UNKNOWN";
+const isCI = Object.values(CI_ENVIRONMENTS).some((env) => env);
+const ciPlatform =
+  Object.keys(CI_ENVIRONMENTS).find((key) => CI_ENVIRONMENTS[key]) || "UNKNOWN";
 
 console.log("🤖 CI/CD Authentication Strategy");
 console.log("================================");
@@ -33,8 +34,9 @@ console.log("");
 
 // Parse command line arguments
 const args = process.argv.slice(2);
-const strategy = args.find(arg => arg.startsWith("--strategy="))?.split("=")[1] || "auto";
-const spec = args.find(arg => arg.startsWith("--spec="))?.split("=")[1];
+const strategy =
+  args.find((arg) => arg.startsWith("--strategy="))?.split("=")[1] || "auto";
+const spec = args.find((arg) => arg.startsWith("--spec="))?.split("=")[1];
 const parallel = args.includes("--parallel");
 const record = args.includes("--record");
 
@@ -42,29 +44,29 @@ const record = args.includes("--record");
 const strategies = {
   auto: {
     description: "Automatically select best strategy based on environment",
-    handler: selectAutoStrategy
+    handler: selectAutoStrategy,
   },
   programmatic: {
     description: "Use JWT tokens for authentication (CI-friendly)",
     authMode: "programmatic",
-    interactive: false
+    interactive: false,
   },
   mock: {
     description: "Use mock authentication for testing (fastest)",
-    authMode: "mock", 
-    interactive: false
+    authMode: "mock",
+    interactive: false,
   },
   skip_auth: {
     description: "Skip authentication tests entirely",
     authMode: "skip",
-    interactive: false
+    interactive: false,
   },
   service_account: {
     description: "Use service account authentication (if configured)",
     authMode: "service_account",
     interactive: false,
-    requiresServiceAccount: true
-  }
+    requiresServiceAccount: true,
+  },
 };
 
 function selectAutoStrategy() {
@@ -74,18 +76,22 @@ function selectAutoStrategy() {
   }
 
   // Check for service account credentials
-  const hasServiceAccount = process.env.ONELOGIN_SERVICE_CLIENT_ID && 
-                            process.env.ONELOGIN_SERVICE_CLIENT_SECRET;
+  const hasServiceAccount =
+    process.env.ONELOGIN_SERVICE_CLIENT_ID &&
+    process.env.ONELOGIN_SERVICE_CLIENT_SECRET;
 
   if (hasServiceAccount) {
-    console.log("🔑 Service account credentials found - using service account auth");
+    console.log(
+      "🔑 Service account credentials found - using service account auth"
+    );
     return strategies.service_account;
   }
 
   // Check if this is a PR/branch build vs main branch
-  const isMainBranch = process.env.GITHUB_REF === "refs/heads/main" ||
-                       process.env.VERCEL_GIT_COMMIT_REF === "main" ||
-                       process.env.CI_COMMIT_REF_NAME === "main";
+  const isMainBranch =
+    process.env.GITHUB_REF === "refs/heads/main" ||
+    process.env.VERCEL_GIT_COMMIT_REF === "main" ||
+    process.env.CI_COMMIT_REF_NAME === "main";
 
   if (isMainBranch) {
     console.log("🎯 Main branch build - using programmatic auth");
@@ -113,9 +119,10 @@ if (typeof selectedStrategy.handler === "function") {
 
 // Check requirements
 if (finalStrategy.requiresServiceAccount) {
-  const hasServiceAccount = process.env.ONELOGIN_SERVICE_CLIENT_ID && 
-                            process.env.ONELOGIN_SERVICE_CLIENT_SECRET;
-  
+  const hasServiceAccount =
+    process.env.ONELOGIN_SERVICE_CLIENT_ID &&
+    process.env.ONELOGIN_SERVICE_CLIENT_SECRET;
+
   if (!hasServiceAccount) {
     console.log("❌ Service account authentication requires:");
     console.log("   - ONELOGIN_SERVICE_CLIENT_ID");
@@ -132,13 +139,15 @@ const envVars = {
   CYPRESS_INTERACTIVE_LOGIN: finalStrategy.interactive || false,
   CYPRESS_PERSIST_SESSIONS: false, // Disable session persistence in CI
   CYPRESS_MFA_WAIT_TIME: 10000, // Short timeout for CI
-  CI: "true"
+  CI: "true",
 };
 
 // Add service account credentials if using service account strategy
 if (finalStrategy.authMode === "service_account") {
-  envVars.CYPRESS_ONELOGIN_SERVICE_CLIENT_ID = process.env.ONELOGIN_SERVICE_CLIENT_ID;
-  envVars.CYPRESS_ONELOGIN_SERVICE_CLIENT_SECRET = process.env.ONELOGIN_SERVICE_CLIENT_SECRET;
+  envVars.CYPRESS_ONELOGIN_SERVICE_CLIENT_ID =
+    process.env.ONELOGIN_SERVICE_CLIENT_ID;
+  envVars.CYPRESS_ONELOGIN_SERVICE_CLIENT_SECRET =
+    process.env.ONELOGIN_SERVICE_CLIENT_SECRET;
 }
 
 // Build Cypress command
@@ -151,8 +160,10 @@ const ciOptions = [
   record && "--record",
   parallel && "--parallel",
   spec && `--spec="${spec}"`,
-  process.env.CYPRESS_RECORD_KEY && "--key $CYPRESS_RECORD_KEY"
-].filter(Boolean).join(" ");
+  process.env.CYPRESS_RECORD_KEY && "--key $CYPRESS_RECORD_KEY",
+]
+  .filter(Boolean)
+  .join(" ");
 
 cypressCmd += ` ${ciOptions}`;
 
@@ -175,21 +186,21 @@ switch (finalStrategy.authMode) {
     console.log("- No external dependencies");
     console.log("- Limited to application functionality");
     break;
-    
+
   case "mock":
     console.log("🎭 Mock Authentication:");
     console.log("- Using simulated authentication");
     console.log("- Fastest execution time");
     console.log("- No external service calls");
     break;
-    
+
   case "service_account":
     console.log("🔐 Service Account Authentication:");
     console.log("- Using OneLogin service account");
     console.log("- Full authentication flow");
     console.log("- Requires service account setup");
     break;
-    
+
   case "skip":
     console.log("⏭️  Skipping Authentication Tests:");
     console.log("- Authentication tests will be skipped");
@@ -204,10 +215,10 @@ const timeout = isCI ? 600000 : 300000; // 10 minutes for CI, 5 for local
 
 console.log("⏱️  Starting tests with timeout protection...");
 
-const childProcess = exec(fullCommand, { 
+const childProcess = exec(fullCommand, {
   cwd: process.cwd(),
   env: { ...process.env, ...envVars },
-  timeout: timeout
+  timeout: timeout,
 });
 
 childProcess.stdout.on("data", (data) => {
@@ -220,10 +231,10 @@ childProcess.stderr.on("data", (data) => {
 
 childProcess.on("close", (code) => {
   console.log("");
-  
+
   if (code === 0) {
     console.log("✅ CI tests completed successfully!");
-    
+
     // CI-specific success reporting
     if (isCI) {
       console.log(`📊 Platform: ${ciPlatform}`);
@@ -232,7 +243,7 @@ childProcess.on("close", (code) => {
     }
   } else {
     console.log(`❌ CI tests failed with exit code ${code}`);
-    
+
     // CI-specific failure guidance
     if (isCI) {
       console.log("");
@@ -243,19 +254,19 @@ childProcess.on("close", (code) => {
       console.log("- Consider using mock authentication for speed");
     }
   }
-  
+
   process.exit(code);
 });
 
 childProcess.on("error", (error) => {
   console.error(`❌ Process error: ${error.message}`);
-  
+
   if (error.code === "TIMEOUT") {
     console.log("");
     console.log("⏰ Test execution timed out");
     console.log("💡 Consider reducing test scope or increasing timeout");
   }
-  
+
   process.exit(1);
 });
 
