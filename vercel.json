@@ -13,7 +13,6 @@
   },
   "buildCommand": "npm run build",
   "framework": "nextjs",
-  "installCommand": "npm ci --force --include=dev",
   "build": {
     "env": {
       "NEXT_TELEMETRY_DISABLED": "1",
@@ -26,25 +25,6 @@
       "maxDuration": 30
     }
   },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        }
-      ]
-    }
-  ],
   "rewrites": [
     {
       "source": "/health",

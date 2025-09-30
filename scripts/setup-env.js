@@ -16,9 +16,15 @@ console.log(`Environment: ${isProduction ? "production" : "development"}`);
 
 // Determine database configuration
 const databaseConfig = process.env.DATABASE_URL;
+const isNeonDb = databaseConfig?.includes("neon.tech");
+const isSqlite = databaseConfig?.startsWith("file:");
+
 console.log(
-  `Database: ${databaseConfig ? (databaseConfig.startsWith("file:") ? "SQLite (local)" : "PostgreSQL (remote)") : "NOT SET"}`
+  `Database: ${databaseConfig ? (isSqlite ? "SQLite (local)" : "PostgreSQL (remote)") : "NOT SET"}`
 );
+
+// Force PostgreSQL for production and Neon databases
+const dbProvider = (isProduction || isNeonDb) ? "postgresql" : (isSqlite ? "sqlite" : "postgresql");
 
 // Create schema based on environment
 const schemaTemplate = `generator client {
@@ -27,7 +33,7 @@ const schemaTemplate = `generator client {
 }
 
 datasource db {
-  provider = "${databaseConfig?.startsWith("file:") ? "sqlite" : "postgresql"}"
+  provider = "${dbProvider}"
   url      = env("DATABASE_URL")
 }`;
 

@@ -5,26 +5,50 @@
 import * as Sentry from "@sentry/nextjs";
 
 Sentry.init({
-  dsn: "https://ffc6a191acb1f807ebf01f1b73432d51@o4509746708611072.ingest.us.sentry.io/4509746709397504",
+  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  environment: process.env.NODE_ENV,
 
   // Add optional integrations for additional features
-  integrations: [Sentry.replayIntegration()],
+  integrations: [
+    Sentry.replayIntegration({
+      // Mask sensitive text content
+      maskAllText: process.env.NODE_ENV === "production",
+      blockAllMedia: process.env.NODE_ENV === "production",
+    }),
+  ],
 
-  // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
-  tracesSampleRate: 1,
-  // Enable logs to be sent to Sentry
-  enableLogs: true,
+  // Environment-based sampling rates to control costs and performance
+  tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
+  profilesSampleRate: process.env.NODE_ENV === "production" ? 0.01 : 1.0,
 
-  // Define how likely Replay events are sampled.
-  // This sets the sample rate to be 10%. You may want this to be 100% while
-  // in development and sample at a lower rate in production
-  replaysSessionSampleRate: 0.1,
+  // Enable logs only in development
+  enableLogs: process.env.NODE_ENV !== "production",
 
-  // Define how likely Replay events are sampled when an error occurs.
-  replaysOnErrorSampleRate: 1.0,
+  // Conservative replay sampling for production
+  replaysSessionSampleRate: process.env.NODE_ENV === "production" ? 0.01 : 0.1,
+  replaysOnErrorSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
 
-  // Setting this option to true will print useful information to the console while you're setting up Sentry.
-  debug: false,
+  // Debug mode only in development
+  debug: process.env.NODE_ENV === "development",
+
+  // Filter out known noise and add error handling
+  beforeSend(event) {
+    // Filter out known client-side errors that aren't actionable
+    if (event.exception?.values?.[0]?.value?.includes('ChunkLoadError')) {
+      return null;
+    }
+    if (event.exception?.values?.[0]?.value?.includes('NetworkError')) {
+      return null;
+    }
+    
+    // Scrub sensitive data for compliance
+    if (event.user) {
+      delete event.user.email;
+      delete event.user.ip_address;
+    }
+    
+    return event;
+  },
 });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

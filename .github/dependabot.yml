@@ -1,0 +1,61 @@
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "bryan-besnyi"
+    assignees:
+      - "bryan-besnyi"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    # Group minor and patch updates
+    groups:
+      production-dependencies:
+        patterns:
+          - "@next-auth/*"
+          - "@prisma/*"
+          - "next"
+          - "react"
+          - "react-dom"
+        update-types:
+          - "minor"
+          - "patch"
+      development-dependencies:
+        patterns:
+          - "@types/*"
+          - "eslint*"
+          - "prettier"
+          - "typescript"
+          - "vitest"
+          - "cypress"
+          - "@storybook/*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Auto-merge low-risk updates
+    allow:
+      - dependency-type: "direct:production"
+        update-type: "security"
+      - dependency-type: "direct:development"
+        update-type: "security"
+      - dependency-type: "indirect"
+        update-type: "security"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    reviewers:
+      - "bryan-besnyi"
+    commit-message:
+      prefix: "ci"
