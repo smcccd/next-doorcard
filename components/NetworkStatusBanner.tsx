@@ -11,10 +11,12 @@ import { WifiOff, Wifi } from "lucide-react";
 export function NetworkStatusBanner() {
   const { isOnline, isSlowConnection } = useNetworkStatus();
   const wasOfflineRef = useRef(false);
+  const hasShownInitialOffline = useRef(false);
 
   useEffect(() => {
-    // Show toast when going offline
-    if (!isOnline && !wasOfflineRef.current) {
+    // Only show offline notifications after initial load
+    // and when we've confirmed the user was actually online before
+    if (!isOnline && !wasOfflineRef.current && hasShownInitialOffline.current) {
       toastHelpers.critical({
         title: "You're offline",
         description: "Some features may not work until you reconnect.",
@@ -22,7 +24,7 @@ export function NetworkStatusBanner() {
       wasOfflineRef.current = true;
     }
 
-    // Show toast when coming back online
+    // Show toast when coming back online (only if we were actually offline)
     if (isOnline && wasOfflineRef.current) {
       toastHelpers.success({
         title: "You're back online",
@@ -30,10 +32,16 @@ export function NetworkStatusBanner() {
       });
       wasOfflineRef.current = false;
     }
+
+    // Mark that we've had an initial online state
+    if (isOnline && !hasShownInitialOffline.current) {
+      hasShownInitialOffline.current = true;
+    }
   }, [isOnline]);
 
-  // Show persistent banner when offline
-  if (!isOnline) {
+  // Only show persistent banner if we've confirmed offline status 
+  // and the user was previously online
+  if (!isOnline && wasOfflineRef.current && hasShownInitialOffline.current) {
     return (
       <div className="bg-red-600 text-white px-4 py-2 text-center text-sm flex items-center justify-center gap-2">
         <WifiOff className="h-4 w-4" />
@@ -42,8 +50,8 @@ export function NetworkStatusBanner() {
     );
   }
 
-  // Show warning for slow connections
-  if (isSlowConnection) {
+  // Only show slow connection warning if we're definitely online
+  if (isOnline && isSlowConnection) {
     return (
       <div className="bg-yellow-600 text-white px-4 py-2 text-center text-sm flex items-center justify-center gap-2">
         <Wifi className="h-4 w-4" />

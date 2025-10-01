@@ -12,15 +12,35 @@ export interface NetworkStatus {
  * Hook to monitor network connectivity status
  */
 export function useNetworkStatus(): NetworkStatus {
-  const [isOnline, setIsOnline] = useState(
-    typeof navigator !== 'undefined' ? navigator.onLine : true
-  );
+  const [isOnline, setIsOnline] = useState(true); // Start optimistically as online
   const [isSlowConnection, setIsSlowConnection] = useState(false);
   const [connectionType, setConnectionType] = useState<string>();
 
   useEffect(() => {
+    // Initial connectivity check
+    const checkConnectivity = async () => {
+      try {
+        // Try to fetch a small resource to verify actual connectivity
+        const response = await fetch('/favicon.ico', { 
+          method: 'HEAD',
+          cache: 'no-cache',
+          signal: AbortSignal.timeout(5000) // 5 second timeout
+        });
+        setIsOnline(response.ok);
+      } catch {
+        // If fetch fails, fall back to navigator.onLine
+        setIsOnline(typeof navigator !== 'undefined' ? navigator.onLine : false);
+      }
+    };
+
+    checkConnectivity();
+
     // Update online status
-    const handleOnline = () => setIsOnline(true);
+    const handleOnline = () => {
+      setIsOnline(true);
+      // Double-check connectivity when coming online
+      checkConnectivity();
+    };
     const handleOffline = () => setIsOnline(false);
 
     window.addEventListener('online', handleOnline);
