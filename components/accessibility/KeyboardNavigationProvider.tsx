@@ -29,7 +29,7 @@ export function KeyboardNavigationProvider({ children }: KeyboardNavigationProvi
   const pathname = usePathname();
 
   useEffect(() => {
-    let keyboardTimer: NodeJS.Timeout;
+    let keyboardTimer: NodeJS.Timeout | undefined;
 
     // Detect keyboard usage
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -43,7 +43,10 @@ export function KeyboardNavigationProvider({ children }: KeyboardNavigationProvi
     const handleMouseDown = () => {
       setIsKeyboardUser(false);
       document.body.classList.remove('keyboard-user');
-      clearTimeout(keyboardTimer);
+      if (keyboardTimer) {
+        clearTimeout(keyboardTimer);
+        keyboardTimer = undefined;
+      }
     };
 
     // Global keyboard shortcuts
@@ -95,7 +98,9 @@ export function KeyboardNavigationProvider({ children }: KeyboardNavigationProvi
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('mousedown', handleMouseDown);
       document.removeEventListener('keydown', handleGlobalKeyboard);
-      clearTimeout(keyboardTimer);
+      if (keyboardTimer) {
+        clearTimeout(keyboardTimer);
+      }
     };
   }, []);
 

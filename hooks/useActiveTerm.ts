@@ -30,12 +30,13 @@ export function useActiveTerm() {
       try {
         const response = await api.terms.getActive();
         
-        if (response.success && response.data?.activeTerm) {
+        if (response.success && response.data && typeof response.data === 'object' && 'activeTerm' in response.data && response.data.activeTerm) {
+          const activeTerm = response.data.activeTerm as any;
           // Use term from database
           setActiveTerm({
-            season: response.data.activeTerm.season as TermSeason,
-            year: response.data.activeTerm.year,
-            displayName: response.data.activeTerm.name,
+            season: activeTerm.season as TermSeason,
+            year: activeTerm.year,
+            displayName: activeTerm.name,
             isFromDatabase: true,
           });
         } else {

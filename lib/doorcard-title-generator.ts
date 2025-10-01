@@ -178,7 +178,7 @@ export function generateSubtitleSuggestions(context?: {
   hasClasses?: boolean;
   hasLabs?: boolean;
 }): string[] {
-  const suggestions = [...SUBTITLE_SUGGESTIONS];
+  const suggestions: string[] = [...SUBTITLE_SUGGESTIONS];
 
   if (context?.hasOfficeHours) {
     suggestions.unshift("Office Hours & Schedule");
