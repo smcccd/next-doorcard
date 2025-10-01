@@ -285,28 +285,28 @@ function DoorcardCard({
   return (
     <Card className={getCampusCardStyle(doorcard.college)}>
       <CardHeader className="pb-2 space-y-2">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-          <CardTitle as="h3" className="text-base">
-            <div>
-              {doorcardTitle}
-              {subtitle && (
-                <div className="text-sm font-normal text-gray-600 mt-1">
-                  {subtitle}
-                </div>
-              )}
+        <CardTitle as="h3" className="text-base">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3">
+            <div className="flex items-center gap-2">
+              <span>{doorcardTitle}</span>
+              <Badge
+                variant={badgeProps.variant}
+                className={`flex items-center gap-1 ${badgeProps.className} text-xs`}
+                data-testid="status-badge"
+                title={displayStatus.description}
+                aria-label={`Status: ${displayStatus.label}. ${displayStatus.description}`}
+              >
+                {badgeProps.icon}
+                {displayStatus.label}
+              </Badge>
             </div>
-          </CardTitle>
-          <Badge
-            variant={badgeProps.variant}
-            className={`flex items-center gap-1 ${badgeProps.className} text-xs w-fit`}
-            data-testid="status-badge"
-            title={displayStatus.description}
-            aria-label={`Status: ${displayStatus.label}. ${displayStatus.description}`}
-          >
-            {badgeProps.icon}
-            {displayStatus.label}
-          </Badge>
-        </div>
+            {subtitle && (
+              <div className="text-sm font-normal text-gray-600 mt-1 sm:mt-0">
+                {subtitle}
+              </div>
+            )}
+          </div>
+        </CardTitle>
         <p className="text-xs text-gray-600">
           {doorcard.name || "Faculty Member"} •{" "}
           {doorcard.officeNumber || "Office TBD"}
@@ -457,25 +457,23 @@ function DoorcardRow({
     <Card className={getCampusRowStyle(doorcard.college)}>
       <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="space-y-1 flex-1">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <p className="font-medium">
-              {doorcardTitle}
-              {subtitle && (
-                <span className="block text-sm font-normal text-gray-600 mt-1">
-                  {subtitle}
-                </span>
-              )}
-            </p>
-            <Badge
-              variant={badgeProps.variant}
-              className={`flex items-center gap-1 ${badgeProps.className} text-xs w-fit`}
-              data-testid="status-badge"
-              title={displayStatus.description}
-              aria-label={`Status: ${displayStatus.label}. ${displayStatus.description}`}
-            >
-              {badgeProps.icon}
-              {displayStatus.label}
-            </Badge>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <p className="font-medium">{doorcardTitle}</p>
+              <Badge
+                variant={badgeProps.variant}
+                className={`flex items-center gap-1 ${badgeProps.className} text-xs`}
+                data-testid="status-badge"
+                title={displayStatus.description}
+                aria-label={`Status: ${displayStatus.label}. ${displayStatus.description}`}
+              >
+                {badgeProps.icon}
+                {displayStatus.label}
+              </Badge>
+            </div>
+            {subtitle && (
+              <p className="text-sm font-normal text-gray-600">{subtitle}</p>
+            )}
           </div>
           <p className="text-xs text-gray-600">
             {doorcard.name || "Faculty Member"} •{" "}
