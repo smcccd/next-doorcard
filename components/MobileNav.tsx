@@ -36,20 +36,20 @@ export default function MobileNav({ session, isAdmin }: MobileNavProps) {
       {/* Mobile menu button */}
       <button
         onClick={toggleMenu}
-        className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-smccd-blue-900 text-white hover:bg-smccd-blue-800 focus:outline-none focus:ring-2 focus:ring-smccd-blue-700 focus:ring-offset-2 transition-colors duration-200 font-semibold text-base"
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-smccd-blue-900 text-white hover:bg-smccd-blue-800 focus:outline-none focus:ring-2 focus:ring-smccd-blue-700 focus:ring-offset-2 transition-colors duration-200 font-semibold text-sm min-h-[44px]"
         aria-expanded={isOpen}
         aria-controls="mobile-menu"
         aria-label={isOpen ? "Close menu" : "Open menu"}
       >
         {isOpen ? (
           <>
-            <X className="h-5 w-5" aria-hidden="true" />
-            <span>Close</span>
+            <X className="h-4 w-4" aria-hidden="true" />
+            <span className="hidden xs:inline">Close</span>
           </>
         ) : (
           <>
-            <Menu className="h-5 w-5" aria-hidden="true" />
-            <span>Menu</span>
+            <Menu className="h-4 w-4" aria-hidden="true" />
+            <span className="hidden xs:inline">Menu</span>
           </>
         )}
       </button>
