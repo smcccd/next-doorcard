@@ -8,6 +8,7 @@ import { ProfileSetupProvider } from "@/components/ProfileSetupProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { DarkModeProvider } from "@/components/DarkModeProvider";
 import ClarityInit from "@/components/ClarityInit";
+import { NetworkStatusBanner } from "@/components/NetworkStatusBanner";
 import { ReactNode, Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -97,6 +98,9 @@ export default async function RootLayout({
               <Suspense fallback={<div className="h-16" />}>
                 <Navbar />
               </Suspense>
+
+              {/* Network status banner for offline/slow connection alerts */}
+              <NetworkStatusBanner />
 
               {/* Site Index moved to individual pages that need it */}
 

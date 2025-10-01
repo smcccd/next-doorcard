@@ -5,14 +5,31 @@ import * as React from "react";
 
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
 
-const TOAST_LIMIT = 1;
-const TOAST_REMOVE_DELAY = 1000000;
+const TOAST_LIMIT = 5;
+const TOAST_REMOVE_DELAY = 5000;
+
+// Priority-based toast limits
+const PRIORITY_LIMITS = {
+  low: 2,
+  normal: 3,
+  high: 4,
+  critical: 5,
+};
+
+// Priority-based auto-dismiss timeouts (in ms)
+const PRIORITY_TIMEOUTS = {
+  low: 3000,
+  normal: 5000,
+  high: 8000,
+  critical: 0, // Never auto-dismiss
+};
 
 import type {
   ToasterToast,
   ActionType,
   Action,
   State,
+  ToastPriority,
 } from "@/types/hooks/toast";
 
 const actionTypes = {
@@ -31,29 +48,49 @@ function genId() {
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
-const addToRemoveQueue = (toastId: string) => {
+const addToRemoveQueue = (toastId: string, priority: ToastPriority = 'normal', persistent = false) => {
   if (toastTimeouts.has(toastId)) {
     return;
   }
 
-  const timeout = setTimeout(() => {
+  // Don't auto-dismiss persistent toasts or critical priority toasts
+  const timeout = PRIORITY_TIMEOUTS[priority];
+  if (persistent || timeout === 0) {
+    return;
+  }
+
+  const timeoutId = setTimeout(() => {
     toastTimeouts.delete(toastId);
     dispatch({
       type: "REMOVE_TOAST",
       toastId: toastId,
     });
-  }, TOAST_REMOVE_DELAY);
+  }, timeout);
 
-  toastTimeouts.set(toastId, timeout);
+  toastTimeouts.set(toastId, timeoutId);
 };
 
 export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "ADD_TOAST":
+    case "ADD_TOAST": {
+      const newToast = {
+        priority: 'normal' as ToastPriority,
+        position: 'bottom-right' as const,
+        persistent: false,
+        ...action.toast,
+      };
+
+      // Sort toasts by priority (critical > high > normal > low)
+      const priorityOrder = { critical: 4, high: 3, normal: 2, low: 1 };
+      const sortedToasts = [newToast, ...state.toasts]
+        .sort((a, b) => (priorityOrder[b.priority!] || 0) - (priorityOrder[a.priority!] || 0))
+        .slice(0, TOAST_LIMIT);
+
       return {
         ...state,
-        toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
+        toasts: sortedToasts,
       };
+    }
 
     case "UPDATE_TOAST":
       return {
@@ -69,10 +106,13 @@ export const reducer = (state: State, action: Action): State => {
       // ! Side effects ! - This could be extracted into a dismissToast() action,
       // but I'll keep it here for simplicity
       if (toastId) {
-        addToRemoveQueue(toastId);
+        const toast = state.toasts.find(t => t.id === toastId);
+        if (toast) {
+          addToRemoveQueue(toastId, toast.priority, toast.persistent);
+        }
       } else {
         state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id);
+          addToRemoveQueue(toast.id, toast.priority, toast.persistent);
         });
       }
 
@@ -164,4 +204,22 @@ function useToast() {
   };
 }
 
-export { useToast, toast };
+// Helper functions for common toast patterns
+const toastHelpers = {
+  success: (props: Omit<Toast, 'variant' | 'priority'>) => 
+    toast({ ...props, variant: 'default', priority: 'normal' }),
+  
+  error: (props: Omit<Toast, 'variant' | 'priority'>) => 
+    toast({ ...props, variant: 'destructive', priority: 'high' }),
+  
+  warning: (props: Omit<Toast, 'variant' | 'priority'>) => 
+    toast({ ...props, variant: 'default', priority: 'normal' }),
+  
+  critical: (props: Omit<Toast, 'variant' | 'priority' | 'persistent'>) => 
+    toast({ ...props, variant: 'destructive', priority: 'critical', persistent: true }),
+  
+  info: (props: Omit<Toast, 'variant' | 'priority'>) => 
+    toast({ ...props, variant: 'default', priority: 'low' }),
+};
+
+export { useToast, toast, toastHelpers };

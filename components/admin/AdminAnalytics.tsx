@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { LazyAnalyticsChart } from "@/components/analytics/LazyAnalyticsChart";
+import { fetchWithTimeout, fetchPresets } from "@/lib/fetch-with-timeout";
 import { LazyTestChart } from "@/components/analytics/LazyTestChart";
 import {
   Card,
@@ -62,7 +63,7 @@ export function AdminAnalytics() {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const response = await fetch("/api/admin/analytics");
+      const response = await fetchWithTimeout("/api/admin/analytics", fetchPresets.heavy);
 
       if (!response.ok) {
         throw new Error("Failed to fetch analytics");

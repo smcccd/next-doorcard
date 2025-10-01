@@ -13,6 +13,7 @@ import {
   Building2,
 } from "lucide-react";
 import { updateBasicInfo } from "@/app/doorcard/actions";
+import { previewDoorcardTitle } from "@/lib/doorcard-title-generator";
 
 interface Props {
   doorcard: {
@@ -34,11 +35,11 @@ type FieldErrors = {
 
 const rules: Record<
   keyof FieldErrors,
-  { min: number; max: number; label: string }
+  { min: number; max: number; label: string; required?: boolean }
 > = {
-  name: { min: 2, max: 100, label: "Full name" },
-  doorcardName: { min: 2, max: 50, label: "Doorcard title" },
-  officeNumber: { min: 2, max: 100, label: "Office location" },
+  name: { min: 2, max: 100, label: "Full name", required: true },
+  doorcardName: { min: 0, max: 50, label: "Subtitle", required: false },
+  officeNumber: { min: 2, max: 100, label: "Office location", required: true },
 };
 
 function validateField(
@@ -46,11 +47,22 @@ function validateField(
   value: string
 ): string | undefined {
   const v = value.trim();
-  if (!v) return `${rules[key].label} is required`;
-  if (v.length < rules[key].min)
-    return `${rules[key].label} must be at least ${rules[key].min} characters`;
-  if (v.length > rules[key].max)
-    return `${rules[key].label} must be under ${rules[key].max} characters`;
+  const rule = rules[key];
+  
+  // Check if field is required
+  if (rule.required && !v) {
+    return `${rule.label} is required`;
+  }
+  
+  // Skip validation for empty optional fields
+  if (!rule.required && !v) {
+    return undefined;
+  }
+  
+  if (v.length < rule.min)
+    return `${rule.label} must be at least ${rule.min} characters`;
+  if (v.length > rule.max)
+    return `${rule.label} must be under ${rule.max} characters`;
   return undefined;
 }
 
@@ -106,6 +118,13 @@ export default function BasicInfoForm({ doorcard }: Props) {
 
   const anyClientError = Object.values(errors).some(Boolean);
 
+  // Generate title preview
+  const titlePreview = previewDoorcardTitle(
+    name || "Your Name",
+    doorcard.term,
+    doorcard.year?.toString()
+  );
+
   return (
     <div className="space-y-8">
       {/* Description */}
@@ -115,6 +134,33 @@ export default function BasicInfoForm({ doorcard }: Props) {
           <p className="text-sm text-gray-900">
             Enter your details as they should appear on your doorcard.
           </p>
+        </div>
+      </div>
+
+      {/* Title Preview */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <div className="text-blue-600">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h4 className="text-sm font-medium text-blue-900 mb-1">
+              Generated Doorcard Title
+            </h4>
+            <p className="text-lg font-semibold text-blue-800">
+              {titlePreview}
+            </p>
+            {doorcardName.trim() && (
+              <p className="text-sm text-blue-700 mt-1">
+                Subtitle: {doorcardName}
+              </p>
+            )}
+            <p className="text-xs text-blue-600 mt-2">
+              This title is automatically generated from your name, term, and year.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -140,19 +186,18 @@ export default function BasicInfoForm({ doorcard }: Props) {
             help="Your full name as you'd like it to appear"
             isValid={!validateField("name", name) && name.trim().length >= 2}
           />
-          {/* Doorcard name */}
+          {/* Doorcard subtitle */}
           <Field
             id="doorcardName"
-            label="Doorcard Title"
+            label="Subtitle (optional)"
             icon={<UserSquare2 className="h-4 w-4 text-gray-400" />}
             value={doorcardName}
-            placeholder="Fall 2024 Doorcard"
+            placeholder="Office Hours, Teaching Schedule, etc."
             error={errors.doorcardName}
             onChange={(v) => handleChange("doorcardName", v)}
-            help="Title for this doorcard (e.g., Fall 2024 Doorcard)"
+            help="Optional subtitle for your doorcard"
             isValid={
-              !validateField("doorcardName", doorcardName) &&
-              doorcardName.trim().length >= 2
+              !validateField("doorcardName", doorcardName)
             }
           />
           {/* Office location */}

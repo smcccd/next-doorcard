@@ -1,0 +1,105 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+
+export interface NetworkStatus {
+  isOnline: boolean;
+  isSlowConnection: boolean;
+  connectionType?: string;
+}
+
+/**
+ * Hook to monitor network connectivity status
+ */
+export function useNetworkStatus(): NetworkStatus {
+  const [isOnline, setIsOnline] = useState(
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
+  const [isSlowConnection, setIsSlowConnection] = useState(false);
+  const [connectionType, setConnectionType] = useState<string>();
+
+  useEffect(() => {
+    // Update online status
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    // Detect slow connection if Network Information API is available
+    const updateConnectionInfo = () => {
+      if ('connection' in navigator) {
+        const connection = (navigator as any).connection;
+        if (connection) {
+          setConnectionType(connection.effectiveType);
+          // Consider 2G and slow-2g as slow connections
+          setIsSlowConnection(
+            connection.effectiveType === '2g' || 
+            connection.effectiveType === 'slow-2g'
+          );
+        }
+      }
+    };
+
+    updateConnectionInfo();
+
+    // Listen for connection changes
+    if ('connection' in navigator) {
+      const connection = (navigator as any).connection;
+      if (connection) {
+        connection.addEventListener('change', updateConnectionInfo);
+        
+        return () => {
+          window.removeEventListener('online', handleOnline);
+          window.removeEventListener('offline', handleOffline);
+          connection.removeEventListener('change', updateConnectionInfo);
+        };
+      }
+    }
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  return {
+    isOnline,
+    isSlowConnection,
+    connectionType,
+  };
+}
+
+/**
+ * Hook to get adaptive fetch options based on network conditions
+ */
+export function useAdaptiveFetch() {
+  const { isOnline, isSlowConnection } = useNetworkStatus();
+
+  const getAdaptiveOptions = (baseOptions: RequestInit = {}) => {
+    if (!isOnline) {
+      // Return cached response or throw offline error
+      return {
+        ...baseOptions,
+        cache: 'force-cache' as RequestCache,
+      };
+    }
+
+    if (isSlowConnection) {
+      // Use more aggressive caching and longer timeouts for slow connections
+      return {
+        ...baseOptions,
+        cache: 'force-cache' as RequestCache,
+        // Note: timeout would be handled by our fetchWithTimeout wrapper
+      };
+    }
+
+    return baseOptions;
+  };
+
+  return {
+    isOnline,
+    isSlowConnection,
+    getAdaptiveOptions,
+  };
+}

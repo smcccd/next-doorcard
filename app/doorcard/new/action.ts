@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 import type { College, TermSeason } from "@prisma/client";
+import { generateDoorcardTitle } from "@/lib/doorcard-title-generator";
 import crypto from "crypto";
 
 type ActionResult = { success: boolean; message?: string };
@@ -134,12 +135,17 @@ export async function handleNewDoorcardForm(formData: FormData): Promise<void> {
       defaultDisplayName = "Faculty Member";
     }
 
-    // Create smart default doorcard title
-    const defaultDoorcardTitle = `${defaultDisplayName}'s ${data.term} ${data.year} Doorcard`;
+    // Generate automatic doorcard title using the new convention
+    const doorcardTitle = generateDoorcardTitle({
+      facultyName: defaultDisplayName,
+      term: toEnumSeason(data.term),
+      year: data.year,
+    });
 
     console.log("[NEW_DOORCARD] Creating doorcard", {
       name: defaultDisplayName,
-      doorcardName: defaultDoorcardTitle,
+      doorcardTitle: doorcardTitle,
+      doorcardName: "", // Now used as optional subtitle
       term: toEnumSeason(data.term),
       year: data.year,
       college: data.college,
@@ -150,7 +156,7 @@ export async function handleNewDoorcardForm(formData: FormData): Promise<void> {
       data: {
         id: crypto.randomUUID(),
         name: defaultDisplayName,
-        doorcardName: defaultDoorcardTitle,
+        doorcardName: "", // Start with empty subtitle - user can add one later
         officeNumber: "",
         term: toEnumSeason(data.term),
         year: data.year,

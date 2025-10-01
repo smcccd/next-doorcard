@@ -1,10 +1,23 @@
 import type { ToastProps } from "@/components/ui/toast";
 
+export type ToastPriority = 'low' | 'normal' | 'high' | 'critical';
+
+export type ToastPosition = 
+  | 'top-left' 
+  | 'top-center' 
+  | 'top-right' 
+  | 'bottom-left' 
+  | 'bottom-center' 
+  | 'bottom-right';
+
 export type ToasterToast = ToastProps & {
   id: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: React.ReactNode;
+  priority?: ToastPriority;
+  position?: ToastPosition;
+  persistent?: boolean; // Don't auto-dismiss
 };
 
 const actionTypes = {

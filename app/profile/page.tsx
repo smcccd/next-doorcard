@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { logger } from "@/lib/logger";
+import { fetchWithTimeout, fetchPresets } from "@/lib/fetch-with-timeout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -81,7 +82,7 @@ export default function ProfilePage() {
         return;
       }
 
-      const response = await fetch("/api/user/profile");
+      const response = await fetchWithTimeout("/api/user/profile", fetchPresets.standard);
       logger.debug("[Profile] Response status:", response.status);
       logger.debug(
         "[Profile] Response headers:",
@@ -204,7 +205,8 @@ export default function ProfilePage() {
 
       logger.debug("[Profile] Submitting:", updateData);
 
-      const response = await fetch("/api/user/profile", {
+      const response = await fetchWithTimeout("/api/user/profile", {
+        ...fetchPresets.critical,
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

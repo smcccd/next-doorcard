@@ -4,6 +4,8 @@
 import { useState, useEffect } from "react";
 import { TermSeason } from "@prisma/client";
 import { getCurrentAcademicTerm, type ActiveTermInfo } from "@/lib/active-term";
+import { api } from "@/lib/api-client";
+import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 
 export function useActiveTerm() {
   const [activeTerm, setActiveTerm] = useState<ActiveTermInfo>(() =>
@@ -11,32 +13,37 @@ export function useActiveTerm() {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { isOnline } = useNetworkStatus();
 
   useEffect(() => {
     // Try to fetch active term from API, fallback to computed term
     const fetchActiveTerm = async () => {
+      // Skip API call if offline, use computed term
+      if (!isOnline) {
+        setActiveTerm(getCurrentAcademicTerm());
+        return;
+      }
+
       setIsLoading(true);
       setError(null);
 
       try {
-        const response = await fetch("/api/terms/active");
-        if (response.ok) {
-          const data = await response.json();
-          if (data.activeTerm) {
-            // Use term from database
-            setActiveTerm({
-              season: data.activeTerm.season as TermSeason,
-              year: data.activeTerm.year,
-              displayName: data.activeTerm.name,
-              isFromDatabase: true,
-            });
-          } else {
-            // Fallback to computed term
-            setActiveTerm(getCurrentAcademicTerm());
-          }
+        const response = await api.terms.getActive();
+        
+        if (response.success && response.data?.activeTerm) {
+          // Use term from database
+          setActiveTerm({
+            season: response.data.activeTerm.season as TermSeason,
+            year: response.data.activeTerm.year,
+            displayName: response.data.activeTerm.name,
+            isFromDatabase: true,
+          });
         } else {
-          // API failed, use computed term
+          // Fallback to computed term
           setActiveTerm(getCurrentAcademicTerm());
+          if (response.error) {
+            setError(response.error);
+          }
         }
       } catch (err) {
         // Network error, use computed term
@@ -48,7 +55,7 @@ export function useActiveTerm() {
     };
 
     fetchActiveTerm();
-  }, []);
+  }, [isOnline]);
 
   return {
     activeTerm,

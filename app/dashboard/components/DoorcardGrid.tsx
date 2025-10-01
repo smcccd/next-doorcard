@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { type College, COLLEGE_META } from "@/types/doorcard";
 import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
 import { getPrintUrl } from "@/lib/url-utils";
+import { generateDoorcardTitle } from "@/lib/doorcard-title-generator";
 import type { Doorcard, Appointment, User, TermSeason } from "@prisma/client";
 
 interface Props {
@@ -40,6 +41,23 @@ interface Props {
   emptyMessage: string;
   variant?: "grid" | "list";
   activeTerm?: { season: TermSeason; year: number } | null;
+}
+
+// Helper function to generate doorcard title info
+function getDoorcardTitleInfo(doorcard: Doorcard) {
+  const doorcardTitle = generateDoorcardTitle({
+    facultyName: doorcard.name || "Faculty Member",
+    term: doorcard.term,
+    year: doorcard.year,
+  });
+  
+  const subtitle = doorcard.doorcardName || "";
+  
+  const displayName = subtitle 
+    ? `${doorcardTitle} - ${subtitle}`
+    : doorcardTitle;
+    
+  return { doorcardTitle, subtitle, displayName };
 }
 
 export default function DoorcardGrid({
@@ -115,16 +133,14 @@ function DeleteButton({
   };
 
   const isLive = displayStatus.status === "live";
-  const doorcardName =
-    doorcard.doorcardName ||
-    `${doorcard.name || "Faculty Member"}'s ${doorcard.term} ${doorcard.year} Doorcard`;
+  const { doorcardTitle, subtitle, displayName } = getDoorcardTitleInfo(doorcard);
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
         <button
           className="inline-flex items-center text-xs text-red-600 hover:text-red-800 underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 rounded px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
-          aria-label={`Delete doorcard ${doorcardName}`}
+          aria-label={`Delete doorcard ${displayName}`}
         >
           <Trash2 className="h-4 w-4 mr-1" aria-hidden="true" /> Delete
         </button>
@@ -145,12 +161,12 @@ function DeleteButton({
                 <br />
                 <br />
                 Are you sure you want to permanently delete{" "}
-                <strong>"{doorcardName}"</strong>?
+                <strong>"{displayName}"</strong>?
               </>
             ) : (
               <>
                 Are you sure you want to permanently delete{" "}
-                <strong>"{doorcardName}"</strong>?
+                <strong>"{displayName}"</strong>?
                 <br />
                 <br />
                 This action cannot be undone.
@@ -198,6 +214,7 @@ function DoorcardCard({
   activeTerm?: { season: TermSeason; year: number } | null;
 }) {
   const displayStatus = getDoorcardDisplayStatus(doorcard, activeTerm);
+  const { doorcardTitle, subtitle, displayName } = getDoorcardTitleInfo(doorcard);
 
   // Determine the correct view URL based on doorcard status
   const getViewUrl = () => {
@@ -285,10 +302,14 @@ function DoorcardCard({
           </div>
         </div>
         <CardTitle as="h3" className="text-base">
-          {doorcard.doorcardName ||
-            `${doorcard.name || "Faculty Member"}'s ${doorcard.term} ${
-              doorcard.year
-            } Doorcard`}
+          <div>
+            {doorcardTitle}
+            {subtitle && (
+              <div className="text-sm font-normal text-gray-600 mt-1">
+                {subtitle}
+              </div>
+            )}
+          </div>
         </CardTitle>
         <p className="text-xs text-gray-600">
           {doorcard.name || "Faculty Member"} •{" "}
@@ -317,7 +338,7 @@ function DoorcardCard({
               <Link
                 href={`/doorcard/${doorcard.id}/edit?step=1`}
                 className="inline-flex items-center text-xs text-orange-700 bg-orange-50 border border-orange-200 rounded px-3 py-2 hover:bg-orange-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
-                aria-label={`Complete setup for ${doorcard.doorcardName}`}
+                aria-label={`Complete setup for ${displayName}`}
               >
                 <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Complete
                 Setup
@@ -331,7 +352,7 @@ function DoorcardCard({
                 href={getViewUrl()}
                 className="inline-flex items-center text-xs underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 rounded px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
                 target="_blank"
-                aria-label={`View doorcard for ${doorcard.doorcardName}`}
+                aria-label={`View doorcard for ${displayName}`}
               >
                 <ExternalLink className="h-4 w-4 mr-1" aria-hidden="true" />{" "}
                 View
@@ -340,7 +361,7 @@ function DoorcardCard({
                 <Link
                   href={`/doorcard/${doorcard.id}/edit?step=1`}
                   className="inline-flex items-center text-xs underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 rounded px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
-                  aria-label={`Edit doorcard ${doorcard.doorcardName}`}
+                  aria-label={`Edit doorcard ${displayName}`}
                 >
                   <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Edit
                 </Link>
@@ -349,7 +370,7 @@ function DoorcardCard({
                 href={getPrintUrl(getViewUrl())}
                 className="inline-flex items-center text-xs underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 rounded px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
                 target="_blank"
-                aria-label={`Print doorcard ${doorcard.doorcardName}`}
+                aria-label={`Print doorcard ${displayName}`}
               >
                 <Printer className="h-4 w-4 mr-1" aria-hidden="true" /> Print
               </Link>
@@ -374,6 +395,7 @@ function DoorcardRow({
   activeTerm?: { season: TermSeason; year: number } | null;
 }) {
   const displayStatus = getDoorcardDisplayStatus(doorcard, activeTerm);
+  const { doorcardTitle, subtitle, displayName } = getDoorcardTitleInfo(doorcard);
 
   // Determine the correct view URL based on doorcard status
   const getViewUrl = () => {
@@ -449,10 +471,12 @@ function DoorcardRow({
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <p className="font-medium">
-              {doorcard.doorcardName ||
-                `${doorcard.name || "Faculty Member"}'s ${doorcard.term} ${
-                  doorcard.year
-                } Doorcard`}
+              {doorcardTitle}
+              {subtitle && (
+                <span className="block text-sm font-normal text-gray-600 mt-1">
+                  {subtitle}
+                </span>
+              )}
             </p>
             <Badge
               variant={badgeProps.variant}
@@ -478,7 +502,7 @@ function DoorcardRow({
               <Link
                 href={`/doorcard/${doorcard.id}/edit?step=1`}
                 className="text-orange-700 bg-orange-50 border border-orange-200 rounded px-3 py-2 hover:bg-orange-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 flex items-center"
-                aria-label={`Complete setup for ${doorcard.doorcardName}`}
+                aria-label={`Complete setup for ${displayName}`}
               >
                 <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Complete
                 Setup
@@ -492,7 +516,7 @@ function DoorcardRow({
                 href={getViewUrl()}
                 target="_blank"
                 className="underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 rounded flex items-center px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
-                aria-label={`View doorcard for ${doorcard.doorcardName}`}
+                aria-label={`View doorcard for ${displayName}`}
               >
                 <ExternalLink className="h-4 w-4 mr-1" aria-hidden="true" />{" "}
                 View
@@ -501,7 +525,7 @@ function DoorcardRow({
                 <Link
                   href={`/doorcard/${doorcard.id}/edit?step=1`}
                   className="underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 rounded flex items-center px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
-                  aria-label={`Edit doorcard ${doorcard.doorcardName}`}
+                  aria-label={`Edit doorcard ${displayName}`}
                 >
                   <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Edit
                 </Link>
@@ -510,7 +534,7 @@ function DoorcardRow({
                 href={getPrintUrl(getViewUrl())}
                 className="underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 rounded flex items-center px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
                 target="_blank"
-                aria-label={`Print doorcard ${doorcard.doorcardName}`}
+                aria-label={`Print doorcard ${displayName}`}
               >
                 <Printer className="h-4 w-4 mr-1" aria-hidden="true" /> Print
               </Link>
