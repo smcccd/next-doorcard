@@ -8,6 +8,7 @@ import { formatDisplayName } from "@/lib/display-name";
 import { ACCESSIBLE_CATEGORY_COLORS, PRINT_CATEGORY_COLORS } from "./color-contrast";
 import { CATEGORY_LABELS, TIME_SLOTS, WEEKDAYS_ONLY } from "@/lib/doorcard-constants";
 import { createSemanticScheduleData, generateScreenReaderContent } from "@/lib/doorcard/accessibility";
+import type { AppointmentLite } from "@/lib/doorcard/types";
 
 /**
  * Generate accessible PDF HTML with proper structure and alternative text
@@ -357,7 +358,7 @@ export function generateAccessiblePDFHTML(doorcard: DoorcardLite): string {
       <thead>
         <tr role="row">
           <th scope="col" class="time-header">Time</th>
-          ${daysToShow.map(day => `<th scope="col" class="day-header">${day.charAt(0) + day.slice(1).toLowerCase()}</th>`).join('')}
+          ${daysToShow.map(day => `<th scope="col" class="day-header">${day.label}</th>`).join('')}
         </tr>
       </thead>
       
@@ -388,7 +389,7 @@ export function generateAccessiblePDFHTML(doorcard: DoorcardLite): string {
 </html>`;
 }
 
-function generateAccessibleScheduleRows(byDay: Record<string, any[]>, daysToShow: string[]): string {
+function generateAccessibleScheduleRows(byDay: Record<string, AppointmentLite[]>, daysToShow: Array<{ key: string; label: string }>): string {
   // Implementation similar to original but with accessibility enhancements
   let html = '';
   const timeSlots = TIME_SLOTS.slice(0, 30); // 7AM to 10PM
@@ -396,15 +397,15 @@ function generateAccessibleScheduleRows(byDay: Record<string, any[]>, daysToShow
   for (let i = 0; i < timeSlots.length; i++) {
     const slot = timeSlots[i];
     html += `<tr role="row">`;
-    html += `<th scope="row" class="time-header">${slot}</th>`;
+    html += `<th scope="row" class="time-header">${slot.label}</th>`;
     
     for (const day of daysToShow) {
-      const dayAppointments = byDay[day] || [];
+      const dayAppointments = byDay[day.key] || [];
       const activeAppointment = dayAppointments.find(apt => 
-        isSlotCovered(apt, slot)
+        isSlotCovered(apt, slot.value)
       );
       
-      if (activeAppointment && isSlotStart(activeAppointment, slot)) {
+      if (activeAppointment && isSlotStart(activeAppointment, slot.value)) {
         const duration = calculateDuration(activeAppointment);
         const rowspan = Math.ceil(duration / 30);
         const colors = PRINT_CATEGORY_COLORS[activeAppointment.category];

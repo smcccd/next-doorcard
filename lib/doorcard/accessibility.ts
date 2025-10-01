@@ -1,10 +1,44 @@
-import { formatTimeRange } from "@/lib/doorcard-constants";
-import type { AppointmentLite, SemanticScheduleData } from "./types";
+import { formatTimeRange, ALL_DAYS } from "@/lib/doorcard-constants";
+import type { AppointmentLite, SemanticScheduleData, DoorcardLite, DaySchedule } from "./types";
 import { CATEGORY_LABELS } from "./print-optimization";
 
 /**
  * Accessibility utilities for screen readers and assistive technologies
  */
+
+/**
+ * Creates semantic schedule data for accessibility
+ */
+export function createSemanticScheduleData(
+  doorcard: DoorcardLite,
+  includeWeekends = false
+): SemanticScheduleData {
+  const daysToInclude = includeWeekends 
+    ? ALL_DAYS.map(d => d.key)
+    : ALL_DAYS.filter(d => d.key !== 'SATURDAY' && d.key !== 'SUNDAY').map(d => d.key);
+
+  const daySchedules: DaySchedule[] = daysToInclude.map(dayKey => {
+    const dayAppointments = doorcard.appointments.filter(apt => apt.dayOfWeek === dayKey);
+    
+    return {
+      dayKey,
+      dayLabel: dayKey.charAt(0) + dayKey.slice(1).toLowerCase(),
+      appointments: dayAppointments,
+      hasAppointments: dayAppointments.length > 0
+    };
+  });
+
+  return {
+    facultyName: doorcard.name || "Faculty Member",
+    semesterInfo: `${doorcard.term || "Term"} ${doorcard.year || "Year"}`,
+    officeInfo: doorcard.officeNumber || "Office TBD",
+    website: doorcard.user?.website || undefined,
+    daySchedules,
+    hasWeekendAppointments: doorcard.appointments.some(apt => 
+      apt.dayOfWeek === 'SATURDAY' || apt.dayOfWeek === 'SUNDAY'
+    )
+  };
+}
 
 /**
  * Creates accessible description for an appointment
