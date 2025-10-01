@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { PrismaErrorHandler } from "@/lib/prisma-error-handler";
 
 export async function GET() {
   try {
@@ -56,6 +57,7 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching public doorcards:", error);
+    // For public endpoint, maintain the envelope format expected by frontend
     return NextResponse.json(
       {
         doorcards: [],

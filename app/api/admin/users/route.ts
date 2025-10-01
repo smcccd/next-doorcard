@@ -2,6 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { PrismaErrorHandler } from "@/lib/prisma-error-handler";
+import { z } from "zod";
+
+const queryParamsSchema = z.object({
+  limit: z.string().optional().transform((val) => {
+    const parsed = parseInt(val || "50");
+    return isNaN(parsed) || parsed < 1 || parsed > 100 ? 50 : parsed;
+  }),
+  offset: z.string().optional().transform((val) => {
+    const parsed = parseInt(val || "0");
+    return isNaN(parsed) || parsed < 0 ? 0 : parsed;
+  }),
+  search: z.string().optional().transform((val) => (val || "").trim()),
+  campus: z.enum(["all", "SKYLINE", "CSM", "CANADA", "DISTRICT_OFFICE"]).optional().default("all"),
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -24,12 +39,24 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Get URL parameters for pagination and filtering
+    // Get and validate URL parameters for pagination and filtering
     const { searchParams } = new URL(req.url);
-    const limit = parseInt(searchParams.get("limit") || "50");
-    const offset = parseInt(searchParams.get("offset") || "0");
-    const search = searchParams.get("search") || "";
-    const campus = searchParams.get("campus") || "";
+    const rawParams = {
+      limit: searchParams.get("limit"),
+      offset: searchParams.get("offset"), 
+      search: searchParams.get("search"),
+      campus: searchParams.get("campus"),
+    };
+
+    const validationResult = queryParamsSchema.safeParse(rawParams);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: "Invalid query parameters", details: validationResult.error.errors },
+        { status: 400 }
+      );
+    }
+
+    const { limit, offset, search, campus } = validationResult.data;
 
     // Build where clause
     const where: any = {};
@@ -117,9 +144,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(processedUsers);
   } catch (error) {
     console.error("Admin users error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch users" },
-      { status: 500 }
-    );
+    return PrismaErrorHandler.handle(error);
   }
 }

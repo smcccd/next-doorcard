@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { PrismaErrorHandler } from "@/lib/prisma-error-handler";
 
 export async function GET() {
   try {
@@ -25,6 +26,7 @@ export async function GET() {
 
     return NextResponse.json(health, { status: 200 });
   } catch (error) {
+    // For health checks, provide more detailed error info than standard handler
     const healthError = {
       status: "unhealthy",
       timestamp: new Date().toISOString(),
@@ -33,6 +35,8 @@ export async function GET() {
       database: "disconnected",
     };
 
+    // Log the error for debugging but still return health-specific format
+    console.error("Health check failed:", error);
     return NextResponse.json(healthError, { status: 500 });
   }
 }

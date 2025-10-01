@@ -2,6 +2,7 @@ import { logger } from "@/lib/logger";
 import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
+import { PrismaErrorHandler } from "@/lib/prisma-error-handler";
 import { z } from "zod";
 import { COLLEGES } from "@/types/doorcard";
 import { Prisma, College, TermSeason } from "@prisma/client";
@@ -134,22 +135,27 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requireAuthUserAPI();
-  if ("error" in auth) {
-    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  try {
+    const auth = await requireAuthUserAPI();
+    if ("error" in auth) {
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+
+    const resolvedParams = await params;
+    const doorcard = await prisma.doorcard.findFirst({
+      where: { id: resolvedParams.id, userId: auth.user.id },
+      include: includeDoorcard(),
+    });
+
+    if (!doorcard) {
+      return NextResponse.json({ error: "Doorcard not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(doorcard);
+  } catch (error) {
+    logger.error("Error fetching doorcard:", error);
+    return PrismaErrorHandler.handle(error);
   }
-
-  const resolvedParams = await params;
-  const doorcard = await prisma.doorcard.findFirst({
-    where: { id: resolvedParams.id, userId: auth.user.id },
-    include: includeDoorcard(),
-  });
-
-  if (!doorcard) {
-    return NextResponse.json({ error: "Doorcard not found" }, { status: 404 });
-  }
-
-  return NextResponse.json(doorcard);
 }
 
 /* ----------------------------------------------------------------------------
@@ -377,9 +383,6 @@ export async function DELETE(
     return NextResponse.json({ message: "Doorcard deleted successfully" });
   } catch (err) {
     logger.error("Error deleting doorcard:", err);
-    return NextResponse.json(
-      { error: "Failed to delete doorcard" },
-      { status: 500 }
-    );
+    return PrismaErrorHandler.handle(err);
   }
 }

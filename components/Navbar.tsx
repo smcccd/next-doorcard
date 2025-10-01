@@ -70,7 +70,7 @@ export default async function Navbar() {
                   className={`${navStyles.loginButton.base} ${navStyles.loginButton.desktop}`}
                   aria-label="Sign in to your faculty account"
                 >
-                  Login
+                  Faculty Login
                 </Link>
               )}
             </div>

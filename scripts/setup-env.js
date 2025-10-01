@@ -18,9 +18,14 @@ console.log(`Environment: ${isProduction ? "production" : "development"}`);
 const databaseConfig = process.env.DATABASE_URL;
 const isNeonDb = databaseConfig?.includes("neon.tech");
 const isSqlite = databaseConfig?.startsWith("file:");
+const isLocalPostgres = databaseConfig?.includes("localhost:5432");
 
 console.log(
-  `Database: ${databaseConfig ? (isSqlite ? "SQLite (local)" : "PostgreSQL (remote)") : "NOT SET"}`
+  `Database: ${databaseConfig ? 
+    (isSqlite ? "SQLite (local)" : 
+     isLocalPostgres ? "PostgreSQL (Docker)" : 
+     "PostgreSQL (remote)") : 
+    "NOT SET"}`
 );
 
 // Force PostgreSQL for production and Neon databases
