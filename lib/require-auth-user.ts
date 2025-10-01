@@ -32,8 +32,12 @@ type SelectedUser = {
 };
 
 async function fetchSessionUser(): Promise<SelectedUser | null> {
-  // In Cypress environment only (not jest tests), create a mock user if session token exists
-  if (process.env.CYPRESS === "true") {
+  // ONLY allow Cypress bypass in non-production environments
+  // This prevents authentication bypass in production
+  if (
+    process.env.NODE_ENV !== "production" &&
+    process.env.CYPRESS === "true"
+  ) {
     try {
       const { cookies } = await import("next/headers");
       const cookieStore = await cookies();
@@ -43,7 +47,7 @@ async function fetchSessionUser(): Promise<SelectedUser | null> {
 
       if (sessionToken) {
         console.log(
-          "[DEBUG] Cypress detected with session token, returning mock user"
+          "[DEBUG] Cypress detected with session token in test environment, returning mock user"
         );
         return {
           id: "test-besnyib-smccd-edu",
