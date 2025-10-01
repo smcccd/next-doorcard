@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import {
-  Printer,
   Edit,
   ExternalLink,
   XCircle,
@@ -28,7 +27,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { type College, COLLEGE_META } from "@/types/doorcard";
 import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
-import { getPrintUrl } from "@/lib/url-utils";
 import { generateDoorcardTitle } from "@/lib/doorcard-title-generator";
 import type { Doorcard, Appointment, User, TermSeason } from "@prisma/client";
 
@@ -268,17 +266,17 @@ function DoorcardCard({
 
   const badgeProps = getBadgeProps(displayStatus.status);
 
-  // Campus-specific card styling
+  // Campus-specific card styling (removed gradients)
   const getCampusCardStyle = (college?: College) => {
     if (!college) return "hover:shadow-sm";
 
     switch (college) {
       case "SKYLINE":
-        return "hover:shadow-sm border-l-4 border-l-campus-skyline bg-gradient-to-r from-red-50/80 to-white dark:from-red-950/30 dark:to-gray-800";
+        return "hover:shadow-sm border-l-4 border-l-campus-skyline";
       case "CSM":
-        return "hover:shadow-sm border-l-4 border-l-campus-csm bg-gradient-to-r from-blue-50/80 to-white dark:from-blue-950/30 dark:to-gray-800";
+        return "hover:shadow-sm border-l-4 border-l-campus-csm";
       case "CANADA":
-        return "hover:shadow-sm border-l-4 border-l-campus-canada bg-gradient-to-r from-green-50/80 to-white dark:from-green-950/30 dark:to-gray-800";
+        return "hover:shadow-sm border-l-4 border-l-campus-canada";
       default:
         return "hover:shadow-sm";
     }
@@ -286,31 +284,29 @@ function DoorcardCard({
 
   return (
     <Card className={getCampusCardStyle(doorcard.college)}>
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2">
-            <Badge
-              variant={badgeProps.variant}
-              className={`flex items-center gap-1 ${badgeProps.className} text-xs`}
-              data-testid="status-badge"
-              title={displayStatus.description}
-              aria-label={`Status: ${displayStatus.label}. ${displayStatus.description}`}
-            >
-              {badgeProps.icon}
-              {displayStatus.label}
-            </Badge>
-          </div>
+      <CardHeader className="pb-2 space-y-2">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+          <CardTitle as="h3" className="text-base">
+            <div>
+              {doorcardTitle}
+              {subtitle && (
+                <div className="text-sm font-normal text-gray-600 mt-1">
+                  {subtitle}
+                </div>
+              )}
+            </div>
+          </CardTitle>
+          <Badge
+            variant={badgeProps.variant}
+            className={`flex items-center gap-1 ${badgeProps.className} text-xs w-fit`}
+            data-testid="status-badge"
+            title={displayStatus.description}
+            aria-label={`Status: ${displayStatus.label}. ${displayStatus.description}`}
+          >
+            {badgeProps.icon}
+            {displayStatus.label}
+          </Badge>
         </div>
-        <CardTitle as="h3" className="text-base">
-          <div>
-            {doorcardTitle}
-            {subtitle && (
-              <div className="text-sm font-normal text-gray-600 mt-1">
-                {subtitle}
-              </div>
-            )}
-          </div>
-        </CardTitle>
         <p className="text-xs text-gray-600">
           {doorcard.name || "Faculty Member"} •{" "}
           {doorcard.officeNumber || "Office TBD"}
@@ -366,14 +362,6 @@ function DoorcardCard({
                   <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Edit
                 </Link>
               )}
-              <Link
-                href={getPrintUrl(getViewUrl())}
-                className="inline-flex items-center text-xs underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 rounded px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
-                target="_blank"
-                aria-label={`Print doorcard ${displayName}`}
-              >
-                <Printer className="h-4 w-4 mr-1" aria-hidden="true" /> Print
-              </Link>
               <DeleteButton doorcard={doorcard} displayStatus={displayStatus} />
             </>
           )}
@@ -449,17 +437,17 @@ function DoorcardRow({
 
   const badgeProps = getBadgeProps(displayStatus.status);
 
-  // Campus-specific card styling for list view
+  // Campus-specific card styling for list view (removed gradients)
   const getCampusRowStyle = (college?: College) => {
     if (!college) return "";
 
     switch (college) {
       case "SKYLINE":
-        return "border-l-4 border-l-campus-skyline bg-gradient-to-r from-red-50/80 to-white dark:from-red-950/30 dark:to-gray-800";
+        return "border-l-4 border-l-campus-skyline";
       case "CSM":
-        return "border-l-4 border-l-campus-csm bg-gradient-to-r from-blue-50/80 to-white dark:from-blue-950/30 dark:to-gray-800";
+        return "border-l-4 border-l-campus-csm";
       case "CANADA":
-        return "border-l-4 border-l-campus-canada bg-gradient-to-r from-green-50/80 to-white dark:from-green-950/30 dark:to-gray-800";
+        return "border-l-4 border-l-campus-canada";
       default:
         return "";
     }
@@ -467,9 +455,9 @@ function DoorcardRow({
 
   return (
     <Card className={getCampusRowStyle(doorcard.college)}>
-      <CardContent className="p-4 flex items-center justify-between">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
+      <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="space-y-1 flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
             <p className="font-medium">
               {doorcardTitle}
               {subtitle && (
@@ -480,7 +468,7 @@ function DoorcardRow({
             </p>
             <Badge
               variant={badgeProps.variant}
-              className={`flex items-center gap-1 ${badgeProps.className} text-xs`}
+              className={`flex items-center gap-1 ${badgeProps.className} text-xs w-fit`}
               data-testid="status-badge"
               title={displayStatus.description}
               aria-label={`Status: ${displayStatus.label}. ${displayStatus.description}`}
@@ -495,7 +483,7 @@ function DoorcardRow({
             {doorcard.year}
           </p>
         </div>
-        <div className="flex gap-2 text-xs">
+        <div className="flex flex-wrap gap-2 text-xs">
           {displayStatus.status === "incomplete" ? (
             // For incomplete doorcards, only show edit action with helpful text
             <>
@@ -530,14 +518,6 @@ function DoorcardRow({
                   <Edit className="h-4 w-4 mr-1" aria-hidden="true" /> Edit
                 </Link>
               )}
-              <Link
-                href={getPrintUrl(getViewUrl())}
-                className="underline hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 rounded flex items-center px-2 py-1 min-h-[44px] min-w-[44px] justify-center"
-                target="_blank"
-                aria-label={`Print doorcard ${displayName}`}
-              >
-                <Printer className="h-4 w-4 mr-1" aria-hidden="true" /> Print
-              </Link>
               <DeleteButton doorcard={doorcard} displayStatus={displayStatus} />
             </>
           )}
