@@ -16,7 +16,9 @@ export const ClarityUtils = {
     if (typeof window !== "undefined") {
       try {
         Clarity.event(eventName);
-        console.log(`📊 Clarity event tracked: ${eventName}`);
+        if (process.env.NODE_ENV === "development") {
+          console.log(`📊 Clarity event tracked: ${eventName}`);
+        }
       } catch (error) {
         console.error("Failed to track Clarity event:", error);
       }
@@ -32,7 +34,9 @@ export const ClarityUtils = {
     if (typeof window !== "undefined") {
       try {
         Clarity.setTag(key, value);
-        console.log(`🏷️ Clarity tag set: ${key} = ${value}`);
+        if (process.env.NODE_ENV === "development") {
+          console.log(`🏷️ Clarity tag set: ${key} = ${value}`);
+        }
       } catch (error) {
         console.error("Failed to set Clarity tag:", error);
       }
@@ -55,7 +59,9 @@ export const ClarityUtils = {
     if (typeof window !== "undefined") {
       try {
         Clarity.identify(customId, sessionId, pageId, friendlyName);
-        console.log(`👤 Clarity identify: ${customId}`);
+        if (process.env.NODE_ENV === "development") {
+          console.log(`👤 Clarity identify: ${customId}`);
+        }
       } catch (error) {
         console.error("Failed to identify with Clarity:", error);
       }
@@ -70,7 +76,9 @@ export const ClarityUtils = {
     if (typeof window !== "undefined") {
       try {
         Clarity.consent(hasConsent);
-        console.log(`🔒 Clarity consent: ${hasConsent}`);
+        if (process.env.NODE_ENV === "development") {
+          console.log(`🔒 Clarity consent: ${hasConsent}`);
+        }
       } catch (error) {
         console.error("Failed to set Clarity consent:", error);
       }
