@@ -7,14 +7,14 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  // Next.js 16: Turbopack is now the default bundler (5-10x faster Fast Refresh, 2-5x faster builds)
+  // No configuration needed - Turbopack is automatically used for development
+
   // Production optimizations
   reactStrictMode: true,
 
-  // ESLint configuration for CI/CD
-  eslint: {
-    // Only run linting during development
-    ignoreDuringBuilds: process.env.CI === "true",
-  },
+  // Note: ESLint configuration has been removed from next.config in Next.js 16
+  // Use eslint.config.js instead. "next lint" is deprecated - use ESLint CLI directly
 
   // Environment-specific configs
   env: {
