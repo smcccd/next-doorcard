@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { DarkModeProvider } from "@/components/DarkModeProvider";
 import ClarityInit from "@/components/ClarityInit";
 import { NetworkStatusBanner } from "@/components/NetworkStatusBanner";
+import { BetaBadge } from "@/components/BetaBadge";
 import { ReactNode, Suspense } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -98,6 +99,9 @@ export default async function RootLayout({
               <Suspense fallback={<div className="h-16" />}>
                 <Navbar />
               </Suspense>
+
+              {/* Beta testing banner for UAT group */}
+              <BetaBadge />
 
               {/* Network status banner for offline/slow connection alerts */}
               <NetworkStatusBanner />

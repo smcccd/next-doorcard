@@ -1,13 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { logger } from "@/lib/logger";
+import {
+  getAuthErrorInfo,
+  getSeverityColorClasses,
+} from "@/lib/auth-errors";
+import { ITSupportContact } from "@/components/ITSupportContact";
+import { AlertCircle, AlertTriangle, Info as InfoIcon } from "lucide-react";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [urlError, setUrlError] = useState<string | null>(null);
+
+  // Read error from URL on mount
+  useEffect(() => {
+    const errorParam = searchParams.get("error");
+    if (errorParam) {
+      setUrlError(errorParam);
+      logger.warn("Login page loaded with error", { error: errorParam });
+    }
+  }, [searchParams]);
 
   const handleOneLoginSignIn = async () => {
     if (isLoading) return;
@@ -59,15 +77,94 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {error && (
+          {/* Display client-side errors */}
+          {error && !urlError && (
             <div
               className="bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-200 px-4 py-3 rounded-md"
               role="alert"
               aria-live="polite"
             >
-              <p className="text-sm">{error}</p>
+              <div className="flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                <p className="text-sm">{error}</p>
+              </div>
             </div>
           )}
+
+          {/* Display URL-based OAuth errors */}
+          {urlError && (() => {
+            const errorInfo = getAuthErrorInfo(urlError);
+            const colors = getSeverityColorClasses(errorInfo.severity);
+            const ErrorIcon =
+              errorInfo.severity === "critical"
+                ? AlertCircle
+                : errorInfo.severity === "warning"
+                  ? AlertTriangle
+                  : InfoIcon;
+
+            return (
+              <div className="space-y-3">
+                <div
+                  className={`${colors.bg} border ${colors.border} rounded-lg p-4`}
+                  role="alert"
+                  aria-live="assertive"
+                >
+                  <div className="flex items-start gap-3">
+                    <ErrorIcon
+                      className={`h-5 w-5 ${colors.icon} flex-shrink-0 mt-0.5`}
+                    />
+                    <div className="flex-1">
+                      <h3
+                        className={`font-semibold ${colors.text} text-sm mb-1`}
+                      >
+                        {errorInfo.title}
+                      </h3>
+                      <p className={`text-sm ${colors.text}`}>
+                        {errorInfo.description}
+                      </p>
+
+                      {errorInfo.steps && errorInfo.steps.length > 0 && (
+                        <div className="mt-3">
+                          <p className={`text-sm font-medium ${colors.text}`}>
+                            What to do:
+                          </p>
+                          <ol className="mt-2 ml-4 list-decimal space-y-1">
+                            {errorInfo.steps.map((step, index) => (
+                              <li
+                                key={index}
+                                className={`text-sm ${colors.text}`}
+                              >
+                                {step}
+                              </li>
+                            ))}
+                          </ol>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Show IT support contact for errors that need it */}
+                {errorInfo.showITSupport && <ITSupportContact />}
+
+                {/* Debug info in development */}
+                {process.env.NODE_ENV === "development" &&
+                  errorInfo.technicalDetails && (
+                    <details className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
+                      <summary className="text-xs font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                        Technical Details (Dev Only)
+                      </summary>
+                      <p className="mt-2 text-xs text-gray-600 dark:text-gray-400 font-mono">
+                        {errorInfo.technicalDetails}
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                        Error code: {urlError}
+                      </p>
+                    </details>
+                  )}
+              </div>
+            );
+          })()}
 
           <div className="mt-8">
             <Button
