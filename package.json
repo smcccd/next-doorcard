@@ -136,7 +136,7 @@
     "eslint": "^9",
     "eslint-config-next": "^15.4.4",
     "eslint-plugin-cypress": "^5.1.0",
-    "eslint-plugin-storybook": "^9.0.18",
+    "eslint-plugin-storybook": "^10.0.7",
     "fast-csv": "^5.0.2",
     "jsdom": "^26.1.0",
     "jsonwebtoken": "^9.0.2",
