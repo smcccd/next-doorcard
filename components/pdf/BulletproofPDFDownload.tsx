@@ -12,6 +12,7 @@ import {
   CATEGORY_LABELS,
   TIME_SLOTS,
   WEEKDAYS_ONLY,
+  calculateAppointmentLayout,
 } from "@/lib/doorcard-constants";
 
 type PDFState =
@@ -85,6 +86,14 @@ function generateEnhancedHTML(doorcard: DoorcardLite): string {
   });
 
   const daysToShow = WEEKDAYS_ONLY;
+
+  // Format time for display
+  const formatTime = (time: string) => {
+    const [hour, min] = time.split(":").map(Number);
+    const period = hour >= 12 ? "PM" : "AM";
+    const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+    return `${displayHour}:${min.toString().padStart(2, "0")} ${period}`;
+  };
 
   return `
 <!DOCTYPE html>
@@ -178,53 +187,114 @@ function generateEnhancedHTML(doorcard: DoorcardLite): string {
       color: #1f2937;
     }
     
-    .schedule-table {
-      width: 100%;
-      border-collapse: collapse;
+    .schedule-grid {
+      display: flex;
+      gap: 0;
       margin-bottom: 8px;
-      font-size: 9px;
+      position: relative;
     }
-    
-    .schedule-table th,
-    .schedule-table td {
-      border: 1px solid #d1d5db;
-      padding: 2px 4px;
-      text-align: center;
-      vertical-align: middle;
-    }
-    
-    .time-cell {
+
+    .time-column {
       width: 60px;
-      font-size: 8px;
+      border-right: 1px solid #d1d5db;
+    }
+
+    .time-header {
+      height: 30px;
+      background: #3b82f6;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 600;
+      border: 1px solid #d1d5db;
+    }
+
+    .time-slot {
+      height: 30px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 6px;
+      font-size: 7px;
       color: #6b7280;
       background: #f9fafb;
-      text-align: right;
-      padding-right: 4px;
     }
-    
+
+    .days-grid {
+      flex: 1;
+      display: flex;
+      gap: 0;
+    }
+
+    .day-column {
+      flex: 1;
+      border-right: 1px solid #d1d5db;
+      position: relative;
+    }
+
     .day-header {
       background: #3b82f6;
       color: white;
-      padding: 4px 2px;
+      padding: 6px 2px;
       font-size: 9px;
       font-weight: 600;
+      text-align: center;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid #d1d5db;
     }
-    
-    .empty-slot {
-      height: 14px;
+
+    .day-content {
+      position: relative;
+      height: 900px;
+      border-top: 1px solid #d1d5db;
+    }
+
+    .grid-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    .grid-line {
+      height: 30px;
+      border-bottom: 1px solid #e5e7eb;
       background: white;
     }
-    
+
     .appointment {
-      padding: 2px 4px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      padding: 3px 4px;
       font-size: 7px;
       font-weight: 600;
       text-align: center;
       line-height: 1.2;
+      border-left: 3px solid #1f2937;
+      overflow: hidden;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
-    
+
+    .appointment-name {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .appointment-time {
+      font-size: 6px;
+      opacity: 0.8;
+      margin-top: 1px;
+    }
+
     .appointment-location {
       font-size: 6px;
       color: #6b7280;
@@ -332,62 +402,62 @@ function generateEnhancedHTML(doorcard: DoorcardLite): string {
     }
   </div>
 
-  <table class="schedule-table">
-    <thead>
-      <tr>
-        <th class="time-cell">Time</th>
-        ${daysToShow.map((day) => `<th class="day-header">${day.label}</th>`).join("")}
-      </tr>
-    </thead>
-    <tbody>
-      ${TIME_SLOTS.map((slot, index) => {
-        const showTime = index % 2 === 0;
-        let html = `<tr>`;
-        html += `<td class="time-cell">${showTime ? slot.label : ""}</td>`;
+  <div class="schedule-grid">
+    <!-- Time column -->
+    <div class="time-column">
+      <div class="time-header">Time</div>
+      ${TIME_SLOTS.map((slot) => `<div class="time-slot">${slot.label}</div>`).join("")}
+    </div>
 
-        daysToShow.forEach((day) => {
-          const appointment = byDay[day.key]?.find((apt: any) => {
-            const [slotHour, slotMin] = slot.value.split(":").map(Number);
-            const [startHour, startMin] = apt.startTime.split(":").map(Number);
-            const [endHour, endMin] = apt.endTime.split(":").map(Number);
-            const slotMinutes = slotHour * 60 + slotMin;
-            const startMinutes = startHour * 60 + startMin;
-            const endMinutes = endHour * 60 + endMin;
-            return slotMinutes >= startMinutes && slotMinutes < endMinutes;
-          });
+    <!-- Days grid -->
+    <div class="days-grid">
+      ${daysToShow
+        .map((day) => {
+          const dayAppointments = byDay[day.key] || [];
 
-          if (appointment && appointment.startTime === slot.value) {
-            const [startHour, startMin] = appointment.startTime
-              .split(":")
-              .map(Number);
-            const [endHour, endMin] = appointment.endTime
-              .split(":")
-              .map(Number);
-            const durationMinutes =
-              endHour * 60 + endMin - (startHour * 60 + startMin);
-            const rowspan = Math.ceil(durationMinutes / 30);
-            const bgColor =
-              CATEGORY_COLORS[
-                appointment.category as keyof typeof CATEGORY_COLORS
-              ] || CATEGORY_COLORS.REFERENCE;
-            const courseName = appointment.name.replace(/^(.*?)\s*-\s*/, "");
+          return `
+        <div class="day-column">
+          <div class="day-header">${day.label}</div>
+          <div class="day-content">
+            <!-- Background grid lines -->
+            <div class="grid-background">
+              ${TIME_SLOTS.map(() => `<div class="grid-line"></div>`).join("")}
+            </div>
 
-            html += `<td rowspan="${rowspan}" class="appointment" style="background-color: ${bgColor}; color: #1f2937;">`;
-            html += `<div style="font-weight: 600;">${courseName}</div>`;
-            if (appointment.location) {
-              html += `<div style="font-size: 6px; opacity: 0.7;">${appointment.location}</div>`;
-            }
-            html += `</td>`;
-          } else if (!appointment) {
-            html += `<td class="empty-slot"></td>`;
-          }
-        });
+            <!-- Appointments positioned absolutely -->
+            ${dayAppointments
+              .map((appointment) => {
+                const layout = calculateAppointmentLayout(appointment);
+                const heightInPixels = (layout.height / 100) * 900; // 900px = grid height
+                const topInPixels = (layout.top / 100) * 900;
+                const bgColor =
+                  CATEGORY_COLORS[
+                    appointment.category as keyof typeof CATEGORY_COLORS
+                  ] || CATEGORY_COLORS.REFERENCE;
+                const courseName = appointment.name.replace(/^(.*?)\s*-\s*/, "");
+                const timeRange = `${formatTime(appointment.startTime)} - ${formatTime(appointment.endTime)}`;
 
-        html += `</tr>`;
-        return html;
-      }).join("")}
-    </tbody>
-  </table>
+                return `
+              <div class="appointment" style="
+                top: ${topInPixels}px;
+                height: ${Math.max(heightInPixels, 20)}px;
+                background-color: ${bgColor};
+                color: #1f2937;
+              ">
+                <div class="appointment-name">${courseName}</div>
+                <div class="appointment-time">${timeRange}</div>
+                ${appointment.location ? `<div class="appointment-location">${appointment.location}</div>` : ""}
+              </div>
+            `;
+              })
+              .join("")}
+          </div>
+        </div>
+      `;
+        })
+        .join("")}
+    </div>
+  </div>
 
   <div class="legend">
     <div class="legend-title">Activity Types</div>

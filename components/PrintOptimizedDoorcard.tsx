@@ -5,6 +5,8 @@ import {
   formatTimeRange,
   extractCourseCode,
   ALL_DAYS,
+  calculateAppointmentLayout,
+  TIME_SLOTS,
 } from "@/lib/doorcard-constants";
 import { formatDisplayName } from "@/lib/display-name";
 import type { AppointmentCategory, DayOfWeek } from "@prisma/client";
@@ -13,36 +15,12 @@ import type {
   DoorcardLite,
 } from "@/components/UnifiedDoorcard";
 
-// Compact time slots for print (7 AM to 10 PM, 30-min intervals)
-const PRINT_TIME_SLOTS = Array.from({ length: 31 }, (_, i) => {
-  const hour = Math.floor(i / 2) + 7;
-  const minute = i % 2 === 0 ? "00" : "30";
-  const value = `${hour.toString().padStart(2, "0")}:${minute}`;
-  const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-  const period = hour >= 12 ? "PM" : "AM";
-  const label = `${displayHour}:${minute} ${period}`;
-  return { value, label };
-});
-
-// Days are now imported from shared constants
+// Use centralized TIME_SLOTS from doorcard-constants
+const PRINT_TIME_SLOTS = TIME_SLOTS;
 
 interface PrintOptimizedDoorcardProps {
   doorcard: DoorcardLite;
   containerId?: string;
-}
-
-function minutes(t: string) {
-  const [h, m] = t.split(":").map(Number);
-  return h * 60 + m;
-}
-
-function durationRows(a: AppointmentLite) {
-  return Math.ceil((minutes(a.endTime) - minutes(a.startTime)) / 30);
-}
-
-function isSlotCovered(a: AppointmentLite, slot: string) {
-  const s = minutes(slot);
-  return s >= minutes(a.startTime) && s < minutes(a.endTime);
 }
 
 function groupByDay(appts: AppointmentLite[]) {
@@ -131,64 +109,105 @@ export function PrintOptimizedDoorcard({
               line-height: 1.4;
             }
             
-            .print-table { 
-              width: 100%; 
-              border-collapse: collapse; 
-              margin: 12px 0; 
-              font-size: ${daysToShow.length > 5 ? "9px" : "11px"};
-              table-layout: auto;
+            .print-schedule-grid {
+              display: flex !important;
+              margin: 12px 0;
+              gap: 0;
             }
-            
-            .print-table th { 
-              background-color: #f3f4f6 !important; 
-              border: 1px solid #d1d5db; 
-              padding: ${daysToShow.length > 5 ? "4px 2px" : "6px 4px"}; 
-              text-align: center; 
-              font-weight: 600; 
+
+            .print-time-column {
+              width: ${daysToShow.length > 5 ? "60px" : "80px"} !important;
+              border-right: 1px solid #d1d5db;
+            }
+
+            .print-time-header {
+              height: 30px;
+              background-color: #f3f4f6 !important;
+              border: 1px solid #d1d5db;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: 600;
               font-size: ${daysToShow.length > 5 ? "8px" : "10px"};
-              height: ${daysToShow.length > 5 ? "25px" : "30px"};
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
-            
-            .print-table td { 
-              border: 1px solid #d1d5db; 
-              padding: ${daysToShow.length > 5 ? "2px" : "4px"}; 
-              text-align: center; 
-              font-size: ${daysToShow.length > 5 ? "8px" : "10px"}; 
-              min-height: ${daysToShow.length > 5 ? "20px" : "25px"}; 
-              vertical-align: middle;
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-            
-            .print-time-cell { 
-              width: ${daysToShow.length > 5 ? "60px" : "80px"}; 
-              background-color: #f9fafb !important; 
-              font-size: ${daysToShow.length > 5 ? "7px" : "9px"}; 
+
+            .print-time-slot {
+              height: 30px;
+              border-bottom: 1px solid #e5e7eb;
+              display: flex;
+              align-items: center;
+              justify-content: flex-end;
+              padding-right: 6px;
+              font-size: ${daysToShow.length > 5 ? "7px" : "9px"};
               color: #6b7280;
-              font-weight: 500;
+              background-color: #f9fafb !important;
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
-            
-            .print-appointment { 
-              font-weight: 600; 
+
+            .print-days-grid {
+              flex: 1;
+              display: flex !important;
+              gap: 0;
+            }
+
+            .print-day-column {
+              flex: 1;
+              border-right: 1px solid #d1d5db;
+              position: relative;
+            }
+
+            .print-day-header {
+              height: 30px;
+              background-color: #f3f4f6 !important;
+              border-bottom: 1px solid #d1d5db;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: 600;
+              font-size: ${daysToShow.length > 5 ? "8px" : "10px"};
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+
+            .print-day-content {
+              position: relative;
+              height: 900px;
+            }
+
+            .print-grid-line {
+              height: 30px;
+              border-bottom: 1px solid #e5e7eb;
+              background: white;
+            }
+
+            .print-appointment {
+              position: absolute !important;
+              left: 0;
+              right: 0;
+              padding: ${daysToShow.length > 5 ? "2px" : "4px"};
+              font-weight: 600;
               line-height: 1.2;
               word-wrap: break-word;
+              text-align: center;
+              border-left: 3px solid #1f2937;
+              overflow: hidden;
+              font-size: ${daysToShow.length > 5 ? "8px" : "10px"};
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
-            
-            .print-time-range { 
-              font-size: 9px; 
-              opacity: 0.8; 
+
+            .print-time-range {
+              font-size: ${daysToShow.length > 5 ? "7px" : "9px"};
+              opacity: 0.8;
               margin-top: 2px;
             }
-            
-            .print-location { 
-              font-size: 8px; 
-              opacity: 0.7; 
+
+            .print-location {
+              font-size: ${daysToShow.length > 5 ? "6px" : "8px"};
+              opacity: 0.7;
               margin-top: 1px;
             }
             
@@ -273,59 +292,70 @@ export function PrintOptimizedDoorcard({
         })}
       </div>
 
-      {/* Compact Schedule Table */}
-      <table className="print-table" aria-hidden="true">
-        <thead>
-          <tr>
-            <th className="print-time-cell">Time</th>
-            {daysToShow.map((d) => (
-              <th key={d.key}>{d.label}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
+      {/* Compact Schedule Grid with Percentage-Based Positioning */}
+      <div className="print-schedule-grid">
+        {/* Time column */}
+        <div className="print-time-column">
+          <div className="print-time-header">Time</div>
           {PRINT_TIME_SLOTS.map((slot) => (
-            <tr key={slot.value}>
-              <td className="print-time-cell">{slot.label}</td>
-              {daysToShow.map((d) => {
-                const list = byDay[d.key] || [];
-                const active = list.find((a) => a.startTime === slot.value);
-                if (active) {
-                  return (
-                    <td
-                      key={`${d.key}-${slot.value}`}
-                      rowSpan={durationRows(active)}
-                      style={{
-                        backgroundColor:
-                          CATEGORY_COLORS[active.category] ?? "#f0f0f0",
-                      }}
-                    >
-                      <div className="print-appointment">
-                        {extractCourseCode(active.name)}
-                      </div>
-                      <div className="print-time-range">
-                        {formatTimeRange(active.startTime, active.endTime)}
-                      </div>
-                      {active.location && (
-                        <div className="print-location">{active.location}</div>
-                      )}
-                    </td>
-                  );
-                }
-                if (
-                  list.some(
-                    (a) =>
-                      isSlotCovered(a, slot.value) && a.startTime !== slot.value
-                  )
-                ) {
-                  return null;
-                }
-                return <td key={`${d.key}-${slot.value}`} />;
-              })}
-            </tr>
+            <div key={slot.value} className="print-time-slot">
+              {slot.label}
+            </div>
           ))}
-        </tbody>
-      </table>
+        </div>
+
+        {/* Days grid */}
+        <div className="print-days-grid">
+          {daysToShow.map((day) => {
+            const dayAppointments = byDay[day.key] || [];
+
+            return (
+              <div key={day.key} className="print-day-column">
+                <div className="print-day-header">{day.label}</div>
+                <div className="print-day-content">
+                  {/* Background grid lines */}
+                  {PRINT_TIME_SLOTS.map((slot) => (
+                    <div key={slot.value} className="print-grid-line" />
+                  ))}
+
+                  {/* Appointments positioned absolutely */}
+                  {dayAppointments.map((appointment) => {
+                    const layout = calculateAppointmentLayout(appointment);
+                    const heightInPixels = (layout.height / 100) * 900;
+                    const topInPixels = (layout.top / 100) * 900;
+
+                    return (
+                      <div
+                        key={appointment.id}
+                        className="print-appointment"
+                        style={{
+                          top: `${topInPixels}px`,
+                          height: `${Math.max(heightInPixels, 20)}px`,
+                          backgroundColor:
+                            CATEGORY_COLORS[appointment.category] ?? "#f0f0f0",
+                        }}
+                      >
+                        <div>{extractCourseCode(appointment.name)}</div>
+                        <div className="print-time-range">
+                          {formatTimeRange(
+                            appointment.startTime,
+                            appointment.endTime
+                          )}
+                        </div>
+                        {appointment.location && (
+                          <div className="print-location">
+                            {appointment.location}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Compact Legend - All Categories */}
       <div className="print-legend" style={{ marginTop: "12px" }}>

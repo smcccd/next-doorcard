@@ -165,3 +165,75 @@ export const getActivityStyle = (activity: string) => {
       return "bg-gray-50";
   }
 };
+
+// ============================================================================
+// Time Calculation Utilities for Percentage-Based Positioning
+// ============================================================================
+
+/**
+ * Converts time string (HH:mm) to minutes since midnight
+ * @param time - Time in "HH:mm" format (e.g., "13:09", "08:15")
+ * @returns Total minutes since midnight
+ */
+export const timeToMinutes = (time: string): number => {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+};
+
+/**
+ * Grid constants for schedule rendering
+ * Grid displays from 7:00 AM (420 minutes) to 10:00 PM (1320 minutes)
+ */
+export const GRID_START_HOUR = 7; // 7:00 AM
+export const GRID_END_HOUR = 22; // 10:00 PM
+export const GRID_START_MINUTES = GRID_START_HOUR * 60; // 420
+export const GRID_END_MINUTES = GRID_END_HOUR * 60; // 1320
+export const GRID_TOTAL_MINUTES = GRID_END_MINUTES - GRID_START_MINUTES; // 900 minutes (15 hours)
+
+/**
+ * Calculate the top position percentage for an appointment
+ * @param startTime - Start time in "HH:mm" format
+ * @returns Percentage from top of grid (0-100)
+ */
+export const calculateTopPercent = (startTime: string): number => {
+  const startMinutes = timeToMinutes(startTime);
+  const offsetMinutes = startMinutes - GRID_START_MINUTES;
+  return (offsetMinutes / GRID_TOTAL_MINUTES) * 100;
+};
+
+/**
+ * Calculate the height percentage for an appointment
+ * @param startTime - Start time in "HH:mm" format
+ * @param endTime - End time in "HH:mm" format
+ * @returns Percentage of grid height (0-100)
+ */
+export const calculateHeightPercent = (
+  startTime: string,
+  endTime: string
+): number => {
+  const startMinutes = timeToMinutes(startTime);
+  const endMinutes = timeToMinutes(endTime);
+  const durationMinutes = endMinutes - startMinutes;
+  return (durationMinutes / GRID_TOTAL_MINUTES) * 100;
+};
+
+/**
+ * Calculate appointment layout with position and dimensions
+ * @param appointment - Appointment with startTime and endTime
+ * @returns Layout object with top and height percentages
+ */
+export const calculateAppointmentLayout = (appointment: {
+  startTime: string;
+  endTime: string;
+}) => {
+  const topPercent = calculateTopPercent(appointment.startTime);
+  const heightPercent = calculateHeightPercent(
+    appointment.startTime,
+    appointment.endTime
+  );
+
+  return {
+    top: Math.max(0, topPercent), // Ensure non-negative
+    height: Math.max(1, heightPercent), // Minimum 1% height for visibility
+  };
+};

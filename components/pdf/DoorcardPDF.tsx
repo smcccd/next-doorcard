@@ -16,6 +16,7 @@ import {
   CATEGORY_LABELS,
   TIME_SLOTS,
   WEEKDAYS_ONLY,
+  calculateAppointmentLayout,
 } from "@/lib/doorcard-constants";
 
 // Use built-in fonts to avoid CORS issues with external font loading
@@ -98,13 +99,20 @@ const styles = StyleSheet.create({
   },
   scheduleContainer: {
     flex: 1,
-    maxHeight: 480,
+    height: 480,
     position: "relative",
   },
   scheduleGrid: {
     flexDirection: "row",
     height: "100%",
     marginLeft: 45,
+  },
+  gridBackground: {
+    position: "absolute",
+    left: 45,
+    right: 0,
+    top: 14,
+    bottom: 0,
   },
   timeColumn: {
     position: "absolute",
@@ -133,6 +141,12 @@ const styles = StyleSheet.create({
     marginRight: 0,
     borderRightWidth: 0.25,
     borderRightColor: "#d1d5db",
+    position: "relative",
+    height: "100%",
+  },
+  dayContent: {
+    position: "relative",
+    height: "100%",
   },
   dayHeader: {
     backgroundColor: "#60a5fa",
@@ -156,16 +170,17 @@ const styles = StyleSheet.create({
     position: "relative",
     borderBottomWidth: 0.25,
     borderBottomColor: "#e5e7eb",
-    borderRightWidth: 0.25,
-    borderRightColor: "#e5e7eb",
   },
   appointment: {
-    borderLeftWidth: 0,
+    position: "absolute",
+    left: 0,
+    right: 0,
     padding: 2,
-    height: "100%",
     justifyContent: "center",
     alignItems: "center",
     minHeight: 15,
+    borderLeftWidth: 3,
+    borderLeftColor: "#1f2937",
   },
   appointmentText: {
     fontSize: 7,
@@ -253,19 +268,6 @@ interface AppointmentForPDF {
   location?: string | null;
 }
 
-// Helper function to check if appointment covers time slot
-function isSlotCovered(appointment: AppointmentForPDF, slot: string) {
-  const [slotHour, slotMin] = slot.split(":").map(Number);
-  const [startHour, startMin] = appointment.startTime.split(":").map(Number);
-  const [endHour, endMin] = appointment.endTime.split(":").map(Number);
-
-  const slotMinutes = slotHour * 60 + slotMin;
-  const startMinutes = startHour * 60 + startMin;
-  const endMinutes = endHour * 60 + endMin;
-
-  return slotMinutes >= startMinutes && slotMinutes < endMinutes;
-}
-
 // Group appointments by day
 function groupByDay(appointments: AppointmentForPDF[]) {
   const grouped: Record<string, AppointmentForPDF[]> = {};
@@ -334,84 +336,58 @@ export function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
         {/* Schedule Title */}
         <Text style={styles.scheduleTitle}>Weekly Schedule</Text>
 
-        {/* Schedule Container with proper layout */}
+        {/* Schedule Container with percentage-based positioning */}
         <View style={styles.scheduleContainer} wrap={false}>
           {/* Time Column - Absolute positioned */}
           <View style={styles.timeColumn}>
             {/* Empty header slot to align with day headers */}
             <View style={{ height: 14, marginBottom: 1 }} />
-            {TIME_SLOTS.map((slot, slotIndex) => (
+            {TIME_SLOTS.map((slot) => (
               <View key={slot.value} style={styles.timeSlotLabel}>
                 <Text style={styles.timeText}>{slot.label}</Text>
               </View>
             ))}
           </View>
 
-          {/* Days Grid */}
+          {/* Days Grid with absolute-positioned appointments */}
           <View style={styles.scheduleGrid}>
-            {DAYS.map((day, dayIndex) => (
-              <View key={day.key} style={styles.dayColumn}>
-                <Text style={styles.dayHeader}>{day.label}</Text>
-                {TIME_SLOTS.map((slot, slotIndex) => {
-                  const appointment = byDay[day.key]?.find((apt) =>
-                    isSlotCovered(apt, slot.value)
-                  );
+            {DAYS.map((day) => {
+              const dayAppointments = byDay[day.key] || [];
 
-                  // Skip rendering slots that are covered by previous appointments
-                  const previousSlotHasAppointment =
-                    slotIndex > 0 &&
-                    byDay[day.key]?.find((apt) => {
-                      const prevSlot = TIME_SLOTS[slotIndex - 1];
+              return (
+                <View key={day.key} style={styles.dayColumn}>
+                  <Text style={styles.dayHeader}>{day.label}</Text>
+
+                  {/* Background grid lines */}
+                  <View style={{ position: "relative", height: 450 }}>
+                    {TIME_SLOTS.map((slot) => (
+                      <View
+                        key={slot.value}
+                        style={[
+                          styles.timeSlot,
+                          { backgroundColor: "#ffffff" },
+                        ]}
+                      />
+                    ))}
+
+                    {/* Appointments positioned absolutely based on actual time */}
+                    {dayAppointments.map((appointment) => {
+                      const layout = calculateAppointmentLayout(appointment);
+                      const heightInPixels = (layout.height / 100) * 450; // Convert % to px
+                      const topInPixels = (layout.top / 100) * 450;
+
                       return (
-                        isSlotCovered(apt, prevSlot.value) &&
-                        apt.startTime !== prevSlot.value
-                      );
-                    });
-
-                  if (
-                    previousSlotHasAppointment &&
-                    appointment &&
-                    appointment.startTime !== slot.value
-                  ) {
-                    return null; // Skip this slot as it's covered by previous appointment
-                  }
-
-                  const isStartingSlot =
-                    appointment && appointment.startTime === slot.value;
-
-                  // Calculate appointment height for spanning
-                  let appointmentHeight = 15;
-                  let slotHeight = 15;
-
-                  if (isStartingSlot) {
-                    const [startHour, startMin] = appointment.startTime
-                      .split(":")
-                      .map(Number);
-                    const [endHour, endMin] = appointment.endTime
-                      .split(":")
-                      .map(Number);
-                    const durationMinutes =
-                      endHour * 60 + endMin - (startHour * 60 + startMin);
-                    const slotCount = Math.ceil(durationMinutes / 30);
-                    appointmentHeight = 15 * slotCount; // No margin gaps now
-                    slotHeight = appointmentHeight;
-                  }
-
-                  return (
-                    <View
-                      key={slot.value}
-                      style={[styles.timeSlot, { height: slotHeight }]}
-                    >
-                      {isStartingSlot ? (
                         <View
+                          key={appointment.id}
                           style={[
                             styles.appointment,
                             {
+                              top: topInPixels,
+                              height: Math.max(heightInPixels, 15),
                               backgroundColor:
                                 CATEGORY_COLORS[
                                   appointment.category as keyof typeof CATEGORY_COLORS
                                 ] || CATEGORY_COLORS.REFERENCE,
-                              height: appointmentHeight,
                             },
                           ]}
                         >
@@ -422,16 +398,12 @@ export function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
                               ` • ${appointment.location}`}
                           </Text>
                         </View>
-                      ) : (
-                        <View
-                          style={{ height: "100%", backgroundColor: "#ffffff" }}
-                        />
-                      )}
-                    </View>
-                  );
-                }).filter(Boolean)}
-              </View>
-            ))}
+                      );
+                    })}
+                  </View>
+                </View>
+              );
+            })}
           </View>
         </View>
 
