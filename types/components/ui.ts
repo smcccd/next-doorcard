@@ -47,6 +47,7 @@ export interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
   errorInfo?: React.ErrorInfo;
+  eventId?: string; // Sentry event ID for error tracking
 }
 
 export interface ErrorBoundaryProps {

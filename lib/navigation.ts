@@ -3,13 +3,11 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 // Navigation configuration
-export const navigationItems = [
-  {
-    href: "/",
-    label: "Home",
-    ariaLabel: "Go to home page",
-  },
-] as const;
+export const navigationItems: Array<{
+  href: string;
+  label: string;
+  ariaLabel: string;
+}> = [];
 
 export const externalLinks = [
   { href: "https://smccd.edu/", text: "Home" },

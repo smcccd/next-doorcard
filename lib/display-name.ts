@@ -161,6 +161,22 @@ export const COLLEGE_OPTIONS = [
   { value: "CANADA", label: "Cañada College" },
 ] as const;
 
+/**
+ * Converts a college enum value to its human-readable display name.
+ * Used to ensure consistent branding across the application (e.g., "Cañada College" not "CANADA").
+ *
+ * @param college - The college enum value (e.g., "CANADA", "CSM", "SKYLINE")
+ * @returns The human-readable college name with proper formatting
+ *
+ * @example
+ * getCollegeDisplayName("CANADA") // Returns "Cañada College"
+ * getCollegeDisplayName("CSM") // Returns "College of San Mateo"
+ */
+export function getCollegeDisplayName(college: string): string {
+  const option = COLLEGE_OPTIONS.find(opt => opt.value === college);
+  return option?.label || college;
+}
+
 export const ACADEMIC_TITLES = [
   "Dr.",
   "Prof.",

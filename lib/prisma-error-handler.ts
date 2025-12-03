@@ -1,8 +1,15 @@
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
+import type { ApiErrorResponse } from "./error-handler";
 
 export class PrismaErrorHandler {
-  static handle(error: unknown) {
+  static handle(error: unknown): NextResponse<ApiErrorResponse> {
+    // Capture error with Sentry and get event ID
+    const eventId = Sentry.captureException(error, {
+      tags: { error_type: "database" },
+    });
+
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       // P2002: Unique constraint violation
       if (error.code === "P2002") {
@@ -10,6 +17,7 @@ export class PrismaErrorHandler {
           {
             error: "A record with this value already exists",
             code: "DUPLICATE_ENTRY",
+            eventId,
           },
           { status: 409 }
         );
@@ -21,6 +29,7 @@ export class PrismaErrorHandler {
           {
             error: "Record not found",
             code: "NOT_FOUND",
+            eventId,
           },
           { status: 404 }
         );
@@ -32,6 +41,7 @@ export class PrismaErrorHandler {
           {
             error: "Database connection timeout. Please try again.",
             code: "CONNECTION_TIMEOUT",
+            eventId,
           },
           { status: 503 }
         );
@@ -43,6 +53,7 @@ export class PrismaErrorHandler {
         {
           error: "Database connection error. Please try again later.",
           code: "DB_CONNECTION_ERROR",
+          eventId,
         },
         { status: 503 }
       );
@@ -53,20 +64,20 @@ export class PrismaErrorHandler {
         {
           error: "An unexpected database error occurred",
           code: "DB_PANIC_ERROR",
+          eventId,
         },
         { status: 500 }
       );
-    }
-
-    // Log unexpected errors in production
-    if (process.env.NODE_ENV === "production") {
-      console.error("Unexpected database error:", error);
     }
 
     return NextResponse.json(
       {
         error: "An unexpected error occurred",
         code: "INTERNAL_ERROR",
+        eventId,
+        ...(process.env.NODE_ENV === "development" && {
+          details: error instanceof Error ? error.message : String(error),
+        }),
       },
       { status: 500 }
     );

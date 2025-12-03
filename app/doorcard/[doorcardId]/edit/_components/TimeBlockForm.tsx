@@ -62,6 +62,7 @@ const CATEGORY_OPTIONS: { value: AppointmentCategory; label: string }[] = [
   { value: "LAB", label: "Lab" },
   { value: "HOURS_BY_ARRANGEMENT", label: "Hours by Arrangement" },
   { value: "REFERENCE", label: "Reference" },
+  { value: "OTHER", label: "Other" },
 ];
 
 type BlockDraft = {

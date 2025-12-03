@@ -10,7 +10,7 @@ import {
   Font,
 } from "@react-pdf/renderer";
 import { DoorcardLite } from "../UnifiedDoorcard";
-import { formatDisplayName } from "@/lib/display-name";
+import { formatDisplayName, getCollegeDisplayName } from "@/lib/display-name";
 import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,
@@ -300,7 +300,7 @@ export function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
         <View style={styles.header}>
           <Text style={styles.logo}>Faculty Doorcard</Text>
           <Text style={styles.term}>
-            {doorcard.term} {doorcard.year} • {doorcard.college}
+            {doorcard.term} {doorcard.year} • {getCollegeDisplayName(doorcard.college || "")}
           </Text>
         </View>
 
@@ -319,7 +319,7 @@ export function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
           </View>
           <View style={styles.officeItem}>
             <Text style={styles.officeLabel}>Campus</Text>
-            <Text style={styles.officeValue}>{doorcard.college}</Text>
+            <Text style={styles.officeValue}>{getCollegeDisplayName(doorcard.college || "")}</Text>
           </View>
           {doorcard.user?.website && (
             <View style={styles.officeItem}>

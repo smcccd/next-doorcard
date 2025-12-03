@@ -23,6 +23,28 @@ import { TermManager } from "@/lib/term-management";
    Helpers
 ---------------------------------------------------------------------------- */
 
+/**
+ * Multi-Doorcard URL Strategy
+ *
+ * This application supports multiple doorcards per campus per term for each user.
+ * The URL patterns are designed to be human-readable while handling ambiguity:
+ *
+ * URL Patterns:
+ * - /view/username/current - Find the current active doorcard
+ * - /view/username/fall-2025 - Find doorcards matching the term
+ * - /view/username/csm-fall-2025 - Find doorcard for specific campus/term
+ *
+ * When Multiple Doorcards Match:
+ * - If a URL pattern matches multiple doorcards (e.g., a user has 2 doorcards
+ *   for CSM Fall 2025), the system shows a selection page (DoorcardSelectionPage)
+ *   allowing the user to choose which doorcard to view.
+ * - This maintains human-readable URLs while gracefully handling edge cases.
+ *
+ * Design Decision:
+ * - We keep term-based URLs (not ID-based) for better UX and shareability
+ * - Selection UI provides fallback when uniqueness cannot be guaranteed
+ * - Public vs authenticated views are handled via ?auth=true query parameter
+ */
 async function fetchDoorcard(
   username: string,
   termSlug: string | undefined,
@@ -195,6 +217,11 @@ async function fetchDoorcard(
       return { error: "Doorcard not found" } as const;
     }
 
+    // MULTI-DOORCARD HANDLING:
+    // When a user has multiple active doorcards (e.g., teaching at multiple campuses
+    // in the same term), and no specific term slug is provided in the URL, we show
+    // a selection page rather than arbitrarily choosing one. This gives users control
+    // while keeping URLs simple and readable.
     if (availableDoorcards.length > 1) {
       // Return multiple doorcards for selection UI
       return { multipleDoorcards: availableDoorcards, user } as const;
