@@ -102,7 +102,7 @@
     "@faker-js/faker": "^9.9.0",
     "@next/bundle-analyzer": "^16.0.1",
     "@prisma/client": "^6.19.0",
-    "@sentry/nextjs": "^10.25.0",
+    "@sentry/nextjs": "^10.28.0",
     "@storybook/addon-a11y": "^10.0.7",
     "@storybook/addon-docs": "^10.0.7",
     "@storybook/addon-onboarding": "^10.0.7",
