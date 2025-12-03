@@ -148,18 +148,23 @@ const preview: Preview = {
       },
     },
 
-    // Accessibility testing configuration
+    // Accessibility testing configuration - WCAG 2.1 AA compliant
     a11y: {
-      // Configure accessibility testing
+      // Configure accessibility testing for ADA compliance
       config: {
         rules: [
           {
-            // Disable color contrast checking in certain scenarios
+            // Standard color contrast checking (AA level: 4.5:1 normal, 3:1 large)
             id: "color-contrast",
             enabled: true,
           },
           {
-            // Ensure all elements have accessible names
+            // Enhanced color contrast (AAA level: 7:1 normal, 4.5:1 large)
+            id: "color-contrast-enhanced",
+            enabled: false, // Set to true for AAA compliance
+          },
+          {
+            // Ensure all ARIA elements have required attributes
             id: "aria-required-attr",
             enabled: true,
           },
@@ -168,9 +173,43 @@ const preview: Preview = {
             id: "aria-valid-attr",
             enabled: true,
           },
+          {
+            // Ensure buttons have accessible names
+            id: "button-name",
+            enabled: true,
+          },
+          {
+            // Ensure links have accessible names
+            id: "link-name",
+            enabled: true,
+          },
+          {
+            // Ensure form inputs have labels
+            id: "label",
+            enabled: true,
+          },
+          {
+            // Check for valid HTML lang attribute
+            id: "html-has-lang",
+            enabled: true,
+          },
+          {
+            // Ensure images have alt text
+            id: "image-alt",
+            enabled: true,
+          },
+          {
+            // Check for keyboard accessibility
+            id: "scrollable-region-focusable",
+            enabled: true,
+          },
         ],
       },
-      // Show violations in the accessibility panel (updated parameter)
+      // Run specific WCAG 2.1 AA standards
+      options: {
+        runOnly: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"],
+      },
+      // Show violations in the accessibility panel
       context: "#storybook-root",
       manual: false,
     },

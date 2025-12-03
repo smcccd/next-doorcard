@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
+import * as Sentry from "@sentry/nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { AlertTriangle, RefreshCw, MessageSquare } from "lucide-react";
 
 import type {
   ErrorBoundaryState,
@@ -27,20 +28,43 @@ class ErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // Capture with Sentry and get event ID
+    const eventId = Sentry.captureException(error, {
+      contexts: {
+        react: {
+          componentStack: errorInfo.componentStack,
+        },
+      },
+    });
+
     this.setState({
       error,
       errorInfo,
+      eventId, // Store event ID in state
     });
-
-    // Log error to monitoring service
-    console.error("ErrorBoundary caught an error:", error, errorInfo);
 
     // Call custom error handler if provided
     this.props.onError?.(error, errorInfo);
   }
 
   resetError = () => {
-    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
+    this.setState({
+      hasError: false,
+      error: undefined,
+      errorInfo: undefined,
+      eventId: undefined,
+    });
+  };
+
+  showReportDialog = () => {
+    if (this.state.eventId) {
+      Sentry.showReportDialog({
+        eventId: this.state.eventId,
+        title: "Report an Issue",
+        subtitle: "Help us improve by providing additional details",
+        subtitle2: "",
+      });
+    }
   };
 
   render() {
@@ -70,20 +94,40 @@ class ErrorBoundary extends React.Component<
             </CardHeader>
             <CardContent className="text-center space-y-4">
               <p className="text-gray-600">
-                An unexpected error occurred while loading this page.
+                An unexpected error occurred. We've been notified and are
+                working to fix it.
               </p>
+
+              {/* Event ID Display */}
+              {this.state.eventId && (
+                <div className="bg-gray-50 rounded-lg p-3 text-left">
+                  <p className="text-xs font-medium text-gray-500 mb-1">
+                    Error Reference
+                  </p>
+                  <code className="text-sm font-mono text-gray-800 break-all select-all block">
+                    {this.state.eventId}
+                  </code>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Include this reference if contacting support
+                  </p>
+                </div>
+              )}
+
+              {/* Development Error Details */}
               {process.env.NODE_ENV === "development" && this.state.error && (
                 <details className="text-left bg-gray-50 p-3 rounded text-sm">
                   <summary className="cursor-pointer font-medium text-gray-700 mb-2">
-                    Error Details
+                    Error Details (Development Only)
                   </summary>
-                  <pre className="whitespace-pre-wrap text-red-600">
+                  <pre className="whitespace-pre-wrap text-red-600 text-xs">
                     {this.state.error.message}
                     {this.state.errorInfo?.componentStack}
                   </pre>
                 </details>
               )}
-              <div className="flex gap-2 justify-center">
+
+              {/* Action Buttons */}
+              <div className="flex gap-2 justify-center flex-wrap">
                 <Button
                   onClick={this.resetError}
                   variant="outline"
@@ -92,6 +136,16 @@ class ErrorBoundary extends React.Component<
                   <RefreshCw className="w-4 h-4" />
                   Try Again
                 </Button>
+                {this.state.eventId && (
+                  <Button
+                    onClick={this.showReportDialog}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Report Issue
+                  </Button>
+                )}
                 <Button onClick={() => (window.location.href = "/dashboard")}>
                   Go to Dashboard
                 </Button>

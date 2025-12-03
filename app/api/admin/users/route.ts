@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { PrismaErrorHandler } from "@/lib/prisma-error-handler";
+import { logger } from "@/lib/logger";
 import { z } from "zod";
 
 const queryParamsSchema = z.object({
@@ -143,7 +144,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(processedUsers);
   } catch (error) {
-    console.error("Admin users error:", error);
+    logger.error("Admin users error", error);
     return PrismaErrorHandler.handle(error);
   }
 }

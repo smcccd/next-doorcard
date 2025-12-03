@@ -8,6 +8,7 @@ import { PrismaErrorHandler, withRetry } from "@/lib/prisma-error-handler";
 import { validateAppointments } from "@/lib/appointment-validation";
 import { applyRateLimit, apiRateLimit } from "@/lib/rate-limit";
 import { sanitizeDoorcardData, sanitizeAppointmentData } from "@/lib/sanitize";
+import { logger } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
   // Apply rate limiting
@@ -158,7 +159,7 @@ export async function POST(req: NextRequest) {
       throw error;
     }
   } catch (error) {
-    console.error("Error creating doorcard:", error);
+    logger.error("Error creating doorcard", error);
     return PrismaErrorHandler.handle(error);
   }
 }
@@ -197,7 +198,7 @@ export async function GET() {
 
     return NextResponse.json(doorcards);
   } catch (error) {
-    console.error("Error fetching doorcards:", error);
+    logger.error("Error fetching doorcards", error);
     return PrismaErrorHandler.handle(error);
   }
 }

@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { PrismaErrorHandler } from "@/lib/prisma-error-handler";
+import { formatApiError, ErrorCodes } from "@/lib/error-handler";
 import { z } from "zod";
 import { COLLEGES } from "@/types/doorcard";
 import { Prisma, College, TermSeason } from "@prisma/client";
@@ -252,10 +253,12 @@ export async function PUT(
         { status: 400 }
       );
     }
-    logger.error("Error updating doorcard (PUT):", err);
-    return NextResponse.json(
-      { error: "Failed to update doorcard" },
-      { status: 500 }
+    return formatApiError(
+      err,
+      500,
+      "Failed to update doorcard",
+      ErrorCodes.UPDATE_FAILED,
+      { tags: { api_route: "/api/doorcards/[id]", method: "PUT" } }
     );
   }
 }
@@ -355,10 +358,12 @@ export async function PATCH(
         { status: 400 }
       );
     }
-    logger.error("Error updating doorcard (PATCH):", err);
-    return NextResponse.json(
-      { error: "Failed to update doorcard" },
-      { status: 500 }
+    return formatApiError(
+      err,
+      500,
+      "Failed to update doorcard",
+      ErrorCodes.UPDATE_FAILED,
+      { tags: { api_route: "/api/doorcards/[id]", method: "PATCH" } }
     );
   }
 }

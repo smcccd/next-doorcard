@@ -62,6 +62,7 @@ const CATEGORY_OPTIONS: { value: AppointmentCategory; label: string }[] = [
   { value: "LAB", label: "Lab" },
   { value: "HOURS_BY_ARRANGEMENT", label: "Hours by Arrangement" },
   { value: "REFERENCE", label: "Reference" },
+  { value: "OTHER", label: "Other" },
 ];
 
 type BlockDraft = {
@@ -141,8 +142,6 @@ function checkConflicts(
 /* Component                                                                  */
 /* -------------------------------------------------------------------------- */
 export default function TimeBlockForm({ doorcard, draftId }: Props) {
-  console.log("draftId", draftId);
-
   // Create a unique key for this doorcard's time blocks
   const storageKey = `doorcard-timeblocks-${doorcard.id}`;
 

@@ -585,7 +585,9 @@ export function BulletproofPDFDownload({
     }
 
     // Track attempt
-    console.log(`PDF download attempt - Browser: ${browserInfo.current.name}`);
+    if (process.env.NODE_ENV === "development") {
+      console.log(`PDF download attempt - Browser: ${browserInfo.current.name}`);
+    }
 
     try {
       // Method 1: Try React PDF first (skip on Firefox due to known issues)

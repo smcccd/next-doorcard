@@ -11,10 +11,12 @@ export default function ClarityInit() {
         // Initialize Microsoft Clarity
         Clarity.init(process.env.NEXT_PUBLIC_CLARITY_ID);
 
-        console.log(
-          "✅ Microsoft Clarity initialized successfully with ID:",
-          process.env.NEXT_PUBLIC_CLARITY_ID
-        );
+        if (process.env.NODE_ENV === "development") {
+          console.log(
+            "✅ Microsoft Clarity initialized successfully with ID:",
+            process.env.NEXT_PUBLIC_CLARITY_ID
+          );
+        }
 
         // Add custom events for better tracking
         Clarity.event("app_initialized");
