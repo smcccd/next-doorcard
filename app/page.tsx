@@ -10,7 +10,7 @@ import { TermSeason } from "@prisma/client";
 
 // Configure page-level caching
 export const revalidate = 300; // Revalidate every 5 minutes
-export const dynamic = "force-static"; // Force static generation
+export const dynamic = "force-dynamic"; // Use dynamic rendering (database queries require runtime)
 
 const getCachedTop25Doorcards = unstable_cache(
   async (season: TermSeason, year: number) => {
