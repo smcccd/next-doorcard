@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 
 const NEW_DOORCARD_STEPS = [
   { title: "Campus & Term", description: "Select your campus and term" },
-  { title: "Basic Info", description: "Your personal information" },
+  { title: "Basic Info", description: "Subtitle and office location" },
   { title: "Schedule", description: "Add your time blocks" },
   { title: "Preview", description: "Review and publish" },
 ];

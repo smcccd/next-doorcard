@@ -150,7 +150,7 @@ export default function CampusTermForm({ doorcard }: Props) {
             Select Campus &amp; Term
           </h3>
           <p className="text-sm text-gray-500">
-            One doorcard per campus per term. Choose where this one applies.
+            Choose the campus and term for this doorcard.
           </p>
         </div>
       </div>
@@ -283,17 +283,6 @@ export default function CampusTermForm({ doorcard }: Props) {
         <SubmitButton />
       </form>
 
-      <div className="rounded-lg bg-gray-50 border border-gray-200">
-        <div className="px-4 py-5 sm:p-6">
-          <h3 className="text-sm font-medium text-gray-900">
-            About Campus &amp; Term Selection
-          </h3>
-          <p className="mt-2 text-sm text-gray-500">
-            To avoid confusion, you can only have one active doorcard per campus
-            per term. If one exists already you&apos;ll be guided to edit it.
-          </p>
-        </div>
-      </div>
     </div>
   );
 }
