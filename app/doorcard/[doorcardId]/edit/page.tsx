@@ -22,7 +22,7 @@ function seasonToDisplay(season?: TermSeason | null): string {
 
 const STEPS = [
   { title: "Campus & Term", desc: "Select your campus and term" },
-  { title: "Basic Info", desc: "Your personal information" },
+  { title: "Basic Info", desc: "Subtitle and office location" },
   { title: "Schedule", desc: "Add your time blocks" },
   { title: "Preview", desc: "Review and publish" },
 ];
