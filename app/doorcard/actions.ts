@@ -33,8 +33,7 @@ function toEnumSeason(display: (typeof TERM_DISPLAY)[number]): TermSeason {
 }
 
 const personalInfoSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  doorcardName: z.string().min(1, "Doorcard name is required"),
+  doorcardName: z.string().optional().default(""),
   officeNumber: z.string().min(1, "Office number is required"),
 });
 
@@ -128,15 +127,41 @@ export async function updateBasicInfo(
   try {
     const user = await requireAuth();
     const data = personalInfoSchema.parse({
-      name: formData.get("name"),
       doorcardName: formData.get("doorcardName"),
       officeNumber: formData.get("officeNumber"),
     });
 
+    // Get the user's name from their profile
+    const userProfile = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        firstName: true,
+        lastName: true,
+        title: true,
+        name: true,
+      },
+    });
+
+    // Build the display name from user profile
+    let displayName = "";
+    if (userProfile?.firstName && userProfile?.lastName) {
+      if (userProfile.title && userProfile.title !== "none") {
+        displayName = `${userProfile.title} ${userProfile.firstName} ${userProfile.lastName}`;
+      } else {
+        displayName = `${userProfile.firstName} ${userProfile.lastName}`;
+      }
+    } else if (userProfile?.name) {
+      displayName = userProfile.name;
+    }
+
+    if (!displayName) {
+      return { success: false, message: "Unable to determine your name from profile. Please update your profile first." };
+    }
+
     await prisma.doorcard.update({
       where: { id: doorcardId, userId: user.id },
       data: {
-        name: data.name,
+        name: displayName,
         doorcardName: data.doorcardName,
         officeNumber: data.officeNumber,
       },

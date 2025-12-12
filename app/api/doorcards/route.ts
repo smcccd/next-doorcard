@@ -62,8 +62,35 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      // Derive name from user profile
+      const userProfile = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { firstName: true, lastName: true, title: true, name: true },
+      });
+
+      let displayName = "";
+      if (userProfile?.firstName && userProfile?.lastName) {
+        if (userProfile.title && userProfile.title !== "none") {
+          displayName = `${userProfile.title} ${userProfile.firstName} ${userProfile.lastName}`;
+        } else {
+          displayName = `${userProfile.firstName} ${userProfile.lastName}`;
+        }
+      } else if (userProfile?.name) {
+        displayName = userProfile.name;
+      }
+
+      if (!displayName) {
+        return NextResponse.json(
+          {
+            error:
+              "Unable to determine your name from profile. Please update your profile first.",
+          },
+          { status: 400 }
+        );
+      }
+
       // Generate a URL-friendly slug
-      const baseSlug = `${validatedData.name
+      const baseSlug = `${displayName
         .toLowerCase()
         .replace(/[^a-z0-9]/g, "-")}-${validatedData.term.toLowerCase()}-${
         validatedData.year
@@ -75,7 +102,7 @@ export async function POST(req: NextRequest) {
         prisma.doorcard.create({
           data: {
             id: crypto.randomUUID(),
-            name: validatedData.name,
+            name: displayName,
             doorcardName: validatedData.doorcardName,
             officeNumber: validatedData.officeNumber,
             term: validatedData.term,

@@ -1,3 +1,4 @@
+import { describe, it, expect } from "vitest";
 import {
   collegeSchema,
   userRoleSchema,
@@ -202,8 +203,8 @@ describe("Doorcard Validation Schemas", () => {
   });
 
   describe("basicInfoSchema", () => {
+    // Note: 'name' is derived from user profile, not user input
     const validBasicInfo = {
-      name: "Dr. John Doe",
       doorcardName: "Fall Office Hours",
       officeNumber: "Room 123",
       term: "FALL",
@@ -216,13 +217,13 @@ describe("Doorcard Validation Schemas", () => {
       expect(result).toEqual(validBasicInfo);
     });
 
+    it("accepts basic info without doorcardName (uses default)", () => {
+      const { doorcardName, ...withoutDoorcardName } = validBasicInfo;
+      const result = basicInfoSchema.parse(withoutDoorcardName);
+      expect(result.doorcardName).toBe("");
+    });
+
     it("validates required fields", () => {
-      expect(() =>
-        basicInfoSchema.parse({ ...validBasicInfo, name: "" })
-      ).toThrow("Name is required");
-      expect(() =>
-        basicInfoSchema.parse({ ...validBasicInfo, doorcardName: "" })
-      ).toThrow("Doorcard name is required");
       expect(() =>
         basicInfoSchema.parse({ ...validBasicInfo, officeNumber: "" })
       ).toThrow("Office number is required");
@@ -235,13 +236,6 @@ describe("Doorcard Validation Schemas", () => {
     });
 
     it("validates field lengths", () => {
-      expect(() =>
-        basicInfoSchema.parse({
-          ...validBasicInfo,
-          name: "A".repeat(101),
-        })
-      ).toThrow();
-
       expect(() =>
         basicInfoSchema.parse({
           ...validBasicInfo,
@@ -303,8 +297,8 @@ describe("Doorcard Validation Schemas", () => {
   });
 
   describe("doorcardSchema", () => {
+    // Note: 'name' is derived from user profile at save time, not validated here
     const validDoorcard = {
-      name: "Dr. Jane Smith",
       doorcardName: "Spring Schedule",
       officeNumber: "Building A, Room 205",
       term: "SPRING",
@@ -337,6 +331,12 @@ describe("Doorcard Validation Schemas", () => {
       expect(result.appointments).toEqual([]); // Default value
     });
 
+    it("accepts doorcard without doorcardName (uses default)", () => {
+      const { doorcardName, ...doorcardWithoutName } = validDoorcard;
+      const result = doorcardSchema.parse(doorcardWithoutName);
+      expect(result.doorcardName).toBe(""); // Default value
+    });
+
     it("sets default values correctly", () => {
       const result = doorcardSchema.parse(validDoorcard);
       expect(result.isActive).toBe(false); // New default: start as draft
@@ -365,10 +365,11 @@ describe("Doorcard Validation Schemas", () => {
   });
 
   describe("updateDoorcardSchema", () => {
+    // Note: 'name' is derived from user profile at save time, not accepted as input
     it("accepts partial updates", () => {
       const partialUpdate = {
-        name: "Updated Name",
         doorcardName: "Updated Doorcard",
+        officeNumber: "Room 456",
       };
 
       const result = updateDoorcardSchema.parse(partialUpdate);
@@ -381,18 +382,15 @@ describe("Doorcard Validation Schemas", () => {
     });
 
     it("validates provided fields", () => {
-      expect(() => updateDoorcardSchema.parse({ name: "" })).toThrow(
-        "Name is required"
-      );
       expect(() => updateDoorcardSchema.parse({ year: 1999 })).toThrow(
         "Number must be greater than or equal to 2020"
       );
     });
 
-    it("accepts CUID for id field", () => {
+    it("accepts UUID for id field", () => {
       const updateWithId = {
-        id: "clv2example123456789", // Example CUID
-        name: "Updated Name",
+        id: "550e8400-e29b-41d4-a716-446655440000", // Example UUID
+        doorcardName: "Updated Doorcard",
       };
 
       const result = updateDoorcardSchema.parse(updateWithId);
@@ -675,7 +673,6 @@ describe("Edge Cases and Error Handling", () => {
         });
 
       const largeDoorcard = {
-        name: "Dr. Busy Professor",
         doorcardName: "Very Busy Schedule",
         officeNumber: "Room 999",
         term: "FALL",
@@ -713,7 +710,6 @@ describe("Edge Cases and Error Handling", () => {
       // Exactly at limit
       expect(() =>
         doorcardSchema.parse({
-          name: "A".repeat(100), // Exactly 100 characters
           doorcardName: "B".repeat(100),
           officeNumber: "C".repeat(20),
           term: "FALL", // Valid enum value
@@ -725,11 +721,10 @@ describe("Edge Cases and Error Handling", () => {
       // Over limit
       expect(() =>
         doorcardSchema.parse({
-          name: "A".repeat(101), // 101 characters
-          doorcardName: "Valid Name",
+          doorcardName: "A".repeat(101), // 101 characters
           officeNumber: "Valid Office",
           term: "FALL",
-          year: "2024",
+          year: 2024,
           college: "SKYLINE",
         })
       ).toThrow();

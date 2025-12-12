@@ -266,15 +266,23 @@ describe("Doorcard Server Actions", () => {
   });
 
   describe("updateBasicInfo", () => {
+    // Note: name is now derived from user profile, not from form input
     it("should update basic information successfully", async () => {
-      mockPrisma.doorcard.findUnique.mockResolvedValue(mockDoorcard as any);
+      // Mock user profile with firstName/lastName
+      mockPrisma.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        firstName: "Test",
+        lastName: "Professor",
+        title: "Dr.",
+      } as any);
       mockPrisma.doorcard.update.mockResolvedValue({
         ...mockDoorcard,
-        name: "Updated Name",
+        name: "Dr. Test Professor",
+        doorcardName: "Updated Doorcard",
+        officeNumber: "Room 202",
       } as any);
 
       const formData = new FormData();
-      formData.set("name", "Updated Name");
       formData.set("doorcardName", "Updated Doorcard");
       formData.set("officeNumber", "Room 202");
 
@@ -285,18 +293,17 @@ describe("Doorcard Server Actions", () => {
       expect(mockPrisma.doorcard.update).toHaveBeenCalledWith({
         where: { id: "doorcard-123", userId: "user-123" },
         data: {
-          name: "Updated Name",
+          name: "Dr. Test Professor", // Derived from user profile
           doorcardName: "Updated Doorcard",
           officeNumber: "Room 202",
         },
       });
     });
 
-    it("should return error for invalid data", async () => {
+    it("should return error for invalid data (empty office number)", async () => {
       const formData = new FormData();
-      formData.set("name", ""); // Required field empty
       formData.set("doorcardName", "Valid Name");
-      formData.set("officeNumber", "Room 101");
+      formData.set("officeNumber", ""); // Required field empty
 
       const result = await updateBasicInfo(
         "doorcard-123",
@@ -308,11 +315,39 @@ describe("Doorcard Server Actions", () => {
       expect(result.message).toContain("Validation failed");
     });
 
-    it("should handle non-existent doorcard", async () => {
-      mockPrisma.doorcard.findUnique.mockResolvedValue(null);
+    it("should return error when user profile has no name", async () => {
+      // Mock user profile with no name info
+      mockPrisma.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        firstName: null,
+        lastName: null,
+        title: null,
+        name: null,
+      } as any);
 
       const formData = new FormData();
-      formData.set("name", "Test Name");
+      formData.set("doorcardName", "Test Doorcard");
+      formData.set("officeNumber", "Room 101");
+
+      const result = await updateBasicInfo(
+        "doorcard-123",
+        { success: true },
+        formData
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain("Unable to determine your name");
+    });
+
+    it("should handle non-existent doorcard", async () => {
+      // Mock user profile
+      mockPrisma.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        firstName: "Test",
+        lastName: "User",
+      } as any);
+
+      const formData = new FormData();
       formData.set("doorcardName", "Test Doorcard");
       formData.set("officeNumber", "Room 101");
 

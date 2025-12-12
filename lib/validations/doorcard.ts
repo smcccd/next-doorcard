@@ -63,10 +63,10 @@ export const updateAppointmentSchema = baseAppointmentSchema.partial().extend({
 });
 
 // Basic info validation
+// Note: 'name' is derived from user profile, not user input
 export const basicInfoSchema = z
   .object({
-    name: z.string().min(1, "Name is required").max(100),
-    doorcardName: z.string().min(1, "Doorcard name is required").max(100),
+    doorcardName: z.string().max(100).optional().default(""),
     officeNumber: z.string().min(1, "Office number is required").max(20),
     term: termSeasonSchema,
     year: z.number().int().min(2020).max(2030),
@@ -89,9 +89,9 @@ export const basicInfoSchema = z
   );
 
 // Full doorcard validation - simplified without refinement extend
+// Note: 'name' is derived from user profile at save time, not validated here
 export const doorcardSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100),
-  doorcardName: z.string().min(1, "Doorcard name is required").max(100),
+  doorcardName: z.string().max(100).optional().default(""),
   officeNumber: z.string().min(1, "Office number is required").max(20),
   term: termSeasonSchema,
   year: z.number().int().min(2020).max(2030),
@@ -107,19 +107,11 @@ export const doorcardSchema = z.object({
 export const createDoorcardSchema = doorcardSchema;
 
 // Update doorcard schema (for API) - simplified
+// Note: 'name' is derived from user profile at save time, not accepted as input
 export const updateDoorcardSchema = z.object({
   id: z.string().uuid().optional(),
-  name: z.string().min(1, "Name is required").max(100).optional(),
-  doorcardName: z
-    .string()
-    .min(1, "Doorcard name is required")
-    .max(100)
-    .optional(),
-  officeNumber: z
-    .string()
-    .min(1, "Office number is required")
-    .max(20)
-    .optional(),
+  doorcardName: z.string().max(100).optional(),
+  officeNumber: z.string().max(20).optional(),
   term: termSeasonSchema.optional(),
   year: z.number().int().min(2020).max(2030).optional(),
   college: collegeSchema.optional(),
