@@ -77,19 +77,29 @@ describe("BasicInfoForm", () => {
     it("should render form with pre-filled values", () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      expect(
-        screen.getByDisplayValue("Dr. Test Professor")
-      ).toBeInTheDocument();
+      // Name should be displayed as read-only text, not an input
+      expect(screen.getByText("Dr. Test Professor")).toBeInTheDocument();
       expect(screen.getByDisplayValue("Test Doorcard")).toBeInTheDocument();
       expect(screen.getByDisplayValue("Room 101")).toBeInTheDocument();
     });
 
-    it("should render all form fields with labels", () => {
+    it("should render name as read-only display", () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/doorcard title/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/office location/i)).toBeInTheDocument();
+      // Name should not be an editable input
+      expect(screen.queryByLabelText(/full name/i)).not.toBeInTheDocument();
+      // Name should be displayed as text
+      expect(screen.getByText("Dr. Test Professor")).toBeInTheDocument();
+      // Should show helper text explaining name is from profile
+      expect(screen.getByText(/name is set from your profile/i)).toBeInTheDocument();
+    });
+
+    it("should render editable fields with labels", () => {
+      render(<BasicInfoForm doorcard={mockDoorcard} />);
+
+      // Use exact label text without the optional suffix indicator
+      expect(screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" })).toBeInTheDocument();
+      expect(screen.getByLabelText(/^Office Location/, { selector: "input" })).toBeInTheDocument();
     });
 
     it("should render submit button", () => {
@@ -100,84 +110,19 @@ describe("BasicInfoForm", () => {
       ).toBeInTheDocument();
     });
 
-    it("should show term and campus info", () => {
+    it("should show title preview with name, term and year", () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      expect(screen.getByText(/FALL 2024/)).toBeInTheDocument();
-      expect(screen.getByText(/SKYLINE/)).toBeInTheDocument();
+      // Title preview should show the generated title
+      expect(screen.getByText(/Generated Doorcard Title/i)).toBeInTheDocument();
     });
   });
 
   describe("Field Validation", () => {
-    it("should show error for empty full name", async () => {
+    it("should validate office location is required", async () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const nameInput = screen.getByLabelText(/full name/i);
-      await user.clear(nameInput);
-
-      const submitButton = screen.getByRole("button", {
-        name: /continue to schedule/i,
-      });
-      await user.click(submitButton);
-
-      expect(screen.getByText("Full name is required")).toBeInTheDocument();
-      expect(mockUpdateBasicInfo).not.toHaveBeenCalled();
-    });
-
-    it("should show error for short full name", async () => {
-      render(<BasicInfoForm doorcard={mockDoorcard} />);
-
-      const nameInput = screen.getByLabelText(/full name/i);
-      await user.clear(nameInput);
-      await user.type(nameInput, "A");
-
-      const submitButton = screen.getByRole("button", {
-        name: /continue to schedule/i,
-      });
-      await user.click(submitButton);
-
-      expect(
-        screen.getByText("Full name must be at least 2 characters")
-      ).toBeInTheDocument();
-    });
-
-    it("should show error for long full name", async () => {
-      render(<BasicInfoForm doorcard={mockDoorcard} />);
-
-      const nameInput = screen.getByLabelText(/full name/i);
-      await user.clear(nameInput);
-      await user.type(nameInput, "A".repeat(101));
-
-      const submitButton = screen.getByRole("button", {
-        name: /continue to schedule/i,
-      });
-      await user.click(submitButton);
-
-      expect(
-        screen.getByText("Full name must be under 100 characters")
-      ).toBeInTheDocument();
-    });
-
-    it("should validate doorcard title", async () => {
-      render(<BasicInfoForm doorcard={mockDoorcard} />);
-
-      const titleInput = screen.getByLabelText(/doorcard title/i);
-      await user.clear(titleInput);
-
-      const submitButton = screen.getByRole("button", {
-        name: /continue to schedule/i,
-      });
-      await user.click(submitButton);
-
-      expect(
-        screen.getByText("Doorcard title is required")
-      ).toBeInTheDocument();
-    });
-
-    it("should validate office location", async () => {
-      render(<BasicInfoForm doorcard={mockDoorcard} />);
-
-      const officeInput = screen.getByLabelText(/office location/i);
+      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
       await user.clear(officeInput);
 
       const submitButton = screen.getByRole("button", {
@@ -197,35 +142,52 @@ describe("BasicInfoForm", () => {
       const submitButton = screen.getByRole("button", {
         name: /continue to schedule/i,
       });
+
+      // Clear office location
+      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
+      await user.clear(officeInput);
+
       await user.click(submitButton);
 
-      // Clear field and blur
-      const nameInput = screen.getByLabelText(/full name/i);
-      await user.clear(nameInput);
-      await user.tab(); // Blur
-
-      expect(screen.getByText("Full name is required")).toBeInTheDocument();
+      expect(screen.getByText("Office location is required")).toBeInTheDocument();
     });
 
     it("should clear validation errors when field is corrected", async () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const nameInput = screen.getByLabelText(/full name/i);
-      await user.clear(nameInput);
+      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
+      await user.clear(officeInput);
 
       const submitButton = screen.getByRole("button", {
         name: /continue to schedule/i,
       });
       await user.click(submitButton);
 
-      expect(screen.getByText("Full name is required")).toBeInTheDocument();
+      expect(screen.getByText("Office location is required")).toBeInTheDocument();
 
-      // Type valid name
-      await user.type(nameInput, "Valid Name");
+      // Type valid office location
+      await user.type(officeInput, "Room 202");
 
       expect(
-        screen.queryByText("Full name is required")
+        screen.queryByText("Office location is required")
       ).not.toBeInTheDocument();
+    });
+
+    it("should allow optional subtitle to be empty", async () => {
+      render(<BasicInfoForm doorcard={mockDoorcard} />);
+
+      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" });
+      await user.clear(subtitleInput);
+
+      const submitButton = screen.getByRole("button", {
+        name: /continue to schedule/i,
+      });
+      await user.click(submitButton);
+
+      // Should not show error for empty subtitle since it's optional
+      await waitFor(() => {
+        expect(mockUpdateBasicInfo).toHaveBeenCalled();
+      });
     });
   });
 
@@ -237,14 +199,11 @@ describe("BasicInfoForm", () => {
 
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const nameInput = screen.getByLabelText(/full name/i);
-      const titleInput = screen.getByLabelText(/doorcard title/i);
-      const officeInput = screen.getByLabelText(/office location/i);
+      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" });
+      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
 
-      await user.clear(nameInput);
-      await user.type(nameInput, "Dr. Updated Name");
-      await user.clear(titleInput);
-      await user.type(titleInput, "Updated Title");
+      await user.clear(subtitleInput);
+      await user.type(subtitleInput, "Updated Subtitle");
       await user.clear(officeInput);
       await user.type(officeInput, "Room 202");
 
@@ -265,9 +224,9 @@ describe("BasicInfoForm", () => {
     it("should trim whitespace from input values", async () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const nameInput = screen.getByLabelText(/full name/i);
-      await user.clear(nameInput);
-      await user.type(nameInput, "  Dr. Trimmed Name  ");
+      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" });
+      await user.clear(subtitleInput);
+      await user.type(subtitleInput, "  Trimmed Subtitle  ");
 
       const submitButton = screen.getByRole("button", {
         name: /continue to schedule/i,
@@ -277,7 +236,23 @@ describe("BasicInfoForm", () => {
       await waitFor(() => {
         expect(mockUpdateBasicInfo).toHaveBeenCalled();
         const formData = mockUpdateBasicInfo.mock.calls[0][2];
-        expect(formData.get("name")).toBe("Dr. Trimmed Name");
+        expect(formData.get("doorcardName")).toBe("Trimmed Subtitle");
+      });
+    });
+
+    it("should not include name field in form submission", async () => {
+      render(<BasicInfoForm doorcard={mockDoorcard} />);
+
+      const submitButton = screen.getByRole("button", {
+        name: /continue to schedule/i,
+      });
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(mockUpdateBasicInfo).toHaveBeenCalled();
+        const formData = mockUpdateBasicInfo.mock.calls[0][2];
+        // Name should not be in the form data - it's derived from user profile on server
+        expect(formData.get("name")).toBeNull();
       });
     });
 
@@ -318,6 +293,28 @@ describe("BasicInfoForm", () => {
         ).toBeInTheDocument();
       });
     });
+
+    it("should display error when user profile has no name", async () => {
+      mockUpdateBasicInfo.mockImplementation(() => {
+        return Promise.resolve({
+          success: false,
+          message: "Unable to determine your name from profile",
+        } as any);
+      });
+
+      render(<BasicInfoForm doorcard={mockDoorcard} />);
+
+      const submitButton = screen.getByRole("button", {
+        name: /continue to schedule/i,
+      });
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(/Unable to determine your name/i)
+        ).toBeInTheDocument();
+      });
+    });
   });
 
   describe("Edge Cases", () => {
@@ -325,25 +322,21 @@ describe("BasicInfoForm", () => {
       const emptyDoorcard = { id: "doorcard-123" };
       render(<BasicInfoForm doorcard={emptyDoorcard} />);
 
-      const nameInput = screen.getByLabelText(/full name/i);
-      const titleInput = screen.getByLabelText(/doorcard title/i);
-      const officeInput = screen.getByLabelText(/office location/i);
+      // Name should show default "Your Name" when not provided
+      expect(screen.getByText("Your Name")).toBeInTheDocument();
 
-      expect(nameInput).toHaveValue("");
-      expect(titleInput).toHaveValue("");
+      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" });
+      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
+
+      expect(subtitleInput).toHaveValue("");
       expect(officeInput).toHaveValue("");
     });
 
     it("should not submit form with validation errors", async () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      // Clear all fields
-      const nameInput = screen.getByLabelText(/full name/i);
-      const titleInput = screen.getByLabelText(/doorcard title/i);
-      const officeInput = screen.getByLabelText(/office location/i);
-
-      await user.clear(nameInput);
-      await user.clear(titleInput);
+      // Clear required field
+      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
       await user.clear(officeInput);
 
       const submitButton = screen.getByRole("button", {
@@ -352,10 +345,6 @@ describe("BasicInfoForm", () => {
       await user.click(submitButton);
 
       expect(mockUpdateBasicInfo).not.toHaveBeenCalled();
-      expect(screen.getByText("Full name is required")).toBeInTheDocument();
-      expect(
-        screen.getByText("Doorcard title is required")
-      ).toBeInTheDocument();
       expect(
         screen.getByText("Office location is required")
       ).toBeInTheDocument();
@@ -366,44 +355,46 @@ describe("BasicInfoForm", () => {
     it("should have proper ARIA attributes for errors", async () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const nameInput = screen.getByLabelText(/full name/i);
-      await user.clear(nameInput);
+      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
+      await user.clear(officeInput);
 
       const submitButton = screen.getByRole("button", {
         name: /continue to schedule/i,
       });
       await user.click(submitButton);
 
-      const errorMessage = screen.getByText("Full name is required");
-      expect(errorMessage).toHaveAttribute("id", "name-error");
-      expect(nameInput).toHaveAttribute("aria-describedby", "name-error");
-      expect(nameInput).toHaveAttribute("aria-invalid", "true");
+      const errorMessage = screen.getByText("Office location is required");
+      expect(errorMessage).toHaveAttribute("id", "officeNumber-error");
+      expect(officeInput).toHaveAttribute("aria-describedby", "officeNumber-error");
+      expect(officeInput).toHaveAttribute("aria-invalid", "true");
     });
 
-    it("should have required attributes on inputs", () => {
+    it("should have required attributes on required inputs", () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const nameInput = screen.getByLabelText(/full name/i);
-      const titleInput = screen.getByLabelText(/doorcard title/i);
-      const officeInput = screen.getByLabelText(/office location/i);
+      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
 
-      // Check for aria-required instead of HTML required attribute (semantic approach)
-      expect(nameInput).toHaveAttribute("aria-required", "true");
-      expect(titleInput).toHaveAttribute("aria-required", "true");
+      // Check for aria-required on required fields
       expect(officeInput).toHaveAttribute("aria-required", "true");
     });
 
-    it("should be keyboard navigable", async () => {
+    it("should not have required attribute on optional subtitle", () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      await user.tab(); // Focus first input
-      expect(screen.getByLabelText(/full name/i)).toHaveFocus();
+      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" });
 
-      await user.tab(); // Focus second input
-      expect(screen.getByLabelText(/doorcard title/i)).toHaveFocus();
+      // Subtitle is optional, so aria-required should be false
+      expect(subtitleInput).toHaveAttribute("aria-required", "false");
+    });
 
-      await user.tab(); // Focus third input
-      expect(screen.getByLabelText(/office location/i)).toHaveFocus();
+    it("should be keyboard navigable (editable fields only)", async () => {
+      render(<BasicInfoForm doorcard={mockDoorcard} />);
+
+      await user.tab(); // Focus first editable input (subtitle)
+      expect(screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" })).toHaveFocus();
+
+      await user.tab(); // Focus second editable input (office location)
+      expect(screen.getByLabelText(/^Office Location/, { selector: "input" })).toHaveFocus();
 
       await user.tab(); // Focus submit button
       expect(

@@ -139,12 +139,14 @@ export const authOptions: NextAuthOptions = {
           const clientId = process.env.ONELOGIN_CLIENT_ID!;
           const clientSecret = process.env.ONELOGIN_CLIENT_SECRET!;
 
-          // Try Basic Authentication (common OIDC method)
-          const baseUrl =
-            process.env.NEXTAUTH_URL ||
-            (process.env.NODE_ENV === "production"
-              ? "https://doorcard.vercel.app"
-              : "http://localhost:3000");
+          // NEXTAUTH_URL must be set in environment - no hardcoded fallbacks
+          // This ensures the redirect_uri matches exactly what's configured in OneLogin
+          const baseUrl = process.env.NEXTAUTH_URL;
+          if (!baseUrl) {
+            throw new Error(
+              "NEXTAUTH_URL environment variable is required for OAuth authentication"
+            );
+          }
           const redirectUri = `${baseUrl.replace(/\/$/, "")}/api/auth/callback/onelogin`;
           const tokenParams = new URLSearchParams({
             grant_type: "authorization_code",

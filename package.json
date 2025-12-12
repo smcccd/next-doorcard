@@ -44,7 +44,7 @@
     "qa:urls": "tsx scripts/qa-url-testing.ts",
     "qa:urls:quick": "tsx scripts/qa-url-quick-test.ts",
     "security:headers": "node scripts/verify-security-headers.js",
-    "security:headers:prod": "node scripts/verify-security-headers.js https://doorcard.vercel.app",
+    "security:headers:prod": "node scripts/verify-security-headers.js ${PRODUCTION_URL:-https://test.doorcard.smccd.edu}",
     "test:auth:interactive": "node scripts/test-auth-interactive.js",
     "test:auth:interactive:headed": "node scripts/test-auth-interactive.js --headed",
     "test:auth:manual": "node scripts/test-auth-interactive.js --mode=manual --headed",
@@ -56,7 +56,9 @@
     "test:auth:ci:auto": "node scripts/ci-auth-strategy.js --strategy=auto",
     "test:auth:ci:programmatic": "node scripts/ci-auth-strategy.js --strategy=programmatic",
     "test:auth:ci:mock": "node scripts/ci-auth-strategy.js --strategy=mock",
-    "test:auth:ci:service": "node scripts/ci-auth-strategy.js --strategy=service_account"
+    "test:auth:ci:service": "node scripts/ci-auth-strategy.js --strategy=service_account",
+    "test:pdf": "tsx scripts/test-pdf.ts",
+    "test:pdf:save": "tsx scripts/test-pdf.ts --save"
   },
   "dependencies": {
     "@microsoft/clarity": "^1.0.0",

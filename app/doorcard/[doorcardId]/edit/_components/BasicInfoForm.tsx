@@ -28,7 +28,6 @@ interface Props {
 }
 
 type FieldErrors = {
-  name?: string;
   doorcardName?: string;
   officeNumber?: string;
 };
@@ -37,7 +36,6 @@ const rules: Record<
   keyof FieldErrors,
   { min: number; max: number; label: string; required?: boolean }
 > = {
-  name: { min: 2, max: 100, label: "Full name", required: true },
   doorcardName: { min: 0, max: 50, label: "Subtitle", required: false },
   officeNumber: { min: 2, max: 100, label: "Office location", required: true },
 };
@@ -76,11 +74,13 @@ function SubmitButton() {
 }
 
 export default function BasicInfoForm({ doorcard }: Props) {
-  const [name, setName] = useState(doorcard.name || "");
   const [doorcardName, setDoorcardName] = useState(doorcard.doorcardName || "");
   const [officeNumber, setOfficeNumber] = useState(doorcard.officeNumber || "");
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState(false);
+
+  // Name comes from user profile and is not editable
+  const name = doorcard.name || "Your Name";
 
   const [state, action] = useActionState(
     updateBasicInfo.bind(null, doorcard.id),
@@ -88,7 +88,6 @@ export default function BasicInfoForm({ doorcard }: Props) {
   );
 
   const handleChange = (field: keyof FieldErrors, value: string) => {
-    if (field === "name") setName(value);
     if (field === "doorcardName") setDoorcardName(value);
     if (field === "officeNumber") setOfficeNumber(value);
 
@@ -103,14 +102,12 @@ export default function BasicInfoForm({ doorcard }: Props) {
   const handleSubmit = (fd: FormData) => {
     setTouched(true);
     const nextErrors: FieldErrors = {
-      name: validateField("name", name),
       doorcardName: validateField("doorcardName", doorcardName),
       officeNumber: validateField("officeNumber", officeNumber),
     };
     setErrors(nextErrors);
     if (Object.values(nextErrors).some(Boolean)) return;
 
-    fd.set("name", name.trim());
     fd.set("doorcardName", doorcardName.trim());
     fd.set("officeNumber", officeNumber.trim());
     action(fd);
@@ -120,7 +117,7 @@ export default function BasicInfoForm({ doorcard }: Props) {
 
   // Generate title preview
   const titlePreview = previewDoorcardTitle(
-    name || "Your Name",
+    name,
     doorcard.term,
     doorcard.year?.toString()
   );
@@ -174,18 +171,23 @@ export default function BasicInfoForm({ doorcard }: Props) {
 
       <form action={handleSubmit} className="space-y-8">
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Full name */}
-          <Field
-            id="name"
-            label="Full Name"
-            icon={<User className="h-4 w-4 text-gray-400" />}
-            value={name}
-            placeholder="Dr. Jane Smith"
-            error={errors.name}
-            onChange={(v) => handleChange("name", v)}
-            help="Your full name as you'd like it to appear"
-            isValid={!validateField("name", name) && name.trim().length >= 2}
-          />
+          {/* Full name - read-only display */}
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-gray-900">
+              Full Name
+            </Label>
+            <div className="relative">
+              <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <User className="h-4 w-4 text-gray-400" />
+              </span>
+              <div className="flex h-10 w-full items-center rounded-md border border-gray-200 bg-gray-50 pl-10 pr-3 text-sm text-gray-700">
+                {name}
+              </div>
+            </div>
+            <p className="text-xs text-gray-600">
+              Name is set from your profile
+            </p>
+          </div>
           {/* Doorcard subtitle */}
           <Field
             id="doorcardName"
@@ -199,6 +201,7 @@ export default function BasicInfoForm({ doorcard }: Props) {
             isValid={
               !validateField("doorcardName", doorcardName)
             }
+            required={false}
           />
           {/* Office location */}
           <div className="md:col-span-2">
@@ -235,6 +238,7 @@ function Field({
   error,
   help,
   isValid = false,
+  required = true,
 }: {
   id: string;
   label: string;
@@ -245,11 +249,12 @@ function Field({
   error?: string;
   help?: string;
   isValid?: boolean;
+  required?: boolean;
 }) {
   return (
     <div className="space-y-1.5">
       <Label htmlFor={id} className="text-sm font-medium text-gray-900">
-        {label} <span className="text-red-600">*</span>
+        {label} {required && <span className="text-red-600">*</span>}
         {isValid && (
           <span
             className="ml-2 inline-flex animate-in fade-in-50 slide-in-from-right-2 duration-300"
@@ -270,7 +275,7 @@ function Field({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           aria-invalid={!!error}
-          aria-required="true"
+          aria-required={required}
           aria-describedby={
             error ? `${id}-error` : help ? `${id}-help` : undefined
           }

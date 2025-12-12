@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "jsdom",
-    setupFiles: ["./vitest.setup.ts"],
+    setupFiles: [path.resolve(__dirname, "./vitest.setup.ts")],
     include: [
       "**/__tests__/**/*.{js,ts,jsx,tsx}",
       "**/*.{test,spec}.{js,ts,jsx,tsx}",
@@ -52,7 +52,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./"),
+      "@": path.resolve(__dirname, "../"),
     },
   },
 });

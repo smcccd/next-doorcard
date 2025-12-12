@@ -3,10 +3,10 @@ import { College, DayOfWeek, AppointmentCategory } from "@prisma/client";
 
 /**
  * Schema for the "basic info" step.
+ * Note: 'name' is derived from user profile, not user input
  */
 export const basicInfoSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  doorcardName: z.string().min(1, "Doorcard name is required"),
+  doorcardName: z.string().max(100).optional().default(""),
   officeNumber: z.string().min(1, "Office number is required"),
   term: z.string().min(1, "Term is required"),
   year: z.string().min(1, "Year is required"),
