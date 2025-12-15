@@ -174,7 +174,7 @@ export default function CampusTermForm({ userCollege }: Props) {
               Select Campus & Term
             </CardTitle>
             <p className="text-sm text-gray-500 mt-1">
-              One doorcard per campus per term. Choose where this one applies.
+              Choose the campus and term for this doorcard.
             </p>
           </div>
         </div>
