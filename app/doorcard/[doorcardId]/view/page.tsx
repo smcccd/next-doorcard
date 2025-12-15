@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 import { UnifiedDoorcard } from "@/components/UnifiedDoorcard";
@@ -33,7 +32,7 @@ export default async function DoorcardViewById({
   const autoPrint = resolvedSearchParams.print === "true";
 
   // For auth=true views, require authentication
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (useAuth && !session?.user?.email) {
     return (
       <div className="flex items-center justify-center bg-gray-50 py-12">

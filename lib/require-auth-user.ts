@@ -1,6 +1,5 @@
-import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import type { Session } from "next-auth";
 
@@ -65,7 +64,7 @@ async function fetchSessionUser(): Promise<SelectedUser | null> {
     }
   }
 
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session?.user?.email || !session.user.email.trim()) return null;
 
   return prisma.user.findUnique({

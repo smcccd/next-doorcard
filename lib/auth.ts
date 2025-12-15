@@ -1,22 +1,22 @@
-import type { NextAuthOptions } from "next-auth";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import type { Adapter, AdapterAccount } from "next-auth/adapters";
+import NextAuth from "next-auth";
+import type { DefaultSession } from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import type { Adapter, AdapterUser } from "next-auth/adapters";
 import { prisma } from "@/lib/prisma";
-import crypto from "crypto";
 import { logger } from "@/lib/logger";
+import { authConfig } from "./auth.config";
 
-// OneLogin profile interface
-interface OneLoginProfile {
-  sub?: string;
-  id?: string;
-  name?: string;
-  email: string;
-  picture?: string;
-  given_name?: string;
-  family_name?: string;
-  role?: string;
-  college?: string;
-  department?: string;
+// Use Web Crypto API for Edge Runtime compatibility
+function generateUUID(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for older environments
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 }
 
 // Custom PrismaAdapter that handles PascalCase relations and ID generation
@@ -25,7 +25,7 @@ function CustomPrismaAdapter(): Adapter {
 
   return {
     ...baseAdapter,
-    async createUser(user: any) {
+    async createUser(user): Promise<AdapterUser> {
       logger.debug("[ADAPTER] createUser called", {
         email: user.email,
         name: user.name,
@@ -33,9 +33,9 @@ function CustomPrismaAdapter(): Adapter {
       try {
         const result = await prisma.user.create({
           data: {
-            id: crypto.randomUUID(), // Generate ID for our schema
+            id: generateUUID(), // Generate ID for our schema
             name: user.name,
-            email: user.email,
+            email: user.email!,
             image: user.image,
             emailVerified: user.emailVerified,
             updatedAt: new Date(), // Required field in our schema
@@ -45,7 +45,14 @@ function CustomPrismaAdapter(): Adapter {
           },
         });
         logger.debug("[ADAPTER] createUser success", { userId: result.id });
-        return result;
+        // Return only AdapterUser fields
+        return {
+          id: result.id,
+          email: result.email,
+          name: result.name,
+          image: result.image,
+          emailVerified: result.emailVerified,
+        };
       } catch (error) {
         logger.error("[ADAPTER] createUser failed", {
           error: error instanceof Error ? error.message : "Unknown error",
@@ -73,7 +80,7 @@ function CustomPrismaAdapter(): Adapter {
         emailVerified: user.emailVerified,
       };
     },
-    async linkAccount(account: AdapterAccount) {
+    async linkAccount(account): Promise<void> {
       logger.debug("[ADAPTER] linkAccount called", {
         provider: account.provider,
         userId: account.userId,
@@ -81,24 +88,23 @@ function CustomPrismaAdapter(): Adapter {
       });
 
       try {
-        const result = await prisma.account.create({
+        await prisma.account.create({
           data: {
-            id: crypto.randomUUID(),
+            id: generateUUID(),
             userId: account.userId,
             type: account.type,
             provider: account.provider,
             providerAccountId: account.providerAccountId,
-            refresh_token: account.refresh_token,
-            access_token: account.access_token,
-            expires_at: account.expires_at,
-            token_type: account.token_type,
-            scope: account.scope,
-            id_token: account.id_token,
-            session_state: account.session_state,
+            refresh_token: account.refresh_token ?? undefined,
+            access_token: account.access_token ?? undefined,
+            expires_at: account.expires_at ?? undefined,
+            token_type: account.token_type ?? undefined,
+            scope: account.scope ?? undefined,
+            id_token: account.id_token ?? undefined,
+            session_state: account.session_state?.toString() ?? undefined,
           },
         });
-        logger.debug("[ADAPTER] linkAccount success", { accountId: result.id });
-        return result;
+        logger.debug("[ADAPTER] linkAccount success");
       } catch (error) {
         logger.error("[ADAPTER] linkAccount failed", {
           error: error instanceof Error ? error.message : "Unknown error",
@@ -109,173 +115,12 @@ function CustomPrismaAdapter(): Adapter {
   };
 }
 
-export const authOptions: NextAuthOptions = {
-  debug:
-    process.env.NODE_ENV === "development" &&
-    process.env.NEXTAUTH_DEBUG === "true",
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   adapter: CustomPrismaAdapter(),
-  providers: [
-    // OneLogin OIDC Provider - Custom OAuth Configuration
-    {
-      id: "onelogin",
-      name: "SMCCD OneLogin",
-      type: "oauth",
-      clientId: process.env.ONELOGIN_CLIENT_ID!,
-      clientSecret: process.env.ONELOGIN_CLIENT_SECRET!,
-
-      authorization: {
-        url: "https://smccd.onelogin.com/oidc/2/auth",
-        params: {
-          scope: "openid profile email",
-          response_type: "code",
-        },
-      },
-      token: {
-        url: "https://smccd.onelogin.com/oidc/2/token",
-        async request(context) {
-          const { params, provider } = context;
-
-          // Get client credentials from the provider config
-          const clientId = process.env.ONELOGIN_CLIENT_ID!;
-          const clientSecret = process.env.ONELOGIN_CLIENT_SECRET!;
-
-          // NEXTAUTH_URL must be set in environment - no hardcoded fallbacks
-          // This ensures the redirect_uri matches exactly what's configured in OneLogin
-          const baseUrl = process.env.NEXTAUTH_URL;
-          if (!baseUrl) {
-            throw new Error(
-              "NEXTAUTH_URL environment variable is required for OAuth authentication"
-            );
-          }
-          const redirectUri = `${baseUrl.replace(/\/$/, "")}/api/auth/callback/onelogin`;
-          const tokenParams = new URLSearchParams({
-            grant_type: "authorization_code",
-            code: params.code || "",
-            redirect_uri: redirectUri,
-          });
-
-          const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString(
-            "base64"
-          );
-
-          logger.debug("Token request initiated", {
-            grant_type: "authorization_code",
-            auth_method: "Basic",
-            client_id: clientId,
-          });
-
-          const tokenUrl =
-            typeof provider.token === "string"
-              ? provider.token
-              : provider.token?.url || "";
-          const response = await fetch(tokenUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              Authorization: `Basic ${basicAuth}`,
-            },
-            body: tokenParams,
-          });
-
-          const tokens = await response.json();
-          logger.debug("Token response received", {
-            status: response.status,
-            hasAccessToken: !!tokens.access_token,
-            hasRefreshToken: !!tokens.refresh_token,
-            tokenType: tokens.token_type,
-          });
-
-          if (!response.ok) {
-            throw new Error(
-              `Token request failed: ${response.status} ${JSON.stringify(tokens)}`
-            );
-          }
-
-          return { tokens };
-        },
-      },
-      userinfo: {
-        url: "https://smccd.onelogin.com/oidc/2/me",
-        async request({ tokens, provider }) {
-          logger.debug("Fetching UserInfo with access token");
-
-          const userinfoUrl =
-            typeof provider.userinfo === "string"
-              ? provider.userinfo
-              : provider.userinfo?.url || "";
-          const response = await fetch(userinfoUrl, {
-            headers: {
-              Authorization: `Bearer ${tokens.access_token}`,
-            },
-          });
-
-          const userInfo = await response.json();
-          logger.debug("UserInfo response received", {
-            status: response.status,
-            hasUserInfo: !!userInfo,
-            userEmail: userInfo?.email,
-          });
-
-          if (!response.ok) {
-            throw new Error(
-              `UserInfo request failed: ${response.status} ${JSON.stringify(userInfo)}`
-            );
-          }
-
-          return userInfo;
-        },
-      },
-
-      profile(profile) {
-        logger.debug("Profile data received", {
-          sub: profile.sub,
-          email: profile.email,
-          name: profile.name,
-        });
-
-        // Ensure we have required fields
-        if (!profile.sub && !profile.id) {
-          throw new Error("Profile is missing required 'sub' or 'id' field");
-        }
-
-        return {
-          id: profile.sub || profile.id, // OneLogin might use 'id' instead of 'sub'
-          name:
-            profile.name ||
-            `${profile.given_name || ""} ${profile.family_name || ""}`.trim() ||
-            profile.email,
-          email: profile.email,
-          image: profile.picture,
-          // Map OneLogin attributes to our user model
-          role: profile.role || "FACULTY", // Default role
-          college: profile.college || profile.department,
-        };
-      },
-    },
-  ],
-  session: {
-    strategy: "jwt",
-    maxAge: 8 * 60 * 60, // 8 hours for production
-    updateAge: 24 * 60 * 60, // Update session only once per day (best practice to reduce server load)
-  },
-  cookies: {
-    sessionToken: {
-      name: `${process.env.NODE_ENV === "production" ? "__Secure-" : ""}next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 8 * 60 * 60, // Match session.maxAge
-      },
-    },
-  },
-  pages: {
-    signIn: "/login",
-    error: "/auth/error",
-  },
   callbacks: {
-    async signIn({ user, account, profile }) {
+    ...authConfig.callbacks,
+    async signIn({ user, account }) {
       logger.debug("[SIGNIN] Callback triggered", {
         provider: account?.provider,
         userEmail: user?.email,
@@ -301,8 +146,8 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role;
-        token.college = user.college;
+        token.role = (user as any).role;
+        token.college = (user as any).college;
       }
 
       // Skip database queries in test environment to avoid timeouts
@@ -333,14 +178,6 @@ export const authOptions: NextAuthOptions = {
 
       return token;
     },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.college = token.college as string;
-      }
-      return session;
-    },
   },
   events: {
     async signIn({ user, account, isNewUser }) {
@@ -352,4 +189,21 @@ export const authOptions: NextAuthOptions = {
       }
     },
   },
-};
+});
+
+// Type augmentation for custom session properties
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+declare module "next-auth" {
+  interface User {
+    role?: string;
+    college?: string;
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id?: string;
+    role?: string;
+    college?: string;
+  }
+}
