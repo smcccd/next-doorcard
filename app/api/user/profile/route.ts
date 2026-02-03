@@ -1,7 +1,6 @@
 import { logger } from "@/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
   withRateLimit,
@@ -14,7 +13,7 @@ export async function PATCH(req: NextRequest) {
   // Apply rate limiting with user-specific identifier for authenticated requests
   return withRateLimit(req, RateLimitTier.API, undefined, async () => {
     try {
-      const session = await getServerSession(authOptions);
+      const session = await auth();
       logger.debug("[Profile API] Session:", session?.user?.email);
 
       if (!session?.user?.email) {
@@ -172,7 +171,7 @@ export async function GET(req: NextRequest) {
         Object.fromEntries(req.headers.entries())
       );
 
-      const session = await getServerSession(authOptions);
+      const session = await auth();
       logger.debug("[Profile API GET] Session:", session ? "EXISTS" : "NULL");
       logger.debug(
         "[Profile API GET] Full session:",

@@ -1,11 +1,9 @@
-import { withAuth } from "next-auth/middleware";
+import NextAuth from "next-auth";
+import { authConfig } from "@/lib/auth.config";
 import { NextResponse, NextRequest } from "next/server";
-import {
-  getRateLimitTier,
-  getClientIdentifier,
-  checkRateLimit,
-  createRateLimitResponse,
-} from "./lib/rate-limit";
+
+// Initialize auth with edge-compatible config (no Prisma adapter)
+const { auth } = NextAuth(authConfig);
 
 /**
  * Detects if the request is from a test environment
@@ -14,62 +12,6 @@ import {
 function isTestEnvironment(): boolean {
   // Only trust environment variables, not headers or user agents
   return process.env.NODE_ENV === "test" || process.env.CYPRESS === "true";
-}
-
-/**
- * Apply rate limiting to API routes
- */
-async function applyRateLimitingMiddleware(
-  req: NextRequest
-): Promise<NextResponse | null> {
-  // Skip rate limiting in test environments
-  if (isTestEnvironment()) {
-    return null;
-  }
-
-  // Only apply rate limiting to API routes
-  if (!req.nextUrl.pathname.startsWith("/api/")) {
-    return null;
-  }
-
-  try {
-    const tier = getRateLimitTier(req.nextUrl.pathname);
-    const identifier = getClientIdentifier(req);
-    const result = await checkRateLimit(tier, identifier);
-
-    if (!result.success) {
-      return new NextResponse(
-        JSON.stringify({
-          error: "Rate limit exceeded",
-          message: `Too many requests for ${result.tier} endpoints. Try again in ${result.retryAfter || 60} seconds.`,
-          tier: result.tier,
-          limit: result.limit,
-          remaining: result.remaining,
-          reset: result.reset.toISOString(),
-          retryAfter: result.retryAfter,
-        }),
-        {
-          status: 429,
-          headers: {
-            "Content-Type": "application/json",
-            "X-RateLimit-Limit": result.limit.toString(),
-            "X-RateLimit-Remaining": result.remaining.toString(),
-            "X-RateLimit-Reset": result.reset.getTime().toString(),
-            "Retry-After": (result.retryAfter || 60).toString(),
-          },
-        }
-      );
-    }
-
-    return null; // Continue processing
-  } catch (error) {
-    // On error, allow the request but log the issue
-    console.error(
-      "[Rate Limit Middleware] Error applying rate limiting:",
-      error
-    );
-    return null;
-  }
 }
 
 /**
@@ -110,84 +52,73 @@ async function testMiddleware(req: NextRequest): Promise<NextResponse> {
   return NextResponse.next();
 }
 
+// Public API routes that don't require authentication
+const publicApiRoutes = [
+  "/api/doorcards/public",
+  "/api/doorcards/view",
+  "/api/health",
+  "/api/analytics/track",
+  "/api/terms/active",
+  "/api/auth", // Auth routes should always be public
+];
+
 /**
- * Main middleware function with proper authentication and rate limiting
- * Uses NextAuth withAuth for production security
+ * Main middleware function with proper authentication
+ * Uses Auth.js v5 auth() function with edge-compatible config
+ * Note: Rate limiting has been moved to API routes for Edge Runtime compatibility
  */
-export default withAuth(
-  async function middleware(req) {
-    // Apply rate limiting first (for API routes)
-    const rateLimitResponse = await applyRateLimitingMiddleware(req);
-    if (rateLimitResponse) {
-      return rateLimitResponse;
-    }
+export default auth(async function middleware(req) {
+  // Use simplified middleware only in test environments
+  if (isTestEnvironment()) {
+    return await testMiddleware(req);
+  }
 
-    // Use simplified middleware only in test environments
-    if (isTestEnvironment()) {
-      return await testMiddleware(req);
-    }
+  // Check if this is a public API route
+  const isPublicApiRoute = publicApiRoutes.some((route) =>
+    req.nextUrl.pathname.startsWith(route)
+  );
 
-    // For protected routes, set appropriate cache headers
-    const protectedRoutes = ["/dashboard", "/doorcard", "/admin", "/profile"];
-    const isProtectedRoute = protectedRoutes.some((route) =>
-      req.nextUrl.pathname.startsWith(route)
+  if (isPublicApiRoute) {
+    return NextResponse.next();
+  }
+
+  // For protected routes, check authentication via req.auth (provided by auth())
+  const protectedRoutes = ["/dashboard", "/doorcard", "/admin", "/profile"];
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    req.nextUrl.pathname.startsWith(route)
+  );
+
+  // If protected route and no auth, redirect to login
+  if (isProtectedRoute && !req.auth) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  if (isProtectedRoute) {
+    const response = NextResponse.next();
+
+    // Use private cache with must-revalidate for better performance
+    response.headers.set(
+      "Cache-Control",
+      "private, no-cache, must-revalidate"
     );
+    // Important for CDN and browser caching with authentication
+    response.headers.set("Vary", "Cookie");
 
-    if (isProtectedRoute) {
-      const response = NextResponse.next();
-
-      // Use private cache with must-revalidate for better performance
+    // Only set strict no-cache for admin pages
+    if (req.nextUrl.pathname.startsWith("/admin")) {
       response.headers.set(
         "Cache-Control",
-        "private, no-cache, must-revalidate"
+        "no-store, no-cache, must-revalidate, proxy-revalidate"
       );
-      // Important for CDN and browser caching with authentication
-      response.headers.set("Vary", "Cookie");
-
-      // Only set strict no-cache for admin pages
-      if (req.nextUrl.pathname.startsWith("/admin")) {
-        response.headers.set(
-          "Cache-Control",
-          "no-store, no-cache, must-revalidate, proxy-revalidate"
-        );
-        response.headers.set("Pragma", "no-cache");
-        response.headers.set("Expires", "0");
-      }
-
-      return response;
+      response.headers.set("Pragma", "no-cache");
+      response.headers.set("Expires", "0");
     }
 
-    return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token, req }) => {
-        // Allow public API routes without authentication
-        const publicApiRoutes = [
-          "/api/doorcards/public",
-          "/api/doorcards/view",
-          "/api/health",
-          "/api/analytics/track",
-          "/api/terms/active",
-        ];
-
-        if (
-          publicApiRoutes.some((route) =>
-            req.nextUrl.pathname.startsWith(route)
-          )
-        ) {
-          return true;
-        }
-
-        // User must have a valid token for protected routes
-        return !!token;
-      },
-    },
-    pages: {
-      signIn: "/login",
-    },
+    return response;
   }
-);
+
+  return NextResponse.next();
+});
 
 export const config = {
   matcher: [
@@ -196,7 +127,7 @@ export const config = {
     "/doorcard/:path*",
     "/admin/:path*",
     "/profile/:path*",
-    // Add API routes for rate limiting (but not authentication)
+    // Add API routes (rate limiting is handled in API routes themselves)
     "/api/:path*",
   ],
 };

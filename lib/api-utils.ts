@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
+import { auth } from "@/lib/auth";
 import type { Session } from "next-auth";
 
 type AuthenticatedHandler<T> = (session: Session) => Promise<T>;
@@ -8,7 +8,7 @@ export async function withAuth<T>(
   handler: AuthenticatedHandler<T>
 ): Promise<NextResponse> {
   try {
-    const session = await getServerSession();
+    const session = await auth();
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

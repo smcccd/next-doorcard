@@ -23,6 +23,7 @@ interface HomeSearchClientProps {
   activeTerm: ActiveTermInfo | null;
   termLoading: boolean;
   inHero?: boolean;
+  isAuthenticated?: boolean;
 }
 
 export function HomeSearchClient({
@@ -30,6 +31,7 @@ export function HomeSearchClient({
   activeTerm,
   termLoading,
   inHero = false,
+  isAuthenticated = false,
 }: HomeSearchClientProps) {
   const router = useRouter();
   const [doorcards] = useState<PublicDoorcard[]>(initialDoorcards);
@@ -230,13 +232,13 @@ export function HomeSearchClient({
 
         {/* Action Buttons - Hero Version */}
         <div className="flex justify-center mx-auto mt-8 mb-12">
-          <Link href="/login">
+          <Link href={isAuthenticated ? "/dashboard" : "/login"}>
             <Button
               variant="outline"
               size="lg"
               className="border-2 border-white/40 bg-white/10 backdrop-blur-sm text-white hover:bg-white hover:text-blue-900 font-semibold py-4 px-8 text-lg rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
             >
-              Faculty Log In
+              {isAuthenticated ? "Visit Dashboard" : "Faculty Log In"}
             </Button>
           </Link>
         </div>

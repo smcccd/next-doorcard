@@ -11,8 +11,7 @@ import ClarityInit from "@/components/ClarityInit";
 import { NetworkStatusBanner } from "@/components/NetworkStatusBanner";
 import { BetaBadge } from "@/components/BetaBadge";
 import { ReactNode, Suspense } from "react";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({
@@ -74,7 +73,7 @@ export default async function RootLayout({
 }: {
   children: ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   return (
     <html
       lang="en"

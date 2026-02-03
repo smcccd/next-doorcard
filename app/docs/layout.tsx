@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
@@ -10,7 +9,7 @@ export default async function DocsLayout({
   children: React.ReactNode;
 }) {
   // Check if user is authenticated
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session?.user?.email) {
     redirect("/login?callbackUrl=/docs");

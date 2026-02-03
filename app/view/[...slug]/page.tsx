@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 import { UnifiedDoorcard } from "@/components/UnifiedDoorcard";
@@ -51,7 +50,7 @@ async function fetchDoorcard(
   useAuth: boolean
 ) {
   // If ?auth=true is passed, we allow viewing non-public doorcards (must be signed in)
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (useAuth && !session?.user?.email) {
     return { error: "Authentication required" } as const;
   }

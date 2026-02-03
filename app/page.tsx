@@ -3,6 +3,7 @@ import { getCurrentAcademicTerm } from "@/lib/active-term";
 import { HomeSearchClient } from "@/components/HomeSearchClient";
 import { Calendar } from "lucide-react";
 import { unstable_cache } from "next/cache";
+import { auth } from "@/lib/auth";
 
 import type { PublicDoorcard } from "@/types/pages/public";
 import type { ActiveTermInfo } from "@/lib/active-term";
@@ -116,6 +117,10 @@ export default async function Home() {
   // Get current term info first to filter data properly
   const currentTerm = getCurrentAcademicTerm();
 
+  // Get session to determine authentication state for the homepage button
+  const session = await auth();
+  const isAuthenticated = !!session;
+
   const [rawDoorcards, activeTerm] = await Promise.all([
     // Use cached version for all doorcards (needed for pagination)
     getCachedAllDoorcards(currentTerm.season, currentTerm.year),
@@ -202,6 +207,7 @@ export default async function Home() {
               activeTerm={currentTermInfo}
               termLoading={false}
               inHero={true}
+              isAuthenticated={isAuthenticated}
             />
           </div>
         </div>
@@ -212,6 +218,7 @@ export default async function Home() {
           activeTerm={currentTermInfo}
           termLoading={false}
           inHero={false}
+          isAuthenticated={isAuthenticated}
         />
       </div>
     </>
