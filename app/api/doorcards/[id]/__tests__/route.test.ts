@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { GET, PUT, PATCH, DELETE } from "../route";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
-import { getTermStatus } from "@/lib/doorcard-status";
+import { getTermStatus } from "@/lib/doorcard/doorcard-status";
 import { randomUUID } from "crypto";
 
 // Mock dependencies
@@ -37,7 +37,7 @@ vi.mock("@/lib/require-auth-user", () => ({
   requireAuthUserAPI: vi.fn(),
 }));
 
-vi.mock("@/lib/doorcard-status", () => ({
+vi.mock("@/lib/doorcard/doorcard-status", () => ({
   getTermStatus: vi.fn(),
 }));
 

@@ -30,7 +30,10 @@ const createPrismaClient = () => {
   }
 
   // Only log in development or when debugging
-  if (process.env.NODE_ENV === "development" || process.env.DEBUG_DB === "true") {
+  if (
+    process.env.NODE_ENV === "development" ||
+    process.env.DEBUG_DB === "true"
+  ) {
     console.log(
       "Prisma connecting to:",
       connectionString.replace(/:[^:@]+@/, ":***@")

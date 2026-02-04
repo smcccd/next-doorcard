@@ -21,13 +21,13 @@ vi.mock("@/lib/prisma");
 vi.mock("@/lib/auth");
 
 // Mock components
-vi.mock("@/components/UnifiedDoorcard", () => ({
+vi.mock("@/components/doorcard/UnifiedDoorcard", () => ({
   UnifiedDoorcard: ({ doorcard }: any) => (
     <div data-testid="unified-doorcard">Doorcard for {doorcard.name}</div>
   ),
 }));
 
-vi.mock("@/components/PrintOptimizedDoorcard", () => ({
+vi.mock("@/components/doorcard/PrintOptimizedDoorcard", () => ({
   PrintOptimizedDoorcard: ({ doorcard }: any) => (
     <div data-testid="print-optimized-doorcard">
       Print version for {doorcard.name}
@@ -35,7 +35,7 @@ vi.mock("@/components/PrintOptimizedDoorcard", () => ({
   ),
 }));
 
-vi.mock("@/components/UnifiedDoorcardActions", () => ({
+vi.mock("@/components/doorcard/UnifiedDoorcardActions", () => ({
   DoorcardActions: ({ doorcard }: any) => (
     <div data-testid="doorcard-actions">Actions for {doorcard.name}</div>
   ),
@@ -47,7 +47,7 @@ vi.mock("@/components/doorcard/DoorcardViewTracker", () => ({
   ),
 }));
 
-vi.mock("@/components/AutoPrintHandler", () => ({
+vi.mock("@/components/doorcard/AutoPrintHandler", () => ({
   AutoPrintHandler: ({ autoPrint }: any) => (
     <div data-testid="auto-print-handler" data-auto-print={autoPrint} />
   ),

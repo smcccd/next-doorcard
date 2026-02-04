@@ -282,7 +282,6 @@ export default function CampusTermForm({ doorcard }: Props) {
 
         <SubmitButton />
       </form>
-
     </div>
   );
 }

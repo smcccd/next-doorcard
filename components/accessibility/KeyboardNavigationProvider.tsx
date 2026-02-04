@@ -1,21 +1,27 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { announceToScreenReader, manageFocusOnRouteChange } from '@/lib/accessibility/focus-management';
-import { usePathname } from 'next/navigation';
+import React, { createContext, useContext, useEffect, useState } from "react";
+import {
+  announceToScreenReader,
+  manageFocusOnRouteChange,
+} from "@/lib/accessibility/focus-management";
+import { usePathname } from "next/navigation";
 
 interface KeyboardNavigationContextType {
   isKeyboardUser: boolean;
-  announceToUser: (message: string, priority?: 'polite' | 'assertive') => void;
+  announceToUser: (message: string, priority?: "polite" | "assertive") => void;
   focusMainContent: () => void;
 }
 
-const KeyboardNavigationContext = createContext<KeyboardNavigationContextType | null>(null);
+const KeyboardNavigationContext =
+  createContext<KeyboardNavigationContextType | null>(null);
 
 export function useKeyboardNavigation() {
   const context = useContext(KeyboardNavigationContext);
   if (!context) {
-    throw new Error('useKeyboardNavigation must be used within KeyboardNavigationProvider');
+    throw new Error(
+      "useKeyboardNavigation must be used within KeyboardNavigationProvider"
+    );
   }
   return context;
 }
@@ -24,7 +30,9 @@ interface KeyboardNavigationProviderProps {
   children: React.ReactNode;
 }
 
-export function KeyboardNavigationProvider({ children }: KeyboardNavigationProviderProps) {
+export function KeyboardNavigationProvider({
+  children,
+}: KeyboardNavigationProviderProps) {
   const [isKeyboardUser, setIsKeyboardUser] = useState(false);
   const pathname = usePathname();
 
@@ -33,16 +41,16 @@ export function KeyboardNavigationProvider({ children }: KeyboardNavigationProvi
 
     // Detect keyboard usage
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Tab') {
+      if (e.key === "Tab") {
         setIsKeyboardUser(true);
-        document.body.classList.add('keyboard-user');
+        document.body.classList.add("keyboard-user");
       }
     };
 
     // Reset keyboard detection on mouse use
     const handleMouseDown = () => {
       setIsKeyboardUser(false);
-      document.body.classList.remove('keyboard-user');
+      document.body.classList.remove("keyboard-user");
       if (keyboardTimer) {
         clearTimeout(keyboardTimer);
         keyboardTimer = undefined;
@@ -52,52 +60,61 @@ export function KeyboardNavigationProvider({ children }: KeyboardNavigationProvi
     // Global keyboard shortcuts
     const handleGlobalKeyboard = (e: KeyboardEvent) => {
       // Skip to main content (Alt + M)
-      if (e.altKey && e.key === 'm') {
+      if (e.altKey && e.key === "m") {
         e.preventDefault();
-        const mainContent = document.getElementById('main-content');
+        const mainContent = document.getElementById("main-content");
         if (mainContent) {
           mainContent.focus();
-          announceToScreenReader('Skipped to main content', 'assertive');
+          announceToScreenReader("Skipped to main content", "assertive");
         }
       }
 
       // Skip to navigation (Alt + N)
-      if (e.altKey && e.key === 'n') {
+      if (e.altKey && e.key === "n") {
         e.preventDefault();
-        const navigation = document.querySelector('nav') || document.querySelector('[role="navigation"]');
+        const navigation =
+          document.querySelector("nav") ||
+          document.querySelector('[role="navigation"]');
         if (navigation) {
           (navigation as HTMLElement).focus();
-          announceToScreenReader('Skipped to navigation', 'assertive');
+          announceToScreenReader("Skipped to navigation", "assertive");
         }
       }
 
       // Help dialog (Alt + H)
-      if (e.altKey && e.key === 'h') {
+      if (e.altKey && e.key === "h") {
         e.preventDefault();
-        announceToScreenReader('Keyboard shortcuts: Alt+M for main content, Alt+N for navigation, Alt+H for help', 'assertive');
+        announceToScreenReader(
+          "Keyboard shortcuts: Alt+M for main content, Alt+N for navigation, Alt+H for help",
+          "assertive"
+        );
       }
 
       // Close modal/dialog (Escape)
-      if (e.key === 'Escape') {
-        const openModal = document.querySelector('[role="dialog"][aria-modal="true"]');
+      if (e.key === "Escape") {
+        const openModal = document.querySelector(
+          '[role="dialog"][aria-modal="true"]'
+        );
         if (openModal) {
-          const closeButton = openModal.querySelector('[aria-label*="close"], [aria-label*="Close"], button[data-close]') as HTMLButtonElement;
+          const closeButton = openModal.querySelector(
+            '[aria-label*="close"], [aria-label*="Close"], button[data-close]'
+          ) as HTMLButtonElement;
           if (closeButton) {
             closeButton.click();
-            announceToScreenReader('Dialog closed', 'assertive');
+            announceToScreenReader("Dialog closed", "assertive");
           }
         }
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('mousedown', handleMouseDown);
-    document.addEventListener('keydown', handleGlobalKeyboard);
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener("keydown", handleGlobalKeyboard);
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('mousedown', handleMouseDown);
-      document.removeEventListener('keydown', handleGlobalKeyboard);
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener("keydown", handleGlobalKeyboard);
       if (keyboardTimer) {
         clearTimeout(keyboardTimer);
       }
@@ -112,15 +129,18 @@ export function KeyboardNavigationProvider({ children }: KeyboardNavigationProvi
     }
   }, [pathname]);
 
-  const announceToUser = (message: string, priority: 'polite' | 'assertive' = 'polite') => {
+  const announceToUser = (
+    message: string,
+    priority: "polite" | "assertive" = "polite"
+  ) => {
     announceToScreenReader(message, priority);
   };
 
   const focusMainContent = () => {
-    const mainContent = document.getElementById('main-content');
+    const mainContent = document.getElementById("main-content");
     if (mainContent) {
       mainContent.focus();
-      announceToUser('Focused on main content', 'assertive');
+      announceToUser("Focused on main content", "assertive");
     }
   };
 
@@ -139,7 +159,7 @@ export function KeyboardNavigationProvider({ children }: KeyboardNavigationProvi
         aria-atomic="true"
         className="sr-only"
       />
-      
+
       {/* Assertive announcements */}
       <div
         id="accessibility-announcements-assertive"
@@ -153,14 +173,14 @@ export function KeyboardNavigationProvider({ children }: KeyboardNavigationProvi
         <a
           href="#main-content"
           className="skip-link"
-          onFocus={() => announceToUser('Skip to main content link')}
+          onFocus={() => announceToUser("Skip to main content link")}
         >
           Skip to main content
         </a>
         <a
           href="#navigation"
           className="skip-link"
-          onFocus={() => announceToUser('Skip to navigation link')}
+          onFocus={() => announceToUser("Skip to navigation link")}
         >
           Skip to navigation
         </a>

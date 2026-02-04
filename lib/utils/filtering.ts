@@ -2,7 +2,7 @@ import { PublicDoorcard } from "@/types/pages/public";
 import { College } from "@/types/doorcard";
 import { DayOfWeek } from "@prisma/client";
 import { extractDepartmentFromText } from "@/lib/departments";
-import { ActiveTermInfo } from "@/lib/active-term";
+import { ActiveTermInfo } from "@/lib/term/active-term";
 
 export interface FilterOptions {
   searchTerm: string;

@@ -182,7 +182,7 @@ vi.mock("@/components/analytics/TestChart", () => ({
   TestChart: () => <div data-testid="test-chart">Test Chart</div>,
 }));
 
-vi.mock("@/components/CollegeLogo", () => ({
+vi.mock("@/components/logos/CollegeLogo", () => ({
   __esModule: true,
   default: () => <div data-testid="college-logo">College Logo</div>,
 }));

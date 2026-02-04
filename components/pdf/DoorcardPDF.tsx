@@ -9,14 +9,14 @@ import {
   PDFDownloadLink,
   Font,
 } from "@react-pdf/renderer";
-import { DoorcardLite } from "../UnifiedDoorcard";
+import { DoorcardLite } from "../doorcard/UnifiedDoorcard";
 import { formatDisplayName, getCollegeDisplayName } from "@/lib/display-name";
 import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,
   TIME_SLOTS,
   WEEKDAYS_ONLY,
-} from "@/lib/doorcard-constants";
+} from "@/lib/doorcard/doorcard-constants";
 
 // Use built-in fonts to avoid CORS issues with external font loading
 // Helvetica is a built-in PDF font that provides excellent readability
@@ -300,7 +300,8 @@ export function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
         <View style={styles.header}>
           <Text style={styles.logo}>Faculty Doorcard</Text>
           <Text style={styles.term}>
-            {doorcard.term} {doorcard.year} • {getCollegeDisplayName(doorcard.college || "")}
+            {doorcard.term} {doorcard.year} •{" "}
+            {getCollegeDisplayName(doorcard.college || "")}
           </Text>
         </View>
 
@@ -319,7 +320,9 @@ export function DoorcardPDFDocument({ doorcard }: DoorcardPDFProps) {
           </View>
           <View style={styles.officeItem}>
             <Text style={styles.officeLabel}>Campus</Text>
-            <Text style={styles.officeValue}>{getCollegeDisplayName(doorcard.college || "")}</Text>
+            <Text style={styles.officeValue}>
+              {getCollegeDisplayName(doorcard.college || "")}
+            </Text>
           </View>
           {doorcard.user?.website && (
             <View style={styles.officeItem}>

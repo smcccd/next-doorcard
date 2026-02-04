@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
 import { PublicDoorcard } from "@/types/pages/public";
 import { College } from "@/types/doorcard";
-import { ActiveTermInfo } from "@/lib/active-term";
+import { ActiveTermInfo } from "@/lib/term/active-term";
 import { getDepartmentName } from "@/lib/departments";
 import { ProfessorCard } from "./professor-card";
 import { ProfessorSkeleton } from "./professor-skeleton";

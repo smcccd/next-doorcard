@@ -4,7 +4,7 @@ import { useState, createContext, useContext, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { UnsavedChangesDialog } from "@/components/UnsavedChangesDialog";
+import { UnsavedChangesDialog } from "@/components/shared/UnsavedChangesDialog";
 import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 
 // Context for forms to report their dirty state
@@ -33,7 +33,9 @@ export function EditPageClient({ children }: EditPageClientProps) {
   const router = useRouter();
   const [isDirty, setIsDirty] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
-  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(
+    null
+  );
 
   // Set up beforeunload warning
   useUnsavedChanges({
@@ -41,14 +43,17 @@ export function EditPageClient({ children }: EditPageClientProps) {
     message: "You have unsaved changes. Are you sure you want to leave?",
   });
 
-  const _handleNavigate = useCallback((href: string) => {
-    if (isDirty) {
-      setPendingNavigation(href);
-      setShowDialog(true);
-    } else {
-      router.push(href);
-    }
-  }, [isDirty, router]);
+  const _handleNavigate = useCallback(
+    (href: string) => {
+      if (isDirty) {
+        setPendingNavigation(href);
+        setShowDialog(true);
+      } else {
+        router.push(href);
+      }
+    },
+    [isDirty, router]
+  );
 
   const handleConfirmNavigation = useCallback(() => {
     setShowDialog(false);
@@ -82,7 +87,9 @@ interface BackToDashboardButtonProps {
 /**
  * Back button that checks for unsaved changes before navigating.
  */
-export function BackToDashboardButton({ className }: BackToDashboardButtonProps) {
+export function BackToDashboardButton({
+  className,
+}: BackToDashboardButtonProps) {
   const router = useRouter();
   const { isDirty } = useDirtyState();
   const [showDialog, setShowDialog] = useState(false);

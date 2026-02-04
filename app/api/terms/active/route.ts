@@ -1,7 +1,7 @@
 // app/api/terms/active/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getCurrentAcademicTerm } from "@/lib/active-term";
+import { getCurrentAcademicTerm } from "@/lib/term/active-term";
 
 export async function GET() {
   try {

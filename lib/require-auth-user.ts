@@ -33,10 +33,7 @@ type SelectedUser = {
 async function fetchSessionUser(): Promise<SelectedUser | null> {
   // ONLY allow Cypress bypass in non-production environments
   // This prevents authentication bypass in production
-  if (
-    process.env.NODE_ENV !== "production" &&
-    process.env.CYPRESS === "true"
-  ) {
+  if (process.env.NODE_ENV !== "production" && process.env.CYPRESS === "true") {
     try {
       const { cookies } = await import("next/headers");
       const cookieStore = await cookies();
@@ -100,6 +97,22 @@ export async function requireAuthUserAPI(): Promise<
 > {
   const user = await fetchSessionUser();
   if (!user) return { error: "Unauthorized", status: 401 };
+  return { user };
+}
+
+/**
+ * Requires authenticated admin user for API routes.
+ * Returns the user if they are authenticated and have ADMIN role,
+ * or an error object with appropriate status code.
+ */
+export async function requireAdminUserAPI(): Promise<
+  { user: SelectedUser } | { error: string; status: number }
+> {
+  const user = await fetchSessionUser();
+  if (!user) return { error: "Unauthorized", status: 401 };
+  if (user.role !== "ADMIN") {
+    return { error: "Forbidden - Admin access required", status: 403 };
+  }
   return { user };
 }
 

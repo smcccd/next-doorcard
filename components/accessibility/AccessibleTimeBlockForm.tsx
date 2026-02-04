@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { CalendarDays, Clock, Plus, X, AlertCircle } from "lucide-react";
-import { DAY_LABELS } from "@/lib/doorcard-constants";
+import { DAY_LABELS } from "@/lib/doorcard/doorcard-constants";
 import { ACCESSIBLE_CATEGORY_COLORS } from "@/lib/accessibility/color-contrast";
 import { announceToScreenReader } from "@/lib/accessibility/focus-management";
 import type { AppointmentCategory, DayOfWeek } from "@prisma/client";
@@ -35,7 +35,13 @@ interface AccessibleTimeBlockFormProps {
 }
 
 const DAYS: DayOfWeek[] = [
-  "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"
+  "MONDAY",
+  "TUESDAY",
+  "WEDNESDAY",
+  "THURSDAY",
+  "FRIDAY",
+  "SATURDAY",
+  "SUNDAY",
 ];
 
 const CATEGORY_OPTIONS: { value: AppointmentCategory; label: string }[] = [
@@ -51,7 +57,7 @@ const CATEGORY_OPTIONS: { value: AppointmentCategory; label: string }[] = [
 export default function AccessibleTimeBlockForm({
   timeBlocks,
   onUpdate,
-  disabled = false
+  disabled = false,
 }: AccessibleTimeBlockFormProps) {
   const [selectedDays, setSelectedDays] = useState<DayOfWeek[]>([]);
   const [activity, setActivity] = useState("");
@@ -68,7 +74,7 @@ export default function AccessibleTimeBlockForm({
   useEffect(() => {
     const count = timeBlocks.length;
     const blockText = count === 1 ? "time block" : "time blocks";
-    announceToScreenReader(`Schedule updated: ${count} ${blockText}`, 'polite');
+    announceToScreenReader(`Schedule updated: ${count} ${blockText}`, "polite");
   }, [timeBlocks.length]);
 
   const validateForm = () => {
@@ -96,11 +102,14 @@ export default function AccessibleTimeBlockForm({
 
   const handleAddTimeBlock = () => {
     if (!validateForm()) {
-      announceToScreenReader("Please correct the errors in the form", 'assertive');
+      announceToScreenReader(
+        "Please correct the errors in the form",
+        "assertive"
+      );
       return;
     }
 
-    const newBlocks = selectedDays.map(day => ({
+    const newBlocks = selectedDays.map((day) => ({
       id: `${day}-${startTime}-${Date.now()}`,
       day,
       startTime,
@@ -122,30 +131,36 @@ export default function AccessibleTimeBlockForm({
     setErrors({});
 
     // Announce success
-    const daysText = selectedDays.length === 1 ? selectedDays[0] : `${selectedDays.length} days`;
-    announceToScreenReader(`Added ${activity} for ${daysText}`, 'assertive');
+    const daysText =
+      selectedDays.length === 1
+        ? selectedDays[0]
+        : `${selectedDays.length} days`;
+    announceToScreenReader(`Added ${activity} for ${daysText}`, "assertive");
 
     // Focus back to first field for easy re-entry
-    const firstField = formRef.current?.querySelector('input, select') as HTMLElement;
+    const firstField = formRef.current?.querySelector(
+      "input, select"
+    ) as HTMLElement;
     firstField?.focus();
   };
 
   const handleRemoveTimeBlock = (blockId: string) => {
-    const block = timeBlocks.find(b => b.id === blockId);
-    onUpdate(timeBlocks.filter(b => b.id !== blockId));
-    
+    const block = timeBlocks.find((b) => b.id === blockId);
+    onUpdate(timeBlocks.filter((b) => b.id !== blockId));
+
     if (block) {
-      announceToScreenReader(`Removed ${block.activity} on ${block.day}`, 'assertive');
+      announceToScreenReader(
+        `Removed ${block.activity} on ${block.day}`,
+        "assertive"
+      );
     }
   };
 
   const toggleDay = (day: DayOfWeek) => {
-    setSelectedDays(prev =>
-      prev.includes(day)
-        ? prev.filter(d => d !== day)
-        : [...prev, day]
+    setSelectedDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
     );
-    setErrors(prev => ({ ...prev, days: "" }));
+    setErrors((prev) => ({ ...prev, days: "" }));
   };
 
   const categoryColors = ACCESSIBLE_CATEGORY_COLORS[category];
@@ -166,13 +181,13 @@ export default function AccessibleTimeBlockForm({
               <legend className="text-sm font-medium text-gray-700">
                 Select Days <span className="text-red-500">*</span>
               </legend>
-              <div 
+              <div
                 className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2"
                 role="group"
                 aria-describedby={errors.days ? "days-error" : undefined}
                 aria-invalid={!!errors.days}
               >
-                {DAYS.map(day => {
+                {DAYS.map((day) => {
                   const isSelected = selectedDays.includes(day);
                   return (
                     <button
@@ -183,11 +198,12 @@ export default function AccessibleTimeBlockForm({
                       className={`
                         px-3 py-2 text-sm font-medium rounded-md border transition-colors
                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-                        ${isSelected
-                          ? 'bg-blue-500 text-white border-blue-500'
-                          : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                        ${
+                          isSelected
+                            ? "bg-blue-500 text-white border-blue-500"
+                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
                         }
-                        ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                        ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
                       `}
                       aria-pressed={isSelected}
                       aria-describedby={`${day}-description`}
@@ -201,7 +217,11 @@ export default function AccessibleTimeBlockForm({
                 })}
               </div>
               {errors.days && (
-                <p id="days-error" className="text-sm text-red-600" role="alert">
+                <p
+                  id="days-error"
+                  className="text-sm text-red-600"
+                  role="alert"
+                >
                   <AlertCircle className="inline h-4 w-4 mr-1" />
                   {errors.days}
                 </p>
@@ -220,16 +240,22 @@ export default function AccessibleTimeBlockForm({
                   value={activity}
                   onChange={(e) => {
                     setActivity(e.target.value);
-                    setErrors(prev => ({ ...prev, activity: "" }));
+                    setErrors((prev) => ({ ...prev, activity: "" }));
                   }}
                   disabled={disabled}
                   aria-invalid={!!errors.activity}
-                  aria-describedby={errors.activity ? "activity-error" : undefined}
+                  aria-describedby={
+                    errors.activity ? "activity-error" : undefined
+                  }
                   placeholder="e.g., MATH 100, Office Hours"
                   className="mt-1"
                 />
                 {errors.activity && (
-                  <p id="activity-error" className="mt-1 text-sm text-red-600" role="alert">
+                  <p
+                    id="activity-error"
+                    className="mt-1 text-sm text-red-600"
+                    role="alert"
+                  >
                     {errors.activity}
                   </p>
                 )}
@@ -240,19 +266,31 @@ export default function AccessibleTimeBlockForm({
                 <Label htmlFor="category" className="text-sm font-medium">
                   Category <span className="text-red-500">*</span>
                 </Label>
-                <Select value={category} onValueChange={(value: AppointmentCategory) => setCategory(value)}>
-                  <SelectTrigger id="category" className="mt-1" disabled={disabled}>
+                <Select
+                  value={category}
+                  onValueChange={(value: AppointmentCategory) =>
+                    setCategory(value)
+                  }
+                >
+                  <SelectTrigger
+                    id="category"
+                    className="mt-1"
+                    disabled={disabled}
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {CATEGORY_OPTIONS.map(option => (
+                    {CATEGORY_OPTIONS.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         <div className="flex items-center gap-2">
                           <div
                             className="w-3 h-3 rounded-sm border"
-                            style={{ 
-                              backgroundColor: ACCESSIBLE_CATEGORY_COLORS[option.value].background,
-                              borderColor: ACCESSIBLE_CATEGORY_COLORS[option.value].border
+                            style={{
+                              backgroundColor:
+                                ACCESSIBLE_CATEGORY_COLORS[option.value]
+                                  .background,
+                              borderColor:
+                                ACCESSIBLE_CATEGORY_COLORS[option.value].border,
                             }}
                             aria-hidden="true"
                           />
@@ -278,15 +316,21 @@ export default function AccessibleTimeBlockForm({
                   value={startTime}
                   onChange={(e) => {
                     setStartTime(e.target.value);
-                    setErrors(prev => ({ ...prev, startTime: "" }));
+                    setErrors((prev) => ({ ...prev, startTime: "" }));
                   }}
                   disabled={disabled}
                   aria-invalid={!!errors.startTime}
-                  aria-describedby={errors.startTime ? "startTime-error" : undefined}
+                  aria-describedby={
+                    errors.startTime ? "startTime-error" : undefined
+                  }
                   className="mt-1"
                 />
                 {errors.startTime && (
-                  <p id="startTime-error" className="mt-1 text-sm text-red-600" role="alert">
+                  <p
+                    id="startTime-error"
+                    className="mt-1 text-sm text-red-600"
+                    role="alert"
+                  >
                     {errors.startTime}
                   </p>
                 )}
@@ -303,15 +347,21 @@ export default function AccessibleTimeBlockForm({
                   value={endTime}
                   onChange={(e) => {
                     setEndTime(e.target.value);
-                    setErrors(prev => ({ ...prev, endTime: "" }));
+                    setErrors((prev) => ({ ...prev, endTime: "" }));
                   }}
                   disabled={disabled}
                   aria-invalid={!!errors.endTime}
-                  aria-describedby={errors.endTime ? "endTime-error" : undefined}
+                  aria-describedby={
+                    errors.endTime ? "endTime-error" : undefined
+                  }
                   className="mt-1"
                 />
                 {errors.endTime && (
-                  <p id="endTime-error" className="mt-1 text-sm text-red-600" role="alert">
+                  <p
+                    id="endTime-error"
+                    className="mt-1 text-sm text-red-600"
+                    role="alert"
+                  >
                     {errors.endTime}
                   </p>
                 )}
@@ -358,8 +408,12 @@ export default function AccessibleTimeBlockForm({
               </h3>
             </div>
 
-            <div className="space-y-3" role="list" aria-label="Current time blocks">
-              {timeBlocks.map(block => {
+            <div
+              className="space-y-3"
+              role="list"
+              aria-label="Current time blocks"
+            >
+              {timeBlocks.map((block) => {
                 const colors = ACCESSIBLE_CATEGORY_COLORS[block.category];
                 return (
                   <div
@@ -367,7 +421,7 @@ export default function AccessibleTimeBlockForm({
                     role="listitem"
                     className="flex items-center justify-between p-3 rounded-lg border"
                     style={{
-                      backgroundColor: colors.background + '15', // 15% opacity
+                      backgroundColor: colors.background + "15", // 15% opacity
                       borderColor: colors.border,
                     }}
                   >
@@ -385,7 +439,8 @@ export default function AccessibleTimeBlockForm({
                           {block.activity}
                         </div>
                         <div className="text-sm text-gray-600">
-                          {DAY_LABELS[block.day]}, {block.startTime} - {block.endTime}
+                          {DAY_LABELS[block.day]}, {block.startTime} -{" "}
+                          {block.endTime}
                           {block.location && ` • ${block.location}`}
                         </div>
                       </div>

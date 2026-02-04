@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect } from 'react';
-import { useKeyboardNavigation } from './KeyboardNavigationProvider';
-import { CheckCircle2, Circle, AlertCircle } from 'lucide-react';
+import React, { useEffect } from "react";
+import { useKeyboardNavigation } from "./KeyboardNavigationProvider";
+import { CheckCircle2, Circle, AlertCircle } from "lucide-react";
 
 interface FormStep {
   id: string;
@@ -18,10 +18,10 @@ interface AccessibleFormProgressProps {
   className?: string;
 }
 
-export function AccessibleFormProgress({ 
-  steps, 
-  currentStepIndex, 
-  className = "" 
+export function AccessibleFormProgress({
+  steps,
+  currentStepIndex,
+  className = "",
 }: AccessibleFormProgressProps) {
   const { announceToUser } = useKeyboardNavigation();
 
@@ -32,21 +32,21 @@ export function AccessibleFormProgress({
       const stepNumber = currentStepIndex + 1;
       const totalSteps = steps.length;
       const message = `Step ${stepNumber} of ${totalSteps}: ${currentStep.title}`;
-      announceToUser(message, 'polite');
+      announceToUser(message, "polite");
     }
   }, [currentStepIndex, steps, announceToUser]);
 
   return (
-    <nav 
-      role="navigation" 
+    <nav
+      role="navigation"
       aria-label="Form progress"
       className={`form-progress ${className}`}
     >
       {/* Screen reader summary */}
       <div className="sr-only">
         <p>
-          Form progress: Step {currentStepIndex + 1} of {steps.length}. 
-          {steps.filter(s => s.completed).length} steps completed.
+          Form progress: Step {currentStepIndex + 1} of {steps.length}.
+          {steps.filter((s) => s.completed).length} steps completed.
         </p>
       </div>
 
@@ -55,20 +55,20 @@ export function AccessibleFormProgress({
           const isCompleted = step.completed;
           const isCurrent = step.current;
           const hasErrors = step.hasErrors;
-          
+
           return (
             <li
               key={step.id}
-              className={`progress-step ${isCurrent ? 'current' : ''} ${isCompleted ? 'completed' : ''} ${hasErrors ? 'error' : ''}`}
+              className={`progress-step ${isCurrent ? "current" : ""} ${isCompleted ? "completed" : ""} ${hasErrors ? "error" : ""}`}
               role="listitem"
             >
               <div
                 className="step-indicator"
-                aria-current={isCurrent ? 'step' : undefined}
+                aria-current={isCurrent ? "step" : undefined}
                 aria-label={`
                   Step ${index + 1}: ${step.title}. 
-                  ${isCompleted ? 'Completed' : isCurrent ? 'Current step' : 'Not started'}
-                  ${hasErrors ? '. Has errors that need attention' : ''}
+                  ${isCompleted ? "Completed" : isCurrent ? "Current step" : "Not started"}
+                  ${hasErrors ? ". Has errors that need attention" : ""}
                 `}
               >
                 <div className="step-icon" aria-hidden="true">
@@ -80,14 +80,12 @@ export function AccessibleFormProgress({
                     <Circle className="h-5 w-5" />
                   )}
                 </div>
-                
+
                 <div className="step-content">
                   <div className="step-number" aria-hidden="true">
                     Step {index + 1}
                   </div>
-                  <div className="step-title">
-                    {step.title}
-                  </div>
+                  <div className="step-title">{step.title}</div>
                   {hasErrors && (
                     <div className="step-error" role="alert">
                       Needs attention
@@ -95,11 +93,11 @@ export function AccessibleFormProgress({
                   )}
                 </div>
               </div>
-              
+
               {/* Progress connector */}
               {index < steps.length - 1 && (
-                <div 
-                  className={`step-connector ${isCompleted ? 'completed' : ''}`}
+                <div
+                  className={`step-connector ${isCompleted ? "completed" : ""}`}
                   aria-hidden="true"
                 />
               )}

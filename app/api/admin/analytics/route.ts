@@ -1,36 +1,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAuthUserAPI } from "@/lib/require-auth-user";
+import { requireAdminUserAPI } from "@/lib/require-auth-user";
 
 export async function GET() {
-  const auth = await requireAuthUserAPI();
-  if ("error" in auth) {
-    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  const authResult = await requireAdminUserAPI();
+  if ("error" in authResult) {
+    return NextResponse.json(
+      { error: authResult.error },
+      { status: authResult.status }
+    );
   }
 
   try {
-    const session = auth.user;
-
-    if (!session?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { email: session.email },
-      select: { role: true },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    if (user.role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Unauthorized: Admin access required" },
-        { status: 403 }
-      );
-    }
 
     // Get overall platform metrics
     const [totalAnalytics, totalMetrics, recentAnalytics] = await Promise.all([

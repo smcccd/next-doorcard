@@ -1,7 +1,7 @@
 import { logger } from "@/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuthUserAPI } from "@/lib/require-auth-user";
-import { TermManager, TermData } from "@/lib/term-management";
+import { requireAuthUserAPI, requireAdminUserAPI } from "@/lib/require-auth-user";
+import { TermManager, TermData } from "@/lib/term/term-management";
 
 // GET /api/terms - Get all terms
 export async function GET() {
@@ -37,10 +37,10 @@ export async function GET() {
   }
 }
 
-// POST /api/terms - Create a new term
+// POST /api/terms - Create a new term (admin only)
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await requireAuthUserAPI();
+    const authResult = await requireAdminUserAPI();
     if ("error" in authResult) {
       return NextResponse.json(
         { error: authResult.error },

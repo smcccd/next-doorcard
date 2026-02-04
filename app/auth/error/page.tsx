@@ -16,11 +16,8 @@ import {
   Info as InfoIcon,
   ArrowLeft,
 } from "lucide-react";
-import {
-  getAuthErrorInfo,
-  getSeverityColorClasses,
-} from "@/lib/auth-errors";
-import { ITSupportContact } from "@/components/ITSupportContact";
+import { getAuthErrorInfo, getSeverityColorClasses } from "@/lib/auth-errors";
+import { ITSupportContact } from "@/components/shared/ITSupportContact";
 
 export default function AuthErrorPage() {
   const searchParams = useSearchParams();

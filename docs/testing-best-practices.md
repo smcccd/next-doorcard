@@ -131,8 +131,8 @@ expect(screen.getByRole("link", { name: /john smith/i })).toHaveAttribute(
 Use our test utilities for consistency:
 
 ```typescript
-import { HomePageObject } from "@/lib/test-page-objects";
-import { testHelpers, mockData } from "@/lib/test-utils";
+import { HomePageObject } from "@/lib/testing/test-page-objects";
+import { testHelpers, mockData } from "@/lib/testing/test-utils";
 
 const homePage = new HomePageObject();
 await homePage.searchForProfessor("Smith");

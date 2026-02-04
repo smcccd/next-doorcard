@@ -10,7 +10,7 @@ import {
   formatTimeRange,
   getActivityStyle,
   convertToPST,
-} from "../doorcard-constants";
+} from "../doorcard/doorcard-constants";
 
 describe("Doorcard Constants", () => {
   describe("Day Arrays", () => {

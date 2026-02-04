@@ -1,6 +1,6 @@
 import { GET, POST } from "../route";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
-import { TermManager } from "@/lib/term-management";
+import { TermManager } from "@/lib/term/term-management";
 import { NextRequest } from "next/server";
 
 // Mock dependencies
@@ -18,7 +18,7 @@ import {
 } from "vitest";
 
 vi.mock("@/lib/require-auth-user");
-vi.mock("@/lib/term-management");
+vi.mock("@/lib/term/term-management");
 
 const mockRequireAuthUserAPI = requireAuthUserAPI as MockedFunction<
   typeof requireAuthUserAPI

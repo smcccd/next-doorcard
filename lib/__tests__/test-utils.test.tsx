@@ -1,7 +1,7 @@
 import React from "react";
 import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { render, testHelpers, mockData, setupUserEvent } from "../test-utils";
+import { render, testHelpers, mockData, setupUserEvent } from "../testing/test-utils";
 
 import {
   vi,

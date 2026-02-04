@@ -13,7 +13,7 @@ import {
 } from "vitest";
 
 // Mock the external dependencies
-vi.mock("@/lib/doorcard-status", () => ({
+vi.mock("@/lib/doorcard/doorcard-status", () => ({
   getDoorcardDisplayStatus: vi.fn(),
 }));
 
@@ -53,7 +53,7 @@ vi.mock("lucide-react", () => ({
   Plus: () => <span data-testid="plus-icon">Plus</span>,
 }));
 
-import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
+import { getDoorcardDisplayStatus } from "@/lib/doorcard/doorcard-status";
 
 const mockGetDoorcardDisplayStatus = getDoorcardDisplayStatus as MockedFunction<
   typeof getDoorcardDisplayStatus

@@ -6,7 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const meta: Meta = {
@@ -40,7 +46,7 @@ export const NavigationPatterns: Story = {
   render: () => (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold mb-6">Keyboard Navigation Patterns</h2>
-      
+
       {/* Common Keys */}
       <Card>
         <CardHeader>
@@ -49,37 +55,59 @@ export const NavigationPatterns: Story = {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
-              <h4 className="font-medium text-sm uppercase text-gray-600 dark:text-gray-400">Navigation</h4>
+              <h4 className="font-medium text-sm uppercase text-gray-600 dark:text-gray-400">
+                Navigation
+              </h4>
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">Tab</kbd>
+                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">
+                    Tab
+                  </kbd>
                   <span className="text-sm">Move forward through elements</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">Shift + Tab</kbd>
-                  <span className="text-sm">Move backward through elements</span>
+                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">
+                    Shift + Tab
+                  </kbd>
+                  <span className="text-sm">
+                    Move backward through elements
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">Arrow Keys</kbd>
+                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">
+                    Arrow Keys
+                  </kbd>
                   <span className="text-sm">Navigate within components</span>
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-3">
-              <h4 className="font-medium text-sm uppercase text-gray-600 dark:text-gray-400">Activation</h4>
+              <h4 className="font-medium text-sm uppercase text-gray-600 dark:text-gray-400">
+                Activation
+              </h4>
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">Enter</kbd>
+                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">
+                    Enter
+                  </kbd>
                   <span className="text-sm">Activate links, submit forms</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">Space</kbd>
-                  <span className="text-sm">Activate buttons, toggle checkboxes</span>
+                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">
+                    Space
+                  </kbd>
+                  <span className="text-sm">
+                    Activate buttons, toggle checkboxes
+                  </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">Escape</kbd>
-                  <span className="text-sm">Close modals, cancel operations</span>
+                  <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600">
+                    Escape
+                  </kbd>
+                  <span className="text-sm">
+                    Close modals, cancel operations
+                  </span>
                 </div>
               </div>
             </div>
@@ -105,30 +133,40 @@ export const NavigationPatterns: Story = {
               <li>Notice the focus indicators on each element</li>
             </ol>
           </div>
-          
+
           <div className="space-y-4">
             <div>
-              <label htmlFor="demo-input" className="block text-sm font-medium mb-1">
+              <label
+                htmlFor="demo-input"
+                className="block text-sm font-medium mb-1"
+              >
                 Text Input (Tab to focus)
               </label>
-              <Input id="demo-input" placeholder="Type here..." className="max-w-sm" />
+              <Input
+                id="demo-input"
+                placeholder="Type here..."
+                className="max-w-sm"
+              />
             </div>
-            
+
             <div className="flex items-center gap-4">
               <Button variant="default">Primary Button</Button>
               <Button variant="outline">Outline Button</Button>
               <Button variant="ghost">Ghost Button</Button>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <Checkbox id="demo-checkbox" />
               <label htmlFor="demo-checkbox" className="text-sm font-medium">
                 Checkbox (Space to toggle)
               </label>
             </div>
-            
+
             <div>
-              <label htmlFor="demo-select" className="block text-sm font-medium mb-1">
+              <label
+                htmlFor="demo-select"
+                className="block text-sm font-medium mb-1"
+              >
                 Dropdown (Arrow keys to navigate)
               </label>
               <Select>
@@ -159,44 +197,128 @@ export const NavigationPatterns: Story = {
               <TabsTrigger value="modals">Modals</TabsTrigger>
               <TabsTrigger value="tables">Tables</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="navigation" className="space-y-3 mt-4">
               <h4 className="font-medium">Navigation Menu</h4>
               <div className="space-y-2 text-sm">
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Tab</kbd> - Move between menu items</p>
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Enter</kbd> - Follow links</p>
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Arrow Down</kbd> - Open dropdown menu</p>
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Escape</kbd> - Close dropdown menu</p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Tab
+                  </kbd>{" "}
+                  - Move between menu items
+                </p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Enter
+                  </kbd>{" "}
+                  - Follow links
+                </p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Arrow Down
+                  </kbd>{" "}
+                  - Open dropdown menu
+                </p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Escape
+                  </kbd>{" "}
+                  - Close dropdown menu
+                </p>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="forms" className="space-y-3 mt-4">
               <h4 className="font-medium">Form Controls</h4>
               <div className="space-y-2 text-sm">
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Tab</kbd> - Move between form fields</p>
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Space</kbd> - Toggle checkboxes/radios</p>
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Arrow Keys</kbd> - Navigate radio groups</p>
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Enter</kbd> - Submit form (when in text field)</p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Tab
+                  </kbd>{" "}
+                  - Move between form fields
+                </p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Space
+                  </kbd>{" "}
+                  - Toggle checkboxes/radios
+                </p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Arrow Keys
+                  </kbd>{" "}
+                  - Navigate radio groups
+                </p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Enter
+                  </kbd>{" "}
+                  - Submit form (when in text field)
+                </p>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="modals" className="space-y-3 mt-4">
               <h4 className="font-medium">Modal Dialogs</h4>
               <div className="space-y-2 text-sm">
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Escape</kbd> - Close modal</p>
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Tab</kbd> - Cycle through modal elements</p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Escape
+                  </kbd>{" "}
+                  - Close modal
+                </p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Tab
+                  </kbd>{" "}
+                  - Cycle through modal elements
+                </p>
                 <p>• Focus is trapped within modal when open</p>
                 <p>• Focus returns to trigger element on close</p>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="tables" className="space-y-3 mt-4">
               <h4 className="font-medium">Data Tables</h4>
               <div className="space-y-2 text-sm">
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Tab</kbd> - Move to next interactive element</p>
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Arrow Keys</kbd> - Navigate cells (when supported)</p>
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Enter</kbd> - Activate row action</p>
-                <p>• <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">Space</kbd> - Select row (when selectable)</p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Tab
+                  </kbd>{" "}
+                  - Move to next interactive element
+                </p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Arrow Keys
+                  </kbd>{" "}
+                  - Navigate cells (when supported)
+                </p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Enter
+                  </kbd>{" "}
+                  - Activate row action
+                </p>
+                <p>
+                  •{" "}
+                  <kbd className="px-1 py-0.5 text-xs bg-gray-100 rounded">
+                    Space
+                  </kbd>{" "}
+                  - Select row (when selectable)
+                </p>
               </div>
             </TabsContent>
           </Tabs>
@@ -211,7 +333,7 @@ export const FocusIndicators: Story = {
   render: () => (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold mb-6">Focus Indicator Standards</h2>
-      
+
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold">WCAG 2.1 Requirements</h3>
@@ -228,7 +350,7 @@ export const FocusIndicators: Story = {
               </p>
             </div>
           </div>
-          
+
           <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded">
             <h4 className="font-medium mb-2">❌ Poor Focus Indicators</h4>
             <div className="space-y-3">
@@ -240,7 +362,7 @@ export const FocusIndicators: Story = {
               </p>
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <h4 className="font-medium">Focus Indicator Requirements:</h4>
             <ul className="text-sm space-y-1">
@@ -261,8 +383,10 @@ export const SkipLinks: Story = {
   name: "Skip Navigation",
   render: () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold mb-6">Skip Navigation Implementation</h2>
-      
+      <h2 className="text-2xl font-bold mb-6">
+        Skip Navigation Implementation
+      </h2>
+
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold">Skip Links Pattern</h3>
@@ -275,14 +399,14 @@ export const SkipLinks: Story = {
             <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded">
               <p className="text-sm font-mono mb-2">Implementation example:</p>
               <pre className="text-xs overflow-x-auto">
-{`<a href="#main-content" 
+                {`<a href="#main-content" 
    className="sr-only focus:not-sr-only focus:absolute 
               focus:top-4 focus:left-4 focus:z-50">
   Skip to main content
 </a>`}
               </pre>
             </div>
-            
+
             <div className="space-y-2">
               <h4 className="font-medium">Best Practices:</h4>
               <ul className="text-sm space-y-1">
@@ -293,11 +417,11 @@ export const SkipLinks: Story = {
                 <li>• High contrast when visible</li>
               </ul>
             </div>
-            
+
             <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded">
               <p className="text-sm">
-                <strong>Try it:</strong> Press Tab on this page to reveal the skip link
-                (if implemented in the main layout)
+                <strong>Try it:</strong> Press Tab on this page to reveal the
+                skip link (if implemented in the main layout)
               </p>
             </div>
           </div>
@@ -311,8 +435,10 @@ export const TestingChecklist: Story = {
   name: "Testing Checklist",
   render: () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold mb-6">Keyboard Accessibility Testing</h2>
-      
+      <h2 className="text-2xl font-bold mb-6">
+        Keyboard Accessibility Testing
+      </h2>
+
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold">Manual Testing Checklist</h3>
@@ -320,25 +446,47 @@ export const TestingChecklist: Story = {
         <CardContent>
           <div className="space-y-4">
             {[
-              { task: "Navigate entire page using only Tab key", status: "required" },
-              { task: "All interactive elements are reachable", status: "required" },
-              { task: "Focus indicators are clearly visible", status: "required" },
+              {
+                task: "Navigate entire page using only Tab key",
+                status: "required",
+              },
+              {
+                task: "All interactive elements are reachable",
+                status: "required",
+              },
+              {
+                task: "Focus indicators are clearly visible",
+                status: "required",
+              },
               { task: "Tab order follows logical flow", status: "required" },
               { task: "No keyboard traps exist", status: "required" },
               { task: "Skip links work correctly", status: "recommended" },
               { task: "Modals trap focus appropriately", status: "required" },
               { task: "Escape key closes overlays", status: "required" },
-              { task: "Custom widgets follow ARIA patterns", status: "required" },
-              { task: "Focus returns to trigger after modal close", status: "required" },
+              {
+                task: "Custom widgets follow ARIA patterns",
+                status: "required",
+              },
+              {
+                task: "Focus returns to trigger after modal close",
+                status: "required",
+              },
             ].map((item, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded">
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded"
+              >
                 <div className="flex items-center gap-3">
                   <Checkbox id={`check-${index}`} />
                   <label htmlFor={`check-${index}`} className="text-sm">
                     {item.task}
                   </label>
                 </div>
-                <Badge variant={item.status === "required" ? "destructive" : "secondary"}>
+                <Badge
+                  variant={
+                    item.status === "required" ? "destructive" : "secondary"
+                  }
+                >
                   {item.status}
                 </Badge>
               </div>
@@ -346,7 +494,7 @@ export const TestingChecklist: Story = {
           </div>
         </CardContent>
       </Card>
-      
+
       <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold">Automated Testing Tools</h3>

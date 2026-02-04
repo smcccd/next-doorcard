@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { LazyAnalyticsChart } from "@/components/analytics/LazyAnalyticsChart";
-import { fetchWithTimeout, fetchPresets } from "@/lib/fetch-with-timeout";
+import { fetchWithTimeout, fetchPresets } from "@/lib/api/fetch-with-timeout";
 import { LazyTestChart } from "@/components/analytics/LazyTestChart";
 import {
   Card,
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import CollegeLogo from "@/components/CollegeLogo";
+import CollegeLogo from "@/components/logos/CollegeLogo";
 import { College } from "@/types/doorcard";
 import {
   Activity,
@@ -63,7 +63,10 @@ export function AdminAnalytics() {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const response = await fetchWithTimeout("/api/admin/analytics", fetchPresets.heavy);
+      const response = await fetchWithTimeout(
+        "/api/admin/analytics",
+        fetchPresets.heavy
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch analytics");

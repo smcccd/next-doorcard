@@ -2,21 +2,21 @@ import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-import { UnifiedDoorcard } from "@/components/UnifiedDoorcard";
-import { PrintOptimizedDoorcard } from "@/components/PrintOptimizedDoorcard";
+import { UnifiedDoorcard } from "@/components/doorcard/UnifiedDoorcard";
+import { PrintOptimizedDoorcard } from "@/components/doorcard/PrintOptimizedDoorcard";
 import { DoorcardViewTracker } from "@/components/doorcard/DoorcardViewTracker";
-import { AutoPrintHandler } from "@/components/AutoPrintHandler";
+import { AutoPrintHandler } from "@/components/doorcard/AutoPrintHandler";
 import { LazyDoorcardPDF } from "@/components/pdf/LazyDoorcardPDF";
 import { analytics } from "@/lib/analytics";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import CollegeLogo from "@/components/CollegeLogo";
+import CollegeLogo from "@/components/logos/CollegeLogo";
 import { College } from "@/types/doorcard";
 import { User, MapPin, Calendar, ArrowLeft, Globe } from "lucide-react";
 import { formatDisplayName } from "@/lib/display-name";
 import { DoorcardSelectionPage } from "@/components/doorcard/DoorcardSelectionPage";
-import { TermManager } from "@/lib/term-management";
+import { TermManager } from "@/lib/term/term-management";
 
 /* ----------------------------------------------------------------------------
    Helpers

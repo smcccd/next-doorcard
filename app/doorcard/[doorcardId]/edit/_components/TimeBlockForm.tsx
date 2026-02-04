@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { CalendarDays, Clock, Plus, X, AlertCircle } from "lucide-react";
 import { updateTimeBlocks } from "@/app/doorcard/actions";
-import { DAY_LABELS, sortDaysByCalendarOrder } from "@/lib/doorcard-constants";
+import { DAY_LABELS, sortDaysByCalendarOrder } from "@/lib/doorcard/doorcard-constants";
 import type { AppointmentCategory, DayOfWeek } from "@prisma/client";
 
 /* -------------------------------------------------------------------------- */

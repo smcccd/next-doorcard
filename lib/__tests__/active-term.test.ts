@@ -6,7 +6,7 @@ import {
   isCurrentTerm,
   isUpcomingTerm,
   isPastTerm,
-} from "../active-term";
+} from "../term/active-term";
 
 // Mock Date for consistent testing
 const mockDate = (year: number, month: number, day: number = 15) => {

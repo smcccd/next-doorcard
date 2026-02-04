@@ -8,8 +8,8 @@ import {
   // Legacy support
   applyRateLimit,
   analyticsRateLimit,
-} from "@/lib/rate-limit";
-import { sanitizeInput } from "@/lib/sanitize";
+} from "@/lib/api/rate-limit";
+import { sanitizeInput } from "@/lib/api/sanitize";
 
 const trackingSchema = z.object({
   doorcardId: z.string().uuid(),

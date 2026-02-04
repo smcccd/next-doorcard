@@ -97,10 +97,7 @@ export default auth(async function middleware(req) {
     const response = NextResponse.next();
 
     // Use private cache with must-revalidate for better performance
-    response.headers.set(
-      "Cache-Control",
-      "private, no-cache, must-revalidate"
-    );
+    response.headers.set("Cache-Control", "private, no-cache, must-revalidate");
     // Important for CDN and browser caching with authentication
     response.headers.set("Vary", "Cookie");
 

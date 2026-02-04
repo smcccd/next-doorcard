@@ -136,16 +136,16 @@ export const userSchema = z.object({
   college: collegeSchema.optional(),
 });
 
+// Re-export time block schema from consolidated source
 // Legacy TimeBlock schema (for backward compatibility)
-export const timeBlockSchema = z.object({
-  id: z.string(),
-  day: dayOfWeekSchema,
-  startTime: timeSchema,
-  endTime: timeSchema,
-  activity: z.string().min(1, "Activity is required"),
-  location: z.string().optional(),
-  category: appointmentCategorySchema.optional(),
-});
+export {
+  timeBlockFormSchema as timeBlockSchema,
+  timeBlockInputSchema,
+  normalizeTimeBlock,
+  toFormTimeBlock,
+  type TimeBlockForm,
+  type TimeBlockInput,
+} from "./time-block";
 
 // Validation helpers
 export function validateTimeSlot(startTime: string, endTime: string): boolean {
@@ -252,4 +252,4 @@ export type AppointmentData = z.infer<typeof appointmentSchema>;
 export type CreateAppointmentData = z.infer<typeof createAppointmentSchema>;
 export type UpdateAppointmentData = z.infer<typeof updateAppointmentSchema>;
 export type UserData = z.infer<typeof userSchema>;
-export type TimeBlockData = z.infer<typeof timeBlockSchema>;
+// TimeBlockData re-exported from time-block.ts as TimeBlockForm

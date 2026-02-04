@@ -266,10 +266,9 @@ export function getAuthErrorInfo(errorCode: string | null): AuthErrorInfo {
           "Contact IT if the issue persists",
         ],
         showITSupport: true,
-        technicalDetails:
-          errorCode
-            ? `Unhandled error code: ${errorCode}`
-            : "No error code provided",
+        technicalDetails: errorCode
+          ? `Unhandled error code: ${errorCode}`
+          : "No error code provided",
       };
   }
 }

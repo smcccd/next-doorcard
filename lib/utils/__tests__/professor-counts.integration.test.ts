@@ -9,7 +9,7 @@ import {
 import { PublicDoorcard } from "@/types/pages/public";
 import { College } from "@/types/doorcard";
 import { DayOfWeek } from "@prisma/client";
-import { ActiveTermInfo } from "@/lib/active-term";
+import { ActiveTermInfo } from "@/lib/term/active-term";
 
 describe("Professor Counts Integration Tests", () => {
   // Mock data for testing
