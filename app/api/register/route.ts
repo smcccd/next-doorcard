@@ -2,13 +2,13 @@ import { NextResponse, NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { randomUUID } from "crypto";
-import { applyRateLimit, registrationRateLimit } from "@/lib/rate-limit";
+import { applyRateLimit, registrationRateLimit } from "@/lib/api/rate-limit";
 import {
   sanitizeRegistrationData,
   isValidEmail,
   isStrongPassword,
   validateName,
-} from "@/lib/sanitize";
+} from "@/lib/api/sanitize";
 
 export async function POST(req: NextRequest) {
   // Apply rate limiting

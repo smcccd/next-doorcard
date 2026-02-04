@@ -2,12 +2,12 @@ import { notFound, redirect } from "next/navigation";
 import { requireAuthUser } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 import { publishDoorcard } from "@/app/doorcard/actions";
-import { getTermStatus } from "@/lib/doorcard-status";
+import { getTermStatus } from "@/lib/doorcard/doorcard-status";
 
 import CampusTermForm from "./_components/CampusTermForm";
 import BasicInfoForm from "./_components/BasicInfoForm";
 import TimeBlockForm from "./_components/TimeBlockForm";
-import UnifiedDoorcard from "@/components/UnifiedDoorcard";
+import UnifiedDoorcard from "@/components/doorcard/UnifiedDoorcard";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

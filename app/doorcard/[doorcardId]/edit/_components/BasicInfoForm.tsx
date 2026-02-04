@@ -13,7 +13,7 @@ import {
   Building2,
 } from "lucide-react";
 import { updateBasicInfo } from "@/app/doorcard/actions";
-import { previewDoorcardTitle } from "@/lib/doorcard-title-generator";
+import { previewDoorcardTitle } from "@/lib/doorcard/doorcard-title-generator";
 
 interface Props {
   doorcard: {
@@ -46,17 +46,17 @@ function validateField(
 ): string | undefined {
   const v = value.trim();
   const rule = rules[key];
-  
+
   // Check if field is required
   if (rule.required && !v) {
     return `${rule.label} is required`;
   }
-  
+
   // Skip validation for empty optional fields
   if (!rule.required && !v) {
     return undefined;
   }
-  
+
   if (v.length < rule.min)
     return `${rule.label} must be at least ${rule.min} characters`;
   if (v.length > rule.max)
@@ -138,8 +138,18 @@ export default function BasicInfoForm({ doorcard }: Props) {
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
           <div className="text-blue-600">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
           <div className="flex-1">
@@ -155,7 +165,8 @@ export default function BasicInfoForm({ doorcard }: Props) {
               </p>
             )}
             <p className="text-xs text-blue-600 mt-2">
-              This title is automatically generated from your name, term, and year.
+              This title is automatically generated from your name, term, and
+              year.
             </p>
           </div>
         </div>
@@ -198,9 +209,7 @@ export default function BasicInfoForm({ doorcard }: Props) {
             error={errors.doorcardName}
             onChange={(v) => handleChange("doorcardName", v)}
             help="Optional subtitle for your doorcard"
-            isValid={
-              !validateField("doorcardName", doorcardName)
-            }
+            isValid={!validateField("doorcardName", doorcardName)}
             required={false}
           />
           {/* Office location */}

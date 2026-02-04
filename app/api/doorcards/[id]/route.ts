@@ -3,18 +3,18 @@ import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { PrismaErrorHandler } from "@/lib/prisma-error-handler";
-import { formatApiError, ErrorCodes } from "@/lib/error-handler";
+import { formatApiError, ErrorCodes } from "@/lib/api/error-handler";
 import { z } from "zod";
 import { COLLEGES } from "@/types/doorcard";
 import { Prisma, College, TermSeason } from "@prisma/client";
-import { getTermStatus } from "@/lib/doorcard-status";
+import { getTermStatus } from "@/lib/doorcard/doorcard-status";
 import { randomUUID } from "crypto";
 import {
   validateAppointments,
   normalizeAppointments,
   timeBlockSchema,
-} from "@/lib/appointment-validation";
-import { sanitizeDoorcardData, sanitizeAppointmentData } from "@/lib/sanitize";
+} from "@/lib/doorcard/appointment-validation";
+import { sanitizeDoorcardData, sanitizeAppointmentData } from "@/lib/api/sanitize";
 
 /* ----------------------------------------------------------------------------
  * Schemas / Helpers
@@ -149,7 +149,10 @@ export async function GET(
     });
 
     if (!doorcard) {
-      return NextResponse.json({ error: "Doorcard not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Doorcard not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json(doorcard);

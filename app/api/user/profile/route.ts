@@ -7,7 +7,7 @@ import {
   RateLimitTier,
   getClientIdentifier,
   getUserIdentifier,
-} from "@/lib/rate-limit";
+} from "@/lib/api/rate-limit";
 
 export async function PATCH(req: NextRequest) {
   // Apply rate limiting with user-specific identifier for authenticated requests

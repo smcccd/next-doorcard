@@ -1,6 +1,8 @@
 # Environment Configuration Guide
 
-This guide explains how to manage environment-specific configuration for the Faculty Doorcard application across **development**, **preview**, and **production** environments.
+This guide explains how to manage environment-specific configuration for the
+Faculty Doorcard application across **development**, **preview**, and
+**production** environments.
 
 ## Table of Contents
 
@@ -16,11 +18,13 @@ This guide explains how to manage environment-specific configuration for the Fac
 ## Overview
 
 The application uses a multi-environment configuration system that supports:
+
 - **Local Development** - Localhost with DEV OneLogin
 - **Preview Deployments** - Vercel preview branches with DEV OneLogin
 - **Production** - Live environment with PROD OneLogin
 
 Each environment has:
+
 - Separate OneLogin SSO applications
 - Different database connections
 - Environment-specific logging levels
@@ -40,7 +44,8 @@ Each environment has:
 
 ### Priority Order
 
-Next.js loads environment files in this order (later files override earlier ones):
+Next.js loads environment files in this order (later files override earlier
+ones):
 
 1. `.env` - Loaded in all environments
 2. `.env.development` or `.env.production` - Loaded based on NODE_ENV
@@ -51,11 +56,13 @@ Next.js loads environment files in this order (later files override earlier ones
 ### First-Time Setup
 
 1. **Copy the example file:**
+
    ```bash
    cp .env.example .env.local
    ```
 
 2. **Update `.env.local` with your credentials:**
+
    ```bash
    # Required: Add your OneLogin DEV credentials
    ONELOGIN_CLIENT_ID="your-dev-client-id"
@@ -84,35 +91,37 @@ That's it! The application will use the committed DEV credentials.
 
 ### Required Variables
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `DATABASE_URL` | Database connection string | `file:./prisma/dev.db` |
-| `NEXTAUTH_URL` | Application URL | `http://localhost:3000` |
-| `NEXTAUTH_SECRET` | Auth encryption key | Generate with `openssl rand -base64 32` |
-| `ONELOGIN_CLIENT_ID` | OneLogin app client ID | From OneLogin dashboard |
-| `ONELOGIN_CLIENT_SECRET` | OneLogin app secret | From OneLogin dashboard |
+| Variable                 | Description                | Example                                 |
+| ------------------------ | -------------------------- | --------------------------------------- |
+| `DATABASE_URL`           | Database connection string | `file:./prisma/dev.db`                  |
+| `NEXTAUTH_URL`           | Application URL            | `http://localhost:3000`                 |
+| `NEXTAUTH_SECRET`        | Auth encryption key        | Generate with `openssl rand -base64 32` |
+| `ONELOGIN_CLIENT_ID`     | OneLogin app client ID     | From OneLogin dashboard                 |
+| `ONELOGIN_CLIENT_SECRET` | OneLogin app secret        | From OneLogin dashboard                 |
 
 ### Optional Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `LOG_LEVEL` | Logging verbosity | `debug` (dev), `error` (prod) |
-| `NEXT_PUBLIC_SHOW_BETA_BANNER` | Show beta banner | `true` (dev), `false` (prod) |
-| `ENABLE_RATE_LIMITING` | Enable API rate limits | `false` (dev), `true` (prod) |
-| `ENABLE_AUTH_DEBUG` | Verbose auth logging | `true` (dev), `false` (prod) |
-| `NEXTAUTH_DEBUG` | NextAuth debug mode | `true` (dev), `false` (prod) |
+| Variable                       | Description            | Default                       |
+| ------------------------------ | ---------------------- | ----------------------------- |
+| `LOG_LEVEL`                    | Logging verbosity      | `debug` (dev), `error` (prod) |
+| `NEXT_PUBLIC_SHOW_BETA_BANNER` | Show beta banner       | `true` (dev), `false` (prod)  |
+| `ENABLE_RATE_LIMITING`         | Enable API rate limits | `false` (dev), `true` (prod)  |
+| `ENABLE_AUTH_DEBUG`            | Verbose auth logging   | `true` (dev), `false` (prod)  |
+| `NEXTAUTH_DEBUG`               | NextAuth debug mode    | `true` (dev), `false` (prod)  |
 
 ### Environment-Specific Defaults
 
 The application automatically adjusts settings based on the environment:
 
 **Development:**
+
 - Log Level: `debug`
 - Beta Banner: Visible
 - Rate Limiting: Disabled
 - Auth Debug: Enabled
 
 **Production:**
+
 - Log Level: `error`
 - Beta Banner: Hidden
 - Rate Limiting: Enabled
@@ -145,7 +154,8 @@ You must configure **two separate OneLogin applications**:
    ```
    https://doorcard.smccd.edu/api/auth/callback/onelogin
    ```
-3. Set Client ID and Client Secret in **Vercel Production** environment variables
+3. Set Client ID and Client Secret in **Vercel Production** environment
+   variables
 
 ### Why Separate Applications?
 
@@ -160,11 +170,11 @@ Feature flags allow enabling/disabling features without code changes.
 
 ### Available Flags
 
-| Flag | Description | Control |
-|------|-------------|---------|
+| Flag                           | Description                  | Control              |
+| ------------------------------ | ---------------------------- | -------------------- |
 | `NEXT_PUBLIC_SHOW_BETA_BANNER` | Display pre-prod beta banner | Environment variable |
-| `ENABLE_RATE_LIMITING` | Enable API rate limiting | Environment variable |
-| `ENABLE_AUTH_DEBUG` | Verbose authentication logs | Environment variable |
+| `ENABLE_RATE_LIMITING`         | Enable API rate limiting     | Environment variable |
+| `ENABLE_AUTH_DEBUG`            | Verbose authentication logs  | Environment variable |
 
 ### Using Feature Flags in Code
 
@@ -233,6 +243,7 @@ Uses committed `.env.development` file (no Vercel config needed)
 **Problem:** `Token request failed: 400 {"error":"invalid_grant"}`
 
 **Solution:**
+
 1. Check that `NEXTAUTH_URL` matches your current URL
    - Local: `http://localhost:3000`
    - Vercel: Your deployment URL
@@ -245,6 +256,7 @@ Uses committed `.env.development` file (no Vercel config needed)
 **Problem:** App fails to start with missing variable error
 
 **Solution:**
+
 1. Copy `.env.example` to `.env.local`
 2. Fill in all required variables
 3. Run `npm run dev` again
@@ -254,6 +266,7 @@ Uses committed `.env.development` file (no Vercel config needed)
 **Problem:** Beta banner doesn't respect environment
 
 **Solution:**
+
 1. Check `NEXT_PUBLIC_SHOW_BETA_BANNER` in your env file
 2. Restart dev server (Next.js bakes env vars at build time)
 3. For production, set in Vercel environment variables
@@ -263,6 +276,7 @@ Uses committed `.env.development` file (no Vercel config needed)
 **Problem:** How do I use DEV credentials locally and PROD in production?
 
 **Solution:**
+
 1. Put DEV credentials in `.env.development` (committed)
 2. Put PROD credentials in Vercel Production environment variables
 3. Never commit PROD credentials to git
@@ -273,6 +287,7 @@ Uses committed `.env.development` file (no Vercel config needed)
 **Problem:** Can't connect to database
 
 **Solution:**
+
 - **Development:** Ensure `prisma/dev.db` exists (run `npx prisma generate`)
 - **Production:** Verify `DATABASE_URL` in Vercel matches your database
 - Check database is accessible from your environment
@@ -281,7 +296,8 @@ Uses committed `.env.development` file (no Vercel config needed)
 
 1. **Never commit `.env.local`** - It's git-ignored for a reason
 2. **Use `.env.example`** as a template for new developers
-3. **Rotate secrets regularly** - Especially NEXTAUTH_SECRET and OAuth credentials
+3. **Rotate secrets regularly** - Especially NEXTAUTH_SECRET and OAuth
+   credentials
 4. **Test in preview** before merging to production
 5. **Use feature flags** instead of environment checks when possible
 6. **Document changes** to environment variables in this file

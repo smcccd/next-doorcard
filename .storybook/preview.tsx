@@ -2,7 +2,7 @@ import type { Preview } from "@storybook/nextjs";
 import React from "react";
 import "../app/globals.css";
 import { Inter, Source_Sans_3 } from "next/font/google";
-import { DarkModeProvider } from "../components/DarkModeProvider";
+import { DarkModeProvider } from "../components/providers/DarkModeProvider";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "../components/ui/toaster";
 

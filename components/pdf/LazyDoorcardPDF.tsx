@@ -4,7 +4,7 @@
 // This component maintains backward compatibility while providing bulletproof PDF downloads
 
 import { BulletproofPDFDownload } from "./BulletproofPDFDownload";
-import { DoorcardLite } from "../UnifiedDoorcard";
+import { DoorcardLite } from "../doorcard/UnifiedDoorcard";
 
 interface LazyDoorcardPDFProps {
   doorcard: DoorcardLite;

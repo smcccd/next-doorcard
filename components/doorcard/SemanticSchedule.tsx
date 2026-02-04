@@ -7,7 +7,7 @@ import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,
   extractCourseCode,
-} from "@/lib/doorcard-constants";
+} from "@/lib/doorcard/doorcard-constants";
 import {
   createSemanticScheduleData,
   generateSemanticIds,

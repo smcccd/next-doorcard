@@ -3,11 +3,21 @@
  * Addresses accessibility issues in generated PDF doorcards
  */
 
-import { DoorcardLite } from "@/components/UnifiedDoorcard";
+import { DoorcardLite } from "@/components/doorcard/UnifiedDoorcard";
 import { formatDisplayName } from "@/lib/display-name";
-import { ACCESSIBLE_CATEGORY_COLORS, PRINT_CATEGORY_COLORS } from "./color-contrast";
-import { CATEGORY_LABELS, TIME_SLOTS, WEEKDAYS_ONLY } from "@/lib/doorcard-constants";
-import { createSemanticScheduleData, generateScreenReaderContent } from "@/lib/doorcard/accessibility";
+import {
+  ACCESSIBLE_CATEGORY_COLORS,
+  PRINT_CATEGORY_COLORS,
+} from "./color-contrast";
+import {
+  CATEGORY_LABELS,
+  TIME_SLOTS,
+  WEEKDAYS_ONLY,
+} from "@/lib/doorcard/doorcard-constants";
+import {
+  createSemanticScheduleData,
+  generateScreenReaderContent,
+} from "@/lib/doorcard/accessibility";
 import type { AppointmentLite } from "@/lib/doorcard/types";
 
 /**
@@ -358,7 +368,7 @@ export function generateAccessiblePDFHTML(doorcard: DoorcardLite): string {
       <thead>
         <tr role="row">
           <th scope="col" class="time-header">Time</th>
-          ${daysToShow.map(day => `<th scope="col" class="day-header">${day.label}</th>`).join('')}
+          ${daysToShow.map((day) => `<th scope="col" class="day-header">${day.label}</th>`).join("")}
         </tr>
       </thead>
       
@@ -389,61 +399,66 @@ export function generateAccessiblePDFHTML(doorcard: DoorcardLite): string {
 </html>`;
 }
 
-function generateAccessibleScheduleRows(byDay: Record<string, AppointmentLite[]>, daysToShow: Array<{ key: string; label: string }>): string {
+function generateAccessibleScheduleRows(
+  byDay: Record<string, AppointmentLite[]>,
+  daysToShow: Array<{ key: string; label: string }>
+): string {
   // Implementation similar to original but with accessibility enhancements
-  let html = '';
+  let html = "";
   const timeSlots = TIME_SLOTS.slice(0, 30); // 7AM to 10PM
-  
+
   for (let i = 0; i < timeSlots.length; i++) {
     const slot = timeSlots[i];
     html += `<tr role="row">`;
     html += `<th scope="row" class="time-header">${slot.label}</th>`;
-    
+
     for (const day of daysToShow) {
       const dayAppointments = byDay[day.key] || [];
-      const activeAppointment = dayAppointments.find(apt => 
+      const activeAppointment = dayAppointments.find((apt) =>
         isSlotCovered(apt, slot.value)
       );
-      
+
       if (activeAppointment && isSlotStart(activeAppointment, slot.value)) {
         const duration = calculateDuration(activeAppointment);
         const rowspan = Math.ceil(duration / 30);
         const colors = PRINT_CATEGORY_COLORS[activeAppointment.category];
-        const categoryClass = `category-${activeAppointment.category.toLowerCase().replace(/_/g, '-')}`;
-        
+        const categoryClass = `category-${activeAppointment.category.toLowerCase().replace(/_/g, "-")}`;
+
         html += `
           <td rowspan="${rowspan}" 
               class="appointment ${categoryClass}"
               role="gridcell"
-              aria-label="${activeAppointment.name}, ${activeAppointment.startTime} to ${activeAppointment.endTime}, ${CATEGORY_LABELS[activeAppointment.category]}${activeAppointment.location ? ', ' + activeAppointment.location : ''}">
+              aria-label="${activeAppointment.name}, ${activeAppointment.startTime} to ${activeAppointment.endTime}, ${CATEGORY_LABELS[activeAppointment.category]}${activeAppointment.location ? ", " + activeAppointment.location : ""}">
             <div class="appointment-text">${activeAppointment.name}</div>
             <div class="appointment-category">${CATEGORY_LABELS[activeAppointment.category]}</div>
-            ${activeAppointment.location ? `<div class="appointment-location">${activeAppointment.location}</div>` : ''}
+            ${activeAppointment.location ? `<div class="appointment-location">${activeAppointment.location}</div>` : ""}
           </td>`;
       } else if (!activeAppointment) {
         html += `<td class="empty-slot" role="gridcell" aria-label="No appointment scheduled"></td>`;
       }
       // Skip cells that are part of a rowspan
     }
-    
+
     html += `</tr>`;
   }
-  
+
   return html;
 }
 
 function generateAccessibleLegend(): string {
   const categories = Object.keys(CATEGORY_LABELS);
-  return categories.map(category => {
-    const label = CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS];
-    const categoryClass = `category-${category.toLowerCase().replace(/_/g, '-')}`;
-    
-    return `
+  return categories
+    .map((category) => {
+      const label = CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS];
+      const categoryClass = `category-${category.toLowerCase().replace(/_/g, "-")}`;
+
+      return `
       <div class="legend-item">
         <div class="legend-sample ${categoryClass}" aria-hidden="true"></div>
         <span class="legend-text">${label}</span>
       </div>`;
-  }).join('');
+    })
+    .join("");
 }
 
 // Helper functions
@@ -465,7 +480,7 @@ function calculateDuration(appointment: any): number {
 }
 
 function timeToMinutes(time: string): number {
-  const [hours, minutes] = time.split(':').map(Number);
+  const [hours, minutes] = time.split(":").map(Number);
   return hours * 60 + minutes;
 }
 
@@ -476,25 +491,25 @@ export const PDF_ACCESSIBILITY_CHECKLIST = {
   structure: [
     "✅ Document has proper title",
     "✅ Headings use semantic HTML (h1, h2, h3)",
-    "✅ Tables have proper headers and captions", 
+    "✅ Tables have proper headers and captions",
     "✅ Alternative text provided for visual elements",
-    "✅ Logical reading order maintained"
+    "✅ Logical reading order maintained",
   ],
-  
+
   color_and_contrast: [
     "✅ High contrast patterns used instead of color alone",
     "✅ Text meets 4.5:1 contrast ratio minimum",
     "✅ Patterns remain visible in black & white printing",
-    "✅ Category differentiation doesn't rely solely on color"
+    "✅ Category differentiation doesn't rely solely on color",
   ],
-  
+
   content: [
     "✅ Schedule description provided for screen readers",
     "✅ Complex table has accessible markup",
     "✅ Activity types clearly explained",
     "✅ Contact information is accessible",
-    "✅ Accessibility notice included"
-  ]
+    "✅ Accessibility notice included",
+  ],
 };
 
 /**
@@ -507,23 +522,23 @@ export function generatePDFAccessibilityReport(doorcard: DoorcardLite): {
 } {
   const issues: string[] = [];
   const recommendations: string[] = [];
-  
+
   // Check for common accessibility issues
   if (doorcard.appointments.length === 0) {
     issues.push("Empty schedule may be confusing for screen reader users");
     recommendations.push("Include a note explaining the empty schedule");
   }
-  
+
   if (!doorcard.officeNumber) {
     issues.push("Missing office location information");
     recommendations.push("Add office location for better accessibility");
   }
-  
+
   // Calculate score based on implementation
   const baseScore = 85; // Our implementation covers most accessibility features
   const deductions = issues.length * 5;
   const score = Math.max(0, baseScore - deductions);
-  
+
   return {
     score,
     issues,
@@ -531,7 +546,7 @@ export function generatePDFAccessibilityReport(doorcard: DoorcardLite): {
       ...recommendations,
       "Test PDF with screen readers",
       "Verify print quality maintains patterns",
-      "Consider providing alternative text formats"
-    ]
+      "Consider providing alternative text formats",
+    ],
   };
 }

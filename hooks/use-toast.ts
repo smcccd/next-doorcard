@@ -48,7 +48,11 @@ function genId() {
 
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
-const addToRemoveQueue = (toastId: string, priority: ToastPriority = 'normal', persistent = false) => {
+const addToRemoveQueue = (
+  toastId: string,
+  priority: ToastPriority = "normal",
+  persistent = false
+) => {
   if (toastTimeouts.has(toastId)) {
     return;
   }
@@ -74,8 +78,8 @@ export const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "ADD_TOAST": {
       const newToast = {
-        priority: 'normal' as ToastPriority,
-        position: 'bottom-right' as const,
+        priority: "normal" as ToastPriority,
+        position: "bottom-right" as const,
         persistent: false,
         ...action.toast,
       };
@@ -83,7 +87,11 @@ export const reducer = (state: State, action: Action): State => {
       // Sort toasts by priority (critical > high > normal > low)
       const priorityOrder = { critical: 4, high: 3, normal: 2, low: 1 };
       const sortedToasts = [newToast, ...state.toasts]
-        .sort((a, b) => (priorityOrder[b.priority!] || 0) - (priorityOrder[a.priority!] || 0))
+        .sort(
+          (a, b) =>
+            (priorityOrder[b.priority!] || 0) -
+            (priorityOrder[a.priority!] || 0)
+        )
         .slice(0, TOAST_LIMIT);
 
       return {
@@ -106,7 +114,7 @@ export const reducer = (state: State, action: Action): State => {
       // ! Side effects ! - This could be extracted into a dismissToast() action,
       // but I'll keep it here for simplicity
       if (toastId) {
-        const toast = state.toasts.find(t => t.id === toastId);
+        const toast = state.toasts.find((t) => t.id === toastId);
         if (toast) {
           addToRemoveQueue(toastId, toast.priority, toast.persistent);
         }
@@ -206,20 +214,25 @@ function useToast() {
 
 // Helper functions for common toast patterns
 const toastHelpers = {
-  success: (props: Omit<Toast, 'variant' | 'priority'>) => 
-    toast({ ...props, variant: 'default', priority: 'normal' }),
-  
-  error: (props: Omit<Toast, 'variant' | 'priority'>) => 
-    toast({ ...props, variant: 'destructive', priority: 'high' }),
-  
-  warning: (props: Omit<Toast, 'variant' | 'priority'>) => 
-    toast({ ...props, variant: 'default', priority: 'normal' }),
-  
-  critical: (props: Omit<Toast, 'variant' | 'priority' | 'persistent'>) => 
-    toast({ ...props, variant: 'destructive', priority: 'critical', persistent: true }),
-  
-  info: (props: Omit<Toast, 'variant' | 'priority'>) => 
-    toast({ ...props, variant: 'default', priority: 'low' }),
+  success: (props: Omit<Toast, "variant" | "priority">) =>
+    toast({ ...props, variant: "default", priority: "normal" }),
+
+  error: (props: Omit<Toast, "variant" | "priority">) =>
+    toast({ ...props, variant: "destructive", priority: "high" }),
+
+  warning: (props: Omit<Toast, "variant" | "priority">) =>
+    toast({ ...props, variant: "default", priority: "normal" }),
+
+  critical: (props: Omit<Toast, "variant" | "priority" | "persistent">) =>
+    toast({
+      ...props,
+      variant: "destructive",
+      priority: "critical",
+      persistent: true,
+    }),
+
+  info: (props: Omit<Toast, "variant" | "priority">) =>
+    toast({ ...props, variant: "default", priority: "low" }),
 };
 
 export { useToast, toast, toastHelpers };

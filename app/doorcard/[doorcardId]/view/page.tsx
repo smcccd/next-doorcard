@@ -2,16 +2,16 @@ import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-import { UnifiedDoorcard } from "@/components/UnifiedDoorcard";
-import { PrintOptimizedDoorcard } from "@/components/PrintOptimizedDoorcard";
-import { DoorcardActions } from "@/components/UnifiedDoorcardActions";
+import { UnifiedDoorcard } from "@/components/doorcard/UnifiedDoorcard";
+import { PrintOptimizedDoorcard } from "@/components/doorcard/PrintOptimizedDoorcard";
+import { DoorcardActions } from "@/components/doorcard/UnifiedDoorcardActions";
 import { DoorcardViewTracker } from "@/components/doorcard/DoorcardViewTracker";
-import { AutoPrintHandler } from "@/components/AutoPrintHandler";
+import { AutoPrintHandler } from "@/components/doorcard/AutoPrintHandler";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { User, MapPin, Calendar, Building, ArrowLeft } from "lucide-react";
-import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
+import { getDoorcardDisplayStatus } from "@/lib/doorcard/doorcard-status";
 
 /* ----------------------------------------------------------------------------
    Doorcard View by ID (for admin access)

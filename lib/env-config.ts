@@ -79,8 +79,8 @@ function getRequiredEnv(key: string, friendlyName?: string): string {
     const name = friendlyName || key;
     throw new Error(
       `Missing required environment variable: ${key}\n` +
-      `Please set ${name} in your environment configuration.\n` +
-      `See .env.example for reference.`
+        `Please set ${name} in your environment configuration.\n` +
+        `See .env.example for reference.`
     );
   }
 
@@ -97,7 +97,10 @@ function getOptionalEnv(key: string, defaultValue: string): string {
 /**
  * Parses a boolean environment variable
  */
-function parseBoolean(value: string | undefined, defaultValue: boolean): boolean {
+function parseBoolean(
+  value: string | undefined,
+  defaultValue: boolean
+): boolean {
   if (value === undefined || value === "") return defaultValue;
   return value === "true" || value === "1" || value === "yes";
 }

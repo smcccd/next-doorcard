@@ -1,6 +1,6 @@
 import type { DayOfWeek } from "@prisma/client";
 import { formatDisplayName } from "@/lib/display-name";
-import { DAY_ORDER, DAY_LABELS } from "@/lib/doorcard-constants";
+import { DAY_ORDER, DAY_LABELS } from "@/lib/doorcard/doorcard-constants";
 import type {
   AppointmentLite,
   DoorcardLite,

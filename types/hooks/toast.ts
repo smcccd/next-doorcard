@@ -1,14 +1,14 @@
 import type { ToastProps } from "@/components/ui/toast";
 
-export type ToastPriority = 'low' | 'normal' | 'high' | 'critical';
+export type ToastPriority = "low" | "normal" | "high" | "critical";
 
-export type ToastPosition = 
-  | 'top-left' 
-  | 'top-center' 
-  | 'top-right' 
-  | 'bottom-left' 
-  | 'bottom-center' 
-  | 'bottom-right';
+export type ToastPosition =
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right";
 
 export type ToasterToast = ToastProps & {
   id: string;

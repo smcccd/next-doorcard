@@ -16,6 +16,19 @@ export async function GET(
     const resolvedParams = await params;
     const { id } = resolvedParams;
 
+    // Verify the doorcard belongs to the authenticated user
+    const doorcard = await prisma.doorcard.findFirst({
+      where: { id, userId: auth.user.id },
+      select: { id: true },
+    });
+
+    if (!doorcard) {
+      return NextResponse.json(
+        { error: "Doorcard not found" },
+        { status: 404 }
+      );
+    }
+
     const appointments = await prisma.appointment.findMany({
       where: { doorcardId: id },
       orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],

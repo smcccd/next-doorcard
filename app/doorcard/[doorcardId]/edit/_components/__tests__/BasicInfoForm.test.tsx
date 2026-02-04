@@ -91,15 +91,21 @@ describe("BasicInfoForm", () => {
       // Name should be displayed as text
       expect(screen.getByText("Dr. Test Professor")).toBeInTheDocument();
       // Should show helper text explaining name is from profile
-      expect(screen.getByText(/name is set from your profile/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/name is set from your profile/i)
+      ).toBeInTheDocument();
     });
 
     it("should render editable fields with labels", () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
       // Use exact label text without the optional suffix indicator
-      expect(screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" })).toBeInTheDocument();
-      expect(screen.getByLabelText(/^Office Location/, { selector: "input" })).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" })
+      ).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/^Office Location/, { selector: "input" })
+      ).toBeInTheDocument();
     });
 
     it("should render submit button", () => {
@@ -122,7 +128,9 @@ describe("BasicInfoForm", () => {
     it("should validate office location is required", async () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
+      const officeInput = screen.getByLabelText(/^Office Location/, {
+        selector: "input",
+      });
       await user.clear(officeInput);
 
       const submitButton = screen.getByRole("button", {
@@ -144,18 +152,24 @@ describe("BasicInfoForm", () => {
       });
 
       // Clear office location
-      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
+      const officeInput = screen.getByLabelText(/^Office Location/, {
+        selector: "input",
+      });
       await user.clear(officeInput);
 
       await user.click(submitButton);
 
-      expect(screen.getByText("Office location is required")).toBeInTheDocument();
+      expect(
+        screen.getByText("Office location is required")
+      ).toBeInTheDocument();
     });
 
     it("should clear validation errors when field is corrected", async () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
+      const officeInput = screen.getByLabelText(/^Office Location/, {
+        selector: "input",
+      });
       await user.clear(officeInput);
 
       const submitButton = screen.getByRole("button", {
@@ -163,7 +177,9 @@ describe("BasicInfoForm", () => {
       });
       await user.click(submitButton);
 
-      expect(screen.getByText("Office location is required")).toBeInTheDocument();
+      expect(
+        screen.getByText("Office location is required")
+      ).toBeInTheDocument();
 
       // Type valid office location
       await user.type(officeInput, "Room 202");
@@ -176,7 +192,9 @@ describe("BasicInfoForm", () => {
     it("should allow optional subtitle to be empty", async () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" });
+      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, {
+        selector: "input",
+      });
       await user.clear(subtitleInput);
 
       const submitButton = screen.getByRole("button", {
@@ -199,8 +217,12 @@ describe("BasicInfoForm", () => {
 
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" });
-      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
+      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, {
+        selector: "input",
+      });
+      const officeInput = screen.getByLabelText(/^Office Location/, {
+        selector: "input",
+      });
 
       await user.clear(subtitleInput);
       await user.type(subtitleInput, "Updated Subtitle");
@@ -224,7 +246,9 @@ describe("BasicInfoForm", () => {
     it("should trim whitespace from input values", async () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" });
+      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, {
+        selector: "input",
+      });
       await user.clear(subtitleInput);
       await user.type(subtitleInput, "  Trimmed Subtitle  ");
 
@@ -325,8 +349,12 @@ describe("BasicInfoForm", () => {
       // Name should show default "Your Name" when not provided
       expect(screen.getByText("Your Name")).toBeInTheDocument();
 
-      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" });
-      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
+      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, {
+        selector: "input",
+      });
+      const officeInput = screen.getByLabelText(/^Office Location/, {
+        selector: "input",
+      });
 
       expect(subtitleInput).toHaveValue("");
       expect(officeInput).toHaveValue("");
@@ -336,7 +364,9 @@ describe("BasicInfoForm", () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
       // Clear required field
-      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
+      const officeInput = screen.getByLabelText(/^Office Location/, {
+        selector: "input",
+      });
       await user.clear(officeInput);
 
       const submitButton = screen.getByRole("button", {
@@ -355,7 +385,9 @@ describe("BasicInfoForm", () => {
     it("should have proper ARIA attributes for errors", async () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
+      const officeInput = screen.getByLabelText(/^Office Location/, {
+        selector: "input",
+      });
       await user.clear(officeInput);
 
       const submitButton = screen.getByRole("button", {
@@ -365,14 +397,19 @@ describe("BasicInfoForm", () => {
 
       const errorMessage = screen.getByText("Office location is required");
       expect(errorMessage).toHaveAttribute("id", "officeNumber-error");
-      expect(officeInput).toHaveAttribute("aria-describedby", "officeNumber-error");
+      expect(officeInput).toHaveAttribute(
+        "aria-describedby",
+        "officeNumber-error"
+      );
       expect(officeInput).toHaveAttribute("aria-invalid", "true");
     });
 
     it("should have required attributes on required inputs", () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const officeInput = screen.getByLabelText(/^Office Location/, { selector: "input" });
+      const officeInput = screen.getByLabelText(/^Office Location/, {
+        selector: "input",
+      });
 
       // Check for aria-required on required fields
       expect(officeInput).toHaveAttribute("aria-required", "true");
@@ -381,7 +418,9 @@ describe("BasicInfoForm", () => {
     it("should not have required attribute on optional subtitle", () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
-      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" });
+      const subtitleInput = screen.getByLabelText(/^Subtitle \(optional\)/, {
+        selector: "input",
+      });
 
       // Subtitle is optional, so aria-required should be false
       expect(subtitleInput).toHaveAttribute("aria-required", "false");
@@ -391,10 +430,14 @@ describe("BasicInfoForm", () => {
       render(<BasicInfoForm doorcard={mockDoorcard} />);
 
       await user.tab(); // Focus first editable input (subtitle)
-      expect(screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" })).toHaveFocus();
+      expect(
+        screen.getByLabelText(/^Subtitle \(optional\)/, { selector: "input" })
+      ).toHaveFocus();
 
       await user.tab(); // Focus second editable input (office location)
-      expect(screen.getByLabelText(/^Office Location/, { selector: "input" })).toHaveFocus();
+      expect(
+        screen.getByLabelText(/^Office Location/, { selector: "input" })
+      ).toHaveFocus();
 
       await user.tab(); // Focus submit button
       expect(

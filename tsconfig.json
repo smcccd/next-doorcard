@@ -1,15 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "types": [
-      "vitest/globals",
-      "@testing-library/jest-dom"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -27,9 +20,7 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ]
+      "@/*": ["./*"]
     }
   },
   "include": [
@@ -50,14 +41,12 @@
     "**/*.test.tsx",
     "**/*.spec.ts",
     "**/*.spec.tsx",
-    "scripts/analyze-import-rejects.ts",
-    "scripts/import-legacy-debug.ts",
-    "scripts/import-legacy.ts",
-    "scripts/import-worker.ts",
-    "scripts/local-migration-test.ts",
-    "scripts/neon-migration-deploy.ts",
-    "scripts/production-migration-final.ts",
-    "scripts/production-migration-monitor.ts",
-    "scripts/test-calendar-fix.ts"
+    "scripts/migration/import-legacy-debug.ts",
+    "scripts/migration/import-legacy.ts",
+    "scripts/migration/import-worker.ts",
+    "scripts/migration/local-migration-test.ts",
+    "scripts/migration/neon-migration-deploy.ts",
+    "scripts/migration/production-migration-final.ts",
+    "scripts/migration/production-migration-monitor.ts"
   ]
 }

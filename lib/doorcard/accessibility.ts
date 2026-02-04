@@ -1,5 +1,10 @@
-import { formatTimeRange, ALL_DAYS } from "@/lib/doorcard-constants";
-import type { AppointmentLite, SemanticScheduleData, DoorcardLite, DaySchedule } from "./types";
+import { formatTimeRange, ALL_DAYS } from "@/lib/doorcard/doorcard-constants";
+import type {
+  AppointmentLite,
+  SemanticScheduleData,
+  DoorcardLite,
+  DaySchedule,
+} from "./types";
 import { CATEGORY_LABELS } from "./print-optimization";
 
 /**
@@ -13,18 +18,22 @@ export function createSemanticScheduleData(
   doorcard: DoorcardLite,
   includeWeekends = false
 ): SemanticScheduleData {
-  const daysToInclude = includeWeekends 
-    ? ALL_DAYS.map(d => d.key)
-    : ALL_DAYS.filter(d => d.key !== 'SATURDAY' && d.key !== 'SUNDAY').map(d => d.key);
+  const daysToInclude = includeWeekends
+    ? ALL_DAYS.map((d) => d.key)
+    : ALL_DAYS.filter((d) => d.key !== "SATURDAY" && d.key !== "SUNDAY").map(
+        (d) => d.key
+      );
 
-  const daySchedules: DaySchedule[] = daysToInclude.map(dayKey => {
-    const dayAppointments = doorcard.appointments.filter(apt => apt.dayOfWeek === dayKey);
-    
+  const daySchedules: DaySchedule[] = daysToInclude.map((dayKey) => {
+    const dayAppointments = doorcard.appointments.filter(
+      (apt) => apt.dayOfWeek === dayKey
+    );
+
     return {
       dayKey,
       dayLabel: dayKey.charAt(0) + dayKey.slice(1).toLowerCase(),
       appointments: dayAppointments,
-      hasAppointments: dayAppointments.length > 0
+      hasAppointments: dayAppointments.length > 0,
     };
   });
 
@@ -34,9 +43,9 @@ export function createSemanticScheduleData(
     officeInfo: doorcard.officeNumber || "Office TBD",
     website: doorcard.user?.website || undefined,
     daySchedules,
-    hasWeekendAppointments: doorcard.appointments.some(apt => 
-      apt.dayOfWeek === 'SATURDAY' || apt.dayOfWeek === 'SUNDAY'
-    )
+    hasWeekendAppointments: doorcard.appointments.some(
+      (apt) => apt.dayOfWeek === "SATURDAY" || apt.dayOfWeek === "SUNDAY"
+    ),
   };
 }
 

@@ -93,9 +93,12 @@ Sentry.init({
       "analytics",
     ];
 
-    if (ignoredErrors.some((ignored) =>
-      errorMessage.includes(ignored) || errorType.includes(ignored)
-    )) {
+    if (
+      ignoredErrors.some(
+        (ignored) =>
+          errorMessage.includes(ignored) || errorType.includes(ignored)
+      )
+    ) {
       return null;
     }
 
@@ -130,11 +133,7 @@ Sentry.init({
 
     // Only track important API routes
     const url = event.transaction || "";
-    const importantRoutes = [
-      "/api/doorcards",
-      "/api/auth",
-      "/api/admin",
-    ];
+    const importantRoutes = ["/api/doorcards", "/api/auth", "/api/admin"];
 
     // Drop transaction if it's not an important route
     if (!importantRoutes.some((route) => url.includes(route))) {

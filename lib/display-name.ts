@@ -1,5 +1,50 @@
 import type { DisplayNameFormat } from "@prisma/client";
 
+/**
+ * Simple user profile for deriving display names.
+ * Used by server actions when creating/updating doorcards.
+ */
+export interface UserProfile {
+  firstName?: string | null;
+  lastName?: string | null;
+  title?: string | null;
+  name?: string | null;
+  email?: string | null;
+}
+
+/**
+ * Derives a display name from user profile data.
+ * This is a simpler version for server-side use that doesn't use the format system.
+ *
+ * Priority:
+ * 1. Title + FirstName + LastName (if title exists and isn't "none")
+ * 2. FirstName + LastName
+ * 3. Legacy name field
+ * 4. Email username
+ * 5. "Faculty Member" fallback
+ *
+ * @param profile - User profile data
+ * @returns The derived display name
+ */
+export function deriveDisplayName(profile: UserProfile): string {
+  if (profile.firstName && profile.lastName) {
+    if (profile.title && profile.title !== "none") {
+      return `${profile.title} ${profile.firstName} ${profile.lastName}`;
+    }
+    return `${profile.firstName} ${profile.lastName}`;
+  }
+
+  if (profile.name) {
+    return profile.name;
+  }
+
+  if (profile.email) {
+    return profile.email.split("@")[0] || "Faculty Member";
+  }
+
+  return "Faculty Member";
+}
+
 export interface UserDisplayInfo {
   firstName?: string | null;
   lastName?: string | null;
@@ -173,7 +218,7 @@ export const COLLEGE_OPTIONS = [
  * getCollegeDisplayName("CSM") // Returns "College of San Mateo"
  */
 export function getCollegeDisplayName(college: string): string {
-  const option = COLLEGE_OPTIONS.find(opt => opt.value === college);
+  const option = COLLEGE_OPTIONS.find((opt) => opt.value === college);
   return option?.label || college;
 }
 

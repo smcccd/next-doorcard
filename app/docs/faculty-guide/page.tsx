@@ -1,4 +1,4 @@
-import { DocsPageWrapper } from "@/components/DocsPageWrapper";
+import { DocsPageWrapper } from "@/components/layout/DocsPageWrapper";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {

@@ -13,7 +13,7 @@ import {
   Clock,
   X,
 } from "lucide-react";
-import { SearchAutocomplete } from "@/components/SearchAutocomplete";
+import { SearchAutocomplete } from "@/components/search/SearchAutocomplete";
 import { type AutocompleteSuggestion } from "@/hooks/useSearchAutocomplete";
 import { College } from "@/types/doorcard";
 

@@ -10,13 +10,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Search, Clock, Calendar, Building2 } from "lucide-react";
-import { SearchAutocomplete } from "@/components/SearchAutocomplete";
+import { SearchAutocomplete } from "@/components/search/SearchAutocomplete";
 import { type AutocompleteSuggestion } from "@/hooks/useSearchAutocomplete";
 import { getAllDepartments } from "@/lib/departments";
-import { ActiveTermInfo } from "@/lib/active-term";
+import { ActiveTermInfo } from "@/lib/term/active-term";
 import { College } from "@/types/doorcard";
 import { DayOfWeek } from "@prisma/client";
-import CollegeLogo from "@/components/CollegeLogo";
+import CollegeLogo from "@/components/logos/CollegeLogo";
 
 interface SearchFormProps {
   searchTerm: string;

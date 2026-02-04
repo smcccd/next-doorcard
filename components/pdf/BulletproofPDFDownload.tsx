@@ -4,7 +4,7 @@ import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { FileDown, Loader2, AlertCircle, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { DoorcardLite } from "../UnifiedDoorcard";
+import { DoorcardLite } from "../doorcard/UnifiedDoorcard";
 import { analytics } from "@/lib/analytics";
 import { formatDisplayName } from "@/lib/display-name";
 import {
@@ -12,7 +12,7 @@ import {
   CATEGORY_LABELS,
   TIME_SLOTS,
   WEEKDAYS_ONLY,
-} from "@/lib/doorcard-constants";
+} from "@/lib/doorcard/doorcard-constants";
 
 type PDFState =
   | "idle"
@@ -479,8 +479,8 @@ export function BulletproofPDFDownload({
       URL.revokeObjectURL(url);
 
       return true;
-    } catch (err) {
-      console.warn("React PDF download failed:", err);
+    } catch {
+      // React PDF download failed, will try fallback
       return false;
     }
   }, [doorcard]);
@@ -511,8 +511,8 @@ export function BulletproofPDFDownload({
       });
 
       return true;
-    } catch (err) {
-      console.warn("Blob download failed:", err);
+    } catch {
+      // Blob download failed, will try fallback
       return false;
     }
   }, [doorcard, toast]);
@@ -543,8 +543,8 @@ export function BulletproofPDFDownload({
       };
 
       return true;
-    } catch (err) {
-      console.warn("Print dialog failed:", err);
+    } catch {
+      // Print dialog failed, will try fallback
       return false;
     }
   }, [doorcard, toast]);
@@ -584,10 +584,6 @@ export function BulletproofPDFDownload({
       analytics.trackPrint(doorcardId, "download");
     }
 
-    // Track attempt
-    if (process.env.NODE_ENV === "development") {
-      console.log(`PDF download attempt - Browser: ${browserInfo.current.name}`);
-    }
 
     try {
       // Method 1: Try React PDF first (skip on Firefox due to known issues)
@@ -641,7 +637,6 @@ export function BulletproofPDFDownload({
       // Reset state after a delay
       setTimeout(() => setState("idle"), 3000);
     } catch (err) {
-      console.error("All PDF download methods failed:", err);
       setState("error");
       setError(err instanceof Error ? err.message : "Download failed");
 

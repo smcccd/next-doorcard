@@ -2,14 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
-import { DoorcardLite } from "../UnifiedDoorcard";
+import { DoorcardLite } from "../doorcard/UnifiedDoorcard";
 import { formatDisplayName } from "@/lib/display-name";
 import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,
   TIME_SLOTS,
   ALL_DAYS,
-} from "@/lib/doorcard-constants";
+} from "@/lib/doorcard/doorcard-constants";
 
 // Appointment interface for PDF generation
 interface AppointmentForPDF {

@@ -1,9 +1,9 @@
 import { render, screen } from "@testing-library/react";
-import { UnifiedDoorcard } from "@/components/UnifiedDoorcard";
+import { UnifiedDoorcard } from "@/components/doorcard/UnifiedDoorcard";
 import type {
   DoorcardLite,
   AppointmentLite,
-} from "@/components/UnifiedDoorcard";
+} from "@/components/doorcard/UnifiedDoorcard";
 
 describe("UnifiedDoorcard", () => {
   const mockDoorcard: DoorcardLite = {

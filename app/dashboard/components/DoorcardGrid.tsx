@@ -26,8 +26,8 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { type College, COLLEGE_META } from "@/types/doorcard";
-import { getDoorcardDisplayStatus } from "@/lib/doorcard-status";
-import { generateDoorcardTitle } from "@/lib/doorcard-title-generator";
+import { getDoorcardDisplayStatus } from "@/lib/doorcard/doorcard-status";
+import { generateDoorcardTitle } from "@/lib/doorcard/doorcard-title-generator";
 import type { Doorcard, Appointment, User, TermSeason } from "@prisma/client";
 
 interface Props {
@@ -48,13 +48,13 @@ function getDoorcardTitleInfo(doorcard: Doorcard) {
     term: doorcard.term,
     year: doorcard.year,
   });
-  
+
   const subtitle = doorcard.doorcardName || "";
-  
-  const displayName = subtitle 
+
+  const displayName = subtitle
     ? `${doorcardTitle} - ${subtitle}`
     : doorcardTitle;
-    
+
   return { doorcardTitle, subtitle, displayName };
 }
 
@@ -131,7 +131,8 @@ function DeleteButton({
   };
 
   const isLive = displayStatus.status === "live";
-  const { doorcardTitle, subtitle, displayName } = getDoorcardTitleInfo(doorcard);
+  const { doorcardTitle, subtitle, displayName } =
+    getDoorcardTitleInfo(doorcard);
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -212,7 +213,8 @@ function DoorcardCard({
   activeTerm?: { season: TermSeason; year: number } | null;
 }) {
   const displayStatus = getDoorcardDisplayStatus(doorcard, activeTerm);
-  const { doorcardTitle, subtitle, displayName } = getDoorcardTitleInfo(doorcard);
+  const { doorcardTitle, subtitle, displayName } =
+    getDoorcardTitleInfo(doorcard);
 
   // Determine the correct view URL based on doorcard status
   const getViewUrl = () => {
@@ -383,7 +385,8 @@ function DoorcardRow({
   activeTerm?: { season: TermSeason; year: number } | null;
 }) {
   const displayStatus = getDoorcardDisplayStatus(doorcard, activeTerm);
-  const { doorcardTitle, subtitle, displayName } = getDoorcardTitleInfo(doorcard);
+  const { doorcardTitle, subtitle, displayName } =
+    getDoorcardTitleInfo(doorcard);
 
   // Determine the correct view URL based on doorcard status
   const getViewUrl = () => {

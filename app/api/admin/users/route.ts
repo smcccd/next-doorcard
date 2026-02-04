@@ -1,41 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { requireAdminUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
 import { PrismaErrorHandler } from "@/lib/prisma-error-handler";
 import { logger } from "@/lib/logger";
 import { z } from "zod";
 
 const queryParamsSchema = z.object({
-  limit: z.string().optional().transform((val) => {
-    const parsed = parseInt(val || "50");
-    return isNaN(parsed) || parsed < 1 || parsed > 100 ? 50 : parsed;
-  }),
-  offset: z.string().optional().transform((val) => {
-    const parsed = parseInt(val || "0");
-    return isNaN(parsed) || parsed < 0 ? 0 : parsed;
-  }),
-  search: z.string().optional().transform((val) => (val || "").trim()),
-  campus: z.enum(["all", "SKYLINE", "CSM", "CANADA", "DISTRICT_OFFICE"]).optional().default("all"),
+  limit: z
+    .string()
+    .optional()
+    .transform((val) => {
+      const parsed = parseInt(val || "50");
+      return isNaN(parsed) || parsed < 1 || parsed > 100 ? 50 : parsed;
+    }),
+  offset: z
+    .string()
+    .optional()
+    .transform((val) => {
+      const parsed = parseInt(val || "0");
+      return isNaN(parsed) || parsed < 0 ? 0 : parsed;
+    }),
+  search: z
+    .string()
+    .optional()
+    .transform((val) => (val || "").trim()),
+  campus: z
+    .enum(["all", "SKYLINE", "CSM", "CANADA", "DISTRICT_OFFICE"])
+    .optional()
+    .default("all"),
 });
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Check if user is admin
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { role: true },
-    });
-
-    if (user?.role !== "ADMIN") {
+    const authResult = await requireAdminUserAPI();
+    if ("error" in authResult) {
       return NextResponse.json(
-        { error: "Forbidden - Admin access required" },
-        { status: 403 }
+        { error: authResult.error },
+        { status: authResult.status }
       );
     }
 
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const rawParams = {
       limit: searchParams.get("limit"),
-      offset: searchParams.get("offset"), 
+      offset: searchParams.get("offset"),
       search: searchParams.get("search"),
       campus: searchParams.get("campus"),
     };
@@ -51,7 +52,10 @@ export async function GET(req: NextRequest) {
     const validationResult = queryParamsSchema.safeParse(rawParams);
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Invalid query parameters", details: validationResult.error.errors },
+        {
+          error: "Invalid query parameters",
+          details: validationResult.error.errors,
+        },
         { status: 400 }
       );
     }
@@ -79,7 +83,7 @@ export async function GET(req: NextRequest) {
       };
     }
 
-    // Get users with related data
+    // Get users with aggregated counts (optimized to avoid N+1)
     const users = await prisma.user.findMany({
       where,
       select: {
@@ -97,15 +101,13 @@ export async function GET(req: NextRequest) {
             Doorcard: true,
           },
         },
+        // Only get the first doorcard's college for primary campus (not all doorcards)
         Doorcard: {
           select: {
             college: true,
-            _count: {
-              select: {
-                Appointment: true,
-              },
-            },
           },
+          take: 1,
+          orderBy: { createdAt: "desc" },
         },
       },
       orderBy: [{ createdAt: "desc" }],
@@ -113,17 +115,42 @@ export async function GET(req: NextRequest) {
       skip: offset,
     });
 
+    // Get appointment counts in a single aggregated query
+    const userIds = users.map((u) => u.id);
+    const appointmentCounts = await prisma.appointment.groupBy({
+      by: ["doorcardId"],
+      where: {
+        Doorcard: {
+          userId: { in: userIds },
+        },
+      },
+      _count: { _all: true },
+    });
+
+    // Get doorcard to user mapping for appointment count aggregation
+    const doorcardUserMap = await prisma.doorcard.findMany({
+      where: { userId: { in: userIds } },
+      select: { id: true, userId: true },
+    });
+
+    // Create a map of userId -> total appointment count
+    const userAppointmentCounts = new Map<string, number>();
+    for (const doorcard of doorcardUserMap) {
+      const countRecord = appointmentCounts.find((a) => a.doorcardId === doorcard.id);
+      const count = countRecord?._count?._all ?? 0;
+      userAppointmentCounts.set(
+        doorcard.userId,
+        (userAppointmentCounts.get(doorcard.userId) ?? 0) + count
+      );
+    }
+
     // Process the data to include computed fields
     const processedUsers = users.map((user) => {
       const doorcardCount = user._count.Doorcard;
-      const appointmentCount = user.Doorcard.reduce(
-        (total, doorcard) => total + doorcard._count.Appointment,
-        0
-      );
+      const appointmentCount = userAppointmentCounts.get(user.id) ?? 0;
 
-      // Get primary campus from doorcards
-      const campuses = user.Doorcard.map((d) => d.college).filter(Boolean);
-      const primaryCampus = campuses.length > 0 ? campuses[0] : user.college;
+      // Get primary campus from first doorcard or user's college
+      const primaryCampus = user.Doorcard[0]?.college ?? user.college;
 
       return {
         id: user.id,

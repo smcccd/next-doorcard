@@ -43,7 +43,8 @@ export function getFeatureFlags(): FeatureFlags {
     enableAnalytics: env.isProduction || env.isPreview,
 
     // Development Features
-    enableMockData: env.isDevelopment && process.env.ENABLE_MOCK_DATA === "true",
+    enableMockData:
+      env.isDevelopment && process.env.ENABLE_MOCK_DATA === "true",
     enableDevTools: env.isDevelopment,
   };
 }

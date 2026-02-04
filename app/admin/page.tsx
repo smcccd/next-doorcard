@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -180,11 +180,7 @@ export default function AdminPage() {
   const [loadingUserDetails, setLoadingUserDetails] = useState(false);
   const [archivingTerm, setArchivingTerm] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchAdminData();
-  }, []);
-
-  const fetchAdminData = async () => {
+  const fetchAdminData = useCallback(async () => {
     try {
       setLoading(true);
       const [statsRes, usersRes, doorcardsRes, termsRes] = await Promise.all([
@@ -223,7 +219,11 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchAdminData();
+  }, [fetchAdminData]);
 
   const fetchUserDetails = async (userId: string) => {
     try {
@@ -349,30 +349,34 @@ export default function AdminPage() {
     return colors[category as keyof typeof colors] || colors.OTHER;
   };
 
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      !searchQuery ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.username.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const matchesSearch =
+        !searchQuery ||
+        user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        user.username.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCampus =
-      campusFilter === "all" || user.college === campusFilter;
+      const matchesCampus =
+        campusFilter === "all" || user.college === campusFilter;
 
-    return matchesSearch && matchesCampus;
-  });
+      return matchesSearch && matchesCampus;
+    });
+  }, [users, searchQuery, campusFilter]);
 
-  const filteredDoorcards = doorcards.filter((doorcard) => {
-    const matchesSearch =
-      !searchQuery ||
-      doorcard.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doorcard.user.email.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredDoorcards = useMemo(() => {
+    return doorcards.filter((doorcard) => {
+      const matchesSearch =
+        !searchQuery ||
+        doorcard.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        doorcard.user.email.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesCampus =
-      campusFilter === "all" || doorcard.college === campusFilter;
+      const matchesCampus =
+        campusFilter === "all" || doorcard.college === campusFilter;
 
-    return matchesSearch && matchesCampus;
-  });
+      return matchesSearch && matchesCampus;
+    });
+  }, [doorcards, searchQuery, campusFilter]);
 
   if (loading) {
     return (

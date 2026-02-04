@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { College, DayOfWeek, AppointmentCategory } from "@prisma/client";
+import { College } from "@prisma/client";
+
+// Re-export time block schema from consolidated source
+export {
+  timeBlockFormSchema as timeBlockSchema,
+  type TimeBlockForm,
+} from "./time-block";
 
 /**
  * Schema for the "basic info" step.
@@ -14,37 +20,15 @@ export const basicInfoSchema = z.object({
 });
 
 /**
- * A single time block row. Times use 24h HH:mm format.
- */
-export const timeBlockSchema = z
-  .object({
-    id: z.string(),
-    day: z.nativeEnum(DayOfWeek, { required_error: "Day is required" }),
-    startTime: z
-      .string()
-      .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Invalid time format (HH:mm)"),
-    endTime: z
-      .string()
-      .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Invalid time format (HH:mm)"),
-    activity: z.string().min(1, "Activity is required"),
-    location: z.string().nullable().optional(),
-    category: z.nativeEnum(AppointmentCategory).optional(),
-  })
-  .refine((val) => val.endTime > val.startTime, {
-    message: "End time must be after start time",
-    path: ["endTime"],
-  });
-
-/**
  * Full doorcard editor schema (basic info + time blocks).
  */
+import { timeBlockFormSchema } from "./time-block";
 export const doorcardEditorSchema = basicInfoSchema.extend({
   timeBlocks: z
-    .array(timeBlockSchema)
+    .array(timeBlockFormSchema)
     .min(1, "At least one time block is required"),
 });
 
 /* ----- Inferred Types ----- */
 export type BasicInfoForm = z.infer<typeof basicInfoSchema>;
-export type TimeBlockForm = z.infer<typeof timeBlockSchema>;
 export type DoorcardForm = z.infer<typeof doorcardEditorSchema>;

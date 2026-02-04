@@ -16,13 +16,12 @@ export async function GET(
     const resolvedParams = await params;
     const { username } = resolvedParams;
 
-    // Find the target user (allow username, email, or name contains)
+    // Find the target user by exact username or email match
     const user = await prisma.user.findFirst({
       where: {
         OR: [
           { username: username },
           { email: username },
-          { name: { contains: username } },
         ],
       },
       select: { id: true },

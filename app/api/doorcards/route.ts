@@ -5,9 +5,10 @@ import { doorcardSchema } from "@/lib/validations/doorcard";
 import { z } from "zod";
 import crypto from "crypto";
 import { PrismaErrorHandler, withRetry } from "@/lib/prisma-error-handler";
-import { validateAppointments } from "@/lib/appointment-validation";
-import { applyRateLimit, apiRateLimit } from "@/lib/rate-limit";
-import { sanitizeDoorcardData, sanitizeAppointmentData } from "@/lib/sanitize";
+import { validateAppointments } from "@/lib/doorcard/appointment-validation";
+import { applyRateLimit, apiRateLimit } from "@/lib/api/rate-limit";
+import { sanitizeDoorcardData, sanitizeAppointmentData } from "@/lib/api/sanitize";
+import { deriveDisplayName } from "@/lib/display-name";
 import { logger } from "@/lib/logger";
 
 export async function POST(req: NextRequest) {
@@ -62,24 +63,15 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Derive name from user profile
+      // Derive name from user profile using shared utility
       const userProfile = await prisma.user.findUnique({
         where: { id: user.id },
         select: { firstName: true, lastName: true, title: true, name: true },
       });
 
-      let displayName = "";
-      if (userProfile?.firstName && userProfile?.lastName) {
-        if (userProfile.title && userProfile.title !== "none") {
-          displayName = `${userProfile.title} ${userProfile.firstName} ${userProfile.lastName}`;
-        } else {
-          displayName = `${userProfile.firstName} ${userProfile.lastName}`;
-        }
-      } else if (userProfile?.name) {
-        displayName = userProfile.name;
-      }
+      const displayName = deriveDisplayName(userProfile || {});
 
-      if (!displayName) {
+      if (displayName === "Faculty Member") {
         return NextResponse.json(
           {
             error:

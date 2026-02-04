@@ -5,7 +5,7 @@ import {
   getTermStatus,
   categorizeDoorcards,
   getDoorcardDisplayStatus,
-} from "../doorcard-status";
+} from "../doorcard/doorcard-status";
 import type { Doorcard } from "@prisma/client";
 
 // Mock Date for consistent testing

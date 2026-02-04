@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
-import type { ApiErrorResponse } from "./error-handler";
+import type { ApiErrorResponse } from "./api/error-handler";
 
 export class PrismaErrorHandler {
   static handle(error: unknown): NextResponse<ApiErrorResponse> {

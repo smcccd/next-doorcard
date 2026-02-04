@@ -1,13 +1,13 @@
 // app/dashboard/page.tsx
 import { prisma } from "@/lib/prisma";
 import { requireAuthUser } from "@/lib/require-auth-user";
-import { categorizeDoorcards } from "@/lib/doorcard-status";
+import { categorizeDoorcards } from "@/lib/doorcard/doorcard-status";
 import NewDoorcardButton from "./components/NewDoorcardButton";
 import DoorcardGrid from "./components/DoorcardGrid";
-import { ProfileBanner } from "@/components/ProfileBanner";
+import { ProfileBanner } from "@/components/profile/ProfileBanner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Eye, Calendar, Clock } from "lucide-react";
-import { getCurrentAcademicTerm } from "@/lib/active-term";
+import { getCurrentAcademicTerm } from "@/lib/term/active-term";
 
 import type { Doorcard, Appointment, User, TermSeason } from "@prisma/client";
 

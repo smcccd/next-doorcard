@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { logger } from "@/lib/logger";
-import { fetchWithTimeout, fetchPresets } from "@/lib/fetch-with-timeout";
+import { fetchWithTimeout, fetchPresets } from "@/lib/api/fetch-with-timeout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,7 +82,10 @@ export default function ProfilePage() {
         return;
       }
 
-      const response = await fetchWithTimeout("/api/user/profile", fetchPresets.standard);
+      const response = await fetchWithTimeout(
+        "/api/user/profile",
+        fetchPresets.standard
+      );
       logger.debug("[Profile] Response status:", response.status);
       logger.debug(
         "[Profile] Response headers:",

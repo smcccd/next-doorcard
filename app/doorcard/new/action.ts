@@ -5,44 +5,31 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAuthUserAPI } from "@/lib/require-auth-user";
 import { prisma } from "@/lib/prisma";
-import type { College, TermSeason } from "@prisma/client";
-import { generateDoorcardTitle } from "@/lib/doorcard-title-generator";
+import type { College } from "@prisma/client";
+import { generateDoorcardTitle } from "@/lib/doorcard/doorcard-title-generator";
+import { deriveDisplayName, getCollegeDisplayName } from "@/lib/display-name";
+import {
+  TERM_DISPLAY_VALUES,
+  CAMPUS_VALUES,
+  toEnumSeason,
+} from "@/lib/term/term-management";
+import { logger } from "@/lib/logger";
 import crypto from "crypto";
 
 type ActionResult = { success: boolean; message?: string };
 
-const CAMPUS_VALUES = ["SKYLINE", "CSM", "CANADA"] as const;
-const TERM_DISPLAY = ["Fall", "Spring", "Summer"] as const;
-
 const campusTermSchema = z.object({
-  term: z.enum(TERM_DISPLAY),
+  term: z.enum(TERM_DISPLAY_VALUES),
   year: z.coerce.number().int().min(2000).max(2100),
   college: z.enum(CAMPUS_VALUES, {
     errorMap: () => ({ message: "Campus is required" }),
   }),
 });
 
-function toEnumSeason(display: (typeof TERM_DISPLAY)[number]): TermSeason {
-  return display.toUpperCase() as TermSeason;
-}
-
 async function requireAuth() {
   const authResult = await requireAuthUserAPI();
   if ("error" in authResult) throw new Error(authResult.error);
   return authResult.user;
-}
-
-function campusLabel(code: string) {
-  switch (code) {
-    case "SKYLINE":
-      return "Skyline College";
-    case "CSM":
-      return "College of San Mateo";
-    case "CANADA":
-      return "Cañada College";
-    default:
-      return code;
-  }
 }
 
 function handleActionError(err: unknown): ActionResult {
@@ -69,8 +56,7 @@ function handleActionError(err: unknown): ActionResult {
 export async function handleNewDoorcardForm(formData: FormData): Promise<void> {
   let newDoorcardId: string | null = null;
 
-  // Log for debugging
-  console.log("[NEW_DOORCARD] Starting form submission", {
+  logger.debug("[NEW_DOORCARD] Starting form submission", {
     term: formData.get("term"),
     year: formData.get("year"),
     college: formData.get("college"),
@@ -78,19 +64,19 @@ export async function handleNewDoorcardForm(formData: FormData): Promise<void> {
 
   try {
     const user = await requireAuth();
-    console.log("[NEW_DOORCARD] User authenticated", { userId: user.id });
+    logger.debug("[NEW_DOORCARD] User authenticated", { userId: user.id });
 
     const data = campusTermSchema.parse({
       term: formData.get("term"),
       year: formData.get("year"),
       college: formData.get("college"),
     });
-    console.log("[NEW_DOORCARD] Data validated", data);
+    logger.debug("[NEW_DOORCARD] Data validated", data);
 
     // Multiple doorcards per term are now allowed - no need to check for existing
 
     // Get user's profile info for smart defaults
-    console.log("[NEW_DOORCARD] Fetching user profile");
+    logger.debug("[NEW_DOORCARD] Fetching user profile");
     const userProfile = await prisma.user.findUnique({
       where: { id: user.id },
       select: {
@@ -101,39 +87,15 @@ export async function handleNewDoorcardForm(formData: FormData): Promise<void> {
         college: true,
       },
     });
-    console.log("[NEW_DOORCARD] User profile fetched", {
+    logger.debug("[NEW_DOORCARD] User profile fetched", {
       hasProfile: !!userProfile,
     });
 
-    // Create smart default display name with better error handling
-    let defaultDisplayName = "";
-    try {
-      if (userProfile?.firstName && userProfile?.lastName) {
-        // Use firstName/lastName if available
-        if (userProfile.title && userProfile.title !== "none") {
-          defaultDisplayName = `${userProfile.title} ${userProfile.firstName} ${userProfile.lastName}`;
-        } else {
-          defaultDisplayName = `${userProfile.firstName} ${userProfile.lastName}`;
-        }
-      } else if (userProfile?.name) {
-        // Fallback to legacy name field
-        defaultDisplayName = userProfile.name;
-      } else {
-        // Ultimate fallback
-        defaultDisplayName = user.email?.split("@")[0] || "Faculty Member";
-      }
-    } catch (nameError) {
-      console.warn(
-        "[NEW_DOORCARD] Error generating display name, using fallback",
-        nameError
-      );
-      defaultDisplayName = user.email?.split("@")[0] || "Faculty Member";
-    }
-
-    // Ensure we have a non-empty display name
-    if (!defaultDisplayName || defaultDisplayName.trim() === "") {
-      defaultDisplayName = "Faculty Member";
-    }
+    // Create smart default display name using shared utility
+    const defaultDisplayName = deriveDisplayName({
+      ...userProfile,
+      email: user.email,
+    });
 
     // Generate automatic doorcard title using the new convention
     const doorcardTitle = generateDoorcardTitle({
@@ -142,7 +104,7 @@ export async function handleNewDoorcardForm(formData: FormData): Promise<void> {
       year: data.year,
     });
 
-    console.log("[NEW_DOORCARD] Creating doorcard", {
+    logger.debug("[NEW_DOORCARD] Creating doorcard", {
       name: defaultDisplayName,
       doorcardTitle: doorcardTitle,
       doorcardName: "", // Now used as optional subtitle
@@ -168,11 +130,11 @@ export async function handleNewDoorcardForm(formData: FormData): Promise<void> {
       },
     });
     newDoorcardId = newDoorcard.id;
-    console.log("[NEW_DOORCARD] Doorcard created successfully", {
+    logger.debug("[NEW_DOORCARD] Doorcard created successfully", {
       id: newDoorcardId,
     });
   } catch (error: any) {
-    console.error("[NEW_DOORCARD] Error creating doorcard:", {
+    logger.error("[NEW_DOORCARD] Error creating doorcard:", {
       error: error.message,
       stack: error.stack,
       name: error.name,

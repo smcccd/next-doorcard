@@ -3,8 +3,8 @@
 
 import { useState, useEffect } from "react";
 import { TermSeason } from "@prisma/client";
-import { getCurrentAcademicTerm, type ActiveTermInfo } from "@/lib/active-term";
-import { api } from "@/lib/api-client";
+import { getCurrentAcademicTerm, type ActiveTermInfo } from "@/lib/term/active-term";
+import { api } from "@/lib/api/api-client";
 import { useNetworkStatus } from "@/hooks/useNetworkStatus";
 
 export function useActiveTerm() {
@@ -29,8 +29,14 @@ export function useActiveTerm() {
 
       try {
         const response = await api.terms.getActive();
-        
-        if (response.success && response.data && typeof response.data === 'object' && 'activeTerm' in response.data && response.data.activeTerm) {
+
+        if (
+          response.success &&
+          response.data &&
+          typeof response.data === "object" &&
+          "activeTerm" in response.data &&
+          response.data.activeTerm
+        ) {
           const activeTerm = response.data.activeTerm as any;
           // Use term from database
           setActiveTerm({

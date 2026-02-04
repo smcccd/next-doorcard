@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuthUserAPI } from "@/lib/require-auth-user";
-import { TermManager } from "@/lib/term-management";
+import { requireAdminUserAPI } from "@/lib/require-auth-user";
+import { TermManager } from "@/lib/term/term-management";
 
-// POST /api/terms/archive - Archive a specific term
+// POST /api/terms/archive - Archive a specific term (admin only)
 export async function POST(request: NextRequest) {
   try {
-    const session = await requireAuthUserAPI();
+    const session = await requireAdminUserAPI();
 
     if ("error" in session) {
       return NextResponse.json(
@@ -42,10 +42,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/terms/archive/auto - Auto-archive expired terms
+// GET /api/terms/archive/auto - Auto-archive expired terms (admin only)
 export async function GET() {
   try {
-    const session = await requireAuthUserAPI();
+    const session = await requireAdminUserAPI();
 
     if ("error" in session) {
       return NextResponse.json(

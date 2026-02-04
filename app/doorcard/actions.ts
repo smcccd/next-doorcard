@@ -9,28 +9,28 @@ import { timeBlockSchema } from "@/lib/validations/doorcard-edit";
 import {
   validateAppointments,
   normalizeAppointments,
-} from "@/lib/appointment-validation";
-import type { College, TermSeason } from "@prisma/client";
+} from "@/lib/doorcard/appointment-validation";
+import { captureAndLogError } from "@/lib/api/error-handler";
+import { deriveDisplayName, getCollegeDisplayName } from "@/lib/display-name";
+import {
+  TERM_DISPLAY_VALUES,
+  CAMPUS_VALUES,
+  toEnumSeason,
+} from "@/lib/term/term-management";
+import type { College } from "@prisma/client";
 import crypto from "crypto";
 
 /* -------------------------------------------------------------------------- */
 /* Schemas / helpers                                                          */
 /* -------------------------------------------------------------------------- */
 
-const CAMPUS_VALUES = ["SKYLINE", "CSM", "CANADA"] as const;
-const TERM_DISPLAY = ["Fall", "Spring", "Summer"] as const;
-
 const campusTermSchema = z.object({
-  term: z.enum(TERM_DISPLAY),
+  term: z.enum(TERM_DISPLAY_VALUES),
   year: z.coerce.number().int().min(2000).max(2100), // coerce form value to number
   college: z.enum(CAMPUS_VALUES, {
     errorMap: () => ({ message: "Campus is required" }),
   }),
 });
-
-function toEnumSeason(display: (typeof TERM_DISPLAY)[number]): TermSeason {
-  return display.toUpperCase() as TermSeason; // "Fall" -> "FALL"
-}
 
 const personalInfoSchema = z.object({
   doorcardName: z.string().optional().default(""),
@@ -45,25 +45,13 @@ async function requireAuth() {
   return authResult.user;
 }
 
-function campusLabel(code: string) {
-  switch (code) {
-    case "SKYLINE":
-      return "Skyline College";
-    case "CSM":
-      return "College of San Mateo";
-    case "CANADA":
-      return "Cañada College";
-    default:
-      return code;
-  }
-}
-
-function handleActionError(err: unknown): ActionResult {
+function handleActionError(err: unknown, context?: { action?: string; doorcardId?: string }): ActionResult {
   // Re-throw redirect errors - they should not be handled as regular errors
   if (err instanceof Error && err.message === "NEXT_REDIRECT") {
     throw err;
   }
 
+  // Don't capture validation errors to Sentry (expected user input errors)
   if (err instanceof z.ZodError) {
     return {
       success: false,
@@ -72,6 +60,16 @@ function handleActionError(err: unknown): ActionResult {
         .join(", ")}`,
     };
   }
+
+  // Capture unexpected errors to Sentry
+  captureAndLogError(err, {
+    tags: {
+      component: "server-action",
+      action: context?.action || "unknown",
+    },
+    extra: { doorcardId: context?.doorcardId },
+  });
+
   return {
     success: false,
     message:
@@ -112,7 +110,7 @@ export async function validateCampusTerm(
     revalidatePath(`/doorcard/${doorcardId}/edit`);
     redirect(`/doorcard/${doorcardId}/edit?step=1`);
   } catch (err) {
-    return handleActionError(err);
+    return handleActionError(err, { action: "validateCampusTerm", doorcardId });
   }
 }
 
@@ -143,19 +141,14 @@ export async function updateBasicInfo(
     });
 
     // Build the display name from user profile
-    let displayName = "";
-    if (userProfile?.firstName && userProfile?.lastName) {
-      if (userProfile.title && userProfile.title !== "none") {
-        displayName = `${userProfile.title} ${userProfile.firstName} ${userProfile.lastName}`;
-      } else {
-        displayName = `${userProfile.firstName} ${userProfile.lastName}`;
-      }
-    } else if (userProfile?.name) {
-      displayName = userProfile.name;
-    }
+    const displayName = deriveDisplayName(userProfile || {});
 
-    if (!displayName) {
-      return { success: false, message: "Unable to determine your name from profile. Please update your profile first." };
+    if (displayName === "Faculty Member") {
+      return {
+        success: false,
+        message:
+          "Unable to determine your name from profile. Please update your profile first.",
+      };
     }
 
     await prisma.doorcard.update({
@@ -167,7 +160,7 @@ export async function updateBasicInfo(
       },
     });
   } catch (err) {
-    return handleActionError(err);
+    return handleActionError(err, { action: "updateBasicInfo", doorcardId });
   }
 
   revalidatePath(`/doorcard/${doorcardId}/edit`);
@@ -255,7 +248,7 @@ export async function updateTimeBlocks(
       throw err; // Re-throw other errors to be handled by outer catch
     }
   } catch (err) {
-    return handleActionError(err);
+    return handleActionError(err, { action: "updateTimeBlocks", doorcardId });
   }
 
   revalidatePath(`/doorcard/${doorcardId}/edit`);
@@ -263,14 +256,22 @@ export async function updateTimeBlocks(
 }
 
 export async function publishDoorcard(doorcardId: string) {
-  const user = await requireAuth();
-  await prisma.doorcard.update({
-    where: { id: doorcardId, userId: user.id },
-    data: { isActive: true, isPublic: true },
-  });
+  try {
+    const user = await requireAuth();
+    await prisma.doorcard.update({
+      where: { id: doorcardId, userId: user.id },
+      data: { isActive: true, isPublic: true },
+    });
 
-  revalidatePath(`/doorcard/${doorcardId}/edit`);
-  revalidatePath("/dashboard");
+    revalidatePath(`/doorcard/${doorcardId}/edit`);
+    revalidatePath("/dashboard");
+  } catch (err) {
+    captureAndLogError(err, {
+      tags: { component: "server-action", action: "publishDoorcard" },
+      extra: { doorcardId },
+    });
+    throw err;
+  }
   redirect("/dashboard");
 }
 
@@ -298,7 +299,7 @@ export async function createDoorcardWithCampusTerm(
     if (existing) {
       return {
         success: false,
-        message: `You already have a doorcard for ${campusLabel(
+        message: `You already have a doorcard for ${getCollegeDisplayName(
           data.college
         )} - ${data.term} ${data.year}. Please edit "${
           existing.doorcardName
@@ -318,22 +319,11 @@ export async function createDoorcardWithCampusTerm(
       },
     });
 
-    // Create smart default display name
-    let defaultDisplayName = "";
-    if (userProfile?.firstName && userProfile?.lastName) {
-      // Use firstName/lastName if available
-      if (userProfile.title && userProfile.title !== "none") {
-        defaultDisplayName = `${userProfile.title} ${userProfile.firstName} ${userProfile.lastName}`;
-      } else {
-        defaultDisplayName = `${userProfile.firstName} ${userProfile.lastName}`;
-      }
-    } else if (userProfile?.name) {
-      // Fallback to legacy name field
-      defaultDisplayName = userProfile.name;
-    } else {
-      // Ultimate fallback
-      defaultDisplayName = user.email?.split("@")[0] || "Faculty Member";
-    }
+    // Create smart default display name using shared utility
+    const defaultDisplayName = deriveDisplayName({
+      ...userProfile,
+      email: user.email,
+    });
 
     // Create smart default doorcard title
     const defaultDoorcardTitle = `${defaultDisplayName}'s ${data.term} ${data.year} Doorcard`;
@@ -355,7 +345,7 @@ export async function createDoorcardWithCampusTerm(
     });
     newDoorcardId = newDoorcard.id;
   } catch (err) {
-    return handleActionError(err);
+    return handleActionError(err, { action: "createDoorcardWithCampusTerm" });
   }
 
   // Revalidate paths to ensure fresh data

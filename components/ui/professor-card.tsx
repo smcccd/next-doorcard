@@ -5,14 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, Calendar } from "lucide-react";
 import { PublicDoorcard } from "@/types/pages/public";
 import { College } from "@/types/doorcard";
-import CollegeLogo from "@/components/CollegeLogo";
+import CollegeLogo from "@/components/logos/CollegeLogo";
 import { TermSeason } from "@prisma/client";
 import {
   isCurrentTerm,
   isPastTerm,
   formatTermDisplay,
-} from "@/lib/active-term";
-import { ActiveTermInfo } from "@/lib/active-term";
+} from "@/lib/term/active-term";
+import { ActiveTermInfo } from "@/lib/term/active-term";
 
 // College display names for badges
 const COLLEGE_BADGE_NAMES: Record<College, string> = {

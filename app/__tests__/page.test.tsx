@@ -14,7 +14,7 @@ import {
   act,
 } from "@testing-library/react";
 import Home from "../page";
-import { HomePageObject } from "@/lib/test-page-objects";
+import { HomePageObject } from "@/lib/testing/test-page-objects";
 
 // Mock the router
 const mockPush = vi.fn();

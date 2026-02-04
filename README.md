@@ -1,6 +1,7 @@
 # Next Doorcard - Faculty Digital Doorcard System
 
-A Next.js application for creating and managing digital doorcards for faculty members at SMCCD.
+A Next.js application for creating and managing digital doorcards for faculty
+members at SMCCD.
 
 ## Tech Stack
 
@@ -36,9 +37,11 @@ auto-updates as you edit the file with Turbopack's lightning-fast Fast Refresh.
 
 ## Environment Setup
 
-See [docs/ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md) for detailed configuration instructions.
+See [docs/ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md) for detailed
+configuration instructions.
 
 Quick start:
+
 ```bash
 cp .env.example .env.local
 # Edit .env.local with your credentials
@@ -61,18 +64,21 @@ npm run dev
 ## Available Scripts
 
 ### Development
+
 - `npm run dev` - Start development server (safe mode with Turbopack)
 - `npm run dev:unsafe` - Start without safety checks
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 
 ### Code Quality
+
 - `npm run lint` - Run ESLint
 - `npm run format` - Format code with Prettier
 - `npm run format:check` - Check code formatting
 - `npm run type-check` - Run TypeScript type checking
 
 ### Testing
+
 - `npm test` - Run unit tests with Vitest
 - `npm run test:watch` - Run tests in watch mode
 - `npm run test:coverage` - Generate coverage report
@@ -80,12 +86,14 @@ npm run dev
 - `npm run storybook` - Run Storybook component explorer
 
 ### Database
+
 - `npm run db:generate` - Generate Prisma client
 - `npm run db:push` - Push schema changes to database
 - `npm run db:migrate` - Run database migrations
 - `npm run db:seed` - Seed database with sample data
 
 ### Quality Assurance
+
 - `npm run qa:urls` - Comprehensive URL quality testing
 - `npm run qa:urls:quick` - Quick URL validation
 - `npm run security:headers` - Verify security headers (local)
@@ -107,7 +115,8 @@ feedback and contributions are welcome!
 
 ## Documentation
 
-- [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md) - Multi-environment configuration
+- [Environment Setup Guide](docs/ENVIRONMENT_SETUP.md) - Multi-environment
+  configuration
 - [Next.js 16 Upgrade Guide](docs/UPGRADE_NEXT16.md) - Latest upgrade details
 - [Project Instructions](CLAUDE.md) - Development guidelines and commands
 
@@ -120,7 +129,8 @@ feedback and contributions are welcome!
 - ✅ Updated Storybook to v10 with enhanced UI
 - ✅ All tests passing, build successful in ~6.4s
 
-See [docs/UPGRADE_NEXT16.md](docs/UPGRADE_NEXT16.md) for complete upgrade details.
+See [docs/UPGRADE_NEXT16.md](docs/UPGRADE_NEXT16.md) for complete upgrade
+details.
 
 ## Deploy on Vercel
 
@@ -130,7 +140,8 @@ This application is deployed on Vercel with environment-specific configurations:
 - **Preview**: Auto-deployed for each branch (DEV OneLogin, Preview DB)
 - **Development**: Local with DEV OneLogin
 
-See [docs/ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md) for deployment configuration.
+See [docs/ENVIRONMENT_SETUP.md](docs/ENVIRONMENT_SETUP.md) for deployment
+configuration.
 
 ## Contributing
 

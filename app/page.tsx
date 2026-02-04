@@ -1,12 +1,12 @@
 import { prisma } from "@/lib/prisma";
-import { getCurrentAcademicTerm } from "@/lib/active-term";
-import { HomeSearchClient } from "@/components/HomeSearchClient";
+import { getCurrentAcademicTerm } from "@/lib/term/active-term";
+import { HomeSearchClient } from "@/components/search/HomeSearchClient";
 import { Calendar } from "lucide-react";
 import { unstable_cache } from "next/cache";
 import { auth } from "@/lib/auth";
 
 import type { PublicDoorcard } from "@/types/pages/public";
-import type { ActiveTermInfo } from "@/lib/active-term";
+import type { ActiveTermInfo } from "@/lib/term/active-term";
 import { TermSeason } from "@prisma/client";
 
 // Configure page-level caching

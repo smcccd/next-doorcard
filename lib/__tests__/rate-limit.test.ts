@@ -15,7 +15,7 @@ import {
   apiRateLimit,
   analyticsRateLimit,
   applyRateLimit,
-} from "../rate-limit";
+} from "../api/rate-limit";
 
 // Mock Upstash Redis and Ratelimit
 const mockRedis = {

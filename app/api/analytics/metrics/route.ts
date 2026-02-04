@@ -9,24 +9,11 @@ export async function GET() {
   }
 
   try {
-    const session = auth.user;
-
-    if (!session?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Find user by email
-    const user = await prisma.user.findUnique({
-      where: { email: session.email },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    const userId = auth.user.id;
 
     // Get user's doorcards with metrics
     const doorcards = await prisma.doorcard.findMany({
-      where: { userId: user.id },
+      where: { userId },
       include: {
         DoorcardMetrics: true,
         _count: {
@@ -72,7 +59,7 @@ export async function GET() {
     const recentAnalytics = await prisma.doorcardAnalytics.count({
       where: {
         Doorcard: {
-          userId: user.id,
+          userId,
         },
         eventType: "PRINT_DOWNLOAD",
         createdAt: {
@@ -112,7 +99,7 @@ export async function GET() {
     // Get draft count (inactive doorcards)
     const totalDrafts = await prisma.doorcard.count({
       where: {
-        userId: user.id,
+        userId,
         isActive: false,
       },
     });

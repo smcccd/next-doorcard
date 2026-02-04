@@ -12,7 +12,7 @@ import {
   TERM_SEASONS,
   generateTermName,
   getCurrentAcademicYear,
-} from "../term-management";
+} from "../term/term-management";
 
 // Use the global Prisma mock from jest.setup.js
 const mockPrisma = prisma as MockedObject<typeof prisma>;

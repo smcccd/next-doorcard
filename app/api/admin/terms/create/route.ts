@@ -1,19 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
-import { TermManager } from "@/lib/term-management";
+import { requireAdminUserAPI } from "@/lib/require-auth-user";
+import { TermManager } from "@/lib/term/term-management";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth();
-
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Only allow admin users to create terms
-    // You may want to add proper role checking here
-    if (session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const authResult = await requireAdminUserAPI();
+    if ("error" in authResult) {
+      return NextResponse.json(
+        { error: authResult.error },
+        { status: authResult.status }
+      );
     }
 
     const body = await request.json();

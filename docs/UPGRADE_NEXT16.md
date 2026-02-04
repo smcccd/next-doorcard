@@ -1,22 +1,22 @@
 # Next.js 16 Upgrade Guide
 
-This document details the upgrade from Next.js 15.4.4 to Next.js 16.0.1, including all breaking changes, new features, and migration steps.
+This document details the upgrade from Next.js 15.4.4 to Next.js 16.0.1,
+including all breaking changes, new features, and migration steps.
 
 ## Summary
 
-**Upgrade Date**: 2025-11-11
-**Branch**: `upgrade/nextjs-16`
-**Status**: ✅ Complete - Build passing, all tests passing
+**Upgrade Date**: 2025-11-11 **Branch**: `upgrade/nextjs-16` **Status**: ✅
+Complete - Build passing, all tests passing
 
 ### Major Version Changes
 
-| Package | From | To | Notes |
-|---------|------|-----|-------|
-| Next.js | 15.4.4 | 16.0.1 | Turbopack now default bundler |
-| Sentry | 9.46.0 | 10.25.0 | Major version with breaking changes |
-| Storybook | 9.1.8 | 10.0.7 | UI and testing improvements |
-| Prisma | 6.16.2 | 6.19.0 | Latest patch updates |
-| React | 19.0.0 | 19.0.0 | Already compatible, no changes |
+| Package   | From   | To      | Notes                               |
+| --------- | ------ | ------- | ----------------------------------- |
+| Next.js   | 15.4.4 | 16.0.1  | Turbopack now default bundler       |
+| Sentry    | 9.46.0 | 10.25.0 | Major version with breaking changes |
+| Storybook | 9.1.8  | 10.0.7  | UI and testing improvements         |
+| Prisma    | 6.16.2 | 6.19.0  | Latest patch updates                |
+| React     | 19.0.0 | 19.0.0  | Already compatible, no changes      |
 
 ### Build Performance
 
@@ -44,7 +44,8 @@ const nextConfig: NextConfig = {
 };
 ```
 
-**Migration**: None required - Turbopack is automatically enabled for `next dev`.
+**Migration**: None required - Turbopack is automatically enabled for
+`next dev`.
 
 ### 2. Cache Components (Beta)
 
@@ -60,7 +61,8 @@ export async function CachedComponent() {
 }
 ```
 
-**Migration**: Optional - can be adopted incrementally for performance-critical components.
+**Migration**: Optional - can be adopted incrementally for performance-critical
+components.
 
 ### 3. ESLint Configuration Changes
 
@@ -80,13 +82,15 @@ const nextConfig = {
 ```
 
 **Migration**:
+
 - Removed `eslint` option from `next.config.ts` (line 16-18)
 - Continue using `npm run lint` (uses ESLint CLI directly)
 - Consider migrating to flat config (eslint.config.js) in future
 
 ### 4. Middleware → Proxy Migration
 
-**Deprecation Warning**: `middleware.ts` will be replaced by `proxy.ts` in future
+**Deprecation Warning**: `middleware.ts` will be replaced by `proxy.ts` in
+future
 
 ```
 (middleware)/middleware proxy configuration is now at `proxy.ts`, learn more: https://nextjs.org/docs/pages/building-your-application/configuring/typescript#middleware-to-proxy-migration
@@ -124,6 +128,7 @@ eslint: {
 ### 2. Sentry 10.x Breaking Changes
 
 **Major Changes**:
+
 - Modern sourcemaps configuration
 - New release configuration structure
 - Enhanced telemetry control
@@ -165,6 +170,7 @@ export default withSentryConfig(withBundleAnalyzer(nextConfig), {
 ### 3. Storybook 10.x Migration
 
 **Changes**:
+
 - Updated all `@storybook/*` packages to v10
 - New UI improvements
 - Enhanced accessibility addon
@@ -183,7 +189,8 @@ export default withSentryConfig(withBundleAnalyzer(nextConfig), {
 }
 ```
 
-**Impact**: No breaking changes in our Storybook configuration - works out of the box.
+**Impact**: No breaking changes in our Storybook configuration - works out of
+the box.
 
 ---
 
@@ -206,6 +213,7 @@ export default withSentryConfig(withBundleAnalyzer(nextConfig), {
 ### Minor Updates
 
 All Radix UI components updated to latest versions:
+
 - `@radix-ui/react-checkbox`: 1.1.3 → 1.1.4
 - `@radix-ui/react-dialog`: 1.1.5 → 1.1.6
 - `@radix-ui/react-dropdown-menu`: 2.1.12 → 2.1.15
@@ -235,7 +243,8 @@ npm install next@16.0.1 react@19.0.0 react-dom@19.0.0 --save --legacy-peer-deps
 npx @next/codemod@latest upgrade latest
 ```
 
-**Result**: No automated migrations needed - our codebase already follows Next.js 15/16 patterns.
+**Result**: No automated migrations needed - our codebase already follows
+Next.js 15/16 patterns.
 
 ### 4. Update Dependencies
 
@@ -286,24 +295,24 @@ Route (app)                              Size     First Load JS
 ### 1. Middleware → Proxy Deprecation Warning
 
 **Warning**:
+
 ```
 (middleware)/middleware proxy configuration is now at `proxy.ts`
 ```
 
-**Status**: Non-blocking - middleware still works
-**Action**: Can migrate to `proxy.ts` in future update
-**Priority**: Low
+**Status**: Non-blocking - middleware still works **Action**: Can migrate to
+`proxy.ts` in future update **Priority**: Low
 
 ### 2. React 19 Peer Dependency Warnings
 
 **Warning**: Some packages expect React 18
+
 ```
 ERESOLVE unable to resolve dependency tree
 ```
 
-**Fix**: Using `--legacy-peer-deps` flag
-**Status**: Working correctly - React 19 is backward compatible
-**Priority**: Low - will resolve as ecosystem updates
+**Fix**: Using `--legacy-peer-deps` flag **Status**: Working correctly - React
+19 is backward compatible **Priority**: Low - will resolve as ecosystem updates
 
 ---
 
@@ -357,6 +366,7 @@ git reset --hard origin/main
 ```
 
 **Previous Working State**:
+
 - Next.js 15.4.4
 - Sentry 9.46.0
 - Storybook 9.1.8
@@ -375,16 +385,21 @@ git reset --hard origin/main
 
 ## Next Steps
 
-1. **Test Dev Server**: Start development server and verify Turbopack performance
+1. **Test Dev Server**: Start development server and verify Turbopack
+   performance
 2. **Monitor Production**: Deploy to preview environment and monitor for issues
-3. **Update Dependencies**: Continue updating ecosystem packages as they add Next.js 16 support
-4. **Adopt New Features**: Consider using Cache Components for performance optimization
-5. **Middleware Migration**: Plan migration from `middleware.ts` to `proxy.ts` when ready
+3. **Update Dependencies**: Continue updating ecosystem packages as they add
+   Next.js 16 support
+4. **Adopt New Features**: Consider using Cache Components for performance
+   optimization
+5. **Middleware Migration**: Plan migration from `middleware.ts` to `proxy.ts`
+   when ready
 
 ---
 
 ## Questions?
 
 - Check [Next.js 16 Documentation](https://nextjs.org/docs)
-- Review [Upgrade Codemods](https://nextjs.org/docs/app/building-your-application/upgrading/codemods)
+- Review
+  [Upgrade Codemods](https://nextjs.org/docs/app/building-your-application/upgrading/codemods)
 - Contact IT Support: itsupport@smccd.edu

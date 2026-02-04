@@ -3,6 +3,7 @@
 ## ✅ Pre-UAT Status: READY
 
 **Completed**:
+
 - ✅ Console.log statements cleaned up
 - ✅ Database schema synced
 - ✅ Beta banner configured
@@ -11,6 +12,7 @@
 - ✅ Comprehensive UAT report generated
 
 **Current State**:
+
 - Dev server running: http://localhost:3000
 - Database: 51 users, 52 doorcards, 0 terms
 - Branch: `upgrade/nextjs-16`
@@ -50,7 +52,9 @@ open http://localhost:3000/login
 ```
 
 **If login fails**:
-- Check OneLogin DEV app has redirect URI: `http://localhost:3000/api/auth/callback/onelogin`
+
+- Check OneLogin DEV app has redirect URI:
+  `http://localhost:3000/api/auth/callback/onelogin`
 - Verify credentials in `.env.development` match OneLogin app
 - Check browser console for error details
 
@@ -145,6 +149,7 @@ open http://localhost:3000/dashboard
 **Symptoms**: Redirect loop, "invalid_grant" error, stuck on login page
 
 **Fix**:
+
 ```bash
 # 1. Verify OneLogin configuration
 cat .env.development | grep ONELOGIN
@@ -163,6 +168,7 @@ cat .env.development | grep ONELOGIN
 **Symptoms**: Orange banner doesn't appear on dashboard
 
 **Fix**:
+
 ```bash
 # 1. Verify environment variable
 cat .env.development | grep BETA_BANNER
@@ -180,6 +186,7 @@ npm run dev
 **Symptoms**: Can't create doorcard, no term dropdown options
 
 **Fix**:
+
 ```bash
 # Create a term via admin dashboard (see Step 1 above)
 # OR use Prisma Studio:
@@ -196,6 +203,7 @@ npx prisma studio
 **Symptoms**: "Can't connect to database" error
 
 **Fix**:
+
 ```bash
 # 1. Verify database exists
 ls -la prisma/dev.db
@@ -215,18 +223,21 @@ npx prisma generate
 ## 📊 UAT Metrics to Collect
 
 ### Performance Metrics
-- [ ] Time to create new doorcard: _____ seconds
-- [ ] Time to load dashboard: _____ seconds
-- [ ] Time to publish doorcard: _____ seconds
+
+- [ ] Time to create new doorcard: **\_** seconds
+- [ ] Time to load dashboard: **\_** seconds
+- [ ] Time to publish doorcard: **\_** seconds
 - [ ] Mobile performance feels: ☐ Fast ☐ Acceptable ☐ Slow
 
 ### Usability Metrics
-- [ ] Number of errors encountered: _____
-- [ ] Number of confusing UI elements: _____
-- [ ] Number of helpful features discovered: _____
-- [ ] Overall satisfaction (1-5): _____
+
+- [ ] Number of errors encountered: **\_**
+- [ ] Number of confusing UI elements: **\_**
+- [ ] Number of helpful features discovered: **\_**
+- [ ] Overall satisfaction (1-5): **\_**
 
 ### Feature Completeness
+
 - [ ] Can create doorcard: ☐ Yes ☐ No
 - [ ] Can edit doorcard: ☐ Yes ☐ No
 - [ ] Can delete doorcard: ☐ Yes ☐ No
@@ -235,6 +246,7 @@ npx prisma generate
 - [ ] Can export data (admin): ☐ Yes ☐ No
 
 ### Bug Tracking Template
+
 ```
 Bug #: ___
 Severity: ☐ Critical ☐ High ☐ Medium ☐ Low
@@ -257,6 +269,7 @@ Browser/Device:
 ## 🎯 UAT Success Criteria
 
 ### Must Pass (Blockers)
+
 - ✅ Users can log in with OneLogin
 - ✅ Users can create and publish doorcards
 - ✅ Doorcards display correctly in public view
@@ -264,12 +277,14 @@ Browser/Device:
 - ✅ No critical errors or crashes
 
 ### Should Pass (Important)
+
 - ✅ Mobile experience is usable
 - ✅ Form validation works correctly
 - ✅ Error messages are helpful
 - ✅ Beta banner displays appropriately
 
 ### Nice to Have (Enhancements)
+
 - ⭐ Fast page load times (<2s)
 - ⭐ Intuitive navigation
 - ⭐ Helpful empty states
@@ -282,6 +297,7 @@ Browser/Device:
 ### If Something Breaks
 
 **Priority 1: Check Logs**
+
 ```bash
 # Browser console (F12)
 # Look for red errors
@@ -291,11 +307,13 @@ Browser/Device:
 ```
 
 **Priority 2: Check Documentation**
+
 - Full UAT Report: `/docs/UAT_READINESS_REPORT.md`
 - Environment Setup: `/docs/ENVIRONMENT_SETUP.md`
 - Accessibility: `/docs/ACCESSIBILITY_REPORT.md`
 
 **Priority 3: Quick Fixes**
+
 ```bash
 # Restart dev server
 lsof -ti:3000 | xargs kill && npm run dev
@@ -314,6 +332,7 @@ git status
 ### Emergency Rollback
 
 If upgrade causes issues:
+
 ```bash
 # Switch back to main branch
 git checkout main
@@ -345,15 +364,18 @@ Before starting UAT tomorrow, verify:
 
 ## 🎉 Expected UAT Outcome
 
-**Goal**: Validate that the application meets user needs and is ready for production deployment.
+**Goal**: Validate that the application meets user needs and is ready for
+production deployment.
 
 **Timeline**:
+
 - UAT Duration: 1-2 days
 - Bug fixes: 1-2 days
 - Final review: 1 day
 - Production deployment: TBD
 
 **Next Steps After UAT**:
+
 1. Collect all feedback and bug reports
 2. Prioritize issues (critical vs. nice-to-have)
 3. Fix critical bugs
@@ -364,6 +386,5 @@ Before starting UAT tomorrow, verify:
 
 ---
 
-**Generated**: 2025-11-11
-**UAT Start**: 2025-11-12
-**Application**: Next Doorcard v0.1.0 (Next.js 16.0.1)
+**Generated**: 2025-11-11 **UAT Start**: 2025-11-12 **Application**: Next
+Doorcard v0.1.0 (Next.js 16.0.1)
