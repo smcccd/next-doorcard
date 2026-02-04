@@ -24,27 +24,14 @@ export const authConfig: NextAuthConfig = {
     process.env.NODE_ENV === "development" &&
     process.env.NEXTAUTH_DEBUG === "true",
   providers: [
-    // OneLogin OIDC Provider - Custom OAuth Configuration
+    // OneLogin OIDC Provider
     {
       id: "onelogin",
       name: "SMCCD OneLogin",
-      type: "oauth",
+      type: "oidc",
+      issuer: "https://smccd.onelogin.com/oidc/2",
       clientId: process.env.ONELOGIN_CLIENT_ID!,
       clientSecret: process.env.ONELOGIN_CLIENT_SECRET!,
-
-      authorization: {
-        url: "https://smccd.onelogin.com/oidc/2/auth",
-        params: {
-          scope: "openid profile email",
-          response_type: "code",
-        },
-      },
-      token: {
-        url: "https://smccd.onelogin.com/oidc/2/token",
-      },
-      userinfo: {
-        url: "https://smccd.onelogin.com/oidc/2/me",
-      },
 
       profile(profile: OneLoginProfile) {
         if (process.env.NODE_ENV === "development") {
